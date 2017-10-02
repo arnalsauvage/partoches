@@ -176,7 +176,7 @@ if(!isset ($FichierUtilsSi)){
 	}
 
 	function insereJavaScript ($source){
-		echo "<script type='text/javascript' src='$source'></script>\n";
+		return "<script type='text/javascript' src='$source'></script>\n";
 	}
 
 	function insereLienLightbox($image,$largeur=''){
@@ -188,14 +188,18 @@ if(!isset ($FichierUtilsSi)){
 	}
 	// Cette fonction crée l'en-tête du HTML de réponse
 	function EnTete ($titre, $texte, $menu, $soustitre, $imagetitreGauche, $imagetitreDroite){
-		echo "<HTML> <HEAD>";
-		echo "<meta http-equiv=\"Content-Type\" content=\"text/html\"; \"charset=iso-8859-1\" />";
-		//echo "<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\" />";
-		echo "<TITLE>$titre</TITLE>\n";
-		echo "<LINK REL=\"stylesheet\" HREF=\"pages/si.css\" TYPE=\"text/css\">\n";
-		echo '<link rel="stylesheet" href="pages/include/lightbox/css/lightbox.css" type="text/css" media="screen" />';
-		echo "<link rel='stylesheet' href='pages/include/videobox/css/videobox.css' type='text/css' />";  		
-		insereJavaScript ("pages/include/javascript.js");
+		$enTete = "";
+		$enTete .= "<!doctype html>\n";
+		$enTete .= "<html lang='fr'>";
+		$enTete .= "<head>";
+
+//		$enTete .= "<meta http-equiv=\"Content-Type\" content=\"text/html\"; \"charset=iso-8859-1\" />";
+		$enTete .= "<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\" />";
+		$enTete .= "<TITLE>$titre</TITLE>\n";
+		$enTete .= "<LINK REL=\"stylesheet\" HREF=\"pages/si.css\" TYPE=\"text/css\">\n";
+		$enTete .= '<link rel="stylesheet" href="pages/include/lightbox/css/lightbox.css" type="text/css" media="screen" />';
+		$enTete .= "<link rel='stylesheet' href='pages/include/videobox/css/videobox.css' type='text/css' />";  		
+		$enTete .= insereJavaScript ("pages/include/javascript.js");
 
 		// On insère ici le composant videobox pour afficher les vidéos	
 		//		insereJavaScript ('pages/include/videobox/js/mootools.js');
@@ -204,16 +208,17 @@ if(!isset ($FichierUtilsSi)){
 
 
 		// Utilisation de lightbox
-		insereJavaScript ("pages/include/lightbox/js/prototype.js");
-		insereJavaScript ("pages/include/lightbox/js/scriptaculous.js?load=effects,builder");
-		insereJavaScript ("pages/include/lightbox/js/lightbox.js");
+		$enTete .= insereJavaScript ("pages/include/lightbox/js/prototype.js");
+		$enTete .= insereJavaScript ("pages/include/lightbox/js/scriptaculous.js?load=effects,builder");
+		$enTete .= insereJavaScript ("pages/include/lightbox/js/lightbox.js");
 
 		// Utilisation du nuage de mots tagcanvas
-		insereJavaScript("pages/include/tagcanvas.min.js");
+		$enTete .= insereJavaScript("pages/include/tagcanvas.min.js");
 		include("pages/include/tagcanvas.param.php");
 
-		echo "</HEAD><BODY>\n";
-		echo "<div align='center'>";
+		$enTete .= "</HEAD>\n";
+		$enTete .= "<BODY>\n";
+		$enTete .= "<div align='center'>";
 		TblDebut (1,"800",3,3,"page"); 
 		TblDebutLigne ("MENU"); TblDebutCellule ();
 		TblDebut (0,"800",3,3);
@@ -230,7 +235,7 @@ if(!isset ($FichierUtilsSi)){
 
 		TblCellule ("<FONT SIZE=+7>$texte</FONT><BR><BR> $soustitre ",1,1,"TITRE");
 		//		TblCellule ("<DIV align='center'>".Image ($image2,240)."</DIV>");
-		echo ("<TD align='center'>".insereLienLightbox($image2,240)."</TD>");
+		$enTete .= ("<TD align='center'>".insereLienLightbox($image2,240)."</TD>");
 		TblFinLigne(); TblFin();		
 		// Affichage du menu
 		// Premier tableau d'une case pour obtenir le fond rouge
@@ -242,7 +247,9 @@ if(!isset ($FichierUtilsSi)){
 		while( list ($libelle, $ancre) = each($menu))
 		TblCellule (Ancre($ancre, $libelle,"MENU"), 1, 1, "MENU");
 		TblFin(); TblFin();
-		TblDebut (0,"800",1,1,"page"); TblDebutLigne();TblDebutCellule	();					 
+		TblDebut (0,"800",1,1,"page"); TblDebutLigne();TblDebutCellule	();		
+		$enTete .= "</BODY></HTML>";
+		return $enTete	;		 
 	}
 	// Menu affiché sur la barre horizontale
 	$menu = array (
@@ -267,25 +274,25 @@ if(!isset ($FichierUtilsSi)){
 		TblDebutLigne ();
 		TblDebutCellule();
 		$imgbarre = "images/barre.jpg";
-		echo "<P>" . Image ($imgbarre,"800",15) . "<br><DIV align ='center'>";
-		echo Ancre ("index.php?page=articlesvoir.php&article=Contacts",Image ("images/icone_mail.png"),-1);
-		echo Ancre ("http://www.myspace.com/arnal",Image ("images/myspace.png"),-1,1);
-		echo Ancre ("http://youtube.com/arnalsauvage",Image ("images/youtube.png"),-1,1);
-		echo Ancre ("http://www.arnalsauvage.com",Image ("images/icone_arnal.png"),-1,1);
-		echo Ancre ("http://www.facebook.com/arnaud.medina",Image ("images/facebook.png"),-1,1);
-		echo Ancre ("http://enavantlazizique.free.fr/wiki/index.php5?title=Accueil",Image ("images/wikipedia.png"),-1,1);		
-		echo Ancre ("http://www.delicious.com/arnalsauvage",Image ("images/delicious.png"),-1,1);		
-		echo Ancre ("http://www.goodreads.com/user/show/979367-arnalsauvage",Image ("images/icone_livre.png"),-1,1);
-		echo Ancre ("http://fr.audiofanzine.com/membres/a.play,u.123722.html",Image ("images/audiofanzine.png"),-1,1);		
-		echo Ancre ("https://sites.google.com/site/glashband/","*g*",-1,1);
-		echo "</div></P>";
+		$enTete .= "<footer>" . Image ($imgbarre,"800",15) . "<br><DIV align ='center'>";
+		$enTete .= Ancre ("index.php?page=articlesvoir.php&article=Contacts",Image ("images/icone_mail.png"),-1);
+		$enTete .= Ancre ("http://www.myspace.com/arnal",Image ("images/myspace.png"),-1,1);
+		$enTete .= Ancre ("http://youtube.com/arnalsauvage",Image ("images/youtube.png"),-1,1);
+		$enTete .= Ancre ("http://www.arnalsauvage.com",Image ("images/icone_arnal.png"),-1,1);
+		$enTete .= Ancre ("http://www.facebook.com/arnaud.medina",Image ("images/facebook.png"),-1,1);
+		$enTete .= Ancre ("http://enavantlazizique.free.fr/wiki/index.php5?title=Accueil",Image ("images/wikipedia.png"),-1,1);		
+		$enTete .= Ancre ("http://www.delicious.com/arnalsauvage",Image ("images/delicious.png"),-1,1);		
+		$enTete .= Ancre ("http://www.goodreads.com/user/show/979367-arnalsauvage",Image ("images/icone_livre.png"),-1,1);
+		$enTete .= Ancre ("http://fr.audiofanzine.com/membres/a.play,u.123722.html",Image ("images/audiofanzine.png"),-1,1);		
+		$enTete .= Ancre ("https://sites.google.com/site/glashband/","*g*",-1,1);
+		$enTete .= "</div></footer>";
 		TblFinCellule();
 		TblFinligne();
 		TblFin();
-		echo "</BODY></HTML>";
-		//				exit;
+
 	}
-	// Cette fonction retourne une liste des images disponibles sur le site
+	
+	// Cette fonction retourne une liste des images disponibles sur le site, eventuellement dans un sous-dossier
 	function listeImages ($subDir=""){
 		$d = dir("../images".$subDir);
 		$compteur = 0;

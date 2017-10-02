@@ -2,7 +2,7 @@
 include_once("lib/utilssi.php");
 include_once("utilisateur.php");
 
-$sortie = envoieHead("Menu", "../css/index.css");
+$sortie = envoieHead("Partoches", "../css/index.css");
 
 // Si l'utilisateur a demandé la déconnexion, on efface les infos de la session
 if(isset($_GET['logoff']))
@@ -42,22 +42,47 @@ if(!isset ($_SESSION['user']) ){
 	//	echo afficheComposClubs($idChampionnat);
 	exit();
 }
-
-echo "<table align='center'><tr><td>";
-//echo image ($_SESSION['image'], 64);
-echo Ancre("../html/index.html","index")." | ";
-echo Ancre("../php/utilisateur_liste.php","utilisateurs")." | ";
-echo Ancre("../php/chanson_liste.php","chansons")." | ";
-// echo Ancre("page_compos_actives.php","compositions actives")." | ";
-
+$contenu = "";
+$contenu .= "
+<nav class='navbar navbar-inverse navbar-fixed-top'>
+<div class= 'container '>
+	<div class= 'navbar-header ' >
+		<button type= 'button ' class= 'navbar-toggle collapsed ' data-toggle= 'collapse ' data-target= '#navbar ' aria-expanded= 'false ' aria-controls= 'navbar '>
+		<span class= 'sr-only '>Menu</span>
+		<span class= 'icon-bar '></span>
+		<span class= 'icon-bar '></span>";
+		if((($_SESSION['user'])==$_SESSION['loginParam'])||	($_SESSION['privilege']>2))
+		  $contenu .=  "<span class= 'icon-bar '></span>";
+		$contenu .= "
+		<span class= 'icon-bar '></span>
+		</button>
+		<a class='navbar-brand' href= '../html/index.html'>Partoches</a>
+	</div>
+    <div id= 'navbar ' class= 'collapse navbar-collapse '>
+          <ul class= 'nav navbar-nav '>
+            <li class= 'active '><a href= '../php/utilisateur_liste.php '>Utilisateurs</a></li>
+            <li><a href= '../php/chanson_liste.php '>Chansons</a></li>";
+            
 if((($_SESSION['user'])==$_SESSION['loginParam'])||	($_SESSION['privilege']>2))
-	echo Ancre("../php/paramsEdit.php","parametrage")." | ";
+	$contenu .=  "<li><a href= '../php/paramsEdit.php '>parametrage</a></li>";
+            
+ $contenu .= "<li><a href= '#contact '>Contact</a></li>
+          </ul>
+    </div><!--/.nav-collapse -->
+</div>
+</nav>   ";
+   
+$contenu .= "<div class= 'container' class='row col-sm-4'>
+			<div class='starter-template'>";
+$contenu .= "<br><br>" . image ("../images".$_SESSION['image'], 64);
 
 $date = date("d/m/Y");
 $heure = date("H:i");  
     
-echo Ancre("menu.php?logoff=1","logoff") . " | ";
-echo "Bienvenue ".$_SESSION['user'].", ". statut($_SESSION['privilege']) .", nous sommes le $date et il est $heure<br>";
-echo "</td></tr></table>";
-	
+$contenu .=  Ancre("menu.php?logoff=1","logoff") . " | ";
+$contenu .=  "Bienvenue ".$_SESSION['user'].", ". statut($_SESSION['privilege']) .", nous sommes le $date et il est $heure<br>";
+$contenu .=  "</td></tr></table>";
+$contenu .= " </div> </div>";
+
+echo $contenu;	
 ?>

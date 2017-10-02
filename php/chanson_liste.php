@@ -62,4 +62,5 @@ echo Image ($iconeAttention,"100%",1,1);
 if($_SESSION['privilege']>1)
 echo "<BR>" . Ancre("?page=$chansonForm",Image($cheminImages.$iconeDossier,32,32) . "Créer une nouvelle chanson");
 ////////////////////////////////////////////////////////////////////////ADMIN
+echo envoieFooter("Bienvenue chez nous !");
 ?>

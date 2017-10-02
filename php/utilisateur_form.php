@@ -61,5 +61,5 @@ $f->fin();
 // 1 : abonné (consultation + évaluation + commentaires)
 // 2 : éditeur (idem + possibilité de rédiger, envoyer des fichiers)
 // 3 : administrateur (droits complets sur le site)
-
+echo envoieFooter("Bienvenue chez nous !");
 ?>

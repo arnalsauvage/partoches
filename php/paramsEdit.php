@@ -46,4 +46,5 @@ $sortie .= "  <FORM action='paramsEdit.php' method='post' ENCTYPE='x-www-form-ur
 </form> ";
 echo $sortie;
 echo "</td></tr></table>";
+echo envoieFooter("Bienvenue chez nous !");
 ?>

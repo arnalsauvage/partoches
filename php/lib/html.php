@@ -35,16 +35,18 @@ if(!isset ($FichierHtml)){
 	// Fonction créant un champ SELECT
 	// Liste contient toutes les valeurs duchamp select
 	function ChampSelect ($liste, $numero, $nom){
-		echo "<select name = $nom size=\"1\">";
+		$champSelect = "";
+		$champSelect .= "<select name = $nom size=\"1\">";
 		while($ligne = LigneSuivante($liste)){
 			$choix++;
-			echo "<option ";
+			$champSelect .= "<option ";
 			if($numero==$choix)
-			echo "selected ";
-			echo "value=$choix>";
-			echo $ligne[1] . "</option>";
+			$champSelect .= "selected ";
+			$champSelect .= "value=$choix>";
+			$champSelect .= $ligne[1] . "</option>";
 		}
-		echo " </select>";
+		$champSelect .= " </select>";
+		return $champSelect;
 	}
 
 	function ecritHtml($texte){
@@ -56,13 +58,13 @@ if(!isset ($FichierHtml)){
 	}
 
 	// Cette fonction donne l'instruction au navigateur de se rediriger
-	// vers une autre adresse (aucun caract?re n'a du ?tre transmis,
+	// vers une autre adresse (aucun caractère n'a du être transmis,
 	// pas m?me un espace ou  un retour de ligne
 	function redirection($url){
 		if(headers_sent())
-		print('<meta http-equiv="refresh" content="0;URL='.$url.'">');
+			print('<meta http-equiv="refresh" content="0;URL='.$url.'">');
 		else
-		header("Location: $url");
+			header("Location: $url");
 		exit;
 	}
 
@@ -137,14 +139,43 @@ if(!isset ($FichierHtml)){
 	// Fin de la function ajouteLiens($texte)
 	
 	function envoieHead($titrePage, $feuilleCss){
-	$retour = 	
-	"<head> 
-<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1' />
-<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' /> 
-<script type='text/javascript' src='./lib/javascript.js'></script>
-<title>$titrePage</title>
-</head>";
-	return $retour;
+		$retour = 	
+		"<!doctype html>
+		<html lang='fr'>
+		<head>
+		<meta http-equiv='Content-Type' content='text/html; charset='utf-8'  />
+		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    	<link href='../css/bootstrap.min.css' rel='stylesheet'>
+    	<script src= 'https://code.jquery.com/jquery-3.2.1.slim.min.js ' integrity= 'sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN ' crossorigin= 'anonymous '></script>
+		<script src= 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js ' integrity= 'sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4 ' crossorigin= 'anonymous '></script>
+		<script src= 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js ' integrity= 'sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1 ' crossorigin= 'anonymous '></script>
+    	
+		<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' /> 
+		<script type='text/javascript' src='./lib/javascript.js'></script>
+		<title>$titrePage</title>
+		</head>";
+		return $retour;
 	}
+	
+	function envoieFooter($contenu){
+		$retour = 	
+		"<footer>
+		$contenu | 
+		<a href='http://www.facebook.com/top5.asso' target='_blank'>Facebook</a> | 
+		<a href='http://www.top5.re' target='_blank'>Site web</a> | 
+		<a href='https://www.youtube.com/channel/UCFKyqYcs5cnML-EgPgYmwdg' target='_blank'>Chaîne Youtube</a>
+		</footer>";
+		$retour .= "
+		<!-- Bootstrap core JavaScript
+	    ================================================== -->
+	    <!-- Placed at the end of the document so the pages load faster -->
+	    <script src= 'https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js '></script>
+	    <script>window.jQuery || document.write('<script src= \"../../assets/js/vendor/jquery.min.js\"><\/script>')</script>
+	    <script src= '../js/bootstrap.min.js '></script>
+	    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+	    <script src= '../js/ie10-viewport-bug-workaround.js '></script>";
+		return $retour;
+	}
+	
 }
 ?>

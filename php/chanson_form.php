@@ -37,4 +37,5 @@ $f->champCache ("mode", $mode);
 $f->champValider ("Valider la saisie", "valider");
 $f->fin();
 
+echo envoieFooter("Bienvenue chez nous !");
 ?>
