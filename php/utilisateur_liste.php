@@ -33,7 +33,8 @@ while($ligne = lignesuivante($resultat)){
 	TblDebutLigne ();
 
 	if($ligne[5])
-		TblCellule(Ancre($utilisateurForm."?id=$ligne[0]",afficheVignette(($ligne[5]),$cheminImages,$cheminVignettes)));  // image
+		// TblCellule(Ancre($utilisateurForm."?id=$ligne[0]",afficheVignette(($ligne[5]),$cheminImages,$cheminVignettes)));  // image
+		TblCellule(Ancre($utilisateurForm."?id=$ligne[0]",Image(($cheminImages.$ligne[5]),32,32)));  // image
 	else
 		TblCellule(Ancre($_SESSION['urlSite']."/index.php?id=$ligne[0]","voir"));
 

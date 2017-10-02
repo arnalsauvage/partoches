@@ -47,6 +47,7 @@ echo "<table align='center'><tr><td>";
 //echo image ($_SESSION['image'], 64);
 echo Ancre("../html/index.html","index")." | ";
 echo Ancre("../php/utilisateur_liste.php","utilisateurs")." | ";
+echo Ancre("../php/chanson_liste.php","chansons")." | ";
 // echo Ancre("page_compos_actives.php","compositions actives")." | ";
 
 if((($_SESSION['user'])==$_SESSION['loginParam'])||	($_SESSION['privilege']>2))

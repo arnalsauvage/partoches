@@ -286,8 +286,8 @@ if(!isset ($FichierUtilsSi)){
 		//				exit;
 	}
 	// Cette fonction retourne une liste des images disponibles sur le site
-	function listeImages (){
-		$d = dir("../images");
+	function listeImages ($subDir=""){
+		$d = dir("../images".$subDir);
 		$compteur = 0;
 		while(false !== ($entry = $d->read())){
 			if(($entry!=".")AND($entry!="..")){

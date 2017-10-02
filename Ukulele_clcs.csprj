@@ -1,0 +1,266 @@
+<codestructure version="5.11">
+<phptree>
+<treenode node="../html/menuLogin.html;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\menu.php;f10;40;32;40;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/class.ini.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f16;36;33;36;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/compteur.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f16;33;32;33;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/configMysql.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f14;2;33;2;;C:\wamp64\www\French Ukulele Chords Kitchen\php\songbook.php;f9;1;28;1;;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson.php;f14;2;33;2;;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f16;31;35;31;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/formulaire.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f16;32;34;32;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/html.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f16;29;28;29;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/images-config.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f15;34;36;34;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/mysql.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f16;30;29;30;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/params.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f15;37;29;37;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/utilssi.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\paramsEdit.php;f14;1;29;1;;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson_get.php;f14;1;29;1;;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson_form.php;f14;1;29;1;;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson_liste.php;f14;1;29;1;;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur_liste.php;f14;1;29;1;;C:\wamp64\www\French Ukulele Chords Kitchen\php\menu.php;f14;1;29;1;;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur_form.php;f14;1;29;1;;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur_get.php;f14;1;29;1;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="lib/vignette.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f16;35;32;35;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="menu.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\paramsEdit.php;f15;2;23;2;;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson_get.php;f10;2;18;2;;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson_form.php;f10;2;18;2;;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson_liste.php;f10;2;18;2;;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur_liste.php;f10;2;18;2;;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur_form.php;f10;2;18;2;;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur_get.php;f10;2;18;2;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="menuLogin.html;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\paramsEdit.php;f10;37;24;37;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="Table.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f11;6;20;6;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="utilisateur.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\menu.php;f14;2;29;2;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+<treenode node="Chiffrement;PHP:Class Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;5;1;28;;;;vpos;;v;;r;;d17,5;;b0,0;;m">
+<treenode node="crypt;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f15;10;2;17;;;;vpos;;v;;r;;d36,10;;b1,5;;mdata;;p">
+</treenode>
+<treenode node="decrypt;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f15;19;2;27;;;;vpos;;v;;r;;d38,19;;b1,5;;mdata;;p">
+</treenode>
+</treenode>
+<treenode node="Formulaire;PHP:Class Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f1;8;2;252;;;;vpos;;v;;r;;d17,8;;b0,0;;m">
+<treenode node="champBUTTONS;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;75;3;86;;;;vpos;;v;;r;;d59,75;;b0,0;;mpType;;ppNom;;ppListe;;ppDefaut;;p">
+</treenode>
+<treenode node="champCache;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;207;3;209;;;;vpos;;v;;r;;d39,207;;b0,0;;mpNom;;ppValeur;;p">
+</treenode>
+<treenode node="champFenetre;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;193;3;196;;;;vpos;;v;;r;;d63,193;;b0,0;;mpLibelle;;ppNom;;ppVal;;ppLig;;ppCol;;p">
+</treenode>
+<treenode node="champFichier;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;202;3;205;;;;vpos;;v;;r;;d52,202;;b0,0;;mpLibelle;;ppNom;;ppTaille;;p">
+</treenode>
+<treenode node="champForm;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;89;3;133;;;;vpos;;v;;r;;d69,89;;b0,0;;mpType;;ppNom;;ppVal;;pparams;;ppListe;;p">
+</treenode>
+<treenode node="champINPUT;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;33;3;39;;;;vpos;;v;;r;;d67,33;;b0,0;;mpType;;ppNom;;ppVal;;ppTaille;;ppTailleMax;;p">
+</treenode>
+<treenode node="champLibelle;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;136;3;162;;;;vpos;;v;;r;;d37,137;;b0,0;;mpLibelle;;ppNom;;ppVal;;ppType;;pparams;;ppListe;;p">
+</treenode>
+<treenode node="champListe;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;184;3;187;;;;vpos;;v;;r;;d66,184;;b0,0;;mpLibelle;;ppNom;;ppVal;;ppTaille;;ppListe;;p">
+</treenode>
+<treenode node="champListeImages;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;189;3;192;;;;vpos;;v;;r;;d72,189;;b0,0;;mpLibelle;;ppNom;;ppVal;;ppTaille;;ppListe;;p">
+</treenode>
+<treenode node="champMotDePasse;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;172;3;177;;;;vpos;;v;;r;;d17,173;;b0,0;;mpLibelle;;ppNom;;ppVal;;ppTaille;;ppTailleMax;;p">
+</treenode>
+<treenode node="champRadio;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;179;3;182;;;;vpos;;v;;r;;d56,179;;b0,0;;mpLibelle;;ppNom;;ppVal;;ppListe;;p">
+</treenode>
+<treenode node="champSELECT;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;48;3;57;;;;vpos;;v;;r;;d62,48;;b0,0;;mpNom;;ppListe;;ppDefaut;;ppTaille;;p">
+</treenode>
+<treenode node="champSELECTImages;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;60;3;73;;;;vpos;;v;;r;;d68,60;;b0,0;;mpNom;;ppListe;;ppDefaut;;ppTaille;;p">
+</treenode>
+<treenode node="champTEXTAREA;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;42;3;45;;;;vpos;;v;;r;;d53,42;;b0,0;;mpNom;;ppVal;;ppLig;;ppCol;;p">
+</treenode>
+<treenode node="champTexte;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;166;3;170;;;;vpos;;v;;r;;d72,166;;b0,0;;mpLibelle;;ppNom;;ppVal;;ppTaille;;ppTailleMax;;p">
+</treenode>
+<treenode node="champValider;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;198;3;200;;;;vpos;;v;;r;;d42,198;;b0,0;;mpLibelle;;ppNom;;p">
+</treenode>
+<treenode node="debutTable;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;212;3;219;;;;vpos;;v;;r;;d62,212;;b0,0;;mpOrientation;;ppNbLignes;;p">
+</treenode>
+<treenode node="fin;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;247;3;251;;;;vpos;;v;;r;;d17,247;;b0,0;;m">
+</treenode>
+<treenode node="finTable;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;222;3;244;;;;vpos;;v;;r;;d22,222;;b0,0;;m">
+</treenode>
+<treenode node="Formulaire;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\formulaire.php;f2;17;3;30;;;;vpos;;v;;r;;d42,18;;b0,0;;mpMethode;;ppAction;;ppTransfertFichier;;ppNom;;p">
+</treenode>
+</treenode>
+<treenode node="ini;PHP:Class Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f0;4;1;220;;;;vpos;;v;;r;;d9,4;;b0,0;;m">
+<treenode node="array_groupe;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;80;2;84;;;;vpos;;v;;r;;d37,80;;b0,0;;marg_gr;;p">
+</treenode>
+<treenode node="clear;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;118;2;125;;;;vpos;;v;;r;;d17,118;;b0,0;;m">
+</treenode>
+<treenode node="m_count;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;72;2;77;;;;vpos;;v;;r;;d32,72;;b0,0;;marg_gr;;p">
+</treenode>
+<treenode node="m_fichier;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;12;2;42;;;;vpos;;v;;r;;d25,12;;b0,0;;marg;;p">
+</treenode>
+<treenode node="m_groupe;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;45;2;48;;;;vpos;;v;;r;;d24,45;;b0,0;;marg;;p">
+</treenode>
+<treenode node="m_item;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;51;2;54;;;;vpos;;v;;r;;d22,51;;b0,0;;marg;;p">
+</treenode>
+<treenode node="m_put;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;57;2;68;;;;vpos;;v;;r;;d63,57;;b0,0;;marg;;parg_i;;parg_g;;parg_f;;p">
+</treenode>
+<treenode node="m_valeur;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;215;2;218;;;;vpos;;v;;r;;d42,215;;b0,0;;marg_item;;parg_groupe;;p">
+</treenode>
+<treenode node="print_curseur;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;158;2;164;;;;vpos;;v;;r;;d25,158;;b0,0;;m">
+</treenode>
+<treenode node="print_dossier;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;167;2;180;;;;vpos;;v;;r;;d25,167;;b0,0;;m">
+</treenode>
+<treenode node="print_fichier;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;183;2;212;;;;vpos;;v;;r;;d25,183;;b0,0;;m">
+</treenode>
+<treenode node="s_fichier;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;128;2;135;;;;vpos;;v;;r;;d21,128;;b0,0;;m">
+</treenode>
+<treenode node="s_groupe;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;138;2;145;;;;vpos;;v;;r;;d20,138;;b0,0;;m">
+</treenode>
+<treenode node="s_item;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;148;2;155;;;;vpos;;v;;r;;d18,148;;b0,0;;m">
+</treenode>
+<treenode node="save;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\class.ini.php;f1;87;2;115;;;;vpos;;v;;r;;d16,87;;b0,0;;m">
+</treenode>
+</treenode>
+<treenode node="actualise_fichier_BD;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\vignette.php;f0;150;1;159;;;;vpos;;v;;r;;d53,150;;b0,0;;mnomFichier;;pconnexion;;p">
+</treenode>
+<treenode node="affichePlayer;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;98;2;123;;;;vpos;;v;;r;;d36,98;;b0,0;;mmp3;;p">
+</treenode>
+<treenode node="afficheVignette;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\vignette.php;f0;8;1;18;;;;vpos;;v;;r;;d65,8;;b0,0;;mimage;;pcheminImages;;pcheminVignettes;;p">
+</treenode>
+<treenode node="ajoute_fichier_BD;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\vignette.php;f0;134;1;143;;;;vpos;;v;;r;;d50,134;;b0,0;;mnomFichier;;pconnexion;;p">
+</treenode>
+<treenode node="ajouteHit;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\compteur.php;f1;3;2;31;;;;vpos;;v;;r;;d52,3;;b0,0;;mnomtable;;pidItem;;pconnexion;;p">
+</treenode>
+<treenode node="ajouteLiens;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;80;2;135;;;;vpos;;v;;r;;d29,80;;b0,0;;mtexte;;p">
+</treenode>
+<treenode node="Ancre;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;5;2;14;;;;vpos;;v;;r;;d65,5;;b0,0;;murl;;plibelle;;pclasse;;pnouvellefenetre;;p">
+</treenode>
+<treenode node="boutonSuppression;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;304;2;306;;;;vpos;;v;;r;;d63,304;;b0,0;;mlien;;piconePoubelle;;pcheminImages;;p">
+</treenode>
+<treenode node="ChampSelect;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;36;2;47;;;;vpos;;v;;r;;d45,36;;b0,0;;mliste;;pnumero;;pnom;;p">
+</treenode>
+<treenode node="chansonEstEnregistree;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;80;2;95;;;;vpos;;v;;r;;d55,80;;b0,0;;midChanson;;pconnexion;;p">
+</treenode>
+<treenode node="chargeChansons;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;166;2;175;;;;vpos;;v;;r;;d36,166;;b0,0;;mconnexion;;p">
+</treenode>
+<treenode node="chercheChanson;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson.php;f0;7;1;15;;;;vpos;;v;;r;;d28,7;;b0,0;;mid;;p">
+</treenode>
+<treenode node="chercheChansonParLeNom;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson.php;f0;18;1;26;;;;vpos;;v;;r;;d37,18;;b0,0;;mnom;;p">
+</treenode>
+<treenode node="chercheSongbook;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\songbook.php;f0;5;1;13;;;;vpos;;v;;r;;d30,5;;b0,0;;mid;;p">
+</treenode>
+<treenode node="chercheSongbookParLeNom;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\songbook.php;f0;16;1;24;;;;vpos;;v;;r;;d39,16;;b0,0;;mnom;;p">
+</treenode>
+<treenode node="chercheUtilisateur;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;33;1;41;;;;vpos;;v;;r;;d32,33;;b0,0;;mid;;p">
+</treenode>
+<treenode node="chercheUtilisateurParLeLogin;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;44;1;52;;;;vpos;;v;;r;;d45,44;;b0,0;;mlogin;;p">
+</treenode>
+<treenode node="Connexion;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;3;1;19;;;;vpos;;v;;r;;d59,3;;b0,0;;mpNom;;ppMotDePasse;;ppBase;;ppServeur;;p">
+</treenode>
+<treenode node="convertitDateJJMMAAAA;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\configMysql.php;f1;28;2;34;;;;vpos;;v;;r;;d38,28;;b0,0;;mdate;;p">
+</treenode>
+<treenode node="creation_vignette;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\vignette.php;f0;38;1;129;;;;vpos;;v;;r;;d99,38;;b0,0;;mimage;;plargeur;;phauteur;;psource;;pdestination;;pprefixe;;p">
+</treenode>
+<treenode node="creeChanson;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson.php;f0;29;1;32;;;;vpos;;v;;r;;d49,29;;b0,0;;mnom;;pinterprete;;pannee;;p">
+</treenode>
+<treenode node="creeModifiechanson;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson.php;f0;51;1;56;;;;vpos;;v;;r;;d60,51;;b0,0;;mid;;pnom;;pinterprete;;pannee;;p">
+</treenode>
+<treenode node="creeModifieSongbook;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\songbook.php;f0;58;1;63;;;;vpos;;v;;r;;d76,58;;b0,0;;mid;;pnom;;pdescription;;pdate;;pimage;;phits;;p">
+</treenode>
+<treenode node="creeModifieUtilisateur;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;90;1;95;;;;vpos;;v;;r;;d133,90;;b0,0;;mid;;plogin;;pmdp;;pprenom;;pnom;;pimage;;psite;;pemail;;psignature;;pdateDernierLogin;;pnbreLogins;;p">
+</treenode>
+<treenode node="creeSongbook;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\songbook.php;f0;27;1;31;;;;vpos;;v;;r;;d64,27;;b0,0;;mnom;;pdescription;;pdate;;pimage;;phits;;p">
+</treenode>
+<treenode node="creeUtilisateur;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;55;1;63;;;;vpos;;v;;r;;d121,55;;b0,0;;mlogin;;pmdp;;pprenom;;pnom;;pimage;;psite;;pemail;;psignature;;pdateDernierLogin;;pnbreLogins;;p">
+</treenode>
+<treenode node="dateDuJourMysql;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;128;1;130;;;;vpos;;v;;r;;d26,128;;b0,0;;m">
+</treenode>
+<treenode node="dateHeureMysqlVersTexte;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;79;1;92;;;;vpos;;v;;r;;d51,79;;b0,0;;mdate;;pmode;;p">
+</treenode>
+<treenode node="dateMysqlVersTexte;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;64;1;74;;;;vpos;;v;;r;;d51,64;;b0,0;;mdateMysql;;pmode;;p">
+</treenode>
+<treenode node="dateTexteVersMysql;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;94;1;126;;;;vpos;;v;;r;;d35,94;;b0,0;;mdate;;p">
+</treenode>
+<treenode node="DernierIdInsere;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;57;1;59;;;;vpos;;v;;r;;d27,57;;b0,0;;m">
+</treenode>
+<treenode node="ecritFichierLog;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;125;2;139;;;;vpos;;v;;r;;d41,125;;b0,0;;mfichier;;plog;;p">
+</treenode>
+<treenode node="ecritHtml;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;49;2;51;;;;vpos;;v;;r;;d27,49;;b0,0;;mtexte;;p">
+</treenode>
+<treenode node="EnTete;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;189;2;245;;;;vpos;;v;;r;;d90,189;;b0,0;;mtitre;;ptexte;;pmenu;;psoustitre;;pimagetitreGauche;;pimagetitreDroite;;p">
+<treenode node="pages/include/tagcanvas.param.php;PHP:PHP Include;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f11;212;44;212;;;;vpos;;v;;r;;d-1,-1;;b0,0;;m">
+</treenode>
+</treenode>
+<treenode node="entreBalise;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;53;2;55;;;;vpos;;v;;r;;d37,53;;b0,0;;mtexte;;pbalise;;p">
+</treenode>
+<treenode node="envoieHead;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;138;2;147;;;;vpos;;v;;r;;d45,138;;b0,0;;mtitrePage;;pfeuilleCss;;p">
+</treenode>
+<treenode node="ExecRequete;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;22;1;31;;;;vpos;;v;;r;;d43,22;;b0,0;;mrequete;;pconnexion;;p">
+</treenode>
+<treenode node="Image;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;23;2;31;;;;vpos;;v;;r;;d82,23;;b0,0;;murlImage;;plargeur;;phauteur;;pbordure;;palt;;p">
+</treenode>
+<treenode node="imagePortraitRandom;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;150;2;163;;;;vpos;;v;;r;;d32,150;;b0,0;;m">
+</treenode>
+<treenode node="infos;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;98;1;103;;C:\wamp64\www\French Ukulele Chords Kitchen\php\songbook.php;f0;66;1;71;;;;vpos;;v;;r;;d19,98;;b0,0;;mid;;p">
+</treenode>
+<treenode node="infosChanson;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson.php;f0;59;1;64;;;;vpos;;v;;r;;d26,59;;b0,0;;mid;;p">
+</treenode>
+<treenode node="insereJavaScript;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;177;2;179;;;;vpos;;v;;r;;d36,177;;b0,0;;msource;;p">
+</treenode>
+<treenode node="insereLienLightbox;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;181;2;187;;;;vpos;;v;;r;;d48,181;;b0,0;;mimage;;plargeur;;p">
+</treenode>
+<treenode node="libereRessources;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;133;1;135;;;;vpos;;v;;r;;d36,133;;b0,0;;mresultat;;p">
+</treenode>
+<treenode node="LibereResultat;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;53;1;55;;;;vpos;;v;;r;;d35,53;;b0,0;;mresultat;;p">
+</treenode>
+<treenode node="lienCliquable;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;69;2;77;;;;vpos;;v;;r;;d31,69;;b0,0;;mtexte;;p">
+</treenode>
+<treenode node="LigneSuivante;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;34;1;36;;;;vpos;;v;;r;;d34,34;;b0,0;;mresultat;;p">
+</treenode>
+<treenode node="ListeIdLabel;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;142;2;147;;;;vpos;;v;;r;;d39,142;;b0,0;;mtable;;pnomId;;p">
+</treenode>
+<treenode node="listeImages;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;288;2;301;;;;vpos;;v;;r;;d34,288;;b0,0;;msubDir;;p">
+</treenode>
+<treenode node="login_utilisateur;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;124;1;140;;;;vpos;;v;;r;;d52,124;;b0,0;;mlogin;;pmdp;;pidconnect;;p">
+</treenode>
+<treenode node="modifieChanson;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson.php;f0;35;1;40;;;;vpos;;v;;r;;d56,35;;b0,0;;mid;;pnom;;pinterprete;;pannee;;p">
+</treenode>
+<treenode node="modifieSongbook;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\songbook.php;f0;34;1;42;;;;vpos;;v;;r;;d72,34;;b0,0;;mid;;pnom;;pdescription;;pdate;;pimage;;phits;;p">
+</treenode>
+<treenode node="modifieUtilisateur;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;66;1;78;;;;vpos;;v;;r;;d129,66;;b0,0;;mid;;plogin;;pmdp;;pprenom;;pnom;;pimage;;psite;;pemail;;psignature;;pdateDernierLogin;;pnbreLogins;;p">
+</treenode>
+<treenode node="NombreLignes;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;48;1;50;;;;vpos;;v;;r;;d33,48;;b0,0;;mresultat;;p">
+</treenode>
+<treenode node="pc_process_dir;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;46;2;76;;;;vpos;;v;;r;;d74,46;;b0,0;;mnom_rep;;pprofondeur_max;;pprofondeur;;p">
+</treenode>
+<treenode node="PiedDePage;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\utilssi.php;f1;260;2;286;;;;vpos;;v;;r;;d23,260;;b0,0;;m">
+</treenode>
+<treenode node="redirection;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;60;2;66;;;;vpos;;v;;r;;d27,60;;b0,0;;murl;;p">
+</treenode>
+<treenode node="RenvoieLigneN;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\mysql.php;f0;39;1;45;;;;vpos;;v;;r;;d44,39;;b0,0;;mresultat;;pnbligne;;p">
+</treenode>
+<treenode node="statut;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;142;1;149;;;;vpos;;v;;r;;d27,142;;b0,0;;mprivilege;;p">
+</treenode>
+<treenode node="supprime_fichier_BD;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\vignette.php;f0;145;1;148;;;;vpos;;v;;r;;d52,145;;b0,0;;mnomFichier;;pconnexion;;p">
+</treenode>
+<treenode node="supprimeChanson;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson.php;f0;43;1;48;;;;vpos;;v;;r;;d36,43;;b0,0;;midChanson;;p">
+</treenode>
+<treenode node="supprimeSongbook;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\songbook.php;f0;45;1;55;;;;vpos;;v;;r;;d39,45;;b0,0;;midSongbook;;p">
+</treenode>
+<treenode node="supprimeUtilisateur;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;81;1;87;;;;vpos;;v;;r;;d44,81;;b0,0;;midUtilisateur;;p">
+</treenode>
+<treenode node="TblCellule;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\table.php;f1;56;2;63;;;;vpos;;v;;r;;d1,57;;b0,0;;mcontenu;;pnbLig;;pnbCol;;pclasse;;p">
+</treenode>
+<treenode node="TblDebut;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\table.php;f1;7;2;20;;;;vpos;;v;;r;;d1,12;;b0,0;;mbordure;;plargeur;;pespCell;;premplCell;;pclasse;;p">
+</treenode>
+<treenode node="TblDebutCellule;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\table.php;f1;44;2;49;;;;vpos;;v;;r;;d1,45;;b0,0;;mclasse;;p">
+</treenode>
+<treenode node="TblDebutLigne;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\table.php;f1;27;2;32;;;;vpos;;v;;r;;d1,28;;b0,0;;mclasse;;p">
+</treenode>
+<treenode node="TblEntete;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\table.php;f1;39;2;42;;;;vpos;;v;;r;;d1,40;;b0,0;;mcontenu;;pnbLig;;pnbCol;;p">
+</treenode>
+<treenode node="TblFin;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\table.php;f1;22;2;25;;;;vpos;;v;;r;;d1,23;;b0,0;;m">
+</treenode>
+<treenode node="TblFinCellule;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\table.php;f1;51;2;54;;;;vpos;;v;;r;;d1,52;;b0,0;;m">
+</treenode>
+<treenode node="TblFinLigne;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\table.php;f1;34;2;37;;;;vpos;;v;;r;;d1,35;;b0,0;;m">
+</treenode>
+<treenode node="testeChanson;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\chanson.php;f0;67;1;96;;;;vpos;;v;;r;;d23,67;;b0,0;;m">
+</treenode>
+<treenode node="testeSongbook;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\songbook.php;f0;74;1;93;;;;vpos;;v;;r;;d25,74;;b0,0;;m">
+</treenode>
+<treenode node="testeUtilisateur;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\utilisateur.php;f0;106;1;122;;;;vpos;;v;;r;;d27,106;;b0,0;;m">
+</treenode>
+<treenode node="titre;PHP:Function Name;C:\wamp64\www\French Ukulele Chords Kitchen\php\lib\html.php;f1;17;2;19;;;;vpos;;v;;r;;d32,17;;b0,0;;mtexte;;pniveau;;p">
+</treenode>
+</phptree>
+</codestructure>

@@ -47,7 +47,7 @@ $f->champTexte ("Email :", "femail", $donnee[7], 128);
 $f->champFenetre ("Signature :", "fsignature", $donnee[8], 5, 60);
 $f->champTexte ("Dernier login :", "fdateDernierLogin", dateMysqlVersTexte($donnee[9]), 50);
 $f->champTexte ("Nbre de logins :", "fnbreLogins", $donnee[10], 50);
-$listeImages = listeImages ();
+$listeImages = listeImages ("/utilisateur");
 $f->champListeImages("Image : ", "fimage", $donnee[5], 1,$listeImages);
 $pListe = array("utilisateur non validé", "abonné", "éditeur", "administrateur");
 $f->champListe ("Privileges :", "fprivilege", $donnee[11], 1, $pListe);

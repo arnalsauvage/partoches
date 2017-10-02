@@ -2,17 +2,11 @@
 	
 	$configMysql = TRUE;
 
-	$monserveur="mysql.hostinger.fr";
-	$mabase="u528022398_fuck";
-	$LOGIN="u528022398_arnal";
-	$MOTDEPASSE="8adpt7s4";
-
 	$monserveur="localhost";
 	$mabase="fuck";
 	$LOGIN="fuck";
 	$MOTDEPASSE="fuck";
 
-	
 
 	if(($idconnect=@mysql_connect($monserveur,$LOGIN,$MOTDEPASSE))==false){
 		$error="Erreur #1 configMysql : Impossible de creer une connexion persistante !";

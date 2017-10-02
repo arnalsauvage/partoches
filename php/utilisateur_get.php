@@ -14,7 +14,14 @@ $table = "utilisateur";
 entreBalise("Utilisateurs","H1");
 
 $fdateDernierLogin = dateTexteVersMysql($fdateDernierLogin);
-$fsignature = addslashes(($fsignature));
+$flogin = addslashes($flogin);
+$fnom = addslashes($fnom);
+$fprenom = addslashes($fprenom);
+$fsite = addslashes($fsite);
+$femail = addslashes($femail);
+$fimage = "/utilisateur/" . $fimage;
+
+$fsignature = addslashes($fsignature);
 
 // On gère 3 cas :  création d'utilisateur, modif ou suppression
   
