@@ -42,8 +42,8 @@ while($ligne = lignesuivante($resultat)){
 
 
 	////////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-	if($_SESSION['privilege']>2)
-	TblCellule (Ancre("$chansonForm?id=$ligne[0]",Image($cheminImages.$iconeEdit,16,16)));
+	if($_SESSION['privilege']>1)
+		TblCellule (Ancre("$chansonForm?id=$ligne[0]",Image($cheminImages.$iconeEdit,16,16)));
 	////////////////////////////////////////////////////////////////////////ADMIN
 	
 	TblCellule($ligne[2] . " - " . $ligne[3]);         //  interprete annee
