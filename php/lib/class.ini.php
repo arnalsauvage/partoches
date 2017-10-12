@@ -15,17 +15,16 @@ class ini {
 		$this->fichier_ini = array ();
 		if (file_exists ( $arg ) && $fichier_lecture = file ( $arg )) {
 			foreach ( $fichier_lecture as $ligne ) // Parcourt chaque ligne du fichier
-			{
+{
 				$ligne_propre = trim ( $ligne ); // efface les espaces
 				if (preg_match ( "#^\[(.+)\]$#", $ligne_propre, $matches )) // Si la ligne est un groupe
-				{
+{
 					$groupe_curseur = $matches [1];
 					// echo 'groupe :' . $groupe_curseur;
 					$this->groupe = $groupe_curseur; // ajout sinon warning
-				}
-				else {
+				} else {
 					if ($ligne_propre [0] != ';' && $tableau = explode ( "=", $ligne, 2 )) // Sinon, c'est un item / valeur
-					{
+{
 						$this->fichier_ini [$groupe_curseur] [trim ( $tableau [0] )] = trim ( $tableau [1], "\n\r " );
 						// echo ("Fichier [$groupe_curseur][$tableau[0]] =$tableau[1] ");
 						$this->item = $tableau [0]; // ajout sinon warnings
@@ -205,7 +204,7 @@ class ini {
 					$echo .= "<span style='background-color:aqua;'>" . htmlspecialchars ( $ligne ) . "</span><br />";
 					$groupe = true;
 				} // première ligne en jaune
-				elseif ($groupe == true && $this->item == reset ( $var ))
+elseif ($groupe == true && $this->item == reset ( $var ))
 					$echo .= "<span style='background-color:yellow;'>" . htmlspecialchars ( $ligne ) . "</span><br />";
 				else
 					$echo .= htmlspecialchars ( $ligne ) . "<br />";
@@ -217,19 +216,11 @@ class ini {
 		// $this->valeur=$this->fichier_ini[$this->groupe][$this->item];
 		return true;
 	}
-<<<<<<< HEAD
-    
-	//  Prend deux paramètres : l'item, le groupe, et renvoie la valeur
-	function m_valeur($arg_item, $arg_groupe){
-		echo "Cherche item : " . $arg_item . " dans groupe : " . $arg_groupe . "\n";
-		return $this->fichier_ini[$arg_groupe][$arg_item];
-=======
 	
 	// Prend deux paramètres : l'item, le groupe, et renvoie la valeur
 	function m_valeur($arg_item, $arg_groupe) {
-		// echo "Cherche item : " . $arg_item . " dans groupe : " . $arg_groupe . "\n";
+	//	echo "Cherche item : " . $arg_item . " dans groupe : " . $arg_groupe . "\n";
 		return $this->fichier_ini [$arg_groupe] [$arg_item];
->>>>>>> c6fab12bdb69822166092807b50ff77b790d874d
 	}
 }
 

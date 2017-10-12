@@ -2,13 +2,8 @@
 include_once "lib/utilssi.php";
 include_once ("menu.php");
 $sortie = "";
-<<<<<<< HEAD
 echo "<table align='center'><tr><td>";
 $ficher = "../data/params.ini";
-=======
-$sortie .= "<table align='center'><tr><td>";
-$ficher = "..\data\params.ini";
->>>>>>> c6fab12bdb69822166092807b50ff77b790d874d
 
 // On lit les données dans le fichier ini
 $ini_objet=new ini();

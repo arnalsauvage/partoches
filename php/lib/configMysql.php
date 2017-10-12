@@ -1,13 +1,19 @@
 <?php
-	
+if(FALSE == isset($configMysql) )
+{
 	$configMysql = TRUE;
-
-	$monserveur="localhost";
-	$mabase="fuck";
-	$LOGIN="fuck";
-	$MOTDEPASSE="fuck";
-
-
+	
+	$ficher = "../data/params.ini";
+	
+	// On lit les données dans le fichier ini
+	$ini_objet = new ini ();
+	$ini_objet->m_fichier ( $ficher );
+	
+	$monserveur = $ini_objet->m_valeur ( "monServeur", "mysql" );
+	$mabase = $ini_objet->m_valeur ( "maBase", "mysql" );
+	$LOGIN = $ini_objet->m_valeur ( "login", "mysql" );
+	$MOTDEPASSE = $ini_objet->m_valeur ( "motDePasse", "mysql" );
+	
 	if(($idconnect=@mysql_connect($monserveur,$LOGIN,$MOTDEPASSE))==false){
 		$error="Erreur #1 configMysql : Impossible de creer une connexion persistante !";
 		return(0);
@@ -17,6 +23,8 @@
 		$error="Erreur #2 configMysql : Impossible de selectionner la base !";
 		return(0);
 	}
+	
+}
 //	echo "connexion : $idconnect";
 //	return($idconnect);
 

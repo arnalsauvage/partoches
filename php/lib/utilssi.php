@@ -35,6 +35,7 @@ if(!isset ($FichierUtilsSi)){
 	require_once ("lib/html.php");
 	require_once ("lib/mysql.php");
 	include_once("lib/params.php");
+	include_once("lib/table.php");
 	require_once ("lib/vignette.php");
         
 	if(!isset ($_SESSION["privilege"])){

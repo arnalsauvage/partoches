@@ -26,13 +26,10 @@ else
 
 // Création du formulaire
 $f = new Formulaire ( "POST", $table . "_get.php", $sortie );
-$sortie .= $f->debutTable ();
-
 $f->champCache ( "id", $donnee [0] );
 $f->champTexte ( "Nom :", "fnom", $donnee[1], 64, 32 );
 $f->champTexte ( "Interprète :", "finterprete", $donnee[2], 64, 32 );
 $f->champTexte ( "Annee :", "fannee", $donnee [3], 4, 4 );
-$f->finTable ();
 $f->champCache ( "mode", $mode );
 $f->champValider ( "Valider la saisie", "valider" );
 $sortie .= $f->fin();

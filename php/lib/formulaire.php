@@ -3,31 +3,19 @@ if (! isset ( $ClasseFormulaire )) {
 	$ClasseFormulaire = 1;
 	
 	// Classe gérant les formulaires
-<<<<<<< HEAD
-
-	require ("table.php");
 
 	class Formulaire{
 		// ----   Partie privée : les variables
 
-		var $modeTable,  $orientation;
-=======
-	
-	require ("Table.php");
-	class Formulaire {
-		// ---- Partie privée : les variables
 		var $modeTable;
->>>>>>> c6fab12bdb69822166092807b50ff77b790d874d
 		var $entetes, $champs, $nbChamps, $nbLignes;
 		var $htmlGenere = "";
-		var $orientation = 'HORIZONTAL';
 		
 		// ---- Partie privée : les méthodes
 		
 		// Constructeur de la classe
 		function Formulaire($pMethode, $pAction, &$retour, $pTransfertFichier = FALSE, $pNom = "Form") {
 			
-			$this->htmlGenere = $this->debutTable();
 			// Mettre un attribut ENCTYPE si on transfère un fichier
 			if ($pTransfertFichier)
 				$encType = "ENCTYPE='multipart/form-data'";
@@ -151,26 +139,8 @@ if (! isset ( $ClasseFormulaire )) {
 			// Création du champ
 			$retour = "";
 			$champHTML = $this->champForm ( $pType, $pNom, $pVal, $params, $pListe );
-			// Affichage du champ en tenant compte de la présentation
-			if ($this->modeTable) {
-				if ($this->orientation == 'VERTICAL') {
-					// Nouvelle ligne, avec libellé et champ dans deux cellules
-					$retour .= TblDebutLigne ();
-					$retour .= TblCellule ( "<B>" . $pLibelle . "</B>" );
-					$retour .= TblCellule ( $champHTML );
-					$retour .= TblFinLigne ();
-				} else {
-					// On ne peut pas afficher maintenant : on stocke dans les tableaux
-					$retour .= $this->entetes [$this->nbChamps] = "<B>" . $pLibelle . "</B>";
-					$retour .= $this->champs [$this->nbChamps] = $champHTML;
-					$retour .= $this->nbChamps ++;
-				}
-			} else {
-				// Affichage simple
-				// echo "Affichage simple de $pLibelle $champHTML";
-				$retour .= "$pLibelle ";
-				$retour .= $champHTML;
-			}
+				$retour .= "<B>" . $pLibelle . "</B>";
+				$retour .= $champHTML . "<br>";
 			$this->htmlGenere .= $retour;
 		}
 		
@@ -218,50 +188,9 @@ if (! isset ( $ClasseFormulaire )) {
 			$this->htmlGenere .= "<INPUT TYPE=HIDDEN NAME='$pNom' VALUE=\"$pValeur\">\n";
 		}
 		
-		// Début d'une table, mode horizontal ou vertical
-		public function debutTable($pOrientation = 'VERTICAL', $pNbLignes = 1) {
-			// Pas de bordure
-			if ($pOrientation == 'VERTICAL')
-				$this->htmlGenere .= TblDebut ( 0 );
-			$this->modeTable = TRUE;
-			$this->orientation = $pOrientation;
-			$this->nbLignes = $pNbLignes;
-			$this->nbChamps = 0;
-		}
-		
-		// Fin d'une table
-		public function finTable() {
-			$retour = "";
-			echo "Fin table ! modeTable = $this->modeTable
-			";
-			if ($this->modeTable == TRUE) {
-				if ($this->orientation == 'HORIZONTAL') {
-					// Affichage des libelles
-					$retour .= TblDebut ( 0 );
-					$retour .= TblDebutLigne ();
-					// Les entêtes du tableau
-					for($i = 0; $i < $this->nbChamps; $i ++)
-						$retour .= TblCellule ( $this->entetes [$i] );
-					$retour .= TblFinLigne ();
-					
-					// Affichage des lignes et colonnes
-					for($j = 0; $j < $this->nbLignes; $j ++) {
-						$retour .= TblDebutLigne ();
-						for($i = 0; $i < $this->nbChamps; $i ++)
-							$retour .= TblCellule ( $this->champs [$i] );
-						$retour .= TblFinLigne ();
-					}
-				} // Fin if horizontal
-				$retour .= TblFin ();
-			}
-			$this->modeTable = FALSE;
-		}
-		
 		// Fin du formulaire
 		public function fin() {
 			$retour = "";
-			// Fin de la table, au cas où ...
-			$retour .= $this->finTable ();
 			$retour .= "</FORM></CENTER>\n";
 			echo "fonction fin : $retour";
 			$this->htmlGenere .= $retour;

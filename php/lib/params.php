@@ -1,5 +1,5 @@
 <?php
-	$ficher = "..\data\params.ini";
+	$ficher = "../data/params.ini";
 	
 	// On lit les données dans le fichier ini
 	$ini_objet = new ini ();
