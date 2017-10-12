@@ -3,6 +3,7 @@ $cheminImages = "../images/";
 
 // Pour les icones
 $cheminIcones = $cheminImages ."icones/";
+$iconeCreer = $cheminIcones."creer.png";
 $iconeEdit = $cheminIcones."edit.png";
 $iconePoubelle = $cheminIcones."poubelle.png";
 $iconeAttention = $cheminIcones."attention.png";

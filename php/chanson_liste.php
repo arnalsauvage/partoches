@@ -23,7 +23,7 @@ $numligne = 0;
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] > 1)
-	$retour .= "<BR>" . Ancre ( "$chansonForm", Image ( $cheminImages . $iconeDossier, 32, 32 ) . "Créer une nouvelle chanson" );
+	$retour .= "<BR>" . Ancre ( "$chansonForm", Image ( $cheminImages . $iconeCreer, 32, 32 ) . "Créer une nouvelle chanson" );
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 $retour .= Image ( $iconeAttention, "100%", 1, 1 );
@@ -61,7 +61,7 @@ $retour .= TblFin ();
 echo Image ( $iconeAttention, "100%", 1, 1 );
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] > 1)
-	$retour .= "<BR>" . Ancre ( "$chansonForm", Image ( $cheminImages . $iconeDossier, 32, 32 ) . "Créer une nouvelle chanson" );
+	$retour .= "<BR>" . Ancre ( "$chansonForm", Image ( $cheminImages . $iconeCreer, 32, 32 ) . "Créer une nouvelle chanson" );
 // //////////////////////////////////////////////////////////////////////ADMIN
 $retour .= envoieFooter ( "Bienvenue chez nous !" );
 echo $retour;

@@ -22,8 +22,8 @@ $numligne = 0;
 // Affichage de la liste
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
-if ($_SESSION ['privilege'] > 1)
-	$retour .= "<BR>" . Ancre ( "$utilisateurForm", Image ( $cheminImages . $iconeDossier, 32, 32 ) . "Créer un nouvel utilisateur" );
+if ($_SESSION ['privilege'] > 2)
+	$retour .= "<BR>" . Ancre ( "$utilisateurForm", Image ( $cheminImages . $iconeCreer, 32, 32 ) . "Créer un nouvel utilisateur" );
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 $retour .= Image ( $iconeAttention, "100%", 1, 1 );
@@ -34,7 +34,7 @@ while ( $ligne = lignesuivante ( $resultat ) ) {
 	
 	if ($ligne [5])
 		// //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-		if ($_SESSION ['privilege'] > 1)
+		if (($_SESSION ['privilege'] > 2)||$_SESSION['user']==$ligne [1])
 			$retour .= TblCellule ( Ancre ( $utilisateurForm . "?id=$ligne[0]", Image ( ($cheminImages . $ligne [5]), 32, 32 ) ) ); // image
 			                                                                                                                        // //////////////////////////////////////////////////////////////////////ADMIN
 		else
@@ -51,7 +51,7 @@ while ( $ligne = lignesuivante ( $resultat ) ) {
 	$retour .= TblCellule ( " " . $ligne [10] . " logins" ); // nbreLogins
 	                                                         
 	// //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-	if ($_SESSION ['privilege'] > 1) {
+	if ($_SESSION ['privilege'] > 2) {
 		$retour .= TblCellule ( boutonSuppression ( $utilisateurGet . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages ) );
 		// //////////////////////////////////////////////////////////////////////ADMIN
 		
@@ -62,8 +62,8 @@ $retour .= TblFin ();
 
 $retour .= Image ( $iconeAttention, "100%", 1, 1 );
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
-if ($_SESSION ['privilege'] > 1)
-	$retour .= "<BR>" . Ancre ( "?page=$utilisateurForm", Image ( $cheminImages . $iconeDossier, 32, 32 ) . "Créer un nouvel utilisateur" );
+if ($_SESSION ['privilege'] > 2)
+	$retour .= "<BR>" . Ancre ( "?page=$utilisateurForm", Image ( $cheminImages . $iconeCreer, 32, 32 ) . "Créer un nouvel utilisateur" );
 // //////////////////////////////////////////////////////////////////////ADMIN
 $retour .= envoieFooter ( "Bienvenue chez nous !" );
 echo $retour;

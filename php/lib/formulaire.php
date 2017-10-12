@@ -7,7 +7,6 @@ if (! isset ( $ClasseFormulaire )) {
 	class Formulaire{
 		// ----   Partie privée : les variables
 
-		var $modeTable;
 		var $entetes, $champs, $nbChamps, $nbLignes;
 		var $htmlGenere = "";
 		
@@ -47,7 +46,7 @@ if (! isset ( $ClasseFormulaire )) {
 				else
 					$s .= "<OPTION VALUE='$val' SELECTED>$libelle</OPTION>\n";
 			}
-			return "</SELECT>\n";
+			return $s ."</SELECT>\n";
 		}
 		
 		// Champ pour sélectionner dans une liste
@@ -128,7 +127,7 @@ if (! isset ( $ClasseFormulaire )) {
 					break;
 				
 				default :
-					echo "<B>ERREUR: $pType est un type inconnu</B>\n";
+					$champ = "<B>ERREUR: $pType est un type inconnu</B>\n";
 					break;
 			}
 		return $champ;
@@ -192,7 +191,6 @@ if (! isset ( $ClasseFormulaire )) {
 		public function fin() {
 			$retour = "";
 			$retour .= "</FORM></CENTER>\n";
-			echo "fonction fin : $retour";
 			$this->htmlGenere .= $retour;
 			return $this->htmlGenere;
 		}
