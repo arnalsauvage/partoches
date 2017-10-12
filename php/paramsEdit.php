@@ -2,13 +2,18 @@
 include_once "lib/utilssi.php";
 include_once ("menu.php");
 $sortie = "";
+<<<<<<< HEAD
 echo "<table align='center'><tr><td>";
 $ficher = "../data/params.ini";
+=======
+$sortie .= "<table align='center'><tr><td>";
+$ficher = "..\data\params.ini";
+>>>>>>> c6fab12bdb69822166092807b50ff77b790d874d
 
 // On lit les données dans le fichier ini
 $ini_objet=new ini();
 
-echo ("Fichier params.ini<br>"); 
+$sortie .= ("Fichier params.ini<br>"); 
 $ini_objet->m_fichier($ficher);
 $ini_objet->print_fichier();
    
@@ -44,7 +49,8 @@ $sortie .= "  <FORM action='paramsEdit.php' method='post' ENCTYPE='x-www-form-ur
 <br>login de paramétrage <input type='text' value='".$ini_objet->m_valeur("loginParam","general")."' name='loginParam'> 
 <button type='submit' value='Valider' name='valider'>Valider</button>
 </form> ";
+
+$sortie .= "</td></tr></table>";
+$sortie .= envoieFooter("Bienvenue chez nous !");
 echo $sortie;
-echo "</td></tr></table>";
-echo envoieFooter("Bienvenue chez nous !");
 ?>
