@@ -18,7 +18,7 @@ unset ($a);
 //	function boutonSuppression($lien,$iconePoubelle)
 
 // Ce code remplace la récupération automatique des variables post et GET en php4
-
+// TODO : sécurité
 extract($_GET, EXTR_OVERWRITE);
 extract($_POST, EXTR_OVERWRITE);
 
@@ -27,15 +27,15 @@ if(!isset ($FichierUtilsSi)){
 	$FichierUtilsSi = 1;
 
 	// Inclusion des différentes librairies
+	require_once ("lib/class.ini.php");
+	require_once ("lib/compteur.php");
+	require_once ("lib/configMysql.php");
+	include_once "lib/config-images.php";
+	require_once ("lib/formulaire.php");
 	require_once ("lib/html.php");
 	require_once ("lib/mysql.php");
-	require_once ("lib/configMysql.php");
-	require_once ("lib/formulaire.php");
-	require_once ("lib/compteur.php");
-	include_once "lib/images-config.php";
-	require_once ("lib/vignette.php");
-	require_once ("lib/class.ini.php");
 	include_once("lib/params.php");
+	require_once ("lib/vignette.php");
         
 	if(!isset ($_SESSION["privilege"])){
 		// session_register("privilege");	 
@@ -76,25 +76,6 @@ if(!isset ($FichierUtilsSi)){
 		return $fichiers;
 	}	
 
-	// Cette fonction renvoie false si une chanson n'existe pas en enregistrement,
-	// Sinon, elle renvoie le dernier enregistrement dispo	
-	function chansonEstEnregistree ($idChanson,$connexion){
-		$marequete = "select id, idchanson from enregistrement where idchanson = '$idChanson'";
-		$resultat = ExecRequete ( $marequete, $connexion);
-		$nbReponses = mysql_num_rows($resultat);
-
-		if($nbReponses > 0){
-			//echo "ok";
-			while($ligne = lignesuivante($resultat))
-			$id = $ligne[0];
-			return ($id);
-		}
-		else{
-			//echo "Chanson $idChanson non enregistrée... <BR>";
-			return false;
-		}    
-	}
-
 	// Cette fonction affiche un player mp3 ou un lien vers le fichier en mode popup   
 	function affichePlayer($mp3="vide"){
 		if(is_file ("mp3/".$mp3) ){
@@ -123,6 +104,7 @@ if(!isset ($FichierUtilsSi)){
 		return "";
 	}	
 
+	// Cette fonction écrit le $log dans le $fichier
 	function ecritFichierLog($fichier, $log){
 		$time = date("l, j F Y [h:i a]"); 
 		$ip = $_SERVER['REMOTE_ADDR']; 
@@ -139,15 +121,7 @@ if(!isset ($FichierUtilsSi)){
 		fclose($fp); 
 	}
 
-	// Cette fonction retourne des couples id/nom_de_champ d'une table
-	function ListeIdLabel ($table, $nomId){
-		$requete = "SELECT ID , $nomId FROM $table ORDER BY $nomId";
-		$connexion = Connexion ($LOGIN, $MOTDEPASSE,"si", $SERVEUR);
-		$resultat = ExecRequete ($requete, $connexion);
-		return $resultat;
-	}
-
-	// Cette fonction retourne une image en portrait au hasard dans la base
+	// Cette fonction retourne une image en portrait au parmi les images dans la base avec le tag aLaUne
 	function imagePortraitRandom (){
 		global $LOGIN, $MOTDEPASSE, $mabase, $monserveur;
 		$connexion = Connexion($LOGIN,$MOTDEPASSE,$mabase,$monserveur);
@@ -163,29 +137,11 @@ if(!isset ($FichierUtilsSi)){
 		return ($ligne[3].$ligne[0]);
 	}	
 
-	// Chargement de la liste des chansons
-	function chargeChansons($connexion){
-		$marequete = "select id, nom, image from chanson order by nom";
-		$resultat = ExecRequete ($marequete, $connexion);
-		while($ligne=LigneSuivante($resultat)){
-			$listeChansons[$ligne[0]][1] = $ligne[1];
-			$listeChansons[$ligne[0]][2] = $ligne[2];
-		}
-		mysql_free_result($resultat);
-		return($listeChansons);
-	}
-
 	function insereJavaScript ($source){
 		return "<script type='text/javascript' src='$source'></script>\n";
 	}
 
-	function insereLienLightbox($image,$largeur=''){
-		$lien = "<a href=\"$image\" rel=\"lightbox\"> <img src='$image'";
-		if($largeur <> '')
-		$lien .=  "width='$largeur'";
-		$lien .= "></a>";
-		return ($lien);
-	}
+
 	// Cette fonction crée l'en-tête du HTML de réponse
 	function EnTete ($titre, $texte, $menu, $soustitre, $imagetitreGauche, $imagetitreDroite){
 		$enTete = "";
@@ -197,20 +153,7 @@ if(!isset ($FichierUtilsSi)){
 		$enTete .= "<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\" />";
 		$enTete .= "<TITLE>$titre</TITLE>\n";
 		$enTete .= "<LINK REL=\"stylesheet\" HREF=\"pages/si.css\" TYPE=\"text/css\">\n";
-		$enTete .= '<link rel="stylesheet" href="pages/include/lightbox/css/lightbox.css" type="text/css" media="screen" />';
-		$enTete .= "<link rel='stylesheet' href='pages/include/videobox/css/videobox.css' type='text/css' />";  		
 		$enTete .= insereJavaScript ("pages/include/javascript.js");
-
-		// On insère ici le composant videobox pour afficher les vidéos	
-		//		insereJavaScript ('pages/include/videobox/js/mootools.js');
-		//		insereJavaScript ('pages/include/videobox/js/swfobject.js');
-		//		insereJavaScript ('pages/include/videobox/js/videobox.js');
-
-
-		// Utilisation de lightbox
-		$enTete .= insereJavaScript ("pages/include/lightbox/js/prototype.js");
-		$enTete .= insereJavaScript ("pages/include/lightbox/js/scriptaculous.js?load=effects,builder");
-		$enTete .= insereJavaScript ("pages/include/lightbox/js/lightbox.js");
 
 		// Utilisation du nuage de mots tagcanvas
 		$enTete .= insereJavaScript("pages/include/tagcanvas.min.js");
@@ -251,47 +194,7 @@ if(!isset ($FichierUtilsSi)){
 		$enTete .= "</BODY></HTML>";
 		return $enTete	;		 
 	}
-	// Menu affiché sur la barre horizontale
-	$menu = array (
-		// "actualité" => "index.php?page=$PAGEnews",
-		"home" => "index.php?page=accueil.php",
-		"articles" => "index.php?page=",
-		"commentaires" => "index.php?page=commentairesliste.php",
-		"albums" => "index.php?page=",
-		"chansons" => "index.php?page=",
-		//	"atelier accords" => "index.php?page=",
-		//	"contacts" => "index.php?page=",
-		"s'identifier" => "index.php?page=",
-		"<img src='images/iconeRss.png'>" => "pages/rss.php");
 
-	// Cette fonction affiche un pied de page
-	function PiedDePage (){
-		TblFinCellule();
-		TblFinLigne ();
-		TblFin();
-		TblFinCellule();
-		TblFinLigne ();		
-		TblDebutLigne ();
-		TblDebutCellule();
-		$imgbarre = "images/barre.jpg";
-		$enTete .= "<footer>" . Image ($imgbarre,"800",15) . "<br><DIV align ='center'>";
-		$enTete .= Ancre ("index.php?page=articlesvoir.php&article=Contacts",Image ("images/icone_mail.png"),-1);
-		$enTete .= Ancre ("http://www.myspace.com/arnal",Image ("images/myspace.png"),-1,1);
-		$enTete .= Ancre ("http://youtube.com/arnalsauvage",Image ("images/youtube.png"),-1,1);
-		$enTete .= Ancre ("http://www.arnalsauvage.com",Image ("images/icone_arnal.png"),-1,1);
-		$enTete .= Ancre ("http://www.facebook.com/arnaud.medina",Image ("images/facebook.png"),-1,1);
-		$enTete .= Ancre ("http://enavantlazizique.free.fr/wiki/index.php5?title=Accueil",Image ("images/wikipedia.png"),-1,1);		
-		$enTete .= Ancre ("http://www.delicious.com/arnalsauvage",Image ("images/delicious.png"),-1,1);		
-		$enTete .= Ancre ("http://www.goodreads.com/user/show/979367-arnalsauvage",Image ("images/icone_livre.png"),-1,1);
-		$enTete .= Ancre ("http://fr.audiofanzine.com/membres/a.play,u.123722.html",Image ("images/audiofanzine.png"),-1,1);		
-		$enTete .= Ancre ("https://sites.google.com/site/glashband/","*g*",-1,1);
-		$enTete .= "</div></footer>";
-		TblFinCellule();
-		TblFinligne();
-		TblFin();
-
-	}
-	
 	// Cette fonction retourne une liste des images disponibles sur le site, eventuellement dans un sous-dossier
 	function listeImages ($subDir=""){
 		$d = dir("../images".$subDir);
@@ -312,22 +215,6 @@ if(!isset ($FichierUtilsSi)){
 	function boutonSuppression($lien,$iconePoubelle,$cheminImages){//<img src="x.png" onclick="getattrs(this);">
 		return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer la fiche' onclick =\"confirmeSuppr('".$lien."','Voulez-vous vraiment supprimer cet élément ?');\" border='0'>";
 	}
-	// Cette fonction retourne la vignette d'une image
-	/*	function vignette ($image,$largeur)
-	{
-	global $iconePuce;
-	global $cheminImages;
-	if (file_exists($cheminImages."/".$image)==FALSE)
-	$image = $iconePuce;
-	// Si l'image est un PNG, appel à bouton PNG
-	if ( stristr($image, '.png') != FALSE)
-	return "pages/include/boutonpng.php?string=$image&largeur=$largeur";
-	// Si l'image est un JPG, appel à bouton PNG
-	if ( stristr($image, '.jpg') != FALSE)
-	return "pages/include/boutonjpg.php?string=$image&largeur=$largeur";
-	// Sinon affichage de la puce par défaut
-	return "pages/include/boutonjpg.php?string=$iconePuce&largeur=$largeur'";
-	}
-	*/
+
 }
 ?>

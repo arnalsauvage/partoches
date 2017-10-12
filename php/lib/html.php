@@ -85,6 +85,7 @@ if(!isset ($FichierHtml)){
 		// parcours la chaine caractère par acaractère
 		// Quand la balise < est rencontrée, on augmente le niveau : il peut y a voir des < imbriqués
 		// L'indice indique l'élément du tableau dans lequel le bout sera rangé
+		$retour = "";
 		$indice = 0;
 		$niveau = 0;
 		$tableau = array();
@@ -120,7 +121,7 @@ if(!isset ($FichierHtml)){
 		$indice = 0;
 		for( $indice = 0 ; $indice <= $indice_max ; $indice++ ){
 			if(isset($debug_fonc))
-			echo "tableau[$indice] : $tableau[$indice]\n";
+				echo "tableau[$indice] : $tableau[$indice]\n";
 
 			if(strstr($tableau[$indice],"<")==FALSE){
 				$chaine = $tableau[$indice];
@@ -128,9 +129,9 @@ if(!isset ($FichierHtml)){
 				//$tableau[$indice]  = preg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
 				//    "<a href=\"\\0\">\\0</a>", $tableau[$indice]);
 				if(isset($debug_fonc))
-				echo "<br>chaine  remplacée : $chaine <br>\n";
+					echo "<br>chaine  remplacée : $chaine <br>\n";
 				if(isset($debug_fonc))    
-				echo "<br>chaine  de remplacement : $tableau[$indice] <br>\n";
+					echo "<br>chaine  de remplacement : $tableau[$indice] <br>\n";
 			}
 		}
 		$chaine = implode ($tableau);    
@@ -145,11 +146,7 @@ if(!isset ($FichierHtml)){
 		<head>
 		<meta http-equiv='Content-Type' content='text/html; charset='utf-8'  />
 		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    	<link href='../css/bootstrap.min.css' rel='stylesheet'>
-    	<script src= 'https://code.jquery.com/jquery-3.2.1.slim.min.js ' integrity= 'sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN ' crossorigin= 'anonymous '></script>
-		<script src= 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js ' integrity= 'sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4 ' crossorigin= 'anonymous '></script>
-		<script src= 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js ' integrity= 'sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1 ' crossorigin= 'anonymous '></script>
-    	
+    	<link href='../css/bootstrap.min.css' rel='stylesheet'>   	
 		<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' /> 
 		<script type='text/javascript' src='./lib/javascript.js'></script>
 		<title>$titrePage</title>

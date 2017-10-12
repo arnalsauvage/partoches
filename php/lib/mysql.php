@@ -91,6 +91,7 @@ function dateHeureMysqlVersTexte ($date, $mode = 0){
 	//       echo "<P> Année : $an , mois : $mois, Jour : $jour. $retour </P>";
 	return ($retour);
 }
+
 // Cette fonction traduit une date du format JJ/MM/AAAA vers le format mySql
 function dateTexteVersMysql ($date){
 	$compteur = 0;
@@ -125,6 +126,7 @@ function dateTexteVersMysql ($date){
 	$retour = $an . "-" . $mois . "-" . $jour;
 	return ($retour);
 }
+
 // Renvoie la date du jour au format MySql
 function dateDuJourMysql(){
 	return( date("Y") . "-" . date("m") . "-" . date("d"));
@@ -133,5 +135,39 @@ function dateDuJourMysql(){
 // Libere les ressources
 function libereRessources($resultat){
 	mysql_free_result($resultat);
+	
 }
+
+// Chargement de la liste des libelles
+// ex : chargeLibelles($conn, "auteurs", "nom") donne la liste des noms dans un tab[id]=nom trié par nom
+function chargeLibelles($connexion, $table, $libelle){
+	$marequete = "select id, $libelle,  from $table order by $libelle";
+	$resultat = ExecRequete ($marequete, $connexion);
+	while($ligne=LigneSuivante($resultat)){
+		$listeLibelles[$ligne[0]]= $ligne[1];
+	}
+	mysql_free_result($resultat);
+	return($listeLibelles);
+}
+
+// Exemple de fonction métier à recopier
+// Cette fonction renvoie false si une chanson n'existe pas en enregistrement,
+// Sinon, elle renvoie le dernier enregistrement dispo
+function chansonEstEnregistree ($idChanson,$connexion){
+	$marequete = "select id, idchanson from enregistrement where idchanson = '$idChanson'";
+	$resultat = ExecRequete ( $marequete, $connexion);
+	$nbReponses = mysql_num_rows($resultat);
+	
+	if($nbReponses > 0){
+		//echo "ok";
+		while($ligne = lignesuivante($resultat))
+			$id = $ligne[0];
+			return ($id);
+	}
+	else{
+		//echo "Chanson $idChanson non enregistrée... <BR>";
+		return false;
+	}
+}
+
 ?>

@@ -6,11 +6,12 @@ $chansonForm = "chanson_form.php";
 $chansonGet = "chanson_get.php";
 $chansonVoir = "chanson_voir.php";
 
-//include_once ("params.php");
-$sortie = envoieHead("Menu", "../css/index.css");
 $table = "chanson";
-entreBalise("chansons","H1");
-TblDebut (0);
+
+$retour = "";
+
+$retour .= entreBalise("chansons","H1");
+$retour .= TblDebut (0);
 
 // Chargement de la liste des chansons
 $marequete = "select * from $table ORDER BY annee DESC";
@@ -25,11 +26,11 @@ if($_SESSION['privilege']>1)
 echo "<BR>" . Ancre("$chansonForm",Image($cheminImages.$iconeDossier,32,32) . "Créer une nouvelle chanson");
 ////////////////////////////////////////////////////////////////////////ADMIN
 
-echo Image ($iconeAttention,"100%",1,1);
+$retour .= Image ($iconeAttention,"100%",1,1);
 
 while($ligne = lignesuivante($resultat)){
 	$numligne++;
-	TblDebutLigne ();
+	$retour .= TblDebutLigne ();
 
 /* TO Gestion d'une image pour  une chanson'
 	if($ligne[5])
@@ -37,30 +38,30 @@ while($ligne = lignesuivante($resultat)){
 	else
 
 		TblCellule(Ancre($_SESSION['urlSite']."/index.php?id=$ligne[0]","voir"));
-	*/
-	TblCellule(entreBalise($ligne[1],"H2")); // Nom
-
-
+*/
+	
 	////////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
 	if($_SESSION['privilege']>1)
-		TblCellule (Ancre("$chansonForm?id=$ligne[0]",Image($cheminImages.$iconeEdit,16,16)));
+		$retour .= TblCellule (Ancre("$chansonForm?id=$ligne[0]",entreBalise($ligne[1],"H2"))); // Nom));
 	////////////////////////////////////////////////////////////////////////ADMIN
-	
-	TblCellule($ligne[2] . " - " . $ligne[3]);         //  interprete annee
+	else
+		$retour .= TblCellule(entreBalise($ligne[1],"H2")); // Nom
+	$retour .= TblCellule($ligne[2] . " - " . $ligne[3]);         //  interprete annee
 	
 	////////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
 	if($_SESSION['privilege']>1){
-		TblCellule(boutonSuppression($chansonGet."?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
+		$retour .= TblCellule(boutonSuppression($chansonGet."?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
 	////////////////////////////////////////////////////////////////////////ADMIN
-		TblFinLigne ();
+		$retour .= TblFinLigne ();
 	}
 }
-TblFin();
+$retour .= TblFin();
 
 echo Image ($iconeAttention,"100%",1,1);
 ////////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if($_SESSION['privilege']>1)
-echo "<BR>" . Ancre("?page=$chansonForm",Image($cheminImages.$iconeDossier,32,32) . "Créer une nouvelle chanson");
+	$retour .= "<BR>" . Ancre("?page=$chansonForm",Image($cheminImages.$iconeDossier,32,32) . "Créer une nouvelle chanson");
 ////////////////////////////////////////////////////////////////////////ADMIN
-echo envoieFooter("Bienvenue chez nous !");
+	$retour .= envoieFooter("Bienvenue chez nous !");
+	echo $retour;
 ?>
