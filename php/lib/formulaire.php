@@ -4,7 +4,7 @@ if(!isset ($ClasseFormulaire)){
 
 	// Classe gérant les formulaires
 
-	require ("Table.php");
+	require ("table.php");
 
 	class Formulaire{
 		// ----   Partie privée : les variables

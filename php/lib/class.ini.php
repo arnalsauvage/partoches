@@ -214,7 +214,7 @@ class ini{
     
 	//  Prend deux paramètres : l'item, le groupe, et renvoie la valeur
 	function m_valeur($arg_item, $arg_groupe){
-		//echo "Cherche item : " . $arg_item . " dans groupe : " . $arg_groupe . "\n";
+		echo "Cherche item : " . $arg_item . " dans groupe : " . $arg_groupe . "\n";
 		return $this->fichier_ini[$arg_groupe][$arg_item];
 	}
     

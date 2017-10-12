@@ -3,7 +3,7 @@ include_once "lib/utilssi.php";
 include_once ("menu.php");
 $sortie = "";
 echo "<table align='center'><tr><td>";
-$ficher = "..\data\params.ini";
+$ficher = "../data/params.ini";
 
 // On lit les données dans le fichier ini
 $ini_objet=new ini();
