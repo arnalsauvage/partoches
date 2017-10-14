@@ -35,37 +35,43 @@ if (! isset ( $_SESSION ['user'] )) {
 	// echo afficheComposClubs($idChampionnat);
 	exit ();
 }
+
+// Affichage du menu
+
 $contenu = "";
 $contenu .= "
 <nav class='navbar navbar-inverse navbar-fixed-top'>
-<div class= 'container '>
-	<div class= 'navbar-header ' >
-		<button type= 'button ' class= 'navbar-toggle collapsed ' data-toggle= 'collapse ' data-target= '#navbar ' aria-expanded= 'false ' aria-controls= 'navbar '>
-		<span class= 'sr-only '>Menu</span>
-		<span class= 'icon-bar '></span>
-		<span class= 'icon-bar '></span>";
+<div class='container'>
+	<div class='navbar-header' >
+		<button class='navbar-toggle collapsed' data-toggle='collapse'
+			data-target='#main-menu' aria-expanded='true'>
+			<span class='sr-only'>Menu</span>
+			<span class='icon-bar'></span>
+			<span class='icon-bar'></span>";
 // Le lien paramétrage est limité aux admin et login parametrage
 if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > 2))
-	$contenu .= "<span class= 'icon-bar '></span>";
+	$contenu .= "<span class='icon-bar'></span>";
 $contenu .= "
-		<span class= 'icon-bar '></span>
+			<span class='icon-bar'></span>
 		</button>
-		<a class='navbar-brand' href= '../html/index.html'>Partoches</a>
+		<a class='navbar-brand' href='../html/index.html'>Partoches</a>
 	</div>
-    <div id= 'navbar ' class= 'collapse navbar-collapse '>
-          <ul class= 'nav navbar-nav '>
-            <li class= 'active '><a href= '../php/utilisateur_liste.php '>Utilisateurs</a></li>
-            <li><a href= '../php/chanson_liste.php '>Chansons</a></li>";
+    <div id='main-menu' class='collapse navbar-collapse'>
+          <ul class='nav navbar-nav'>
+			<li class='divider' role='separator'></li>
+            <li ><a href='../php/utilisateur_liste.php'>Utilisateurs</a></li>
+            <li><a href='../php/chanson_liste.php'>Chansons</a></li>\n";
 // Le lien paramétrage est limité aux admin et login parametrage
 if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > 2))
-	$contenu .= "<li><a href= '../php/paramsEdit.php '>parametrage</a></li>";
+	$contenu .= "<li><a href='../php/paramsEdit.php'>parametrage</a></li>\n";
 
-$contenu .= "<li><a href= '#contact '>Contact</a></li>
+$contenu .= "<li><a href='#contact'>Contact</a></li>
           </ul>
     </div><!--/.nav-collapse -->
 </div>
 </nav>   ";
 
+// Sous menu
 $contenu .= "<div class= 'container' class='row col-sm-4'>
 			<div class='starter-template'>";
 $contenu .= "<br><br><br>" . image ( "../images".$_SESSION['image'], 64 );
@@ -78,5 +84,5 @@ $contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut ( $_SESSION ['priv
 $contenu .= "</td></tr></table>";
 $contenu .= " </div> </div>";
 
-echo $contenu;
+echo $contenu . "\n\n";
 ?>

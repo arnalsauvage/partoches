@@ -65,7 +65,7 @@ class ini {
 			$this->m_item ( $arg_i );
 		$this->fichier_ini [$this->groupe] [$this->item] = $arg;
 		$this->valeur = $arg;
-		// echo $this->fichier." ==> [".$this->groupe."] ".$this->item."=".$this->valeur . "<br>";
+		 echo $this->fichier." ==> [".$this->groupe."] ".$this->item."=".$this->valeur . "<br>";
 		return $this->fichier . " ==> [" . $this->groupe . "] " . $this->item . "=" . $this->valeur;
 	}
 	
@@ -98,13 +98,14 @@ class ini {
 			foreach ( $groupe_n as $keyCle => $item_n ) // Pour chaque valeur
 {
 				$fichier_save .= "" . $keyCle . " = " . $item_n . "\r\n";
-				// echo ("sauvegarde: $keyCle = $item_n<br>");
+				echo ("sauvegarde[$keyGroupe]: $keyCle = $item_n<br>");
 			}
 		}
 		// $fichier_save=substr($fichier_save, 1);
 		$monTab = explode ( '.', phpversion () );
 		// echo "version :".reset($monTab);
 		if (file_exists ( $this->fichier ) && reset ( $monTab ) >= 5) {
+			echo "Ecriture du fichier : $this->fichier";
 			if (false === file_put_contents ( $this->fichier, $fichier_save )) {
 				die ( "Impossible d'&eacute;crire dans ce fichier (mais le fichier existe)." );
 			}
@@ -189,7 +190,7 @@ class ini {
 	
 	// Affiche le contenu du fichier ini
 	function print_fichier() {
-		$echo = "";
+		$echo = "Fichier : $this->fichier <br>";
 		$groupe = false;
 		if (file_exists ( $this->fichier ) && is_file ( $this->fichier ) && $fichier_lecture = file ( $this->fichier )) {
 			// Pour chaque ligne
@@ -219,7 +220,7 @@ elseif ($groupe == true && $this->item == reset ( $var ))
 	
 	// Prend deux paramètres : l'item, le groupe, et renvoie la valeur
 	function m_valeur($arg_item, $arg_groupe) {
-	//	echo "Cherche item : " . $arg_item . " dans groupe : " . $arg_groupe . "\n";
+		// echo "Cherche item : " . $arg_item . " dans groupe : " . $arg_groupe . "\n";
 		return $this->fichier_ini [$arg_groupe] [$arg_item];
 	}
 }

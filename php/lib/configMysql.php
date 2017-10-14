@@ -3,11 +3,11 @@ if(FALSE == isset($configMysql) )
 {
 	$configMysql = TRUE;
 	
-	$ficher = "../data/params.ini";
+	$fichier = "../conf/params.ini";
 	
 	// On lit les données dans le fichier ini
 	$ini_objet = new ini ();
-	$ini_objet->m_fichier ( $ficher );
+	$ini_objet->m_fichier ( $fichier );
 	
 	$monserveur = $ini_objet->m_valeur ( "monServeur", "mysql" );
 	$mabase = $ini_objet->m_valeur ( "maBase", "mysql" );

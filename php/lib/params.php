@@ -1,9 +1,9 @@
 <?php
-	$ficher = "../data/params.ini";
+	$fichier = "../conf/params.ini";
 	
 	// On lit les données dans le fichier ini
 	$ini_objet = new ini ();
-	$ini_objet->m_fichier ( $ficher );
+	$ini_objet->m_fichier ( $fichier );
 	
 	$_SESSION ['urlSite'] = $ini_objet->m_valeur ( "urlSite", "general" );
 	$_SESSION ['emailAdmin'] = $ini_objet->m_valeur ( "EmailAdmin", "general" );

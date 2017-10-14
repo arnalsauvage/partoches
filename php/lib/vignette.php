@@ -59,7 +59,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 	
 	if (! file_exists ( $source . $image )) {
 		$log = "vignette.php : function creation_vignette : Le fichier source $source$image n'a pas �t� trouv�.";
-		ecritFichierLog ( "fichierlog.htm", $log );
+		ecritFichierLog ( "../logs/fichierlog.htm", $log );
 		return false;
 	}
 	// On verifie que l'extention du fichier est bien une image jpg,jpeg ou gif
@@ -126,10 +126,10 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 			imagecopyresized ( $image_dest, $image_src, 0, 0, 0, 0, round ( $largeur_src * $ratio ), round ( $hauteur_src * $ratio ), $largeur_src, $hauteur_src );
 			
 			$log = "vignette.php Image : $image, largeur : " . round ( $largeur_src * $ratio ) . ", $hauteur : " . round ( $hauteur_src * $ratio ) . ", source : $source, destination : $destination";
-			ecritFichierLog ( "fichierlog.htm", $log );
+			ecritFichierLog ( "../logs/fichierlog.htm", $log );
 			if (! imagejpeg ( $image_dest, $destination . $prefixe . $image )) {
 				$log = "la cr�ation de la vignette a echoué pour l'image $destination$prefixe$image";
-				ecritFichierLog ( "fichierlog.htm", $log );
+				ecritFichierLog ( "../logs/fichierlog.htm", $log );
 				return false;
 			}
 		} // fin du size
