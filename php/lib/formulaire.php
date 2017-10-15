@@ -39,7 +39,7 @@ if (! isset ( $ClasseFormulaire )) {
 		
 		// Champ pour sélectionner dans une liste
 		private function champSELECT($pNom, $pListe, $pDefaut, $pTaille = 1) {
-			$s = "<SELECT NAME='$pNom' SIZE=$pTaille>\n";
+			$s = "<SELECT NAME='$pNom' SIZE='$pTaille'>\n";
 			while ( list ( $val, $libelle ) = each ( $pListe ) ) {
 				if ($val != $pDefaut)
 					$s .= "<OPTION VALUE='$val'>" . $libelle . "</OPTION>\n";
@@ -52,7 +52,7 @@ if (! isset ( $ClasseFormulaire )) {
 		// Champ pour sélectionner dans une liste
 		private function champSELECTImages($pNom, $pListe, $pDefaut, $pTaille = 1) {
 			global $cheminVignettes;
-			$s = "<SELECT NAME='$pNom' id='listeImage' SIZE=$pTaille onchange='changeListeImage(this.form)'>\n";
+			$s = "<SELECT NAME='$pNom' id='listeImage' SIZE='$pTaille' onchange='changeListeImage(this.form)'>\n";
 			while ( list ( $val, $libelle ) = each ( $pListe ) ) {
 				if ($val != $pDefaut)
 					$s .= "<OPTION VALUE='$val'>" . $libelle . "</OPTION>\n";
@@ -94,7 +94,7 @@ if (! isset ( $ClasseFormulaire )) {
 					if (isset ( $params ["MAXLENGHT"] ))
 						$tailleMax = $params ["MAXLENGTH"];
 					if (! isset ( $tailleMax ))
-						$tailleMax = 32;
+						$tailleMax = 128;
 					if ($tailleMax == 0)
 						$tailleMax = $taille;
 					// Appel de la méthode champINPUT de l'objet courant

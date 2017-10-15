@@ -1,15 +1,13 @@
 <?php
 include_once ("lib/utilssi.php");
 include ("menu.php");
-
+include ("chanson.php");
 $table = "chanson";
 $sortie = "";
 
 // Chargement des donnees de la chanson si l'identifiant est fourni
 if (isset ( $_GET ['id'] ) && $_GET ['id'] != "") {
-	$marequete = "select * from $table where id = '" . $_GET ['id'] . "'";
-	$resultat = ExecRequete ( $marequete, $idconnect );
-	$donnee = LigneSuivante ( $resultat );
+	$donnee = chercheChanson($_GET ['id']);
 	$mode = "MAJ";
 } else {
 	$mode = "INS";
@@ -27,12 +25,26 @@ else
 // Création du formulaire
 $f = new Formulaire ( "POST", $table . "_get.php", $sortie );
 $f->champCache ( "id", $donnee [0] );
-$f->champTexte ( "Nom :", "fnom", $donnee[1], 64, 32 );
-$f->champTexte ( "Interprète :", "finterprete", $donnee[2], 64, 32 );
+// TODO : La longueur du champ n'est pas prise en compte dans formulaire!
+$f->champTexte ( "Nom :", "fnom", $donnee[1], 64, 128 );
+$f->champTexte ( "Interprète :", "finterprete", $donnee[2], 64, 128 );
 $f->champTexte ( "Annee :", "fannee", $donnee [3], 4, 4 );
 $f->champCache ( "mode", $mode );
 $f->champValider ( "Valider la saisie", "valider" );
 $sortie .= $f->fin();
-$sortie .= envoieFooter ( "Bienvenue chez nous !" );
+
 echo $sortie;
+?>
+
+<h2>Envoyer un fichier pour cette chanson sur le serveur</h2>   
+<form action="chanson_upload.php" method="post" enctype="multipart/form-data">
+   <input type="hidden" name="MAX_FILE_SIZE" value="10000000">
+   <input type="hidden" name= "id" value = "<?php echo $donnee[0];?>" >
+  <label for="fichier"> </label>
+
+   <input type="file" id ="fichier" name="fichierUploade" size="40">
+   <input type="submit" value="Envoyer">
+</form>
+<?php 
+echo envoieFooter ( "Bienvenue chez nous !" );
 ?>

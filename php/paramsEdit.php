@@ -9,7 +9,7 @@ $sortie .="<table align='center'><tr><td>";
 if(!isset ($_SESSION['user']) ){
 	// Affichage du formulaire de login
 	$sortie .=$sortie;
-	include "menuLogin.html";
+	include "../html/menuLogin.html";
 	exit();
 }
 // On lit les données dans le fichier ini
