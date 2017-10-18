@@ -3,17 +3,9 @@ $a = session_id();
 if(empty($a)) session_start();
 unset ($a);
 //	function pc_process_dir ($nom_rep, $profondeur_max = 10, $profondeur = 0)
-//	function chansonEstEnregistree ($idChanson,$connexion)
-//	function vignette ($image,$largeur)
 //	function affichePlayer($mp3="vide")
 //	function ecritFichierLog($fichier, $log)
-//	function ListeIdLabel ($table, $nomId)
-//	function imagePortraitRandom ()
-//	function chargeChansons($connexion)
 //	function insereJavaScript ($source)
-//	function insereLienLightbox($image,$largeur='')
-//	function EnTete ($titre, $texte, $menu, $soustitre, $imagetitreGauche, $imagetitreDroite)
-//	function PiedDePage ()
 //	function listeImages ()
 //	function boutonSuppression($lien,$iconePoubelle)
 
@@ -122,78 +114,8 @@ if(!isset ($FichierUtilsSi)){
 		fclose($fp); 
 	}
 
-	// Cette fonction retourne une image en portrait au parmi les images dans la base avec le tag aLaUne
-	function imagePortraitRandom (){
-		global $LOGIN, $MOTDEPASSE, $mabase, $monserveur;
-		$connexion = Connexion($LOGIN,$MOTDEPASSE,$mabase,$monserveur);
-		$requete = "SELECT nomFichier, hauteur, largeur, repertoire, poids from image where tags LIKE '%aLaUne%'";
-		$resultat = ExecRequete ($requete, $connexion);
-		$nombreResultats = Mysql_num_rows($resultat);
-		$parcours = 0;
-		mt_srand (time());
-		$numero = mt_rand(0,$nombreResultats);
-		//echo ("Tirage de $numero / $nombreResultats");
-		while($parcours++<=$numero)
-		$ligne = lignesuivante($resultat);
-		return ($ligne[3].$ligne[0]);
-	}	
-
 	function insereJavaScript ($source){
 		return "<script type='text/javascript' src='$source'></script>\n";
-	}
-
-
-	// Cette fonction crée l'en-tête du HTML de réponse
-	function EnTete ($titre, $texte, $menu, $soustitre, $imagetitreGauche, $imagetitreDroite){
-		$enTete = "";
-		$enTete .= "<!doctype html>\n";
-		$enTete .= "<html lang='fr'>";
-		$enTete .= "<head>";
-
-//		$enTete .= "<meta http-equiv=\"Content-Type\" content=\"text/html\"; \"charset=iso-8859-1\" />";
-		$enTete .= "<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\" />";
-		$enTete .= "<TITLE>$titre</TITLE>\n";
-		$enTete .= "<LINK REL=\"stylesheet\" HREF=\"pages/si.css\" TYPE=\"text/css\">\n";
-		$enTete .= insereJavaScript ("pages/include/javascript.js");
-
-		// Utilisation du nuage de mots tagcanvas
-		$enTete .= insereJavaScript("pages/include/tagcanvas.min.js");
-		include("pages/include/tagcanvas.param.php");
-
-		$enTete .= "</HEAD>\n";
-		$enTete .= "<BODY>\n";
-		$enTete .= "<div align='center'>";
-		TblDebut (1,"800",3,3,"page"); 
-		TblDebutLigne ("MENU"); TblDebutCellule ();
-		TblDebut (0,"800",3,3);
-		TblDebutLigne ();
-		// mt_srand (time());
-		//		numero = mt_rand(10,99);
-		//		  $image1 = "/images/flrtr0" . $numero . ".jpg";
-		$image1 = "images/$imagetitreGauche";
-		// $numero = mt_rand(10,99);
-		//		  $image2 = "/images/flrtr0" . $numero . ".jpg";
-		//$image2 = "images/$imagetitreDroite";
-		$image2 = imagePortraitRandom();
-		TblCellule( Image($image1,240, 180));
-
-		TblCellule ("<FONT SIZE=+7>$texte</FONT><BR><BR> $soustitre ",1,1,"TITRE");
-		//		TblCellule ("<DIV align='center'>".Image ($image2,240)."</DIV>");
-		$enTete .= ("<TD align='center'>".insereLienLightbox($image2,240)."</TD>");
-		TblFinLigne(); TblFin();		
-		// Affichage du menu
-		// Premier tableau d'une case pour obtenir le fond rouge
-		TblDebut (0, "800", -1, -1, "MENU");
-		TblDebutLigne ("MENU"); TblDebutCellule();
-		// Deuxième tableau imbriqué pour contenir les éléments du menu
-		TblDebut (0, "800",-1, -1, "MENU"); TblDebutLigne("MENU");
-		// Choix des menus
-		while( list ($libelle, $ancre) = each($menu))
-		TblCellule (Ancre($ancre, $libelle,"MENU"), 1, 1, "MENU");
-		TblFin(); TblFin();
-		TblDebut (0,"800",1,1,"page"); TblDebutLigne();TblDebutCellule	();		
-		$enTete .= "</BODY></HTML>";
-		return $enTete	;		 
 	}
 
 	// Cette fonction retourne une liste des images disponibles sur le site, eventuellement dans un sous-dossier
@@ -211,11 +133,9 @@ if(!isset ($FichierUtilsSi)){
 		asort ($tableau);
 		return $tableau;
 	}
-        
 	// Cette fonction retourne un bouton de suppression avec message de confirmation
 	function boutonSuppression($lien,$iconePoubelle,$cheminImages){//<img src="x.png" onclick="getattrs(this);">
 		return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer la fiche' onclick =\"confirmeSuppr('".$lien."','Voulez-vous vraiment supprimer cet élément ?');\" border='0'>";
 	}
-
 }
 ?>
