@@ -14,15 +14,20 @@ if(FALSE == isset($configMysql) )
 	$LOGIN = $ini_objet->m_valeur ( "login", "mysql" );
 	$MOTDEPASSE = $ini_objet->m_valeur ( "motDePasse", "mysql" );
 	
-	if(($idconnect=@mysql_connect($monserveur,$LOGIN,$MOTDEPASSE))==false){
-		$error="Erreur #1 configMysql : Impossible de creer une connexion persistante !";
+	$mysqli = new mysqli($monserveur, $LOGIN, $MOTDEPASSE, $mabase);
+	
+	if ($mysqli->connect_error) {
+		die(' Erreur #1 configMysql : Impossible de creer une connexion persistante ! ' . $mysqli->connect_errno . ') '
+				. $mysqli->connect_error);
 		return(0);
 	}
 	
-	if(@mysql_select_db($mabase,$idconnect)==false){
+	if($mysqli->select_db($mabase)==false){
 		$error="Erreur #2 configMysql : Impossible de selectionner la base !";
 		return(0);
 	}
+	
+	$_SESSION ['mysql'] = $mysqli;
 	
 }
 //	echo "connexion : $idconnect";

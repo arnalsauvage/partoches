@@ -20,42 +20,42 @@ $contenu .= "
 			data-target='#main-menu' aria-expanded='true'>
 			<span class='sr-only'>Menu</span>
 			<span class='icon-bar'></span>
+			<span class='icon-bar'></span>
 			<span class='icon-bar'></span>";
 // Le lien paramétrage est limité aux admin et login parametrage
 if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > 2))
 	$contenu .= "<span class='icon-bar'></span>";
-	$contenu .= "
-			<span class='icon-bar'></span>
-		</button>
+	$contenu .= "		</button>
 		<a class='navbar-brand' href='../html/index.html'>Partoches</a>
 	</div>
     <div id='main-menu' class='collapse navbar-collapse'>
           <ul class='nav navbar-nav'>
 			<li class='divider' role='separator'></li>
-            <li ><a href='../php/utilisateur_liste.php'>Utilisateurs</a></li>
-            <li><a href='../php/chanson_liste.php'>Chansons</a></li>\n";
+			<li><a href='../php/songbook_liste.php'>Songbooks</a></li>
+            
+            <li><a href='../php/chanson_liste.php'>Chansons</a></li>\n
+			<li ><a href='../php/utilisateur_liste.php'>Utilisateurs</a></li>";
 // Le lien paramétrage est limité aux admin et login parametrage
 if (($_SESSION['user'] == $_SESSION['loginParam']) 
 		|| ($_SESSION['privilege'] > 2))
 	$contenu .= "<li><a href='../php/paramsEdit.php'>parametrage</a></li>\n";
 
-$contenu .= "<li><a href='#contact'>Contact</a></li>
+$contenu .= "
           </ul>
     </div><!--/.nav-collapse -->
 </div>
-</nav>   ";
+</nav>";
 
 // Sous menu
-$contenu .= "<div class= 'container' class='row col-sm-4'>
+$contenu .= "<div>
 			<div class='starter-template'>";
-$contenu .= "<br><br><br>" . image ( "../images" . $_SESSION ['image'], 64 );
+$contenu .= "<br><br><br>" . image ( "../images" . $_SESSION ['image'], 64 ) . "\n";
 
 $date = date ( "d/m/Y" );
 $heure = date ( "H:i" );
 
 $contenu .= Ancre ( "login.php?logoff=1", "logoff" ) . " | ";
-$contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut ( $_SESSION ['privilege'] ) . ", nous sommes le $date et il est $heure<br>";
-$contenu .= "</td></tr></table>";
+$contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut ( $_SESSION ['privilege'] ) . ", nous sommes le $date et il est $heure<br>\n";
 $contenu .= " </div> </div>";
 
 echo $contenu . "\n\n";

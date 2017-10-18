@@ -1,35 +1,5 @@
 <?php
 
-// Fonction Connexion _________________________________________________
-function Connexion ($pNom, $pMotDePasse, $pBase, $pServeur){
-	// Connexion au serveur
-	$connexion = mysql_connect($pServeur, $pNom, $pMotDePasse);
-	if(!$connexion){
-		echo "Désolé, connexion au serveur $pServeur impossible\n";
-		echo " pour $pNom";
-		exit;
-	}
-	// Connexion à la base
-	if(!mysql_select_db($pBase, $connexion)){
-		echo "Désolé, accès à la base $pBase impossible\n";
-		echo "<B>Message de MySQL :</B>" . mysql_error($connexion);
-		exit;
-	}
-	// On renvoie la variable de connexion
-	return $connexion;
-}        // Fin de la fonction Connexion _______________________________
-
-// Exécution d'une requête avec MySql _________________________________
-function ExecRequete ($requete, $connexion){
-	$resultat = mysql_query($requete, $connexion);
-	if($resultat)
-		return ($resultat);
-	else{
-		echo "<B>Erreur dans l'éxécution de la requête '$requete.</B><BR>";
-		echo "<B>Message de MySql : </B> " . mysql_error($connexion);
-		exit;
-	}
-}        // Fin de la fonction ExecRequete _____________________________
 
 // Récupération d'une ligne de résultat avecv MySql____________________
 function LigneSuivante ($resultat){
@@ -45,7 +15,7 @@ function RenvoieLigneN ($resultat, $nbligne){
 	return (mysql_fetch_row ($resultat));
 }        // Fin de la fonction RenvoieLigneN ___________________________
 
-// Récupération du nombre de ligne de résultat avecv MySql____________________
+// Récupération du nombre de ligne de résultat avec MySql____________________
 function NombreLignes ($resultat){
 	return (mysql_num_rows($resultat));
 }        // Fin de la fonction NombreLignes ___________________________

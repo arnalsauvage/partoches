@@ -2,7 +2,8 @@
 include_once ("lib/utilssi.php");
 include ("menu.php");
 include ("chanson.php");
-
+// TODO : ajouter un bouton "ajouter un doc pour cette chanson"
+// TODO : ajouter la date de publication et le tri par date de pub
 $chansonForm = "chanson_form.php";
 $chansonGet = "chanson_get.php";
 $chansonVoir = "chanson_voir.php";
@@ -32,7 +33,7 @@ $retour .= Image ( $iconeAttention, "100%", 1, 1 );
 
 $retour .= TblDebut ( 0 );
 $retour .= TblDebutLigne () . TblCellule ( "Tri" ) . TblCellule ( Ancre ( "?tri=nom", "Nom" ) ) . TblCellule ( Ancre ( "?tri=interprete", "Interprète" ) ) . TblCellule ( Ancre ( "?tri=annee", "Année" ) ) . TblFinLigne ();
-while ( $ligne = lignesuivante ( $resultat ) ) {
+while ( $ligne = $resultat->fetch_row()) {
 	$numligne ++;
 	$retour .= TblDebutLigne ();
 	

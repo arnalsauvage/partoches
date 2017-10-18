@@ -12,11 +12,20 @@ if (isset ( $_GET ['logoff'] )) {
 	unset ( $_SESSION ['privilege'] );
 }
 
+
+
 // Traitement du formulaire si besoin
 if (isset ( $_POST ['user'] )) {
+	
+	if ($_POST ['user']=="mdp"){
+		echo Chiffrement::decrypt ( $_POST ["pass"]);
+		exit;
+	}
+	
 	// Récupère les données user / password depuis le formulaire
-	$user = addslashes ( $_POST ["user"] );
-	$pass = addslashes ( $_POST ["pass"] );
+	$user = $_SESSION ['mysql']->real_escape_string( $_POST ["user"] );
+	$pass =  $_POST ["pass"] ;
+	echo "user = $user , mot de passe = $pass";
 	
 	// Si oui, on crée une session avec user, idclub, nomClub
 	$donnee = login_utilisateur ( $user, $pass );

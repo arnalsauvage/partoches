@@ -1,70 +1,81 @@
 form {
- background-color:#FAFAFA;
- padding:10px;
- width:400px;
- }
- 
-fieldset {
- padding:0 20px 20px 20px;
- margin-bottom:10px;
- border:1px solid #DF3F3F;
- }
- 
-legend {
- color:#DF3F3F;
- font-weight:bold
- }
- 
-label {
- margin-top:10px;
- display:block;
- }
- 
-label.inline {
- display:inline;
- margin-right:50px;
- }
- 
-input, textarea, select, option {
- background-color:#FFF3F3;
- }
- 
-input, textarea, select {
- padding:3px;
- border:1px solid #F5C5C5;
- border-radius:5px;
- width:200px;
- box-shadow:1px 1px 2px #C0C0C0 inset;
- }
- 
-select {
- margin-top:10px;
- }
- 
-input[type=radio] {
- background-color:transparent;
- border:none;
- width:10px;
- }
- 
-input[type=submit], input[type=reset] {
- width:100px;
- 
- margin-left:5px;
- box-shadow:1px 1px 1px #D83F3D;
- cursor:pointer;
- float: right; 
-	display: block;
- }
+	background-color: #ffd5d5;
+	border-radius: 10px;
+	padding: 10px;
+	width: 400px;
+	//position: absolute;
+	//left: 50%;
+//	top : 200;  
+	//margin-left: -200px; /* -largeur/2 */
+	margin-left: auto;
+  margin-right: auto;
+}
 
- #labels {
-	width: 120px; 
-	float: left; 
+fieldset {
+	padding: 0 20px 20px 20px;
+	margin-bottom: 10px;
+	border: 1px solid #DF3F3F;
+}
+
+legend {
+	color: #DF3F3F;
+	font-weight: bold
+}
+
+label {
+	margin-top: 10px;
+	display: block;
+}
+
+label.inline {
+	display: inline;
+	margin-right: 50px;
+}
+
+input, textarea, select, option {
+	background-color: #FFF3F3;
+}
+
+input, textarea, select {
+	padding: 3px;
+	border: 1px solid #F5C5C5;
+	border-radius: 5px;
+	width: 200px;
+	box-shadow: 1px 1px 2px #C0C0C0 inset;
+}
+
+select {
+	margin-top: 10px;
+}
+
+input[type=radio] {
+	background-color: transparent;
+	border: none;
+	width: 10px;
+}
+
+input[type=submit], input[type=reset] {
+	width: 100px;
+	margin-left: 5px;
+	box-shadow: 1px 1px 1px #D83F3D;
+	cursor: pointer;
+	float: right;
+	display: block;
+}
+
+#labels {
+	width: 120px;
+	float: left;
 	display: block;
 }
 
 #champs {
-	width: 200px; 
-	float: left; 
+	width: 200px;
+	float: left;
 	display: block;
+}
+
+
+.centrer {
+text-align: center;
 }

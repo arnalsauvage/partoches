@@ -5,9 +5,9 @@ include ("chanson.php");
 
 $nomTable = "chanson";
 
-$fnom = addslashes($fnom);
-$finterprete = addslashes($finterprete);
-$fannee = addslashes($fannee);
+$fnom = $_SESSION ['mysql']->real_escape_string($fnom);
+$finterprete = $_SESSION ['mysql']->real_escape_string($finterprete);
+$fannee = $_SESSION ['mysql']->real_escape_string($fannee);
 
 // On gère 3 cas :  création d'une chanson, modif ou suppression
   

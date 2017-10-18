@@ -12,16 +12,16 @@ function chercheChansons($critere, $valeur, $critereTri = 'nom', $bTriAscendant 
 	else
 		$maRequete .= " ASC";
 	// echo "ma requete : " . $maRequete;
-	$result = mysql_query ( $maRequete ) or die ( "Problème chercheChanson #3 : " . mysql_error () );
+	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème chercheChanson #3 : " .  $_SESSION ['mysql']->error  );
 	return $result;
 }
 
 // Cherche un chanson et le renvoie s'il existe
 function chercheChanson($id) {
 	$maRequete = "SELECT * FROM chanson WHERE chanson.id = '$id'";
-	$result = mysql_query ( $maRequete ) or die ( "Problème chercheChanson #1 : " . mysql_error () );
+	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème chercheChanson #1 : " .  $_SESSION ['mysql']->error  );
 	// renvoie la lisgne sélectionnée : id, nom, interprète, année
-	if (($ligne = mysql_fetch_array ( $result )))
+	if (($ligne = $result->fetch_row()))
 		return ($ligne);
 	else
 		return (0);
@@ -30,9 +30,9 @@ function chercheChanson($id) {
 // Cherche un chanson et la renvoie si elle existe
 function chercheChansonParLeNom($nom) {
 	$maRequete = "SELECT * FROM chanson WHERE chanson.nom = '$nom'";
-	$result = mysql_query ( $maRequete ) or die ( "Problème chercheChansonParLeNom #1 : " . mysql_error () );
+	$result =  $_SESSION ['mysql']->query ( $maRequete )or die ( "Problème chercheChansonParLeNom #1 : " .  $_SESSION ['mysql']->error  );
 	// renvoie la lisgne sélectionnée : id, nom, taille, date
-	if (($ligne = mysql_fetch_array ( $result )))
+	if (($ligne = $result->fetch_row()))
 		return ($ligne);
 	else
 		return (0);
@@ -41,7 +41,7 @@ function chercheChansonParLeNom($nom) {
 // Crée un chanson
 function creeChanson($nom, $interprete, $annee) {
 	$maRequete = "INSERT INTO chanson VALUES (NULL, '$nom', '$interprete', '$annee')";
-	$result = mysql_query ( $maRequete ) or die ( "Problème creeChanson#1 : " . mysql_error () );
+	$result =  $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème creeChanson#1 : " .  $_SESSION ['mysql']->error  );
 }
 
 // Modifie en base la chanson
@@ -49,7 +49,7 @@ function modifieChanson($id, $nom, $interprete, $annee) {
 	$maRequete = "UPDATE  chanson
 	SET nom = '$nom', interprete = '$interprete', annee = '$annee'
 	WHERE id='$id'";
-	$result = mysql_query ( $maRequete ) or die ( "Problème modifieChanson #1 : " . mysql_error () );
+	$result =  $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème modifieChanson #1 : " .  $_SESSION ['mysql']->error  );
 }
 
 // Cette fonction supprime un chanson si elle existe
@@ -57,7 +57,7 @@ function supprimeChanson($idChanson) {
 	// On supprime les enregistrements dans chanson
 	$maRequete = "DELETE FROM chanson
 	WHERE id='$idChanson'";
-	$result = mysql_query ( $maRequete ) or die ( "Problème #1 dans supprimeChanson : " . mysql_error () );
+	$result =  $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème #1 dans supprimeChanson : " .  $_SESSION ['mysql']->error  );
 }
 
 // Cette fonction modifie ou crée un chanson si besoin
@@ -79,17 +79,17 @@ function infosChanson($id) {
 // Cette fonction renvoie la liste des fichiers attachés à la chanson
 function fichiersChanson($id) {
 	$enr = chercheChanson ( $id );
-	$retour = "";
+	$retour = []; // repertoire, nom, extension
 	$repertoire = "../data/chansons/$id/";
 	if (is_dir ( $repertoire )) {
 		foreach ( new DirectoryIterator ( $repertoire ) as $fileInfo ) {
-			if ($fileInfo->isDot ())
+			if ($fileInfo->isDot ()|| strpos($fileInfo->getFilename (),".")==0)
 				continue;
-			$retour .= "<a href= '" . $repertoire . $fileInfo->getFilename () . "' target='_blank'>" . $fileInfo->getFilename () . "</a> <br>\n";
+			array_push($retour, [$repertoire , $fileInfo->getFilename (),$fileInfo->getextension()]);
 		}
 	}
 	
-	return $retour . "<BR>\n";
+	return $retour;
 }
 // Fonction de test
 function testeChanson() {
@@ -124,5 +124,5 @@ function testeChanson() {
 }
 
 // testeChanson ();
-
+// TODO ajouter des logs pur tracer l'activité du site
 ?>

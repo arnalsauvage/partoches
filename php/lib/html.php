@@ -18,17 +18,17 @@ if(!isset ($FichierHtml)){
 	function titre ($texte,$niveau){
 		return "<h$niveau>$texte</h$niveau>";
 	}
-
+// TODO : attribut border obsolete sur l'image
 
 	// Fonction retournant le code HTML pour une image ____________________
-	function Image ($urlImage, $largeur = -1, $hauteur = -1, $bordure = 0, $alt = ""){
+	function Image ($urlImage, $largeur = -1, $hauteur = -1,  $alt = "image deco"){
 		$attrLargeur = "";
 		$attrHauteur = "";
 		if($largeur != -1)
 		$attrLargeur = " width = '$largeur' ";
 		if($hauteur != -1)
 		$attrHauteur = " height = '$hauteur' ";
-		return "<img src='$urlImage' " . $attrLargeur . $attrHauteur . " border='$bordure' alt='$alt'>\n";
+		return "<img src='$urlImage' " . $attrLargeur . $attrHauteur . "  alt='$alt'>\n";
 	}
 	// Fin de la fonction Image____________________________________________
 
@@ -144,7 +144,7 @@ if(!isset ($FichierHtml)){
 		"<!doctype html>
 		<html lang='fr'>
 		<head>
-		<meta http-equiv='Content-Type' content='text/html; charset='utf-8'  />
+ 		<meta charset='UTF-8' >		
 		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
     	<link href='../css/bootstrap.min.css' rel='stylesheet'>   	
 		<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' /> 

@@ -7,16 +7,15 @@ $utilisateurGet = "utilisateur_get.php";
 $utilisateurVoir = "utilisateur_voir.php";
 
 $table = "utilisateur";
-
 $retour = "";
-
 $retour .= entreBalise ( "Utilisateurs", "H1" );
 $retour .= TblDebut ( 0 );
 
 // Chargement de la liste des utilisateurs
 $marequete = "select * from $table ORDER BY dateDernierLogin DESC";
-// $connexion = Connexion($LOGIN,$MOTDEPASSE,$mabase,$monserveur);
-$resultat = ExecRequete ( $marequete, $idconnect );
+$resultat = $_SESSION ['mysql']->query ( $marequete );
+if (! $resultat)
+	die ( "Problème utilisateursListe #1 : " . $_SESSION ['mysql']->error );
 $numligne = 0;
 
 // Affichage de la liste
@@ -28,19 +27,19 @@ if ($_SESSION ['privilege'] > 2)
 
 $retour .= Image ( $iconeAttention, "100%", 1, 1 );
 
-while ( $ligne = lignesuivante ( $resultat ) ) {
+while ( $ligne = $resultat->fetch_row () ) {
 	$numligne ++;
 	$retour .= TblDebutLigne ();
 	
 	if ($ligne [5])
 		// //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-		if (($_SESSION ['privilege'] > 2)||$_SESSION['user']==$ligne [1])
+		if (($_SESSION ['privilege'] > 2) || $_SESSION ['user'] == $ligne [1])
 			$retour .= TblCellule ( Ancre ( $utilisateurForm . "?id=$ligne[0]", Image ( ($cheminImages . $ligne [5]), 32, 32 ) ) ); // image
 			                                                                                                                        // //////////////////////////////////////////////////////////////////////ADMIN
 		else
 			$retour .= TblCellule ( Image ( ($cheminImages . $ligne [5]), 32, 32 ) ); // image
 	else
-		$retour .= TblCellule ( Ancre ( $_SESSION ['urlSite'] . "/index.php?id=$ligne[0]", "voir" ) );
+		$retour .= TblCellule ( Ancre ( $utilisateurForm . "?id=$ligne[0]", "voir" ) );
 	
 	$retour .= TblCellule ( entreBalise ( $ligne [1], "H2" ) ); // Login
 	

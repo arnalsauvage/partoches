@@ -7,13 +7,16 @@ $sortie = "";
 
 // Chargement des donnees de l'utilisateur si l'identifiant est fourni
 if ((isset ( $_GET ['id'] ) && $_GET ['id'] != "")) {
-	// $marequete = "select * from $table where id = '" . $_GET['id'] . "'";
-	// $resultat = ExecRequete ( $marequete, $idconnect);
-	// $donnee = LigneSuivante($resultat);
 	$donnee = chercheUtilisateur ( $id );
 	if (($_SESSION ['privilege'] > 2) || $_SESSION ['user'] == $donnee [1]) {
 		$mode = "MAJ";
 		$donnee [2] = Chiffrement::decrypt ( $donnee [2] );
+		$donnee [1] = htmlspecialchars($donnee [1]);
+		$donnee [2] = htmlspecialchars($donnee [3]);
+		$donnee [2] = htmlspecialchars($donnee [4]);
+		$donnee [2] = htmlspecialchars($donnee [6]);
+		$donnee [2] = htmlspecialchars($donnee [7]);
+		$donnee [2] = htmlspecialchars($donnee [8]);
 	}
 } 
 else if ($_SESSION ['privilege'] > 2) {

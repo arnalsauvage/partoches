@@ -1,12 +1,12 @@
 <?php
 include_once ("lib/utilssi.php");
 include ("menu.php");
-include ("chanson.php");
-$table = "chanson";
+include ("songbook.php");
+$table = "songbook";
 $sortie = "";
 $monImage = "";
 
-$retour = fichiersChanson ( $_GET ['id'] );
+$retour = fichierssongbook ( $_GET ['id'] );
 
 foreach ( $retour as $fichier ) {
 //	echo $fichier [0] . " " . $fichier [1] . " " . $fichier [2] . " <br>";
@@ -14,12 +14,12 @@ foreach ( $retour as $fichier ) {
 		$monImage = $fichier;
 }
 
-$donnee = chercheChanson ( $_GET ['id'] );
-$sortie .= "<h2>$donnee[1]</h2>";
+$donnee = cherchesongbook ( $_GET ['id'] );
+$sortie .= "<h2>$donnee[1]</h2>"; // Titre
 if ("" != $monImage) {
 	$sortie .= Image ( $monImage [0] . $monImage [1], 200, "", "pochette" );
 }
-$sortie .= $donnee [2] . "-" . $donnee [3] . "<br>\n";
+$sortie .= $donnee [2] . "-" . $donnee [3] ."-". $donnee [5] . " hit(s)<br>\n";
 
 foreach ( $retour as $fichier ) {
 	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );

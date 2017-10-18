@@ -22,13 +22,13 @@ if (! isset ( $ClasseFormulaire )) {
 				$encType = "";
 			
 			// Ouverture de la balise
-			$this->htmlGenere .= "<CENTER><FORM  METHOD='$pMethode' " . $encType . "ACTION='$pAction' NAME='$pNom'>\n";
+			$this->htmlGenere .= "<FORM  METHOD='$pMethode' " . $encType . "ACTION='$pAction' NAME='$pNom'>\n";
 		}
 		
 		// Méthode pour créer un champ INPUT général
 		private function champINPUT($pType, $pNom, $pVal, $pTaille, $pTailleMax) {
 			// Création de la balise
-			return "<INPUT TYPE='$pType' NAME='$pNom' " . 'VALUE="' . htmlentities ( $pVal ) . '" SIZE="$pTaille" MAXLENGTH="' . $pTailleMax . '">';
+			return "<INPUT TYPE='$pType' NAME='$pNom' VALUE=\"" .  $pVal  . "\" SIZE='$pTaille' MAXLENGTH='$pTailleMax'>";
 			// Renvoi de la chaîne de caractères
 		}
 		
@@ -84,9 +84,14 @@ if (! isset ( $ClasseFormulaire )) {
 			$taille = "";
 			$champ = "vide";
 			switch ($pType) {
+				case "SUBMIT" :// Appel de la méthode champINPUT de l'objet courant
+					$champ = "<INPUT TYPE='$pType' NAME='$pNom' VALUE='" .  $pVal . "' ";
+					if (isset ( $params ["SIZE"] ))
+						$champ .= "SIZE='" .$params ["SIZE"] . "'";
+						$champ .= ">";
+					break;
 				case "TEXT" :
 				case "PASSWORD" :
-				case "SUBMIT" :
 				case "RESET" :
 				case "FILE" :
 					if (isset ( $params ["SIZE"] ))
@@ -138,7 +143,7 @@ if (! isset ( $ClasseFormulaire )) {
 			// Création du champ
 			$retour = "";
 			$champHTML = $this->champForm ( $pType, $pNom, $pVal, $params, $pListe );
-				$retour .= "<B>" . $pLibelle . "</B>";
+				$retour .= "<label class='inline'>" . $pLibelle . "</label>";
 				$retour .= $champHTML . "<br>";
 			$this->htmlGenere .= $retour;
 		}
@@ -190,7 +195,7 @@ if (! isset ( $ClasseFormulaire )) {
 		// Fin du formulaire
 		public function fin() {
 			$retour = "";
-			$retour .= "</FORM></CENTER>\n";
+			$retour .= "</FORM>\n";
 			$this->htmlGenere .= $retour;
 			return $this->htmlGenere;
 		}

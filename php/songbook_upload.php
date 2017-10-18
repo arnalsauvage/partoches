@@ -3,7 +3,7 @@ require ("lib/utilssi.php");
 if (isset ( $_SESSION ['user'] )) {
 	
 	$autorisees = "pdf doc docx gif jpg png swf mp3";
-	$repertoire = "../data/chansons/" . $_POST ['id'] . "/";
+	$repertoire = "../data/songbooks/" . $_POST ['id'] . "/";
 	if (! file_exists ( $repertoire )) {
 		mkdir ( $repertoire, 0755 );
 		// echo " -=> Création du repertoire $repertoire réussi<br>";
@@ -25,6 +25,7 @@ if (isset ( $_SESSION ['user'] )) {
 			
 			// on vérifie l'extension
 			$type_file = $_FILES ['fichierUploade'] ['type'];
+			// TODO expression à simplifier en utilisant $autorisees
 			if (! strstr ( $type_file, 'jpg' ) && ! strstr ( $type_file, 'jpeg' ) && ! strstr ( $type_file, 'png' ) && ! strstr ( $type_file, 'gif' ) && ! strstr ( $type_file, 'txt' ) && ! strstr ( $type_file, 'rar' ) && ! strstr ( $type_file, 'zip' ) && ! strstr ( $type_file, 'pdf' ) && ! strstr ( $type_file, 'doc' ) && ! strstr ( $type_file, 'docx' )) 
 			// reproduire cette syntaxe pour ajouter d'autre extension
 			{
@@ -36,6 +37,7 @@ if (isset ( $_SESSION ['user'] )) {
 				$ext = pathinfo ( $path, PATHINFO_EXTENSION ); // on récupère l'extension
 				$name_file = renommeFichier ( $_FILES ['fichierUploade'] ['name'] ); // on crée un nom compatible url
 				$name_file = urlencode ( $name_file );
+				// Si le nom de fichier est déjà pris, on en cherche un autre au hasard
 				while ( file_exists ( $repertoire . $name_file ) ) {
 					$carsPossible = "012346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ";
 					$char = substr ( $carsPossible, mt_rand ( 0, strlen ( $carsPossible ) - 1 ), 1 );
@@ -84,7 +86,7 @@ if (isset ( $_SESSION ['user'] )) {
 		echo "Le fichier n'a pas été reçu !!!<BR>";
 	}
 }
-header ( 'Location: ./chanson_voir.php?id=' . $_POST ['id'] );
+header ( 'Location: ./songbook_voir.php?id=' . $_POST ['id'] );
 // }
 // echo "Vous �tes identifi� avec : " . $email . "<BR>";
 // $texte = " Bonjour, un fichier ($toto_name) a �t� upload� sur http://medina.arnaud.free.fr/$repertoire, par l'ip $REMOTE_ADDR, identifi� avec le nom $email.";

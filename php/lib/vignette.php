@@ -136,32 +136,4 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 	} // fin de l'extension
 }
 
-/* --------------------------------------------------------------------------------------------- */
-
-// Cette fonction ajoute un fichier � la table images de la base de donnees
-function ajoute_fichier_BD($nomFichier, $connexion) {
-	$tabInfos = getimagesize ( $nomFichier );
-	$largeur = $tabInfos [0];
-	$hauteur = $tabInfos [1];
-	$poids = filesize ( $nomFichier );
-	$fichier = substr ( strrchr ( $nomFichier, '/' ), 1 );
-	$repertoire = substr ( $nomFichier, 0, strlen ( $nomFichier ) - strlen ( $fichier ) );
-	$marequete = "INSERT INTO image (nomFichier, repertoire, largeur, hauteur, poids, tags, hits, occurences) VALUES ('$fichier','$repertoire', $largeur, $hauteur, $poids,'',0,1)";
-	$resultat = ExecRequete ( $marequete, $connexion );
-}
-function supprime_fichier_BD($nomFichier, $connexion) {
-	$marequete = "DELETE FROM image WHERE nomFichier = '$nomFichier'";
-	$resultat = ExecRequete ( $marequete, $connexion );
-}
-function actualise_fichier_BD($nomFichier, $connexion) {
-	$tabInfos = getimagesize ( $nomFichier );
-	$largeur = $tabInfos [0];
-	$hauteur = $tabInfos [1];
-	$poids = filesize ( $nomFichier );
-	$fichier = substr ( strrchr ( $nomFichier, '/' ), 1 );
-	$repertoire = substr ( $nomFichier, 0, strlen ( $nomFichier ) - strlen ( $fichier ) );
-	$marequete = "UPDATE image SET nomFichier='$fichier', largeur='$largeur', hauteur='$hauteur', repertoire='$repertoire', poids = $poids WHERE nomFichier='$fichier'";
-	$resultat = ExecRequete ( $marequete, $connexion );
-}
-
 ?>
