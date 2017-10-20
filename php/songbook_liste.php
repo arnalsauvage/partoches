@@ -6,7 +6,7 @@ include ("songbook.php");
 $songbookForm = "songbook_form.php";
 $songbookGet = "songbook_get.php";
 $songbookVoir = "songbook_voir.php";
-$cheminImagesSongbook = "../images/songbook/";
+$cheminImagesSongbook = "../data/songbooks/";
 $table = "songbook";
 $retour = "";
 $retour .= entreBalise ( "Songbooks", "H1" );
@@ -40,7 +40,7 @@ while ( $ligne = $resultat->fetch_row () ) {
 	if ($ligne [4])
 		// //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
 		if ($_SESSION ['privilege'] > 2)
-			$retour .= TblCellule ( Ancre ( $songbookForm . "?id=$ligne[0]", Image ( ($cheminImagesSongbook . $ligne [4]), 32, 32, "couverture" ) ) ); // image
+			$retour .= TblCellule ( Ancre ( $songbookForm . "?id=$ligne[0]", Image ( ($cheminImagesSongbook .$ligne[0]."/". $ligne [4]), 32, 32, "couverture" ) ) ); // image
 			                                                                                                                                  // //////////////////////////////////////////////////////////////////////ADMIN
 		else
 			$retour .= TblCellule ( Image ( ($cheminImagesSongbook . $ligne [4]), 32, 32 ) ); // image
