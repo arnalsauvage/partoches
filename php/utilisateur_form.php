@@ -12,11 +12,11 @@ if ((isset ( $_GET ['id'] ) && $_GET ['id'] != "")) {
 		$mode = "MAJ";
 		$donnee [2] = Chiffrement::decrypt ( $donnee [2] );
 		$donnee [1] = htmlspecialchars($donnee [1]);
-		$donnee [2] = htmlspecialchars($donnee [3]);
-		$donnee [2] = htmlspecialchars($donnee [4]);
-		$donnee [2] = htmlspecialchars($donnee [6]);
-		$donnee [2] = htmlspecialchars($donnee [7]);
-		$donnee [2] = htmlspecialchars($donnee [8]);
+		$donnee [3] = htmlspecialchars($donnee [3]);
+		$donnee [4] = htmlspecialchars($donnee [4]);
+		$donnee [6] = htmlspecialchars($donnee [6]);
+		$donnee [7] = htmlspecialchars($donnee [7]);
+		$donnee [8] = htmlspecialchars($donnee [8]);
 	}
 } 
 else if ($_SESSION ['privilege'] > 2) {

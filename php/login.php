@@ -10,13 +10,11 @@ if (isset ( $_GET ['logoff'] )) {
 	unset ( $_SESSION ['email'] );
 	unset ( $_SESSION ['image'] );
 	unset ( $_SESSION ['privilege'] );
+	unset ( $_SESSION ['id'] );
 }
-
-
 
 // Traitement du formulaire si besoin
 if (isset ( $_POST ['user'] )) {
-	
 	if ($_POST ['user']=="mdp"){
 		echo Chiffrement::decrypt ( $_POST ["pass"]);
 		exit;
@@ -30,6 +28,7 @@ if (isset ( $_POST ['user'] )) {
 	// Si oui, on crée une session avec user, idclub, nomClub
 	$donnee = login_utilisateur ( $user, $pass );
 	if ($donnee) {
+		$_SESSION ['id'] = $donnee [0];
 		$_SESSION ['user'] = $donnee [1];
 		$_SESSION ['email'] = $donnee [7];
 		$_SESSION ['image'] = $donnee [5];

@@ -39,15 +39,26 @@ function chercheChansonParLeNom($nom) {
 }
 
 // Crée un chanson
-function creeChanson($nom, $interprete, $annee) {
-	$maRequete = "INSERT INTO chanson VALUES (NULL, '$nom', '$interprete', '$annee')";
+function creeChanson($nom, $interprete, $annee,  $idAuteur, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0) {
+	$nom = $_SESSION ['mysql']->real_escape_string($nom);
+	$interprete = $_SESSION ['mysql']->real_escape_string($interprete);
+	$annee = $_SESSION ['mysql']->real_escape_string($annee);
+	$date_publication =  convertitDateJJMMAAAA ( date("d/m/Y") );
+	$idAuteur = $_SESSION ['id'];
+	$maRequete = "INSERT INTO chanson VALUES (NULL, '$nom', '$interprete', '$annee', '$tempo', '$mesure', '$pulsation', '$date_publication' , '$idAuteur', '$hits')";
 	$result =  $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème creeChanson#1 : " .  $_SESSION ['mysql']->error  );
 }
 
 // Modifie en base la chanson
-function modifieChanson($id, $nom, $interprete, $annee) {
+function modifieChanson($id, $nom, $interprete, $annee, $idAuteur, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0) {
+	$nom = $_SESSION ['mysql']->real_escape_string($nom);
+	$interprete = $_SESSION ['mysql']->real_escape_string($interprete);
+	$annee = $_SESSION ['mysql']->real_escape_string($annee);
+	$date_publication =  convertitDateJJMMAAAA ( date("d/m/Y") );
+	$idAuteur = $_SESSION ['id'];
+	
 	$maRequete = "UPDATE  chanson
-	SET nom = '$nom', interprete = '$interprete', annee = '$annee'
+	SET nom = '$nom', interprete = '$interprete', annee = '$annee', idauteur = $idAuteur, tempo = '$tempo', mesure='$mesure', pulsation='$pulsation',  date_publication = '$date_publication', hits='$hits'
 	WHERE id='$id'";
 	$result =  $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème modifieChanson #1 : " .  $_SESSION ['mysql']->error  );
 }
@@ -61,11 +72,11 @@ function supprimeChanson($idChanson) {
 }
 
 // Cette fonction modifie ou crée un chanson si besoin
-function creeModifiechanson($id, $nom, $interprete, $annee) {
+function creeModifiechanson($id, $nom, $interprete, $annee, $idAuteur, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0) {
 	if (chercheChanson ( $id ))
-		modifieChanson ( $id, $nom, $interprete, $annee );
+		modifieChanson ( $id, $nom, $interprete, $annee, $idAuteur, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0);
 	else
-		creeChanson ( $nom, $interprete, $annee );
+		creeChanson ( $nom, $interprete, $annee, $idAuteur, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0);
 }
 
 // Cette fonction renvoie une chaine de description de la chanson
@@ -88,12 +99,12 @@ function fichiersChanson($id) {
 			array_push($retour, [$repertoire , $fileInfo->getFilename (),$fileInfo->getextension()]);
 		}
 	}
-	
 	return $retour;
 }
 // Fonction de test
 function testeChanson() {
-	creeChanson ( "La nuit je mens", "Bashung", 1998 );
+	echo "On crée la nuit je mens.<br>\n";
+	creeChanson ( "La nuit je mens", "Bashung", 1998, $_SESSION ['id'], 120, "4/4", "binaire",10);
 	$id = chercheChansonParLeNom ( "La nuit je mens" );
 	$id = $id [0];
 	echo infosChanson ( $id );
@@ -102,12 +113,12 @@ function testeChanson() {
 	$id = $id [0];
 	echo infosChanson ( $id );
 	
-	creeChanson ( "La javanaise", "Gainsbourg", 1962 );
+	creeChanson ( "La javanaise", "Gainsbourg", 1962 , $_SESSION ['id'], 110, "3/4", "binaire",50);
 	$id = chercheChansonParLeNom ( "La javanaise" );
 	$id = $id [0];
 	echo infosChanson ( $id );
 	
-	creeModifieChanson ( $id, "La javanaise remake", "Gainsbarre", 1979 );
+	creeModifieChanson ( $id, "La javanaise remake", "Gainsbarre", 1979, $_SESSION ['id'], 80, "4/4", "ternaire",1);
 	$id = chercheChansonParLeNom ( "La javanaise remake" );
 	$id = $id [0];
 	echo infosChanson ( $id );
@@ -123,6 +134,5 @@ function testeChanson() {
 	// supprimechanson($id[0]);
 }
 
-// testeChanson ();
 // TODO ajouter des logs pur tracer l'activité du site
 ?>

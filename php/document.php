@@ -66,8 +66,8 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable) {
 	$resultat = $resultat->fetch_row ();
 	if ($resultat != NULL)
 		return false;
-	
-	$maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable')";
+	$idUSer = $_SESSION ['id'];
+	$maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser')";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème creedocument#1 : " . $_SESSION ['mysql']->error );
 	return true;
 }
@@ -76,6 +76,7 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable) {
 function modifieDocument($nom, $tailleKo) {
 	$date = date ( "d/m/y" );
 	$date = convertitDateJJMMAAAA ( $date );
+	$idUser = $_SESSION ['id'];
 	
 	$resultat = chercheDocuments ( "nom", $nom );
 	$resultat = $resultat->fetch_row ();
@@ -83,9 +84,8 @@ function modifieDocument($nom, $tailleKo) {
 		return false;
 	else
 		$version = $resultat [4] + 1;
-	
 	$maRequete = "UPDATE  document
-	SET tailleKo = '$tailleKo', date = '$date', version = '$version'
+	SET tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser';
 	WHERE nom = '$nom'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème modifiedocument #1 : " . $_SESSION ['mysql']->error );
 }
@@ -108,15 +108,13 @@ function creeModifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 		modifieDocument ( $nom, $tailleKo );
 	return;
 }
-
-function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant = tru){
+function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant = tru) {
 	$retour = "<select name='documentJoint'>\n";
 	
 	// Ajouter des options
-	$lignes =  chercheDocuments($critere, $valeur, $critereTri, $bTriAscendant );
-	while ($ligne = $lignes->fetch_row ())
-	{
-		$retour .= "<option  value = '".$ligne[0] . "'> " . htmlEntities($ligne[1]) . "</option>\n";
+	$lignes = chercheDocuments ( $critere, $valeur, $critereTri, $bTriAscendant );
+	while ( $ligne = $lignes->fetch_row () ) {
+		$retour .= "<option  value = '" . $ligne [0] . "'> " . htmlEntities ( $ligne [1] ) . "</option>\n";
 	}
 	$retour .= "</select>\n";
 	return $retour;
@@ -137,22 +135,22 @@ function infosDocument($nom) {
 
 // Fonction de test
 function testeDocument() {
-// 	if (creeDocument ( "enfant.pdf", "128", "chanson", 2 ) == FALSE)
-// 		echo "erreur de création, le document existe déjà en base";
-// 	else {
-// 		echo "document enfant créé";
-// 	}
-// 	echo infosDocument ( "enfant.pdf" );
+	// if (creeDocument ( "enfant.pdf", "128", "chanson", 2 ) == FALSE)
+	// echo "erreur de création, le document existe déjà en base";
+	// else {
+	// echo "document enfant créé";
+	// }
+	// echo infosDocument ( "enfant.pdf" );
 	
-// 	creeModifieDocument ( "GrilleSaladeDeFruits.pdf", "179124", "chanson", 25 );
-// 	creeModifieDocument ( "RiffSaladeDeFruits ukulele.pdf", "34900", "chanson", 25 );
-// 	creeModifieDocument ( "SaladeDeFruits.pdf", "475024", "chanson", 4 );
-// 	creeModifieDocument ( "SaladeDeFruits-BOURVIL.png.pdf", "599551", "chanson", 4 );
+	// creeModifieDocument ( "GrilleSaladeDeFruits.pdf", "179124", "chanson", 25 );
+	// creeModifieDocument ( "RiffSaladeDeFruits ukulele.pdf", "34900", "chanson", 25 );
+	// creeModifieDocument ( "SaladeDeFruits.pdf", "475024", "chanson", 4 );
+	// creeModifieDocument ( "SaladeDeFruits-BOURVIL.png.pdf", "599551", "chanson", 4 );
 	
-// 	creeModifieDocument ( "parent.pdf", "256", "chanson", 5 );
+	// creeModifieDocument ( "parent.pdf", "256", "chanson", 5 );
 	echo infosDocument ( "enfant.pdf" );
 }
 
-//testeDocument ();
+// testeDocument ();
 // TODO ajouter des logs pur tracer l'activité du site
 ?>

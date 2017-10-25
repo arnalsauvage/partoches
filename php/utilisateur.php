@@ -59,7 +59,7 @@ function creeUtilisateur($login, $mdp, $prenom, $nom, $image, $site, $email, $si
 	// Crypter le mdp
 	$crypt = Chiffrement::crypt ( $mdp );
 	// vérifier l'email
-	$date = convertitDateJJMMAAAA ( "01/01/1970" );
+	$date = convertitDateJJMMAAAA ( date("d/m/Y") );
 	$login = $_SESSION ['mysql']->escape_string (  $login );
 	$prenom = $_SESSION ['mysql']->escape_string (  $prenom );
 	$nom = $_SESSION ['mysql']->escape_string (  $nom );
@@ -67,9 +67,9 @@ function creeUtilisateur($login, $mdp, $prenom, $nom, $image, $site, $email, $si
 	$site = $_SESSION ['mysql']->escape_string (  $site );
 	$email = $_SESSION ['mysql']->escape_string (  $email );
 	$signature = $_SESSION ['mysql']->escape_string (  $signature );
-	$privilege = $_SESSION ['mysql']->escape_string (  $privilege );
 	
-	$maRequete = "INSERT INTO  utilisateur VALUES (NULL, '$login', '$crypt', '$prenom', '$nom', '$image', '$site', '$email', '$signature', '$date', '0', '$priviliege')";
+	$maRequete = "INSERT INTO  utilisateur VALUES (NULL, '$login', '$crypt', '$prenom', '$nom', '$image', '$site', '$email', '$signature', '$date', '0', '$privilege')";
+	// echo "Ma requete : $maRequete<br>\n";
 	$result = $_SESSION ['mysql']->query ( $maRequete );
 	if (! $result)
 		die ( "Problème creeUtilisateur#1 : " . $_SESSION ['mysql']->error );
@@ -78,9 +78,9 @@ function creeUtilisateur($login, $mdp, $prenom, $nom, $image, $site, $email, $si
 // Formate les chaînes pour enregistrement en base
 
 // Modifie en base le utilisateur
-function modifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $dateDernierLogin, $nbreLogins, $privilege) {
+function modifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $nbreLogins, $privilege) {
 	// On convertit la date au format mysql
-	$date = convertitDateJJMMAAAA ( $dateDernierLogin );
+	$date = convertitDateJJMMAAAA ( date("d/m/Y"));
 	// Crypter le mdp
 	$crypt = Chiffrement::crypt ( $mdp );
 	
@@ -114,11 +114,11 @@ function supprimeUtilisateur($idUtilisateur) {
 }
 
 // Cette fonction modifie ou crée un utilisateur si besoin
-function creeModifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $dateDernierLogin, $nbreLogins, $privilege) {
+function creeModifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $nbreLogins, $privilege) {
 	if (chercheutilisateur ( $id ))
-		modifieUtilisateur ( $id, $login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $dateDernierLogin, $nbreLogins, $privilege );
+		modifieUtilisateur ( $id, $login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $nbreLogins, $privilege );
 	else
-		creeUtilisateur ( $login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $dateDernierLogin, $nbreLogins, $privilege );
+		creeUtilisateur ( $login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $privilege );
 }
 
 // Cette fonction tente de loguer un utilisateur avec le mot de passe
@@ -155,26 +155,30 @@ function infos($id) {
 	$enr = chercheUtilisateur ( $id );
 	// id_journee id_joueur poste statut
 	$retour = "Id : " . $enr [0] . " Nom : " . $enr [1] . " Desc : " . $enr [2] . " date : " . $enr [3] . " image : " . $enr [4] . " hits : " . $enr [5];
-	return $retour;
+	return $retour . "<br>\n";
 }
 
 // Fonction de test
 function testeUtilisateur() {
-	creeUtilisateur ( "test", "kazoo", "Alain", "Minc", "test.png", "http://samere", "truc@bidule.com", "bla bla bla", "25/10/2017", 5, 3 );
-	$id = chercheUtilisateurParLeLogin ( "utilisateur 1" );
+	echo "Test de creeUtilisateur<br>\n";
+	creeUtilisateur ( "test", "kazoo", "Alain", "Minc", "test.png", "http://samere", "truc@bidule.com", "bla bla bla", "2" );
+	$id = chercheUtilisateurParLeLogin ( "test" );
 	$id = $id [0];
 	$enr = chercheUtilisateur ( $id );
 	echo infos ( $id );
-	creeUtilisateur ( "test2", "kazoo2", "Alain", "Minc", "test.png", "http://samere", "truc@bidule.com", "bla bla bla", "25/10/2017", 5, 2 );
-	creeModifieUtilisateur ( $id, "test3", "kazoo3", "Alainx", "Mincx", "tesxt.png", "http://samere.org", "truc@bidule.com", "bla bla bla", "25/10/2017", 5 );
+	echo "Test de creeUtilisateur 2<br>\n";
+	creeUtilisateur ( "test2", "kazoo2", "Alain", "Minc", "test.png", "http://samere", "truc@bidule.com", "bla bla bla",  2 );
+	echo "Test de creeUtilisateur 3<br>\n";
+	creeModifieUtilisateur ( $id, "test3", "kazoo3", "Alainx", "Mincx", "tesxt.png", "http://samere.org", "truc@bidule.com", "bla bla bla",  5, 1 );
 	
 	$id = chercheUtilisateurParLeLogin ( "test" );
 	supprimeUtilisateur ( $id [0] );
 	
 	$id = chercheUtilisateurParLeLogin ( "test2" );
 	supprimeUtilisateur ( $id [0] );
+	
 	$id = chercheUtilisateurParLeLogin ( "test3" );
-	// supprimeUtilisateur($id[0]);
+	supprimeUtilisateur($id[0]);
 }
 
 //testeUtilisateur ();

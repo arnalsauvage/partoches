@@ -41,7 +41,8 @@ function cherchesongbookParLeNom($nom) {
 // Crée un songbook
 function creesongbook($nom, $description, $date, $image, $hits) {
 	$date = convertitDateJJMMAAAA($date);
-	$maRequete = "INSERT INTO songbook VALUES (NULL, '$nom', '$description', '$date', '$image', '$hits')";
+	$idUSer = $_SESSION ['id'];
+	$maRequete = "INSERT INTO songbook VALUES (NULL, '$nom', '$description', '$date', '$image', '$hits', '$idUSer')";
 	$result =  $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème creesongbook#1 : " . $_SESSION ['mysql']->error  );
 }
 
