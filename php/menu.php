@@ -22,6 +22,7 @@ $contenu .= "
 			<span class='icon-bar'></span>
 			<span class='icon-bar'></span>
 			<span class='icon-bar'></span>";
+
 // Le lien paramétrage est limité aux admin et login parametrage
 if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > 2))
 	$contenu .= "<span class='icon-bar'></span>";

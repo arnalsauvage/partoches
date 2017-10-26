@@ -23,7 +23,7 @@ if (isset ( $_POST ['user'] )) {
 	// Récupère les données user / password depuis le formulaire
 	$user = $_SESSION ['mysql']->real_escape_string( $_POST ["user"] );
 	$pass =  $_POST ["pass"] ;
-	echo "user = $user , mot de passe = $pass";
+//	echo "user = $user , mot de passe = $pass";
 	
 	// Si oui, on crée une session avec user, idclub, nomClub
 	$donnee = login_utilisateur ( $user, $pass );

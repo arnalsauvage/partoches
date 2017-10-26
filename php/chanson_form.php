@@ -5,32 +5,57 @@ include ("chanson.php");
 $table = "chanson";
 $sortie = "";
 
+// $id, $nom, $interprete, $annee, $idAuteur, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
+
 // Chargement des donnees de la chanson si l'identifiant est fourni
 if (isset ( $_GET ['id'] ) && $_GET ['id'] != "") {
 	$donnee = chercheChanson ( $_GET ['id'] );
-	$donnee [1] = htmlspecialchars($donnee [1]);
-	$donnee [2] = htmlspecialchars($donnee [2]);
+	$donnee [1] = htmlspecialchars($donnee [1]); // nom
+	$donnee [2] = htmlspecialchars($donnee [2]); // interprete
+	$donnee [3] = intval(htmlspecialchars($donnee [3])); // annee
+	$donnee [4] = intval(htmlspecialchars($donnee [4])); // tempo
+	$donnee [5] = htmlspecialchars($donnee [5]); // mesure
+	$donnee [6] = htmlspecialchars($donnee [6]); // pulsation
+	$donnee [7] = htmlspecialchars($donnee [7]); // date_publication
+	$donnee [8] = $donnee [8];// idAuteur
+	$donnee [9] = intval(htmlspecialchars($donnee [9])); // hits
+	$donnee [10] = htmlspecialchars($donnee [10]); // tonalite
 	$mode = "MAJ";
 } else {
 	$mode = "INS";
-	$donnee [0] = 0;
-	$donnee [1] = "";
-	$donnee [2] = "";
-	$donnee [3] = "";
+	$donnee [0] = 0;// id
+	$donnee [1] = ""; // nom
+	$donnee [2] = ""; // interprete
+	$donnee [3] = ""; // annee
+	$donnee [4] = ""; // tempo
+	$donnee [5] = "4/4"; // mesure
+	$donnee [6] = ""; // pulsation
+	$donnee [7] = convertitDateJJMMAAAA ( date("d/m/Y") ); // date_publication
+	$donnee [8] = $_SESSION ['id']; // idAuteur
+	$donnee [9] = 0; // hits
+	$donnee [10] = ""; // tonalite
 }
 
 if ($mode == "MAJ")
 	$sortie .= "<H1> Mise à jour - " . $table . "</H1>";
 else
 	$sortie .= "<H1> Création - " . $table . "</H1>";
+
 $sortie .= "<Div class = 'centrer'>";
 // Création du formulaire
-$f = new Formulaire ( "POST", $table . "_get.php", $sortie );
+$f = new Formulaire ( "POST", $table . "_post.php", $sortie );
 $f->champCache ( "id", $donnee [0] );
 // TODO : La longueur du champ n'est pas prise en compte dans formulaire!
 $f->champTexte ( "Nom :", "fnom", $donnee [1], 64, 128  );
 $f->champTexte ( "Interprète :", "finterprete", $donnee [2], 64, 128 );
 $f->champTexte ( "Annee :", "fannee", $donnee [3], 4, 4 );
+$f->champTexte ( "Tempo :", "ftempo", $donnee [4], 4, 4 );
+$f->champTexte ( "Mesure :", "fmesure", $donnee [5], 4, 4 );
+$f->champTexte ( "Pulsation :", "fpulsation", $donnee [6], 10, 10 );
+$f->champTexte ( "Date publication :", "fdate", dateMysqlVersTexte ( $donnee [7]), 10, 10 );
+$f->champCache(  "fidAuteur", $donnee [8], 10, 10 );
+$f->champTexte ( "Hits :", "fhits", $donnee [9], 10, 10 );
+$f->champTexte ( "Tonalité :", "ftonalite", $donnee [10], 10, 10 );
 $f->champCache ( "mode", $mode );
 $f->champValider ( " Valider ", "valider" );
 $sortie .= $f->fin ();

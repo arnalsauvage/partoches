@@ -1,34 +1,5 @@
 <?php
 
-
-// Récupération d'une ligne de résultat avecv MySql____________________
-function LigneSuivante ($resultat){
-	return (mysql_fetch_row($resultat));
-}        // Fin de la fonction LigneSuivante ___________________________
-
-// Récupération d'une ligne de résultat avecv MySql__________________
-function RenvoieLigneN ($resultat, $nbligne){
-	if(!mysql_data_seek($resultat, $nbligne)){
-		echo "Impossible d'atteindre la ligne $nbligne: " . mysql_error() . "\n";
-		continue;
-	}     
-	return (mysql_fetch_row ($resultat));
-}        // Fin de la fonction RenvoieLigneN ___________________________
-
-// Récupération du nombre de ligne de résultat avec MySql____________________
-function NombreLignes ($resultat){
-	return (mysql_num_rows($resultat));
-}        // Fin de la fonction NombreLignes ___________________________
-
-// Libération de la variable resultat _________________________________
-function LibereResultat ($resultat){
-	mysql_free_result($resultat);
-}        // Fin de la fonction Resultat ___________________________
-
-function DernierIdInsere (){
-	return (mysql_insert_id());
-}
-
 // Cette fonction transforme une date au format Mysql et la traduit en notation
 // - JJ/MM/AAAA si mode == 0 (par defaut)
 // - JJ/MM si mode = 1
@@ -102,12 +73,6 @@ function dateDuJourMysql(){
 	return( date("Y") . "-" . date("m") . "-" . date("d"));
 }
 
-// Libere les ressources
-function libereRessources($resultat){
-	mysql_free_result($resultat);
-	
-}
-
 // Chargement de la liste des libelles
 // ex : chargeLibelles($conn, "auteurs", "nom") donne la liste des noms dans un tab[id]=nom trié par nom
 function chargeLibelles($connexion, $table, $libelle){
@@ -140,4 +105,12 @@ function chansonEstEnregistree ($idChanson,$connexion){
 	}
 }
 
+function augmenteHits ($nomTable,$id){
+	$marequete = "select id, hits from $nomTable where id = '$id'";
+	$result =  $_SESSION ['mysql']->query ( $marequete) or die ( "Problème augmenteHits #1 : table $nomTable, id : $id " .  $_SESSION ['mysql']->error );
+	$ligne = $result->fetch_row();
+	$nbHits = $ligne[1] + 1;
+	$marequete = "UPDATE $nomTable SET hits = '$nbHits' where id = '$id'";
+	$result =  $_SESSION ['mysql']->query ( $marequete) or die ( "Problème augmenteHits #2 : table $nomTable, id : $id " .  $_SESSION ['mysql']->error );
+}
 ?>
