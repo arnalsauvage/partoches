@@ -1,8 +1,8 @@
 <?php
 include_once ("lib/utilssi.php");
-include ("menu.php");
-include ("chanson.php");
-include ("document.php");
+include_once ("menu.php");
+include_once ("chanson.php");
+include_once ("document.php");
 $table = "chanson";
 $sortie = "";
 $monImage = "";

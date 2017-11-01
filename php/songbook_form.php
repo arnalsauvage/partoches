@@ -1,15 +1,18 @@
 <?php
 include_once ("lib/utilssi.php");
-include_once("menu.php");
-include_once("songbook.php");
-include_once("document.php");
-include_once("lienDocSongbook.php");
+include_once ("menu.php");
+include_once ("songbook.php");
+include_once ("document.php");
+include_once ("lienDocSongbook.php");
 $table = "songbook";
 $sortie = "";
 
 // Traitement de l'ajout de document
 if (isset ( $_POST ['id'] ) && (isset ( $_POST ['documentJoint'] ))) {
-	creeLienDocSongbook ( $_POST ['documentJoint'], $_POST ['id']);
+	
+	$id = $_POST ['id'];
+	ordonneLiensSongbook ( $id );
+	creeLienDocSongbook ( $_POST ['documentJoint'], $_POST ['id'] );
 	$id = $_POST ['id'];
 }
 
@@ -24,6 +27,7 @@ if ($id || (isset ( $_GET ['id'] ) && $_GET ['id'] != "")) {
 	$donnee [4] = $donnee [4];
 	$donnee [5] = $donnee [5];
 	$mode = "MAJ";
+	ordonneLiensSongbook ( $id );
 } else {
 	$mode = "INS";
 	$donnee [0] = 0;
@@ -36,7 +40,7 @@ if ($id || (isset ( $_GET ['id'] ) && $_GET ['id'] != "")) {
 
 if ($mode == "MAJ")
 	$sortie .= "<H1> Mise à jour - " . $table . "</H1>";
-else
+if ($mode == "INS")
 	$sortie .= "<H1> Création - " . $table . "</H1>";
 
 $sortie .= "<Div class = 'centrer'>";
@@ -73,15 +77,15 @@ if ($mode == "MAJ") {
 	while ( $ligne = $lignes->fetch_row () ) {
 		$ligneDoc = chercheDocument ( $ligne [1] );
 		$fichierCourt = composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
-		$fichier = "../data/chansons/" .$ligneDoc [6]. "/" . composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
+		$fichier = "../data/chansons/" . $ligneDoc [6] . "/" . composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
 		$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 		if (! file_exists ( "../images/icones/" . $fichier [2] . ".png" ))
 			$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
 		$listeDocs .= "$icone <a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> ";
-		$listeDocs .= boutonSuppression ( $songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages) . "<br>\n";
+		$listeDocs .= boutonSuppression ( $songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages ) . "<br>\n";
 	}
 	echo $listeDocs;
-?>
+	?>
 
 <h2>Insérer un document dans ce songbook</h2>
 <form action="songbook_form.php" method="post" name="form2">

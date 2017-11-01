@@ -1,7 +1,7 @@
 <?php
 include_once ("lib/utilssi.php");
-include ("menu.php");
-include ("songbook.php");
+include_once ("menu.php");
+include_once ("songbook.php");
 
 $table = "songbook";
 $retour = "";

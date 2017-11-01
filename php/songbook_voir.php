@@ -1,9 +1,9 @@
 <?php
 include_once ("lib/utilssi.php");
-include ("menu.php");
-include ("songbook.php");
-include ("lienDocSongbook.php");
-include ("document.php");
+include_once("menu.php");
+include_once("songbook.php");
+include_once("lienDocSongbook.php");
+include_once("document.php");
 $table = "songbook";
 $sortie = "";
 $monImage = "";
@@ -37,7 +37,7 @@ foreach ( $retour as $fichier ) {
 
 $sortie .= "<h2>Liste des documents dans ce songbook</h2>";
 
-$lignes = chercheLiensDocSongbook ( 'idsongbook', $_GET ['id'], "ordre", true );
+$lignes = chercheLiensDocSongbook ( 'idSongbook', $_GET ['id'], "ordre", true );
 $listeDocs = "";
 while ( $ligne = $lignes->fetch_row () ) {
 	$ligneDoc = chercheDocument ( $ligne [1] );
@@ -48,7 +48,6 @@ while ( $ligne = $lignes->fetch_row () ) {
 		$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
 		$sortie .= "<a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> <br>\n";
 }
-
 
 $sortie .= envoieFooter ( "Bienvenue chez nous !" );
 echo $sortie;

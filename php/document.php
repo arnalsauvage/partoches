@@ -21,7 +21,7 @@ function chercheDocuments($critere, $valeur, $critereTri = 'nom', $bTriAscendant
 function chercheDocument($id) {
 	$maRequete = "SELECT * FROM document WHERE document.id = '$id'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème cherchedocument #1 : " . $_SESSION ['mysql']->error );
-	// renvoie la lisgne sélectionnée : id, nom, interprète, année
+	// renvoie la lisgne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
 	if (($ligne = $result->fetch_row ()))
 		return ($ligne);
 	else
@@ -42,8 +42,7 @@ function chercheDocumentNomTableId($nom, $table, $id) {
 // Cherche les documents d'une entree d'une table et les renvoie s'ils existent
 function chercheDocumentsTableId($table, $id) {
 	$maRequete = "SELECT * FROM document WHERE document.idTable = '$id' AND document.nomTable = '$table'";
-	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème cherchedocument #1 : " . $_SESSION ['mysql']->error );
-	// renvoie la lisgne sélectionnée : id, nom, interprète, année
+	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème chercheDocumentsTableId #1 : " . $_SESSION ['mysql']->error );
 	return ($result);
 }
 
@@ -68,7 +67,7 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable) {
 	$resultat = $resultat->fetch_row ();
 	if ($resultat != NULL)
 		return false;
-	$idUSer = $_SESSION ['id'];
+	$idUser = $_SESSION ['id'];
 	$maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser')";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème creedocument#1 : " . $_SESSION ['mysql']->error );
 	return true;
@@ -94,13 +93,12 @@ function modifieDocument($nom, $tailleKo) {
 
 // Cette fonction supprime un document si il existe
 function supprimeDocument($id) {
-	// On supprime les enregistrements dans document
+	// On supprime les enregistrements dans la table document
 	$maRequete = "DELETE FROM document
 	WHERE id='$id'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème #1 dans supprimedocument : " . $_SESSION ['mysql']->error );
 	// On supprime également toutes les entrées Songbook lui correspondant
-	supprimeliensDocSongbookDuDocument($idDocument);
-	
+	supprimeliensDocSongbookDuDocument($id);
 }
 
 // Cette fonction modifie ou crée un document si besoin

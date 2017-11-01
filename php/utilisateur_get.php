@@ -1,6 +1,6 @@
 <?php
 include_once ("lib/utilssi.php");
-include ("menu.php");
+include_once ("menu.php");
 
 $nomTable = "utilisateur";
 $utilisteurListe = "utilisateur_liste.php";

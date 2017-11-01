@@ -1,7 +1,8 @@
 <?php
 include_once ("lib/utilssi.php");
-include ("menu.php");
-include ("chanson.php");
+include_once ("menu.php");
+include_once ("document.php");
+include_once ("chanson.php");
 
 $nomTable = "chanson";
 
@@ -27,7 +28,7 @@ if ((isset ( $_POST ['id'] ))) {
 	$mode = $_POST ['mode'];
 }
 
-// On gère 3 cas : création d'une chanson, modif ou suppression
+// On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
 if ($mode == "MAJ") {
 	modifieChanson ( $id, $fnom, $finterprete, $fannee, $fidAuteur, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite );
 }
@@ -40,5 +41,12 @@ if ($id && $mode == "SUPPR" && $_SESSION ['privilege'] > 1) {
 if ($mode == "INS") {
 	creeChanson ( $fnom, $finterprete, $fannee, $fidAuteur, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite );
 }
+
+// Gestion de la demande de suppression de document dans le songbook
+if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
+	// 	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
+	supprimeDocument ( $_GET ['idDoc']);
+}
+
 redirection ( $nomTable . "_liste.php" );
 ?>

@@ -1,6 +1,8 @@
 <?php
 include_once ("lib/utilssi.php");
 include_once "lib/configMysql.php";
+include_once ("lienDocSongbook.php");
+
 $songbookForm = "songbook_form.php";
 $songbookGet = "songbook_get.php";
 $songbookVoir = "songbook_voir.php";
@@ -60,12 +62,13 @@ function modifiesongbook($id, $nom, $description, $date, $image, $hits){
 	$result =  $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème modifiesongbook #1 : " . $_SESSION ['mysql']->error  );
 }
 
-// Cette fonction supprime un songbook si elle existe
+// Cette fonction supprime un songbook si il existe
 function supprimesongbook($idsongbook) {
 	// On supprime les enregistrements dans songbook
 	$maRequete = "DELETE FROM songbook
-	WHERE id='$idsongbook'";
+	WHERE id='$idSongbook'";
 	$result =  $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème #1 dans supprimesongbook : " . $_SESSION ['mysql']->error  );
+	supprimeliensDocSongbookDuSongbook($idSongbook);
 }
 
 // Cette fonction modifie ou crée un songbook si besoin

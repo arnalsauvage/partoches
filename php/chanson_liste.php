@@ -1,7 +1,7 @@
 <?php
 include_once ("lib/utilssi.php");
-include ("menu.php");
-include ("chanson.php");
+include_once ("menu.php");
+include_once ("chanson.php");
 // TODO : ajouter un bouton "ajouter un doc pour cette chanson"
 // TODO : ajouter la date de publication et le tri par date de pub
 $chansonForm = "chanson_form.php";

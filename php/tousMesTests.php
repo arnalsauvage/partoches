@@ -2,10 +2,10 @@
 include_once ("lib/utilssi.php");
 include_once "lib/configMysql.php";
 
-include "chanson.php";
-include "document.php";
-include "songbook.php";
-include "utilisateur.php";
+include_once "chanson.php";
+include_once "document.php";
+include_once "songbook.php";
+include_once "utilisateur.php";
 
 
 
