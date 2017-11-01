@@ -1,6 +1,7 @@
 <?php
 include_once ("lib/utilssi.php");
 include_once "lib/configMysql.php";
+include_once("lienDocSongbook.php");
 
 // Fonctions de gestion de la document
 
@@ -45,6 +46,7 @@ function chercheDocumentsTableId($table, $id) {
 	// renvoie la lisgne sélectionnée : id, nom, interprète, année
 	return ($result);
 }
+
 function composeNomVersion($nom, $version) {
 	// echo "Recherche $nom $version\n";
 	
@@ -72,7 +74,7 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable) {
 	return true;
 }
 
-// Modifie en base la document
+// Modifie en base le document
 function modifieDocument($nom, $tailleKo) {
 	$date = date ( "d/m/y" );
 	$date = convertitDateJJMMAAAA ( $date );
@@ -96,6 +98,9 @@ function supprimeDocument($id) {
 	$maRequete = "DELETE FROM document
 	WHERE id='$id'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème #1 dans supprimedocument : " . $_SESSION ['mysql']->error );
+	// On supprime également toutes les entrées Songbook lui correspondant
+	supprimeliensDocSongbookDuDocument($idDocument);
+	
 }
 
 // Cette fonction modifie ou crée un document si besoin

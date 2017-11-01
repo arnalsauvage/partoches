@@ -1,15 +1,15 @@
 <?php
 include_once ("lib/utilssi.php");
-include ("menu.php");
-include ("songbook.php");
-include ("document.php");
-include ("lienDocSongbook.php");
+include_once("menu.php");
+include_once("songbook.php");
+include_once("document.php");
+include_once("lienDocSongbook.php");
 $table = "songbook";
 $sortie = "";
 
 // Traitement de l'ajout de document
 if (isset ( $_POST ['id'] ) && (isset ( $_POST ['documentJoint'] ))) {
-	creeModifielienDocSongbook ( 0, $_POST ['documentJoint'], $_POST ['id'], 5 );
+	creeLienDocSongbook ( $_POST ['documentJoint'], $_POST ['id']);
 	$id = $_POST ['id'];
 }
 
@@ -68,7 +68,7 @@ if ($mode == "MAJ") {
 
 <h2>Liste des documents dans ce songbook</h2>
 <?php
-	$lignes = cherchelienDocSongbooks ( 'idSongbook', $id, "ordre", true );
+	$lignes = chercheLiensDocSongbook ( 'idSongbook', $id, "ordre", true );
 	$listeDocs = "";
 	while ( $ligne = $lignes->fetch_row () ) {
 		$ligneDoc = chercheDocument ( $ligne [1] );
@@ -77,7 +77,8 @@ if ($mode == "MAJ") {
 		$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 		if (! file_exists ( "../images/icones/" . $fichier [2] . ".png" ))
 			$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
-		$listeDocs .= "$icone <a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> <br>\n";
+		$listeDocs .= "$icone <a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> ";
+		$listeDocs .= boutonSuppression ( $songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages) . "<br>\n";
 	}
 	echo $listeDocs;
 ?>

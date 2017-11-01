@@ -1,6 +1,11 @@
 <?php
 include_once ("lib/utilssi.php");
 include_once "lib/configMysql.php";
+$songbookForm = "songbook_form.php";
+$songbookGet = "songbook_get.php";
+$songbookVoir = "songbook_voir.php";
+$songbookListe = "songbook_liste.php";
+$cheminImagesSongbook = "../data/songbooks/";
 
 // Fonctions de gestion du songbook
 
@@ -80,7 +85,7 @@ function infossongbook($id) {
 }
 
 // Cette fonction renvoie la liste des fichiers attachés à la songbook
-function fichierssongbook($id) {
+function fichiersSongbook($id) {
 	$enr = cherchesongbook ( $id );
 	$retour = []; // repertoire, nom, extension
 	$repertoire = "../data/songbooks/$id/";
@@ -94,7 +99,7 @@ function fichierssongbook($id) {
 	return $retour;
 }
 // Fonction de test
-function testesongbook() {
+function testeSongbook() {
 	creesongbook ( "Songbook #1", "Chansons d été", "31/07/2017","cover.jpg", 0 );
 	$id = cherchesongbookParLeNom ( "Songbook #1" );
 	$id = $id [0];

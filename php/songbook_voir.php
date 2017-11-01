@@ -8,8 +8,9 @@ $table = "songbook";
 $sortie = "";
 $monImage = "";
 
-$retour = fichierssongbook ( $_GET ['id'] );
+$retour = fichiersSongbook ( $_GET ['id'] );
 
+//On cherche une imag epour illustrer la songbook parmi les images dispos
 foreach ( $retour as $fichier ) {
 //	echo $fichier [0] . " " . $fichier [1] . " " . $fichier [2] . " <br>";
 	if (stristr ( $fichier [1], "jpg" ) || stristr ( $fichier [1], "png" ))
@@ -18,6 +19,10 @@ foreach ( $retour as $fichier ) {
 
 $donnee = cherchesongbook ( $_GET ['id'] );
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
+
+if ($_SESSION ['privilege'] > 1)
+	$sortie .= Ancre ( $songbookForm . "?id=" . $_GET ['id'], Image ( ($cheminImages . $iconeEdit), 32, 32, "modifier" ) );
+
 if ("" != $monImage) {
 	$sortie .= Image ( $monImage [0] . $monImage [1], 200, "", "pochette" );
 }
@@ -30,10 +35,9 @@ foreach ( $retour as $fichier ) {
 	$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> <br>\n";
 }
 
-
 $sortie .= "<h2>Liste des documents dans ce songbook</h2>";
 
-$lignes = cherchelienDocSongbooks ( 'idsongbook', $_GET ['id'], "ordre", true );
+$lignes = chercheLiensDocSongbook ( 'idsongbook', $_GET ['id'], "ordre", true );
 $listeDocs = "";
 while ( $ligne = $lignes->fetch_row () ) {
 	$ligneDoc = chercheDocument ( $ligne [1] );

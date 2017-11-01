@@ -3,10 +3,6 @@ include_once ("lib/utilssi.php");
 include ("menu.php");
 include ("songbook.php");
 
-$songbookForm = "songbook_form.php";
-$songbookGet = "songbook_get.php";
-$songbookVoir = "songbook_voir.php";
-$cheminImagesSongbook = "../data/songbooks/";
 $table = "songbook";
 $retour = "";
 $retour .= entreBalise ( "Songbooks", "H1" );
@@ -26,7 +22,7 @@ $numligne = 0;
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] > 2)
-	$retour .= "<BR>" . Ancre ( "$songbookForm", Image ( $cheminImagesSongbook . $iconeCreer, 32, 32 ) . "Créer un nouvel songbook" );
+	$retour .= "<BR>" . Ancre ( "$songbookForm", Image ( $cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel songbook" );
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 $retour .= Image ( $iconeAttention, "100%", 1, 1 );
@@ -41,7 +37,6 @@ while ( $ligne = $resultat->fetch_row () ) {
 		// //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
 		if ($_SESSION ['privilege'] > 2)
 			$retour .= TblCellule ( Ancre ( $songbookForm . "?id=$ligne[0]", Image ( ($cheminImagesSongbook .$ligne[0]."/". $ligne [4]), 32, 32, "couverture" ) ) ); // image
-			                                                                                                                                  // //////////////////////////////////////////////////////////////////////ADMIN
 		else
 			$retour .= TblCellule ( Image ( ($cheminImagesSongbook . $ligne [4]), 32, 32 ) ); // image
 	else
@@ -55,7 +50,7 @@ while ( $ligne = $resultat->fetch_row () ) {
 	                                                        
 	// //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
 	if ($_SESSION ['privilege'] > 2) {
-		$retour .= TblCellule ( boutonSuppression ( $songbookGet . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImagesSongbook ) );
+		$retour .= TblCellule ( boutonSuppression ( $songbookGet . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages) );
 		// //////////////////////////////////////////////////////////////////////ADMIN
 		
 		$retour .= TblFinLigne ();
@@ -66,7 +61,7 @@ $retour .= TblFin ();
 $retour .= Image ( $iconeAttention, "100%", 1, 1 );
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] > 2)
-	$retour .= "<BR>" . Ancre ( "?page=$songbookForm", Image ( $cheminImagesSongbook . $iconeCreer, 32, 32 ) . "Créer un nouvel songbook" );
+	$retour .= "<BR>" . Ancre ( "?page=$songbookForm", Image ( $cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel songbook" );
 // //////////////////////////////////////////////////////////////////////ADMIN
 $retour .= envoieFooter ( "Bienvenue chez nous !" );
 echo $retour;
