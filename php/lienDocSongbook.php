@@ -61,7 +61,7 @@ function supprimelienIdDocIdSongbook($idDoc, $idSongbook) {
 	WHERE idDocument = '$idDoc' AND idSongBook = '$idSongbook'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème #1 dans supprimelienDocSongbook : " . $_SESSION ['mysql']->error );
 	// On réordonne la liste
-	ordonneLiensSongbook ( $idlienDocSongbook );
+	ordonneLiensSongbook ( $idSongbook );
 }
 
 // Cette fonction supprime un lienDocSongbook si il existe
@@ -72,7 +72,6 @@ function supprimeliensDocSongbookDuDocument($idDocument) {
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème #1 dans supprimeliensDocSongbookDuDocument : " . $_SESSION ['mysql']->error );
 }
 
-// TODO faire l'équivalent pour la suppression de SongBook
 // Cette fonction supprime un lienDocSongbook si il existe
 function supprimeliensDocSongbookDuSongbook($idSongbook) {
 	// On supprime les enregistrements dans lienDocSongbook
