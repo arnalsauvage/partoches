@@ -24,11 +24,12 @@ if ($id || (isset ( $_GET ['id'] ) && $_GET ['id'] != "")) {
 	$donnee [1] = htmlspecialchars ( $donnee [1] );
 	$donnee [2] = htmlspecialchars ( $donnee [2] );
 	$donnee [3] = dateMysqlVersTexte ( $donnee [3] );
-	$donnee [4] = $donnee [4];
-	$donnee [5] = $donnee [5];
+//	$donnee [4] = $donnee [4];
+//	$donnee [5] = $donnee [5];
 	$mode = "MAJ";
 	ordonneLiensSongbook ( $id );
-} else {
+}
+else {
 	$mode = "INS";
 	$donnee [0] = 0;
 	$donnee [1] = "";
@@ -57,6 +58,12 @@ $f->champCache ( "mode", $mode );
 $f->champValider ( " Valider ", "valider" );
 $sortie .= $f->fin ();
 
+if ($_SESSION ['privilege'] < 3) {
+	// On verrouille les champs hits, date publication
+	$sortie = str_replace ( "NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie );
+	$sortie = str_replace ( "NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie );
+}
+
 echo $sortie;
 if ($mode == "MAJ") {
 	?>
@@ -82,6 +89,7 @@ if ($mode == "MAJ") {
 		if (! file_exists ( "../images/icones/" . $fichier [2] . ".png" ))
 			$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
 		$listeDocs .= "$icone <a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> ";
+// TODO : recopier ce bouton dans chansonform
 		$listeDocs .= boutonSuppression ( $songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages ) . "<br>\n";
 	}
 	echo $listeDocs;

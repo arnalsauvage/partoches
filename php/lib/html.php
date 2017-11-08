@@ -37,6 +37,7 @@ if(!isset ($FichierHtml)){
 	function ChampSelect ($liste, $numero, $nom){
 		$champSelect = "";
 		$champSelect .= "<select name = $nom size=\"1\">";
+		$choix = 0;
 		while($ligne = LigneSuivante($liste)){
 			$choix++;
 			$champSelect .= "<option ";

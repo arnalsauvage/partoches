@@ -1,7 +1,7 @@
 <?php
 include_once ("lib/utilssi.php");
 include_once ("menu.php");
-$mode ="";
+$mode = "";
 $table = "utilisateur";
 $sortie = "";
 
@@ -18,8 +18,7 @@ if ((isset ( $_GET ['id'] ) && $_GET ['id'] != "")) {
 		$donnee [7] = htmlspecialchars($donnee [7]);
 		$donnee [8] = htmlspecialchars($donnee [8]);
 	}
-} 
-else if ($_SESSION ['privilege'] > 2) {
+} else if ($_SESSION ['privilege'] > 2) {
 	$mode = "INS";
 	$donnee [0] = 0; // id
 	$donnee [1] = ""; // login
@@ -38,7 +37,7 @@ else if ($_SESSION ['privilege'] > 2) {
 if ($mode == "MAJ")
 	$sortie .= "<H1> Mise à jour - " . $table . "</H1>";
 else if ($mode == "INS")
-	$sortie . "<H1> Création - " . $table . "</H1>";
+	$sortie .= "<H1> Création - " . $table . "</H1>";
 else
 	return;
 
@@ -69,6 +68,11 @@ $f->champListe ( "Privileges :", "fprivilege", $donnee [11], 1, $pListe );
 $f->champCache ( "mode", $mode );
 $f->champValider ( "Valider la saisie", "valider" );
 $sortie .= $f->fin ();
+if ($_SESSION ['privilege'] < 3) {
+	// On désactive les champs dateDernierLogin et nbreLogins
+	$sortie = str_replace("NAME='fdateDernierLogin'", "NAME='fdateDernierLogin' disabled='disabled' ", $sortie);
+	$sortie = str_replace("NAME='fnbreLogins'", "NAME='fnbreLogins' disabled='disabled' ", $sortie);
+}
 $sortie .= envoieFooter ( "Bienvenue chez nous !" );
 echo $sortie;
 // privilege

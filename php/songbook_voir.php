@@ -8,10 +8,14 @@ $table = "songbook";
 $sortie = "";
 $monImage = "";
 
-$retour = fichiersSongbook ( $_GET ['id'] );
+// On augmente le compteur de vues du songbook
+augmenteHits($table, $_GET ['id']);
 
-//On cherche une imag epour illustrer la songbook parmi les images dispos
-foreach ( $retour as $fichier ) {
+// On récupère les fichiers du Songbook
+$fichiersDuSongbook = fichiersSongbook($_GET ['id']);
+
+//On cherche une image pour illustrer la songbook parmi les images dispos
+foreach ($fichiersDuSongbook as $fichier) {
 //	echo $fichier [0] . " " . $fichier [1] . " " . $fichier [2] . " <br>";
 	if (stristr ( $fichier [1], "jpg" ) || stristr ( $fichier [1], "png" ))
 		$monImage = $fichier;
@@ -28,7 +32,7 @@ if ("" != $monImage) {
 }
 $sortie .= $donnee [2] . "-" . $donnee [3] ."-". $donnee [5] . " hit(s)<br>\n";
 
-foreach ( $retour as $fichier ) {
+foreach ($fichiersDuSongbook as $fichier) {
 	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
 		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
@@ -36,6 +40,8 @@ foreach ( $retour as $fichier ) {
 }
 
 $sortie .= "<h2>Liste des documents dans ce songbook</h2>";
+
+// TODO : afficher une vignette de chaque chanson relative au document
 
 $lignes = chercheLiensDocSongbook ( 'idSongbook', $_GET ['id'], "ordre", true );
 $listeDocs = "";
@@ -46,7 +52,7 @@ while ( $ligne = $lignes->fetch_row () ) {
 	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 	if (! file_exists ( "../images/icones/" . $fichier [2] . ".png" ))
 		$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
-		$sortie .= "<a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> <br>\n";
+	$sortie .= "<a href= 'getdoc.php?doc=" . $ligne [1] . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
 }
 
 $sortie .= envoieFooter ( "Bienvenue chez nous !" );

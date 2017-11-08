@@ -127,7 +127,6 @@ function login_utilisateur($login, $mdp) {
 	$crypt = Chiffrement::crypt ( $mdp );
 	
 	if ($crypt == $donnee [2]) {
-		$donnee [9] = date ("d/m/y");
 		$donnee [10] = $donnee [10] + 1;
 		echo "login ok";
 		modifieUtilisateur ( $donnee [0], $donnee [1], $mdp, $donnee [3], $donnee [4], $donnee [5], $donnee [6], $donnee [7], $donnee [8],  $donnee [10], $donnee [11] );
@@ -147,6 +146,7 @@ function statut($privilege) {
 		case 3 :
 			return "administrateur";
 	}
+	return "invité";
 }
 
 // Pour le test

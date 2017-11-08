@@ -2,6 +2,10 @@
 include_once ("lib/utilssi.php");
 include_once ("utilisateur.php");
 
+// TODO : ajouter notion de liens : 
+// id nom, url, type (video, soundcloud, mp3, image)
+// nomTable, idTable
+
 // Si l'utilisateur n'est pas logué
 if (! isset ( $_SESSION ['user'] )) {
 	header('Location: ./login.php');
