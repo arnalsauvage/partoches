@@ -11,7 +11,7 @@ if (! isset ( $_SESSION ['user'] )) {
 	header('Location: ./login.php');
 }
 
-$contenu = envoieHead ( "Partoches", "../css/index.css" );
+$contenu = envoieHead("Top 5 Partoches", "../css/index.css");
 $contenu .= "<body>";
 
 // Affichage du menu
@@ -31,7 +31,7 @@ $contenu .= "
 if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > 2))
 	$contenu .= "<span class='icon-bar'></span>";
 	$contenu .= "		</button>
-		<a class='navbar-brand' href='../html/index.html'>Partoches</a>
+		<a class='navbar-brand' href='./songbook_portfolio.php'>Top 5 Partoches</a>
 	</div>
     <div id='main-menu' class='collapse navbar-collapse'>
           <ul class='nav navbar-nav'>
@@ -54,7 +54,10 @@ $contenu .= "
 // Sous menu
 $contenu .= "<div>
 			<div class='starter-template'>";
-$contenu .= "<br><br><br>" . image ( "../images" . $_SESSION ['image'], 64 ) . "\n";
+
+$contenu .= "<br><br><br> sur Top 5 partoches, les amis de Top5 partagent leurs partoches pour jouer des morceaux, venues du club ou d'ailleurs... <br>";
+
+$contenu .= image("../images" . $_SESSION ['image'], 64) . "\n";
 
 $date = date ( "d/m/Y" );
 $heure = date ( "H:i" );
