@@ -51,12 +51,12 @@ if (strstr($autorisees, $ext) == FALSE) {
 
 // On met le nom au propre pour éviter les pb de caractères accentués
 $name_file = renommeFichierChanson($path); // on crée un nom compatible url
-$name_file = urlencode($name_file);
+//$name_file = urlencode($name_file);
 
 // On enregistre notre nom de fichier en BDD, on récupère un n°de version
 creeModifieDocument($name_file, $_FILES ['fichierUploade'] ['size'], "songbook", $_POST ['id']);
 $doc = chercheDocumentNomTableId($name_file, "songbook", $_POST ['id']);
-$path = str_replace(".$ext", "-v" . ($doc [4]), $path) . ".$ext";
+$name_file = str_replace(".$ext", "-v" . ($doc [4]), $path) . ".$ext";
 
 // Si le formulaire est validé, on copie le fichier dans le dossier de destination
 if (!move_uploaded_file($tmp_file, $repertoire . $name_file)) {

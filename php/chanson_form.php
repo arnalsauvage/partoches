@@ -31,8 +31,8 @@ if (isset ( $_GET ['id'] ) && $_GET ['id'] != "") {
 	$donnee [0] = 0; // id
 	$donnee [1] = ""; // nom
 	$donnee [2] = ""; // interprete
-	$donnee [3] = "1900"; // annee
-	$donnee [4] = "00"; // tempo
+	$donnee [3] = "1964"; // annee
+	$donnee [4] = "90"; // tempo
 	$donnee [5] = "4/4"; // mesure
 	$donnee [6] = ""; // pulsation
 	$donnee [7] = convertitDateJJMMAAAA ( date ( "d/m/Y" ) ); // datePub
@@ -48,7 +48,7 @@ if ($mode == "INS")
 
 $sortie .= "<Div class = 'centrer'>";
 // Création du formulaire
-$f = new Formulaire ( "POST", $table . "_post.php", $sortie );
+/*$f = new Formulaire ( "POST", $table . "_post.php", $sortie );
 $f->champCache ( "id", $donnee [0] );
 // TODO : La longueur du champ n'est pas prise en compte dans formulaire!
 $f->champTexte ( "Nom :", "fnom", $donnee [1], 64, 128 );
@@ -63,7 +63,47 @@ $f->champTexte ( "Date publication :", "fdate", dateMysqlVersTexte ( $donnee [7]
 $f->champTexte ( "Hits :", "fhits", $donnee [9], 10, 10 );
 $f->champCache ( "mode", $mode );
 $f->champValider ( " Valider ", "valider" );
-$sortie .= $f->fin ();
+$sortie .= $f->fin ();*/
+$sortie .= "
+<FORM  METHOD='POST' ACTION='chanson_post.php' NAME='Form'>
+<INPUT TYPE=HIDDEN NAME='id' VALUE='$donnee[0]'>
+<label class='inline'>Nom :</label><INPUT TYPE='TEXT' NAME='fnom' VALUE='$donnee[1]' SIZE='64' MAXLENGTH='128' placeholder='titre de la chanson'><br>
+<label class='inline'>Interprète :</label><INPUT TYPE='TEXT' NAME='finterprete' VALUE='$donnee[2]' SIZE='64'  placeholder='interprète'><br>
+<label class='inline'>Annee :</label><INPUT TYPE='number' min='0' max='2100' NAME='fannee' VALUE='$donnee[3]' SIZE='4' MAXLENGTH='128'><br>
+
+<script type='text/javascript' >function outputUpdate(vol) {
+	document.querySelector('#tempo').value = vol;
+}</script>
+
+<label for='slider'>Tempo :</label><INPUT TYPE='range' id='fader' min='30' max='250' step='1' oninput='outputUpdate(value)' NAME='ftempo' VALUE='$donnee[4]' SIZE='3' >
+<output for='fader' id='tempo'>$donnee[4]</output><br>
+<label class='inline'>Mesure :</label><INPUT TYPE='TEXT' NAME='fmesure' VALUE='$donnee[5]' SIZE='4' MAXLENGTH='128'><br>
+<label class='inline'>Pulsation :</label><select NAME='fpulsation' VALUE='$donnee[6]'  >
+    <option value='binaire'";
+    if ($donnee[6]=="binaire")
+       $sortie .=  " selected";
+$sortie .=  ">binaire
+    </option>
+    <option value='ternaire' ";
+     if ($donnee[6]=="ternaire")
+       $sortie .=  " selected";
+       $sortie.= ">ternaire</option>
+    </select>
+<br>
+<label class='inline'>Tonalité :</label><INPUT TYPE='TEXT' NAME='ftonalite' VALUE='$donnee[10]' SIZE='10' placeholder='ex :Am ou C ou F#'><br>
+<INPUT TYPE=HIDDEN NAME='fidUser' VALUE='$donnee[8]'>
+<label class='inline'>Date publication :</label><INPUT TYPE='TEXT' NAME='fdate'";
+if ($_SESSION ['privilege'] <3)
+ $sortie .= "disabled='disabled'  ";
+$sortie.= "VALUE='" . dateMysqlVersTexte($donnee[7]) ."' SIZE='10' MAXLENGTH='128'><br>
+<label class='inline'>Hits :</label><INPUT TYPE='TEXT' NAME='fhits' ";
+if ($_SESSION ['privilege'] <3)
+ $sortie .= "disabled='disabled'  ";
+$sortie.= " VALUE='$donnee[9]' SIZE='10' MAXLENGTH='128'><br>
+<INPUT TYPE=HIDDEN NAME='mode' VALUE='MAJ'>
+<label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' ><br>
+</FORM>
+";
 $sortie .= "Pour trouver le tempo en tapant : <a href='http://www.tempotap.com' target='_blank'>tempotap.com</a><br>\n";
 if ($donnee[1]){
 

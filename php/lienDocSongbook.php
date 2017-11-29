@@ -12,7 +12,7 @@ function chercheLiensDocSongbook($critere, $valeur, $critereTri = 'nom', $bTriAs
 	else
 		$maRequete .= " ASC";
 	// echo "ma requete : " . $maRequete;
-	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème cherchelienDocSongbook #1 : " . $_SESSION ['mysql']->error );
+	$result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheliensDocSongbook #1 : " . $_SESSION ['mysql']->error);
 	return $result;
 }
 
@@ -29,7 +29,7 @@ function chercheLienDocSongbook($id) {
 
 // Crée un lienDocSongbook
 function creelienDocSongbook($idDocument, $idSongbook) {
-	$resultats = chercheLiensDocSongbook ( "idSongbook", $idSongbook, "id" );
+	chercheLiensDocSongbook("idSongbook", $idSongbook, "id");
 	$nb = $_SESSION ['mysql']->affected_rows + 1;
 	$maRequete = "INSERT INTO liendocsongbook VALUES (NULL, '$idDocument', '$idSongbook', '$nb')";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème creelienDocSongbook#1 : " . $_SESSION ['mysql']->error );

@@ -4,6 +4,7 @@ include_once("menu.php");
 include_once("songbook.php");
 include_once("lienDocSongbook.php");
 include_once("document.php");
+include_once("utilisateur.php");
 $table = "songbook";
 $sortie = "";
 $monImage = "";
@@ -20,6 +21,9 @@ foreach ($fichiersDuSongbook as $fichier) {
 	if (stristr ( $fichier [1], "jpg" ) || stristr ( $fichier [1], "png" ))
 		$monImage = $fichier;
 }
+
+// On charge le tableau des utilisateurs
+$tabUsers = portraitDesUtilisateurs();
 
 $donnee = cherchesongbook ( $_GET ['id'] );
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
@@ -49,10 +53,15 @@ while ( $ligne = $lignes->fetch_row () ) {
 	$ligneDoc = chercheDocument ( $ligne [1] );
 	$fichierCourt = composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
 	$fichier = "../data/chansons/" .$ligneDoc [6]. "/" . composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
-	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
-	if (! file_exists ( "../images/icones/" . $fichier [2] . ".png" ))
+	$extension = substr(strrchr($ligneDoc [1], '.'), 1);
+	$icone = Image("../images/icones/" . $extension . ".png", 32, 32, "icone");
+
+	if (!file_exists("../images/icones/" . $extension . ".png"))
 		$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
-	$sortie .= "<a href= 'getdoc.php?doc=" . $ligne [1] . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
+	$vignetteChanson = Image("../data/chansons/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
+	$vignettePublicateur = Image("../images" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
+	$sortie .= $vignettePublicateur . $vignetteChanson . $icone;
+	$sortie .= "<a href= 'getdoc.php?doc=" . $ligneDoc [0] . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
 }
 
 $sortie .= envoieFooter ( "Bienvenue chez nous !" );

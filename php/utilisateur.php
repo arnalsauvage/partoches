@@ -135,6 +135,20 @@ function login_utilisateur($login, $mdp) {
 		echo "Erreur de mot de passe : $crypt";
 		return false;
 }
+
+function portraitDesUtilisateurs()
+{
+	$maRequete = "SELECT id, login, image FROM  utilisateur";
+	$result = $_SESSION ['mysql']->query($maRequete);
+	if (!$result)
+		die ("Problème supprimeUtilisateur#1 : " . $_SESSION ['mysql']->error);
+	while ($ligne = $result->fetch_row()) {
+		$tableau[$ligne[0]][0] = $ligne[1];
+		$tableau[$ligne[0]][1] = $ligne[2];
+	}
+	return $tableau;
+}
+
 function statut($privilege) {
 	switch ($privilege) {
 		case 0 :

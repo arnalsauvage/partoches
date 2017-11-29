@@ -60,6 +60,7 @@ while ( $ligne = $result->fetch_row () ) {
 	$icone = Image("../images/icones/" . $extension . ".png", 32, 32, "icone");
 	if (!file_exists("../images/icones/" . $extension . ".png"))
 		$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
+
 	$sortie .= "$icone <a href= 'getdoc.php?doc=" . $ligne [0] . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
 }
 

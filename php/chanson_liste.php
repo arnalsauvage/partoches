@@ -27,6 +27,7 @@ if (isset ($_GET ['tri'])) {
 }
 // Chargement de la liste des chansons
 $resultat = chercheChansons("nom", "%", $tri, $ordreAsc);
+$nbreChansons = $_SESSION ['mysql']->affected_rows;
 $numligne = 0;
 
 // Affichage de la liste
@@ -82,7 +83,7 @@ while ($ligne = $resultat->fetch_row()) {
     }
 }
 $fichiersDuSongbook .= TblFin();
-
+$fichiersDuSongbook .= $nbreChansons . " chanson(s) dans la liste.<br>\n";
 $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] > 1)

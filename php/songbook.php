@@ -92,9 +92,10 @@ function imageSongbook($idSongbook)
 
 	// Choisit une vignette au hasard parmi les images
 	// renvoie la ligne sélectionnée : id, nom, description, date , image, hits
-	if (($ligne = $result->fetch_row()))
-		return ($ligne[1]);
-	else
+	if (($ligne = $result->fetch_row())) {
+		$nom = composeNomVersion($ligne[1], $ligne[4]);
+		return ($nom);
+	} else
 		return ("");
 }
 // Cette fonction renvoie une chaine de description de la songbook

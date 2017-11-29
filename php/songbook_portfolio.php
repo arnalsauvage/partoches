@@ -1,5 +1,6 @@
 <?php
 include_once("lib/utilssi.php");
+$pasDeMenu = true;
 include_once("menu.php");
 include_once("songbook.php");
 include_once("document.php");
@@ -17,10 +18,11 @@ $table = "songbook";
 <body>
 <div class="navigation">
     <h1>les songbooks en ligne</h1>
-    <ul>
+    <ul><a href="chanson_liste.php">
         <li>par genre</li>
-        <li>par interprète</li>
-        <li>par année</li>
+            <li>par interprÃ¨te</li>
+            <li>par annÃ©e ...</li>
+        </a>
     </ul>
 </div>
 
@@ -44,11 +46,12 @@ $table = "songbook";
                 break;
         $imageSongBook = imageSongbook($songbook[0]);
         $dateSongbook = dateMysqlVersTexte($songbook[3]);
+        $nomFichier = composeNomVersion($docSongbook [1], $docSongbook [4]);
         ?>
 
         <div class="songbook">
             <div class="pochette">
-                <a href="../data/songbooks/<?= $songbook[0] ?>/<?= $docSongbook[1] ?>" target="_blank">
+                <a href="../data/songbooks/<?= $songbook[0] ?>/<?= $nomFichier ?>" target="_blank">
                     <img src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>"
                          alt="<?= $songbook[1] ?>"/></a>
                 <br/>
@@ -67,7 +70,7 @@ $table = "songbook";
                         $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
                     echo "<a href= 'getdoc.php?doc=" . $ligne [1] . "' target='_blank'> " . htmlentities($titresChansons[$ligneDoc [6]]) . "</a> <br>\n";
                     ?>
-                    <!--                <a href="http://www.rendevuke.com/eupelode/Quand-je-serai-K.O..pdf" target="_blank">Quand j’serai-->
+                    <!--                <a href="http://www.rendevuke.com/eupelode/Quand-je-serai-K.O..pdf" target="_blank">Quand jâ€™serai-->
                     <!--                    KO </a> <br/>-->
 
                     <?php
