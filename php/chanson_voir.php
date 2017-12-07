@@ -33,7 +33,7 @@ if ($donnee <> null){
 
 $sortie .= "<h2>$donnee[1]</h2>";
 if ($_SESSION ['privilege'] > 1)
-	$sortie .= Ancre("$chansonForm?id=" . $_GET['id'], Image($cheminImages . $iconeEdit, 32, 32)); // Nom));
+	$sortie .= Ancre("chanson_form.php?id=" . $_GET['id'], Image($cheminImages . $iconeEdit, 32, 32)); // Nom));
 
 if ("" != $monImage) {
 	$sortie .= Image ( $monImage [0] . $monImage [1], 200, "", "pochette" );
