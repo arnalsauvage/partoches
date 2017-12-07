@@ -99,8 +99,7 @@ $sortie.= "VALUE='" . dateMysqlVersTexte($donnee[7]) ."' SIZE='10' MAXLENGTH='12
 <label class='inline'>Hits :</label><INPUT TYPE='TEXT' NAME='fhits' ";
 if ($_SESSION ['privilege'] <3)
  $sortie .= "disabled='disabled'  ";
-$sortie.= " VALUE='$donnee[9]' SIZE='10' MAXLENGTH='128'><br>
-<INPUT TYPE=HIDDEN NAME='mode' VALUE='MAJ'>
+$sortie.= " VALUE='$donnee[9]' SIZE='10' MAXLENGTH='128'><br><INPUT TYPE=HIDDEN NAME='mode' VALUE='$mode'>
 <label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' ><br>
 </FORM>
 ";

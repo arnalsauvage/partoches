@@ -40,9 +40,19 @@ if ($_SESSION ['privilege'] > 1)
 $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
 
 $fichiersDuSongbook .= TblDebut(0);
-$fichiersDuSongbook .= TblDebutLigne() . TblCellule("  Tri  ") . TblCellule(Ancre("?tri=nom", "  Nom  ^ ") . Ancre("?triDesc=nom", "  v ")) . TblCellule(Ancre("?tri=interprete", "  Interprète ^ ") . Ancre("?triDesc=interprete", "  v  ")) . TblCellule(Ancre("?tri=annee", "  Année ^ ") . Ancre("?triDesc=annee", "  v  "));
-$fichiersDuSongbook .= TblCellule(Ancre("?tri=tempo", "  Tempo  ")) . TblCellule(Ancre("?tri=mesuree", "  Mesure  ")) . TblCellule(Ancre("?tri=pulsation", "  Pulsation  "));
-$fichiersDuSongbook .= TblCellule(Ancre("?tri=tonalite", "  Tonalité  ")) . TblCellule(Ancre("?tri=datePub", "  Date Pub.  ")) . TblCellule(Ancre("?tri=idUser", "  Publié par  ")) . TblCellule(Ancre("?tri=hits", "  Vues  ")) . TblFinLigne();
+$fichiersDuSongbook .= TblDebutLigne() . TblCellule("  Tri  ");
+$fichiersDuSongbook .= titreColonne("Nom", "nom");
+$fichiersDuSongbook .= titreColonne("Interprète", "interprete");
+$fichiersDuSongbook .= titreColonne("Année", "annee");
+$fichiersDuSongbook .= titreColonne("Tempo", "tempo");
+$fichiersDuSongbook .= titreColonne("Mesure", "mesure");
+$fichiersDuSongbook .= titreColonne("Pulsation", "pulsation");
+$fichiersDuSongbook .= titreColonne("Tonalité", "tonalite");
+$fichiersDuSongbook .= titreColonne("Date pub.", "datePub");
+$fichiersDuSongbook .= titreColonne("Publié par", "idUser");
+$fichiersDuSongbook .= titreColonne("Vues", "hits");
+$fichiersDuSongbook .= TblFinLigne();
+
 while ($ligne = $resultat->fetch_row()) {
     $numligne++;
     $fichiersDuSongbook .= TblDebutLigne();
@@ -91,4 +101,11 @@ if ($_SESSION ['privilege'] > 1)
 // //////////////////////////////////////////////////////////////////////ADMIN
 $fichiersDuSongbook .= envoieFooter("Bienvenue chez nous !");
 echo $fichiersDuSongbook;
+
+function titreColonne($libelle, $nomRubrique)
+{
+    $chaine = TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
+    return $chaine;
+}
+
 ?>

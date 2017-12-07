@@ -10,12 +10,35 @@ $monImage = "";
 
 $sortie .= "<h2>Documents publiés pour des chansons</h2> \n"; // Titre
 
-$lignes = chercheDocuments("nomTable", "chanson", "date", false);
+// Gestion du paramètre de tri
+if (isset ($_GET ['tri'])) {
+    $tri = $_GET ['tri'];
+    $ordreAsc = true;
+} else {
+    if (isset ($_GET ['triDesc'])) {
+        $tri = $_GET ['triDesc'];
+        $ordreAsc = false;
+    } else {
+        $tri = "date";
+        $ordreAsc = false;
+    }
+}
+
+$lignes = chercheDocuments("nomTable", "chanson", $tri, $ordreAsc);
 
 // On charge le tableau des utilisateurs
 $tabUsers = portraitDesUtilisateurs();
 
 $sortie .= "<table> \n";
+$sortie .= "<tr>";
+$sortie .= titreColonne("Publicateur", "idUSer");
+$sortie .= "<td></td>\n";
+$sortie .= "<td></td>\n";
+
+$sortie .= titreColonne("Date", "date");
+$sortie .= titreColonne("Nbre vues", "hits");
+$sortie .= "</tr>\n";
+
 $listeDocs = "";
 $vignetteChanson = "";
 while ($ligneDoc = $lignes->fetch_row()) {
@@ -37,11 +60,17 @@ while ($ligneDoc = $lignes->fetch_row()) {
         $sortie .= "<td>  </td>\n ";
     $sortie .= "<td> $icone <a href= 'getdoc.php?doc=" . $ligneDoc [0] . "' target='_blank'> " . $fichierCourt . "</a></td> \n";
     $sortie .= "<td>" . intval($ligneDoc[2] / 1024) . " ko -  publié le " . dateMysqlVersTexte($ligneDoc[3]) . " </td>";
-    $sortie .= "<td>Nbre de vues : " . $ligneDoc[8] . "</td></tr>\n";
+    $sortie .= "<td>" . $ligneDoc[8] . "</td></tr>\n";
 }
 
 $sortie .= "</table>";
 $sortie .= envoieFooter("Bienvenue chez nous !");
 echo $sortie;
 // TODO ajouter un bouton : supprimer fichiers
+
+function titreColonne($libelle, $nomRubrique)
+{
+    $chaine = TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
+    return $chaine;
+}
 ?>

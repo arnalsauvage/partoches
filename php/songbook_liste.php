@@ -9,13 +9,21 @@ $fichiersDuSongbook .= entreBalise("Songbooks", "H1");
 $fichiersDuSongbook .= TblDebut(0);
 
 // Gestion du paramètre de tri
-if (isset ( $_GET ['tri'] ))
+if (isset ($_GET ['tri'])) {
 	$tri = $_GET ['tri'];
-else
-	$tri = "nom";
+	$ordreAsc = true;
+} else {
+	if (isset ($_GET ['triDesc'])) {
+		$tri = $_GET ['triDesc'];
+		$ordreAsc = false;
+	} else {
+		$tri = "date";
+		$ordreAsc = false;
+	}
+}
 
 // Chargement de la liste des songbooks
-$resultat = chercheSongbooks ( "nom", "%", $tri, true );
+$resultat = chercheSongbooks("nom", "%", $tri, $ordreAsc);
 $numligne = 0;
 
 // Affichage de la liste
@@ -27,7 +35,15 @@ if ($_SESSION ['privilege'] >= 2)
 
 $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
 $fichiersDuSongbook .= TblDebut(0);
-$fichiersDuSongbook .= TblDebutLigne() . TblCellule("Tri") . TblCellule(Ancre("?tri=nom", "Nom")) . TblCellule(Ancre("?tri=description", "Description")) . TblCellule(Ancre("?tri=date", "Date")) . TblCellule(Ancre("?tri=hits", "Hits")) . TblFinLigne();
+TblCellule(Ancre("?tri=hits", "Hits")) . TblFinLigne();
+
+$fichiersDuSongbook .= TblDebut(0);
+$fichiersDuSongbook .= TblDebutLigne() . TblCellule("  Tri  ");
+$fichiersDuSongbook .= titreColonne("Nom", "nom");
+$fichiersDuSongbook .= titreColonne("Description", "description");
+$fichiersDuSongbook .= titreColonne("Date", "date");
+$fichiersDuSongbook .= titreColonne("Vues", "hits");
+$fichiersDuSongbook .= TblFinLigne();
 
 while ( $ligne = $resultat->fetch_row () ) {
 	$numligne ++;
@@ -46,7 +62,7 @@ while ( $ligne = $resultat->fetch_row () ) {
 
 	$fichiersDuSongbook .= TblCellule("  " . $ligne [2]); // description
 	$fichiersDuSongbook .= TblCellule(" " . dateMysqlVersTexte($ligne [3], 0)); // date
-	$fichiersDuSongbook .= TblCellule("    " . $ligne [5] . " hit(s)"); // hits
+	$fichiersDuSongbook .= TblCellule("  -  " . $ligne [5] . " hit(s)"); // hits
 	                                                        
 	// //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
 	if ($_SESSION ['privilege'] >= 2) {
@@ -65,4 +81,10 @@ if ($_SESSION ['privilege'] >= 2)
 // //////////////////////////////////////////////////////////////////////ADMIN
 $fichiersDuSongbook .= envoieFooter("Bienvenue chez nous !");
 echo $fichiersDuSongbook;
+
+function titreColonne($libelle, $nomRubrique)
+{
+	$chaine = TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
+	return $chaine;
+}
 ?>

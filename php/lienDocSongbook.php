@@ -27,6 +27,43 @@ function chercheLienDocSongbook($id) {
 		return (0);
 }
 
+// Renvoie le nombre de docs dans un songbook
+/**
+ * @param $idSongBook
+ * @return mixed
+ */
+function nombreDeLiensDuSongbook($idSongBook)
+{
+    $maRequete = "SELECT * FROM liendocsongbook WHERE idSongbook = '$idSongBook'";
+    $result = $_SESSION['mysql']->query($maRequete) or die ("Problème nombreDeLiensDuSongbook #1 : " . $_SESSION ['mysql']->error);
+    $row_cnt = $result->num_rows;
+    return ($row_cnt);
+}
+
+// Cherche un lienDocSongbook et le renvoie s'il existe
+function chercheLienParIdSongbookIdDoc($idSongbook, $idDoc)
+{
+    $maRequete = "SELECT * FROM liendocsongbook WHERE idDocument = '$idDoc' AND idSongbook = '$idSongbook'";
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheIdSongbookIdDoc #1 : " . $_SESSION ['mysql']->error);
+    // renvoie la ligne sélectionnée : id, nom, interprète, année
+    if (($ligne = $result->fetch_row()))
+        return ($ligne);
+    else
+        return (0);
+}
+
+// Cherche le nieme lienDocSongbook  d'un Songbooket le renvoie s'il existe
+function chercheLienParIdSongbookOrdre($idSongbook, $ordre)
+{
+    $maRequete = "SELECT * FROM liendocsongbook WHERE ordre = '$ordre' AND idSongbook = '$idSongbook'";
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienParIdSongbookOrdre #1 : " . $_SESSION ['mysql']->error);
+    // renvoie la ligne sélectionnée : id, nom, interprète, année
+    if (($ligne = $result->fetch_row()))
+        return ($ligne);
+    else
+        return (0);
+}
+
 // Crée un lienDocSongbook
 function creelienDocSongbook($idDocument, $idSongbook) {
 	chercheLiensDocSongbook("idSongbook", $idSongbook, "id");
@@ -113,6 +150,27 @@ function ordonneLiensSongbook($idSongbook) {
 		modifielienDocSongbook ( $mesLiens [$parcours] [0], $mesLiens [$parcours] [1], $mesLiens [$parcours] [2], $parcours );
 		$parcours ++;
 	}
+}
+
+function remonteTitre($idSongbook, $rang, $longueurSaut)
+{
+    if ($rang < $longueurSaut)
+        return false;
+
+    // cherche le doc à monter
+    $lienAmonter = chercheLienParIdSongbookOrdre($idSongbook, $rang);
+    if ($lienAmonter == 0)
+        return false;
+
+    // cherche le doc à baisser
+    $lienAbaisser = chercheLienParIdSongbookOrdre($idSongbook, $rang - $longueurSaut);
+    if ($lienAbaisser == 0)
+        return false;
+
+    //  changer l'ordre et enregistrer
+    modifielienDocSongbook($lienAmonter[0], $lienAmonter[1], $lienAmonter[2], $lienAmonter[3] - $longueurSaut);
+    modifielienDocSongbook($lienAbaisser[0], $lienAbaisser[1], $lienAbaisser[2], $lienAbaisser[3] + $longueurSaut);
+    return true;
 }
 
 // Fonction de test
