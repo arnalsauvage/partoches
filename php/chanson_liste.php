@@ -61,15 +61,6 @@ while ($ligne = $resultat->fetch_row()) {
     $numligne++;
     $fichiersDuSongbook .= TblDebutLigne();
 
-    /*
-     * TODO Gestion d'une image pour une chanson'
-     * if($ligne[5])
-     * TblCellule(Ancre($chansonForm."?id=$ligne[0]",afficheVignette(($ligne[5]),$cheminImages,$cheminVignettes))); // image
-     * else
-     *
-     * TblCellule(Ancre($_SESSION['urlSite']."/index.php?id=$ligne[0]","voir"));
-     */
-
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
     if ($_SESSION ['privilege'] > 1)
         $fichiersDuSongbook .= TblCellule(Ancre("$chansonForm?id=$ligne[0]", Image($cheminImages . $iconeEdit, 32, 32))); // Nom));

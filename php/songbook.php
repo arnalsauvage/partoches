@@ -156,5 +156,5 @@ function testeSongbook() {
 }
 
 // testesongbook ();
-// TODO ajouter des logs pur tracer l'activité du site
+// TODO ajouter des logs pour tracer l'activité du site
 ?>

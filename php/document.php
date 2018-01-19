@@ -186,5 +186,5 @@ function imageTableId($table, $id) {
 }
 
 // testeDocument ();
-// TODO ajouter des logs pur tracer l'activité du site
+// TODO ajouter des logs pour tracer l'activité du site
 ?>

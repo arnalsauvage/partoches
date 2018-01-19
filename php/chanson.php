@@ -157,5 +157,5 @@ function testeChanson()
     // supprimechanson($id[0]);
 }
 
-// TODO ajouter des logs pur tracer l'activité du site
+// TODO ajouter des logs pour tracer l'activité du site
 ?>

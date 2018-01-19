@@ -69,5 +69,4 @@ while ( $ligne = $lignes->fetch_row () ) {
 
 $sortie .= envoieFooter ( "Bienvenue chez nous !" );
 echo $sortie;
-// TODO ajouter un bouton : supprimer fichiers
 ?>
