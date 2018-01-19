@@ -2,6 +2,7 @@
 include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("chanson.php");
+include_once("document.php");
 // DONE : ajouter un bouton "ajouter un doc pour cette chanson"
 // DONE : ajouter la date de publication et le tri par date de pub
 $chansonForm = "chanson_form.php";
@@ -41,6 +42,7 @@ $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
 
 $fichiersDuSongbook .= TblDebut(0);
 $fichiersDuSongbook .= TblDebutLigne() . TblCellule("  Tri  ");
+$fichiersDuSongbook .= TblCellule("  Pochette  ");
 $fichiersDuSongbook .= titreColonne("Nom", "nom");
 $fichiersDuSongbook .= titreColonne("Interprète", "interprete");
 $fichiersDuSongbook .= titreColonne("Année", "annee");
@@ -52,6 +54,8 @@ $fichiersDuSongbook .= titreColonne("Date pub.", "datePub");
 $fichiersDuSongbook .= titreColonne("Publié par", "idUser");
 $fichiersDuSongbook .= titreColonne("Vues", "hits");
 $fichiersDuSongbook .= TblFinLigne();
+
+$cheminImagesChanson = "../data/chansons/";
 
 while ($ligne = $resultat->fetch_row()) {
     $numligne++;
@@ -72,6 +76,7 @@ while ($ligne = $resultat->fetch_row()) {
     else
         $fichiersDuSongbook .= TblCellule(" "); // Nom));
 
+        $fichiersDuSongbook .= TblCellule(Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 32, 32, "couverture"));
     $fichiersDuSongbook .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", entreBalise($ligne [1], "H3"))); // Nom
     $fichiersDuSongbook .= TblCellule($ligne [2]); // interprete
     $fichiersDuSongbook .= TblCellule($ligne [3]); // annee

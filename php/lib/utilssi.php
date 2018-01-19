@@ -11,7 +11,7 @@ unset ( $a );
 // function boutonSuppression($lien,$iconePoubelle)
 
 // Ce code remplace la récupération automatique des variables post et GET en php4
-// TODO : sécurité
+// TODO : sécurité - supprimer l'extraction automatique des get et posts
 extract ( $_GET, EXTR_OVERWRITE );
 extract ( $_POST, EXTR_OVERWRITE );
 
@@ -135,27 +135,5 @@ if (! isset ( $FichierUtilsSi )) {
 		return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer la fiche' onclick =\"confirmeSuppr('" . $lien . "','Voulez-vous vraiment supprimer cet élément ?');\" border='0'>";
 	}
 	
-	// TODO : utiliser cette fonction partout : users, songbooks ...
-	// Cette fonction renvoie l'image vignette relative à une table et son id
-	function imageTableId($table, $id) {
-		$maRequete = "SELECT * FROM document WHERE document.idTable = '$id' AND document.nomTable='$table' ";
-		$maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
-		$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème imageSongbook #1 : " . $_SESSION ['mysql']->error );
-		if (empty ( $result )) {
-			return ("");
-		}
-		$tableImages = array();
-		// renvoie la ligne sélectionnée : id, nom, description, date , image, hits
-		while ( ($ligne = $result->fetch_row ()) )
-			array_push ( $tableImages, $ligne );
-		if (count ( $tableImages ) == 0)
-			return ("");
-		else {
-			srand ();
-			$imageChoisie = rand ( 0, count ( $tableImages ) - 1 );
-			$ligne = $tableImages [$imageChoisie];
-			return (composeNomVersion ( $ligne [1], $ligne [4] ));
-		}
-	}
 }
 ?>

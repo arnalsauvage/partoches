@@ -100,7 +100,6 @@ if ($mode == "MAJ") {
 			$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=down'><span class='glyphicon glyphicon-chevron-down'></a>" ;
 			$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=pit'><span class='glyphicon glyphicon-arrow-down'></a>" ;
         $listeDocs .= "</td><td><a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> ";
-// TODO : recopier ce bouton dans chansonform
 		$listeDocs .= "</td><td>" .boutonSuppression ( $songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages );
 		$listeDocs .=  "</td></tr>\n";
 	}

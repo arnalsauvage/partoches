@@ -81,7 +81,6 @@ header ( 'Location: ./songbook_voir.php?id=' . $_POST ['id'] );
 
 function renommeFichierChanson($nomFichier)
 {
-	// TODO : le remplacement n'est pas fait'
 	$trans = array (
 			"#" => "diese",
 		"strm" => "strum");
