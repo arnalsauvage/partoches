@@ -16,11 +16,14 @@ augmenteHits($table, $_GET ['id']);
 $fichiersDuSongbook = fichiersSongbook($_GET ['id']);
 
 //On cherche une image pour illustrer la songbook parmi les images dispos
-foreach ($fichiersDuSongbook as $fichier) {
-//	echo $fichier [0] . " " . $fichier [1] . " " . $fichier [2] . " <br>";
-	if (stristr ( $fichier [1], "jpg" ) || stristr ( $fichier [1], "png" ))
-		$monImage = $fichier;
-}
+// foreach ($fichiersDuSongbook as $fichier) {
+// //	echo $fichier [0] . " " . $fichier [1] . " " . $fichier [2] . " <br>";
+// 	if (stristr ( $fichier [1], "jpg" ) || stristr ( $fichier [1], "png" ))
+// 		$monImage = $fichier;
+// }
+
+// On choisit une des images du songbook
+$monImage = imageTableId("songbook", $_GET ['id']);
 
 // On charge le tableau des utilisateurs
 $tabUsers = portraitDesUtilisateurs();
@@ -32,8 +35,10 @@ if ($_SESSION ['privilege'] > 1)
 	$sortie .= Ancre ( $songbookForm . "?id=" . $_GET ['id'], Image ( ($cheminImages . $iconeEdit), 32, 32, "modifier" ) );
 
 if ("" != $monImage) {
-	$sortie .= Image ( $monImage [0] . $monImage [1], 200, "", "pochette" );
+	$repertoire = "../data/songbooks/$id/";
+	$sortie .= Image ( $repertoire . $monImage, 200, "", "pochette" );
 }
+
 $sortie .= $donnee [2] . "-" . $donnee [3] ."-". $donnee [5] . " hit(s)<br>\n";
 
 foreach ($fichiersDuSongbook as $fichier) {

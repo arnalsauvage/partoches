@@ -115,11 +115,13 @@ function fichiersSongbook($id) {
 		foreach ( new DirectoryIterator ( $repertoire ) as $fileInfo ) {
 			if ($fileInfo->isDot ()|| strpos($fileInfo->getFilename (),".")==0)
 				continue;
-				array_push($retour, $repertoire , $fileInfo->getFilename (),$fileInfo->getextension());
+			else
+				array_push($retour, array($repertoire , $fileInfo->getFilename (),$fileInfo->getextension()));
 		}
 	}
 	return $retour;
 }
+
 // Fonction de test
 function testeSongbook() {
 	creesongbook ( "Songbook #1", "Chansons d été", "31/07/2017","cover.jpg", 0 );
