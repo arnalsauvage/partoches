@@ -45,8 +45,6 @@ foreach ($fichiersDuSongbook as $fichier) {
 
 $sortie .= "<h2>Liste des documents dans ce songbook</h2>";
 
-// TODO : afficher une vignette de chaque chanson relative au document
-
 $lignes = chercheLiensDocSongbook ( 'idSongbook', $_GET ['id'], "ordre", true );
 $listeDocs = "";
 while ( $ligne = $lignes->fetch_row () ) {

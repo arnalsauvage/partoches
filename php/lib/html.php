@@ -18,7 +18,6 @@ if(!isset ($FichierHtml)){
 	function titre ($texte,$niveau){
 		return "<h$niveau>$texte</h$niveau>";
 	}
-// TODO : attribut border obsolete sur l'image
 
 	// Fonction retournant le code HTML pour une image ____________________
 	function Image ($urlImage, $largeur = -1, $hauteur = -1,  $alt = "image deco"){
