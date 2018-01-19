@@ -75,13 +75,16 @@ function dateDuJourMysql(){
 
 // Chargement de la liste des libelles
 // ex : chargeLibelles($conn, "auteurs", "nom") donne la liste des noms dans un tab[id]=nom trié par nom
-function chargeLibelles($connexion, $table, $libelle){
-	$marequete = "select id, $libelle,  from $table order by $libelle";
-	$resultat = ExecRequete ($marequete, $connexion);
-	while($ligne=LigneSuivante($resultat)){
+function chargeLibelles($table, $libelle)
+{
+
+	$marequete = "select id, $libelle  from $table order by $libelle";
+	$resultat = $_SESSION ['mysql']->query($marequete);
+
+	while ($ligne = $resultat->fetch_row()) {
 		$listeLibelles[$ligne[0]]= $ligne[1];
 	}
-	mysql_free_result($resultat);
+//	$_SESSION ['mysql']->free_result($resultat);
 	return($listeLibelles);
 }
 

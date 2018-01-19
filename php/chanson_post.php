@@ -19,7 +19,7 @@ if ((isset ( $_POST ['id'] ))) {
 	$fnom = $_POST ['fnom'];
 	$finterprete = $_POST ['finterprete'];
 	$fannee = $_POST ['fannee'];
-	$fidAuteur = $_POST ['fidAuteur'];
+	$fidUser = $_POST ['fidUser'];
 	$ftempo = $_POST ['ftempo'];
 	$fmesure = $_POST ['fmesure'];
 	$fpulsation = $_POST ['fpulsation'];
@@ -30,7 +30,13 @@ if ((isset ( $_POST ['id'] ))) {
 
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
 if ($mode == "MAJ") {
-	modifieChanson ( $id, $fnom, $finterprete, $fannee, $fidAuteur, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite );
+	if ($_SESSION ['privilege'] < 3) {
+		// On doit recharger les hits et la date pour qu'ils ne soient remis à zéro
+		$chanson = chercheChanson($id);
+		$fhits = $chanson[9];
+		$fdate = dateMysqlVersTexte($chanson[7]);
+	}
+	modifieChanson($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
 }
 
 // Gestion de la demande de suppression
@@ -39,7 +45,7 @@ if ($id && $mode == "SUPPR" && $_SESSION ['privilege'] > 1) {
 }
 
 if ($mode == "INS") {
-	creeChanson ( $fnom, $finterprete, $fannee, $fidAuteur, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite );
+	creeChanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
 }
 
 // Gestion de la demande de suppression de document dans le songbook

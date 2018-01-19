@@ -19,7 +19,6 @@ if(FALSE == isset($configMysql) )
 	if ($mysqli->connect_error) {
 		die(' Erreur #1 configMysql : Impossible de creer une connexion persistante ! ' . $mysqli->connect_errno . ') '
 				. $mysqli->connect_error);
-		return(0);
 	}
 	
 	if($mysqli->select_db($mabase)==false){
@@ -35,9 +34,10 @@ if(FALSE == isset($configMysql) )
 
 	function convertitDateJJMMAAAA($date){
 		// On convertit la date au format mysql
+// 		echo "Ancienne date : $date ";
 		$date = explode('/', $date);
 		$new_date = $date[2].'-'.$date[1].'-'.$date[0];
-		//  echo "New date : " . $new_date . "<br>";
+// 		echo " , New date : " . $new_date . "<br>";
 		return $new_date;
 	}
 

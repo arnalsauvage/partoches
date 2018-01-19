@@ -5,6 +5,11 @@ include_once("lienDocSongbook.php");
 
 // Fonctions de gestion de la document
 
+// TODO : faire une fonction de contrôle des documents sur disque :
+// Documents sur disque non vus en BDD & documents BDD non vus sur disque
+
+// TODO : contrôler que les id / Tables fournis existent bien
+
 // Cherche les documents correspondant à un critère
 function chercheDocuments($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true) {
 	$maRequete = "SELECT * FROM document WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
@@ -62,33 +67,34 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable) {
 	$date = date ( "d/m/y" );
 	$date = convertitDateJJMMAAAA ( $date );
 	$version = 1;
-	
-	$resultat = chercheDocuments ( "nom", $nom );
-	$resultat = $resultat->fetch_row ();
+
+	$resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
 	if ($resultat != NULL)
 		return false;
 	$idUser = $_SESSION ['id'];
-	$maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser')";
+	$maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème creedocument#1 : " . $_SESSION ['mysql']->error );
 	return true;
 }
 
 // Modifie en base le document
-function modifieDocument($nom, $tailleKo) {
+function modifieDocument($nom, $tailleKo, $nomTable, $idTable)
+{
 	$date = date ( "d/m/y" );
 	$date = convertitDateJJMMAAAA ( $date );
 	$idUser = $_SESSION ['id'];
-	
-	$resultat = chercheDocuments ( "nom", $nom );
-	$resultat = $resultat->fetch_row ();
+
+	$resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
 	if ($resultat == NULL)
 		return false;
 	else
 		$version = $resultat [4] + 1;
 	$maRequete = "UPDATE  document
-	SET tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser';
+	SET tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser'
 	WHERE nom = '$nom'";
-	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème modifiedocument #1 : " . $_SESSION ['mysql']->error );
+	$result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiedocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
+
+	return true;
 }
 
 // Cette fonction supprime un document si il existe
@@ -103,15 +109,16 @@ function supprimeDocument($id) {
 
 // Cette fonction modifie ou crée un document si besoin
 function creeModifieDocument($nom, $tailleKo, $nomTable, $idTable) {
-	$resultat = chercheDocuments ( "nom", $nom );
-	$resultat = $resultat->fetch_row ();
+	$resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
 	if ($resultat == NULL)
 		creeDocument ( $nom, $tailleKo, $nomTable, $idTable );
 	else
-		modifieDocument ( $nom, $tailleKo );
+		modifieDocument($nom, $tailleKo, $nomTable, $idTable);
 	return;
 }
-function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant = tru) {
+
+function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
+{
 	$retour = "<select name='documentJoint'>\n";
 	
 	// Ajouter des options
@@ -130,7 +137,8 @@ function infosDocument($nom) {
 	if ($resultat != NULL) {
 		$enr = $resultat;
 		// id_journee id_joueur poste statut
-		$retour = "id : " . $enr [0] . " nom : " . $enr [1] . " taille(ko) : " . $enr [2] . " Date : " . $enr [3] . " Version : " . $enr [4] . "nomTable : " . $enr [5] . " idTable : " . $enr [6];
+		$retour = "id : " . $enr [0] . " nom : " . $enr [1] . " taille(ko) : " . $enr [2] . " Date : " . $enr [3];
+		$retour .= " Version : " . $enr [4] . "nomTable : " . $enr [5] . " idTable : " . $enr [6] . " hits : " . $enr[8];
 	} else
 		$retour = "$nom pas trouvé...";
 	return $retour . "<BR>\n";

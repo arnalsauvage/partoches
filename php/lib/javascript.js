@@ -29,7 +29,7 @@ function creerRequete()
 		{
 			try
 			{
-				requete = newActiveXObject("Microsoft.XMLHTTP");
+				requete = new ActiveXObject("Microsoft.XMLHTTP");
 			}
 			catch (echec)
 			{
@@ -108,10 +108,10 @@ function miseAjourListeImages (scriptPhpListeImages)
 		/*    alert("XHR.readyState = " + xhr_object.readyState); */ 
 		if (xhr_object.readyState == 4)
 		{
-			alert("Nouvelle liste reçue du serveur.") 
+			alert("Nouvelle liste reçue du serveur.");
 			eval(xhr_object.responseText);
-		} 
-	}
+		}
+	};
 	xhr_object.send(null);    
 	/*  alert("Sortie fonction MiseAjourListeImage"); */     
 } 

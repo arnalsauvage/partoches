@@ -134,6 +134,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 			}
 		} // fin du size
 	} // fin de l'extension
+	return true;
 }
 
 ?>

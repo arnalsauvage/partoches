@@ -1,32 +1,35 @@
 <?php
 if(!isset ($FichierCompteur)){
-	$FichierCompteur = 1;	
-	function ajouteHit ($nomtable, $idItem, $connexion){
+	$FichierCompteur = 1;
+	function ajouteHit($nomtable, $idItem)
+	{
 		$DEBUG_COMPTEUR = false;
 		//$DEBUG_COMPTEUR = true;
 		// Connexion à la base de données déjà pass� en paramètre
 		// Récupération du nombre de Hits pour cet item
-		$marequete = "select hits from $nomtable WHERE id = '$idItem'";
+		$maRequete = "select hits from $nomtable WHERE id = '$idItem'";
 		if($DEBUG_COMPTEUR)
-			echo " Requête lancée : $marequete <BR>";			
-		$resultat = ExecRequete ( $marequete, $connexion);
-		if($ligne = lignesuivante($resultat)){
-			$nombreHits = $ligne[0];
+			echo " Requête lancée : $maRequete <BR>";
+		$resultat = $_SESSION ['mysql']->query($maRequete) or die ("Problème ajouteHits #1 : " . $_SESSION ['mysql']->error);
+		// renvoie la lisgne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
+		$resultat = $resultat->fetch_row();
+		if ($resultat) {
+			$nombreHits = $resultat[0];
 			if($DEBUG_COMPTEUR)
 				echo " Nombre de hits : $nombreHits <BR>";			
 			if($nombreHits == "")
 				$nombreHits = 0;
 			// Augmentation du nombre et inscription dans la base de donn�es
 			$nombreHits += 1;
-			$marequete = "UPDATE $nomtable SET hits='$nombreHits' WHERE id = '$idItem'";
+			$maRequete = "UPDATE $nomtable SET hits='$nombreHits' WHERE id = '$idItem'";
 			if($DEBUG_COMPTEUR)
-				echo " Requ�te lanc�e : $marequete <BR>";			
-			$resultat = ExecRequete ( $marequete, $connexion);					
+				echo " Requête lancée : $maRequete <BR>";
+			$resultat = $_SESSION ['mysql']->query($maRequete) or die ("Problème ajouteHits #2 : " . $_SESSION ['mysql']->error);
 			return ($nombreHits);
 		}
 		else{
 			if($DEBUG_COMPTEUR)
-				echo " Pas d'identifiant id =$iditem trouv� dans la table $nomtable. <BR>";			
+				echo " Pas d'identifiant id =$idItem trouvé dans la table $nomtable. <BR>";
 			return (0);
 		}
 	}

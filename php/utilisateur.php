@@ -127,7 +127,6 @@ function login_utilisateur($login, $mdp) {
 	$crypt = Chiffrement::crypt ( $mdp );
 	
 	if ($crypt == $donnee [2]) {
-		$donnee [9] = date ("d/m/y");
 		$donnee [10] = $donnee [10] + 1;
 		echo "login ok";
 		modifieUtilisateur ( $donnee [0], $donnee [1], $mdp, $donnee [3], $donnee [4], $donnee [5], $donnee [6], $donnee [7], $donnee [8],  $donnee [10], $donnee [11] );
@@ -135,6 +134,19 @@ function login_utilisateur($login, $mdp) {
 	} else
 		echo "Erreur de mot de passe : $crypt";
 		return false;
+}
+
+function portraitDesUtilisateurs()
+{
+	$maRequete = "SELECT id, login, image FROM  utilisateur";
+	$result = $_SESSION ['mysql']->query($maRequete);
+	if (!$result)
+		die ("Problème supprimeUtilisateur#1 : " . $_SESSION ['mysql']->error);
+	while ($ligne = $result->fetch_row()) {
+		$tableau[$ligne[0]][0] = $ligne[1];
+		$tableau[$ligne[0]][1] = $ligne[2];
+	}
+	return $tableau;
 }
 
 function statut($privilege) {
@@ -148,6 +160,7 @@ function statut($privilege) {
 		case 3 :
 			return "administrateur";
 	}
+	return "invité";
 }
 
 // Pour le test

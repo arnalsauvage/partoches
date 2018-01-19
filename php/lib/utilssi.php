@@ -39,7 +39,7 @@ if(!isset ($FichierUtilsSi)){
 	// parcourt un sous-répertoire et exporte la liste des fichiers dans un tableau	
 	function pc_process_dir ($nom_rep, $profondeur_max = 10, $profondeur = 0){
 		if($profondeur >= $profondeur_max){
-			error_log("Profondeur maximum $profondeur_max atteinte dans $nomrep.");
+			error_log("Profondeur maximum $profondeur_max atteinte dans $nom_rep.");
 			return false;
 		}
 		$sous_repertoires = array();
@@ -136,6 +136,23 @@ if(!isset ($FichierUtilsSi)){
 	// Cette fonction retourne un bouton de suppression avec message de confirmation
 	function boutonSuppression($lien,$iconePoubelle,$cheminImages){//<img src="x.png" onclick="getattrs(this);">
 		return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer la fiche' onclick =\"confirmeSuppr('".$lien."','Voulez-vous vraiment supprimer cet élément ?');\" border='0'>";
+	}
+
+	// Cette fonction renvoie l'image vignette relative à une table et son id
+	function imageTableId($table, $id)
+	{
+		$maRequete = "SELECT * FROM document WHERE document.idTable = '$id' AND document.nomTable='$table' ";
+		$maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
+		$result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imageSongbook #1 : " . $_SESSION ['mysql']->error);
+		if (empty($result)) {
+			return ("");
+		}
+		// TODO : Choisit une vignette au hasard parmi les images
+		// renvoie la ligne sélectionnée : id, nom, description, date , image, hits
+		if (($ligne = $result->fetch_row()))
+			return (composeNomVersion($ligne[1], $ligne[4]));
+		else
+			return ("");
 	}
 }
 ?>

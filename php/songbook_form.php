@@ -24,11 +24,12 @@ if ($id || (isset ( $_GET ['id'] ) && $_GET ['id'] != "")) {
 	$donnee [1] = htmlspecialchars ( $donnee [1] );
 	$donnee [2] = htmlspecialchars ( $donnee [2] );
 	$donnee [3] = dateMysqlVersTexte ( $donnee [3] );
-	$donnee [4] = $donnee [4];
-	$donnee [5] = $donnee [5];
+//	$donnee [4] = $donnee [4];
+//	$donnee [5] = $donnee [5];
 	$mode = "MAJ";
 	ordonneLiensSongbook ( $id );
-} else {
+}
+else {
 	$mode = "INS";
 	$donnee [0] = 0;
 	$donnee [1] = "";
@@ -57,6 +58,12 @@ $f->champCache ( "mode", $mode );
 $f->champValider ( " Valider ", "valider" );
 $sortie .= $f->fin ();
 
+if ($_SESSION ['privilege'] < 3) {
+	// On verrouille les champs hits, date publication
+	$sortie = str_replace ( "NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie );
+	$sortie = str_replace ( "NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie );
+}
+
 echo $sortie;
 if ($mode == "MAJ") {
 	?>
@@ -73,18 +80,31 @@ if ($mode == "MAJ") {
 <h2>Liste des documents dans ce songbook</h2>
 <?php
 	$lignes = chercheLiensDocSongbook ( 'idSongbook', $id, "ordre", true );
-	$listeDocs = "";
+	$listeDocs = "<div><table>";
+	$numero=0;
 	while ( $ligne = $lignes->fetch_row () ) {
+		$numero++;
 		$ligneDoc = chercheDocument ( $ligne [1] );
 		$fichierCourt = composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
 		$fichier = "../data/chansons/" . $ligneDoc [6] . "/" . composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
+		$listeDocs .= "<tr><td>";
+		if ($numero>1){
+			$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=top'><span class='glyphicon glyphicon-arrow-up'></a>" ;
+			$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=up'><span class='glyphicon glyphicon-chevron-up'></a>" ;
+		}
+		$listeDocs .= "</td><td>";
 		$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 		if (! file_exists ( "../images/icones/" . $fichier [2] . ".png" ))
 			$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
-		$listeDocs .= "$icone <a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> ";
-		$listeDocs .= boutonSuppression ( $songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages ) . "<br>\n";
+		$listeDocs .= $icone . "</td><td>";
+			$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=down'><span class='glyphicon glyphicon-chevron-down'></a>" ;
+			$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=pit'><span class='glyphicon glyphicon-arrow-down'></a>" ;
+        $listeDocs .= "</td><td><a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> ";
+// TODO : recopier ce bouton dans chansonform
+		$listeDocs .= "</td><td>" .boutonSuppression ( $songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages );
+		$listeDocs .=  "</td></tr>\n";
 	}
-	echo $listeDocs;
+	echo $listeDocs."</table></div>";
 	?>
 
 <h2>Insérer un document dans ce songbook</h2>

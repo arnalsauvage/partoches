@@ -37,6 +37,7 @@ if(!isset ($FichierHtml)){
 	function ChampSelect ($liste, $numero, $nom){
 		$champSelect = "";
 		$champSelect .= "<select name = $nom size=\"1\">";
+		$choix = 0;
 		while($ligne = LigneSuivante($liste)){
 			$choix++;
 			$champSelect .= "<option ";
@@ -157,7 +158,7 @@ if(!isset ($FichierHtml)){
 	function envoieFooter($contenu){
 		$retour = 	
 		"<footer>
-		$contenu | 
+		Top 5 club ukulélé :
 		<a href='http://www.facebook.com/top5.asso' target='_blank'>Facebook</a> | 
 		<a href='http://www.top5.re' target='_blank'>Site web</a> | 
 		<a href='https://www.youtube.com/channel/UCFKyqYcs5cnML-EgPgYmwdg' target='_blank'>Chaîne Youtube</a>

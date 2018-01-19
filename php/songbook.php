@@ -66,9 +66,9 @@ function modifiesongbook($id, $nom, $description, $date, $image, $hits){
 function supprimesongbook($idsongbook) {
 	// On supprime les enregistrements dans songbook
 	$maRequete = "DELETE FROM songbook
-	WHERE id='$idSongbook'";
+	WHERE id='$idsongbook'";
 	$result =  $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème #1 dans supprimesongbook : " . $_SESSION ['mysql']->error  );
-	supprimeliensDocSongbookDuSongbook($idSongbook);
+	supprimeliensDocSongbookDuSongbook($idsongbook);
 }
 
 // Cette fonction modifie ou crée un songbook si besoin
@@ -79,6 +79,25 @@ function creeModifiesongbook($id, $nom, $description, $date, $image, $hits){
 			creesongbook ( $nom, $description, $date, $image, $hits);
 }
 
+// Cette fonction renvoie l'image vignette d'un songbook
+function imageSongbook($idSongbook)
+{
+
+	$maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
+	$maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
+	$result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imageSongbook #1 : " . $_SESSION ['mysql']->error);
+	if (empty($result)) {
+		return ("");
+	}
+
+	// Choisit une vignette au hasard parmi les images
+	// renvoie la ligne sélectionnée : id, nom, description, date , image, hits
+	if (($ligne = $result->fetch_row())) {
+		$nom = composeNomVersion($ligne[1], $ligne[4]);
+		return ($nom);
+	} else
+		return ("");
+}
 // Cette fonction renvoie une chaine de description de la songbook
 function infossongbook($id) {
 	$enr = cherchesongbook ( $id );
