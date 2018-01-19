@@ -136,6 +136,7 @@ function login_utilisateur($login, $mdp) {
 		echo "Erreur de mot de passe : $crypt";
 		return false;
 }
+
 function statut($privilege) {
 	switch ($privilege) {
 		case 0 :
@@ -156,6 +157,19 @@ function infos($id) {
 	// id_journee id_joueur poste statut
 	$retour = "Id : " . $enr [0] . " Nom : " . $enr [1] . " Desc : " . $enr [2] . " date : " . $enr [3] . " image : " . $enr [4] . " hits : " . $enr [5];
 	return $retour . "<br>\n";
+}
+
+// Fonction test affichage de tous les utilisateurs
+function testUtilisateurs() {
+	$maRequete = "SELECT * FROM utilisateur";
+	$result = $_SESSION ['mysql']->query ( $maRequete );
+	if (! $result)
+		die ( "Problème testUtilisateurs #1 : pas d'utilisateurs trouvés ! - " . $_SESSION ['mysql']->error );
+		// renvoie la lisgne sélectionnée : id, nom, taille, date
+		while($ligne = $result->fetch_row ())
+		{
+			echo (infos($ligne[0]) . " Pass : " . Chiffrement::decrypt ($ligne[2]) . "<br> \n\r");
+		}
 }
 
 // Fonction de test
@@ -179,8 +193,18 @@ function testeUtilisateur() {
 	
 	$id = chercheUtilisateurParLeLogin ( "test3" );
 	supprimeUtilisateur($id[0]);
+	
+	$motDePasse = "coucou";
+	echo("Cryptage de mot de passe : " . $motDePasse. "<br> \n\r");
+	echo 	(Chiffrement::crypt ($motDePasse). "<br> \n\r");
+	
+	$chaine= "YumgdDnP5Oomf2jI1Lmy/A==";
+	echo("Décryptage de chaine : " . $chaine . "<br> \n\r");
+	echo 	("Resultat : " . Chiffrement::decrypt ($chaine). "<br> \n\r");
+	
 }
 
-//testeUtilisateur ();
+// testeUtilisateur ();
+// testUtilisateurs ();
 
 ?>
