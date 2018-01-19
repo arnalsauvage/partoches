@@ -106,16 +106,16 @@ function infossongbook($id) {
 	return $retour . "<BR>\n";
 }
 
-// Cette fonction renvoie la liste des fichiers attachés à la songbook
+// Cette fonction renvoie la liste des fichiers attachés au songbook
 function fichiersSongbook($id) {
 	$enr = cherchesongbook ( $id );
-	$retour = []; // repertoire, nom, extension
+	$retour = array(); // repertoire, nom, extension
 	$repertoire = "../data/songbooks/$id/";
 	if (is_dir ( $repertoire )) {
 		foreach ( new DirectoryIterator ( $repertoire ) as $fileInfo ) {
 			if ($fileInfo->isDot ()|| strpos($fileInfo->getFilename (),".")==0)
 				continue;
-				array_push($retour, [$repertoire , $fileInfo->getFilename (),$fileInfo->getextension()]);
+				array_push($retour, $repertoire , $fileInfo->getFilename (),$fileInfo->getextension());
 		}
 	}
 	return $retour;

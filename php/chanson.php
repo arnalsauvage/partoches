@@ -108,17 +108,17 @@ function infosChanson($id)
 // Cette fonction renvoie la liste des fichiers attachés à la chanson
 function fichiersChanson($id)
 {
-    $retour = []; // repertoire, nom, extension
+    $retour = array();// repertoire, nom, extension
     $repertoire = "../data/chansons/$id/";
     if (is_dir($repertoire)) {
         foreach (new DirectoryIterator ($repertoire) as $fileInfo) {
             if ($fileInfo->isDot() || strpos($fileInfo->getFilename(), ".") == 0)
                 continue;
-            array_push($retour, [
+            array_push($retour, 
                 $repertoire,
                 $fileInfo->getFilename(),
                 $fileInfo->getextension()
-            ]);
+            );
         }
     }
     return $retour;
