@@ -9,3 +9,6 @@
  .settings/org.eclipse.wst.common.project.facet.core.xml
 .idea/deployment.xml
 /.idea/
+/images/
+/logs/
+/vignettes/
