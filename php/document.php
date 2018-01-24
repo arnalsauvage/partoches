@@ -198,7 +198,7 @@ function imageTableId($table, $id) {
 		return ("");
 	}
 	$tableImages = array ();
-	// renvoie la ligne sélectionnée : id, nom, description, date , image, hits
+	// renvoie la ligne sélectionnée : id, nom, taille, date , version, nomtable, idTable, idUser, hits
 	while ( ($ligne = $result->fetch_row ()) )
 		array_push ( $tableImages, $ligne );
 	if (count ( $tableImages ) == 0)

@@ -16,9 +16,9 @@ $fichiersDuSongbook = fichiersChanson ( $_GET ['id'] );
 // }
 
 // On choisit une des images du songbook
-$monImage = imageTableId("songbook", $_GET ['id']);
+$monImage = imageTableId("chanson", $_GET ['id']);
 
-$donnee = chercheChanson ( $_GET ['id'] );
+$donnee = chercheChanson ( $_GET ['id']);
 if ($donnee != null) {
 	$nom = $donnee [1]; // nom
 	$interprete = $donnee [2]; // interprete
@@ -39,7 +39,7 @@ if ($_SESSION ['privilege'] > 1)
 	$sortie .= Ancre ( "chanson_form.php?id=" . $_GET ['id'], Image ( $cheminImages . $iconeEdit, 32, 32 ) ); // Nom));
 
 if ("" != $monImage) {
-	$sortie .= Image ( $monImage [0] . $monImage [1], 200, "", "pochette" );
+	$sortie .= Image ( "../data/chansons/". $_GET ['id'] . "/" . $monImage, 200, "", "pochette" );
 }
 $sortie .= " $interprete - $annee <br>\n";
 $sortie .= "Tonalité : $tonalite, Tempo : $tempo, mesure : $mesure, pulsation : $pulsation <br>\n";
