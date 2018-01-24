@@ -9,11 +9,14 @@ $monImage = "";
 
 $fichiersDuSongbook = fichiersChanson ( $_GET ['id'] );
 
-foreach ( $fichiersDuSongbook as $fichier ) {
-	// echo $fichier [0] . " " . $fichier [1] . " " . $fichier [2] . " <br>";
-	if (stristr ( $fichier [1], "jpg" ) || stristr ( $fichier [1], "png" ))
-		$monImage = $fichier;
-}
+// foreach ( $fichiersDuSongbook as $fichier ) {
+// 	// echo $fichier [0] . " " . $fichier [1] . " " . $fichier [2] . " <br>";
+// 	if (stristr ( $fichier [1], "jpg" ) || stristr ( $fichier [1], "png" ))
+// 		$monImage = $fichier;
+// }
+
+// On choisit une des images du songbook
+$monImage = imageTableId("songbook", $_GET ['id']);
 
 $donnee = chercheChanson ( $_GET ['id'] );
 if ($donnee != null) {
@@ -57,13 +60,13 @@ augmenteHits ( $table, $id );
 // Pour chaque document
 while ( $ligne = $result->fetch_row () ) {
 	$fichierCourt = composeNomVersion ( $ligne [1], $ligne [4] );
-	$fichier = "../data/chansons/" . $_GET ['id'] . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
+	// $fichier = "../data/chansons/" . $_GET ['id'] . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
 	$extension = substr ( strrchr ( $ligne [1], '.' ), 1 );
 	$icone = Image ( "../images/icones/" . $extension . ".png", 32, 32, "icone" );
 	if (! file_exists ( "../images/icones/" . $extension . ".png" ))
 		$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
 	
-	$sortie .= "$icone <a href= 'getdoc.php?doc=" . $ligne [0] . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> <br>\n";
+		$sortie .= "$icone <a href= '".lienUrlAffichageDocument($ligne [0])."' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> <br>\n";
 }
 
 // foreach ( $retour as $fichier ) {

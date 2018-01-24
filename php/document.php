@@ -1,7 +1,7 @@
 <?php
 include_once ("lib/utilssi.php");
 include_once "lib/configMysql.php";
-include_once("lienDocSongbook.php");
+include_once ("lienDocSongbook.php");
 
 // Fonctions de gestion de la document
 
@@ -50,7 +50,6 @@ function chercheDocumentsTableId($table, $id) {
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème chercheDocumentsTableId #1 : " . $_SESSION ['mysql']->error );
 	return ($result);
 }
-
 function composeNomVersion($nom, $version) {
 	// echo "Recherche $nom $version\n";
 	
@@ -67,8 +66,8 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable) {
 	$date = date ( "d/m/y" );
 	$date = convertitDateJJMMAAAA ( $date );
 	$version = 1;
-
-	$resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
+	
+	$resultat = chercheDocumentNomTableId ( $nom, $nomTable, $idTable );
 	if ($resultat != NULL)
 		return false;
 	$idUser = $_SESSION ['id'];
@@ -78,13 +77,12 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable) {
 }
 
 // Modifie en base le document
-function modifieDocument($nom, $tailleKo, $nomTable, $idTable)
-{
+function modifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 	$date = date ( "d/m/y" );
 	$date = convertitDateJJMMAAAA ( $date );
 	$idUser = $_SESSION ['id'];
-
-	$resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
+	
+	$resultat = chercheDocumentNomTableId ( $nom, $nomTable, $idTable );
 	if ($resultat == NULL)
 		return false;
 	else
@@ -92,8 +90,8 @@ function modifieDocument($nom, $tailleKo, $nomTable, $idTable)
 	$maRequete = "UPDATE  document
 	SET tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser'
 	WHERE nom = '$nom'";
-	$result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiedocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
-
+	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème modifiedocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete );
+	
 	return true;
 }
 
@@ -104,21 +102,19 @@ function supprimeDocument($id) {
 	WHERE id='$id'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème #1 dans supprimedocument : " . $_SESSION ['mysql']->error );
 	// On supprime également toutes les entrées Songbook lui correspondant
-	supprimeliensDocSongbookDuDocument($id);
+	supprimeliensDocSongbookDuDocument ( $id );
 }
 
 // Cette fonction modifie ou crée un document si besoin
 function creeModifieDocument($nom, $tailleKo, $nomTable, $idTable) {
-	$resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
+	$resultat = chercheDocumentNomTableId ( $nom, $nomTable, $idTable );
 	if ($resultat == NULL)
 		creeDocument ( $nom, $tailleKo, $nomTable, $idTable );
 	else
-		modifieDocument($nom, $tailleKo, $nomTable, $idTable);
+		modifieDocument ( $nom, $tailleKo, $nomTable, $idTable );
 	return;
 }
-
-function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
-{
+function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true) {
 	$retour = "<select name='documentJoint'>\n";
 	
 	// Ajouter des options
@@ -130,6 +126,30 @@ function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant =
 	return $retour;
 }
 
+// Cette fonction renvoie un lien pour affichage direct du document dans une url
+function lienUrlAffichageDocument($idDoc) {
+	$ligne = chercheDocument ( $idDoc );
+	if ($ligne != 0) {
+		// Le fichier est stocke dans le répertoire data/NOMTABLEs/IDTABLE
+		// ex: nom table = chanson, dossier = data/chansons/123/
+		$url= "../data/" . $ligne [5] . "s/" . $ligne [6] . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
+	} else {
+		$url = "";
+	}
+	return $url;
+}
+
+// Cette fonction renvoie un lien pour télécharger le document via une url
+function lienUrlTelechargeDocument($idDoc) {
+	$ligne = chercheDocument ( $idDoc );
+	if ($ligne != 0) {
+		$url = "getdoc.php?doc=" . $ligne [0];
+	} else {
+		$url = "";
+	}
+	return $url;
+}
+
 // Cette fonction renvoie une chaine de description de la document pour test
 function infosDocument($nom) {
 	$resultat = chercheDocuments ( "nom", $nom );
@@ -138,7 +158,7 @@ function infosDocument($nom) {
 		$enr = $resultat;
 		// id_journee id_joueur poste statut
 		$retour = "id : " . $enr [0] . " nom : " . $enr [1] . " taille(ko) : " . $enr [2] . " Date : " . $enr [3];
-		$retour .= " Version : " . $enr [4] . "nomTable : " . $enr [5] . " idTable : " . $enr [6] . " hits : " . $enr[8];
+		$retour .= " Version : " . $enr [4] . "nomTable : " . $enr [5] . " idTable : " . $enr [6] . " hits : " . $enr [8];
 	} else
 		$retour = "$nom pas trouvé...";
 	return $retour . "<BR>\n";
@@ -160,6 +180,12 @@ function testeDocument() {
 	
 	// creeModifieDocument ( "parent.pdf", "256", "chanson", 5 );
 	echo infosDocument ( "enfant.pdf" );
+	
+	for ($idDoc=0; $idDoc < 100; $idDoc++)
+	{
+		echo "<a href='" . lienUrlAffichageDocument($idDoc) .  "'>lien affichage</a> <BR>"; 
+		echo "<a href='" . lienUrlTelechargeDocument($idDoc) . "'>lien téléchargement</a> <BR>"; 
+	}
 }
 
 // TODO : utiliser cette fonction partout : users ...
@@ -171,18 +197,18 @@ function imageTableId($table, $id) {
 	if (empty ( $result )) {
 		return ("");
 	}
-	$tableImages = array();
+	$tableImages = array ();
 	// renvoie la ligne sélectionnée : id, nom, description, date , image, hits
 	while ( ($ligne = $result->fetch_row ()) )
 		array_push ( $tableImages, $ligne );
-		if (count ( $tableImages ) == 0)
-			return ("");
-			else {
-				srand ();
-				$imageChoisie = rand ( 0, count ( $tableImages ) - 1 );
-				$ligne = $tableImages [$imageChoisie];
-				return (composeNomVersion ( $ligne [1], $ligne [4] ));
-			}
+	if (count ( $tableImages ) == 0)
+		return ("");
+	else {
+		srand ();
+		$imageChoisie = rand ( 0, count ( $tableImages ) - 1 );
+		$ligne = $tableImages [$imageChoisie];
+		return (composeNomVersion ( $ligne [1], $ligne [4] ));
+	}
 }
 
 // testeDocument ();
