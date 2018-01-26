@@ -2,6 +2,7 @@
 include_once ("lib/utilssi.php");
 include_once ("menu.php");
 include_once ("songbook.php");
+include_once ("document.php");
 
 $table = "songbook";
 $fichiersDuSongbook = "";
@@ -52,7 +53,7 @@ while ( $ligne = $resultat->fetch_row () ) {
 	if ($ligne [4])
 		// //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
 		if ($_SESSION ['privilege'] >= 2)
-			$fichiersDuSongbook .= TblCellule(Ancre($songbookForm . "?id=$ligne[0]", Image(($cheminImagesSongbook . $ligne[0] . "/" . $ligne [4]), 32, 32, "couverture"))); // image
+			$fichiersDuSongbook .= TblCellule(Ancre($songbookForm . "?id=$ligne[0]", Image((imageTableId("songbook", $ligne[0])), 32, 32, "couverture"))); // image
 		else
 			$fichiersDuSongbook .= TblCellule(Image(($cheminImagesSongbook . $ligne[0] . "/" . $ligne [4]), 32, 32)); // image
 	else

@@ -50,9 +50,11 @@ function chercheDocumentsTableId($table, $id) {
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème chercheDocumentsTableId #1 : " . $_SESSION ['mysql']->error );
 	return ($result);
 }
+
+// A partir d'un nom de fichier (monNom.txt) et un numéro de version du doc (2)
+// donne un nom pour identifier le document : (monNom-v2.txt)
 function composeNomVersion($nom, $version) {
 	// echo "Recherche $nom $version\n";
-	
 	// On cherche le rang du dernier point dans nom
 	$ext = strrchr ( $nom, "." );
 	$nomSec = str_replace ( $ext, "", $nom );
@@ -61,7 +63,7 @@ function composeNomVersion($nom, $version) {
 	return $nouveauNom;
 }
 
-// Crée un document
+// Crée un document en base de données
 function creeDocument($nom, $tailleKo, $nomTable, $idTable) {
 	$date = date ( "d/m/y" );
 	$date = convertitDateJJMMAAAA ( $date );
@@ -95,7 +97,7 @@ function modifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 	return true;
 }
 
-// Cette fonction supprime un document si il existe
+// Supprime un document en base de données si il existe
 function supprimeDocument($id) {
 	// On supprime les enregistrements dans la table document
 	$maRequete = "DELETE FROM document
@@ -105,7 +107,7 @@ function supprimeDocument($id) {
 	supprimeliensDocSongbookDuDocument ( $id );
 }
 
-// Cette fonction modifie ou crée un document si besoin
+// Modifie ou crée un document si besoin
 function creeModifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 	$resultat = chercheDocumentNomTableId ( $nom, $nomTable, $idTable );
 	if ($resultat == NULL)
@@ -114,9 +116,11 @@ function creeModifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 		modifieDocument ( $nom, $tailleKo, $nomTable, $idTable );
 	return;
 }
+
+// Prépare un combo en html avec les documents correspondant à un critere et triés selon un critereTri
+// SELECT * FROM document WHERE $critere LIKE '$valeur' ORDER BY $critereTri
 function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true) {
 	$retour = "<select name='documentJoint'>\n";
-	
 	// Ajouter des options
 	$lignes = chercheDocuments ( $critere, $valeur, $critereTri, $bTriAscendant );
 	while ( $ligne = $lignes->fetch_row () ) {
@@ -126,7 +130,7 @@ function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant =
 	return $retour;
 }
 
-// Cette fonction renvoie un lien pour affichage direct du document dans une url
+// Renvoie un lien pour affichage direct du document dans une url
 function lienUrlAffichageDocument($idDoc) {
 	$ligne = chercheDocument ( $idDoc );
 	if ($ligne != 0) {
@@ -139,7 +143,7 @@ function lienUrlAffichageDocument($idDoc) {
 	return $url;
 }
 
-// Cette fonction renvoie un lien pour télécharger le document via une url
+// Renvoie un lien pour télécharger le document via une url
 function lienUrlTelechargeDocument($idDoc) {
 	$ligne = chercheDocument ( $idDoc );
 	if ($ligne != 0) {
@@ -150,7 +154,7 @@ function lienUrlTelechargeDocument($idDoc) {
 	return $url;
 }
 
-// Cette fonction renvoie une chaine de description de la document pour test
+// Renvoie une chaine de description du document pour test
 function infosDocument($nom) {
 	$resultat = chercheDocuments ( "nom", $nom );
 	$resultat = $resultat->fetch_row ();

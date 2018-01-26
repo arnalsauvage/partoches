@@ -64,7 +64,22 @@ if ($_SESSION ['privilege'] < 3) {
 	$sortie = str_replace ( "NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie );
 }
 
+$sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
+
+
+// On récupère les fichiers du Songbook
+$fichiersDuSongbook = fichiersSongbook($id);
+
+foreach ($fichiersDuSongbook as $fichier) {
+	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
+	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
+		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
+		$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> \n";
+		$sortie .= boutonSuppression ( "songbook_get.php" . "?idSongbook=$id&idDoc=$fichier[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages ) . "<br>\n";
+}
+
 echo $sortie;
+
 if ($mode == "MAJ") {
 	?>
 

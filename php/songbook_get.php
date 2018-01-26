@@ -23,6 +23,8 @@ if (($mode == "MAJ") || ($mode == "INS")) {
 	}
 }
 
+// On récupère l'identifiant du songbook passé par POST ou GET
+
 if (isset ($_GET ['id'])) {
 	$id = $_GET ['id'];
 }
@@ -31,9 +33,10 @@ if (isset ($_POST ['id'])) {
 	$id = $_POST ['id'];
 }
 
+// Cas de la mise à jour
 if ($mode == "MAJ") {
 	if ($_SESSION ['privilege'] < 3) {
-		// On doit recharger les hits et la date pour qu'ils ne soient remis à zéro
+		// On récupère les valeurs de hits et date en base, car ils ne sont pas dans le formulaire
 		$songbook = cherchesongbook($id);
 		$fhits = $songbook[5];
 		$fdate = dateMysqlVersTexte($songbook[3]);
@@ -41,6 +44,7 @@ if ($mode == "MAJ") {
 	modifiesongbook($id, $fnom, $fdescription, $fdate, $fimage, $fhits);
 }
 
+// Cas de l'ajout d'un Songbook
 if ($mode == "INS") {
 	$fhits = 0;
 	$fdate = date("d/m/Y");
@@ -48,7 +52,7 @@ if ($mode == "INS") {
 }
 
 // Gestion de la demande de suppression
-if ($id && $mode == "SUPPR") {
+if ($id && ($mode == "SUPPR")) {
 	supprimesongbook ( $id );
 }
 

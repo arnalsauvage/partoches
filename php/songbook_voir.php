@@ -12,15 +12,6 @@ $monImage = "";
 // On augmente le compteur de vues du songbook
 augmenteHits($table, $_GET ['id']);
 
-// On récupère les fichiers du Songbook
-$fichiersDuSongbook = fichiersSongbook($_GET ['id']);
-
-//On cherche une image pour illustrer la songbook parmi les images dispos
-// foreach ($fichiersDuSongbook as $fichier) {
-// //	echo $fichier [0] . " " . $fichier [1] . " " . $fichier [2] . " <br>";
-// 	if (stristr ( $fichier [1], "jpg" ) || stristr ( $fichier [1], "png" ))
-// 		$monImage = $fichier;
-// }
 
 // On choisit une des images du songbook
 $monImage = imageTableId("songbook", $_GET ['id']);
@@ -40,6 +31,11 @@ if ("" != $monImage) {
 }
 
 $sortie .= $donnee [2] . "-" . $donnee [3] ."-". $donnee [5] . " hit(s)<br>\n";
+
+$sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
+
+// On récupère les fichiers du Songbook
+$fichiersDuSongbook = fichiersSongbook($_GET ['id']);
 
 foreach ($fichiersDuSongbook as $fichier) {
 	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
