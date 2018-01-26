@@ -60,7 +60,7 @@ while ( $ligne = $lignes->fetch_row () ) {
 	$vignetteChanson = Image("../data/chansons/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
 	$vignettePublicateur = Image("../images" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
 	$sortie .= $vignettePublicateur . $vignetteChanson . $icone;
-	$sortie .= "<a href= 'getdoc.php?doc=" . $ligneDoc [0] . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
+	$sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
 }
 
 $sortie .= envoieFooter ( "Bienvenue chez nous !" );

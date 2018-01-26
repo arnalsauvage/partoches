@@ -85,7 +85,8 @@ $table = "songbook";
 						$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 						if (! file_exists ( "../images/icones/" . $fichier [2] . ".png" ))
 							$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
-						echo "<a href= 'getdoc.php?doc=" . $ligne [1] . "' target='_blank'> " . htmlentities ( $titresChansons [$ligneDoc [6]] ) . "</a> <br>\n";
+						echo "<a href= '" . $fichier . "' target='_blank'> " . htmlentities ( $titresChansons [$ligneDoc [6]] ) . "</a> \n";
+						echo "<a href= 'getdoc.php?doc=" . $ligne [1] . "' target='_blank'> [t] </a> <br>\n";
 						?>
                     <!--                <a href="http://www.rendevuke.com/eupelode/Quand-je-serai-K.O..pdf" target="_blank">Quand j’serai-->
 				<!--                    KO </a> <br/>-->

@@ -58,7 +58,7 @@ while ( $ligneDoc = $lignes->fetch_row () ) {
 		$sortie .= "<td> $vignetteChanson </td>\n";
 	} else
 		$sortie .= "<td>  </td>\n ";
-	$sortie .= "<td> $icone <a href= 'getdoc.php?doc=" . $ligneDoc [0] . "' target='_blank'> " . $fichierCourt . "</a></td> \n";
+	$sortie .= "<td> " . Ancre ( "getdoc.php?doc=" . $ligneDoc [0], $icone, "", true ) . "<a href= '" . $fichier . "' target='_blank'> " . $fichierCourt . "</a> \n";
 	$sortie .= "<td>" . intval ( $ligneDoc [2] / 1024 ) . " ko -  publié le " . dateMysqlVersTexte ( $ligneDoc [3] ) . " </td>";
 	$sortie .= "<td>" . $ligneDoc [8] . "</td></tr>\n";
 }
