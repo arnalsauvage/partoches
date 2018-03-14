@@ -17,7 +17,7 @@ if (isset ( $_POST ['id'] ) && (isset ( $_POST ['documentJoint'] ))) {
 }
 
 // Chargement des donnees de la songbook si l'identifiant est fourni
-if ($id || (isset ( $_GET ['id'] ) && $_GET ['id'] != "")) {
+if (isset ($_POST ['id']) || (isset ($_GET ['id']) && $_GET ['id'] != "")) {
 	if (isset ( $_GET ['id'] ))
 		$id = $_GET ['id'];
 	$donnee = cherchesongbook ( $id );
@@ -39,11 +39,14 @@ else {
 	$donnee [5] = 0;
 }
 
-if ($mode == "MAJ")
+if ($mode == "MAJ") {
 	$sortie .= "<H1> Mise à jour - " . $table . "</H1>";
-if ($mode == "INS")
+	$sortie .= " <p> Vous êtes sur le point de modifier un Songbook !</p>";
+}
+if ($mode == "INS") {
 	$sortie .= "<H1> Création - " . $table . "</H1>";
-
+	$sortie .= "<p>Vous êtes sur le point de créer un nouveau Songbook !</p>";
+}
 $sortie .= "<Div class = 'centrer'>";
 // Création du formulaire
 $f = new Formulaire ( "POST", $table . "_get.php", $sortie );
@@ -65,6 +68,7 @@ if ($_SESSION ['privilege'] < 3) {
 }
 
 $sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
+$sortie .= "<p>Les fichiers à rattacher ici seront relatifs au songbook lui-même : illustration de couverture, pdf contenant toutes les chansons...</p>";
 
 
 // On récupère les fichiers du Songbook
@@ -93,6 +97,9 @@ if ($mode == "MAJ") {
 </form>
 
 <h2>Liste des documents dans ce songbook</h2>
+	<p>Voici la liste des documents rattachés au songbook :grilles, partoches, partitions...</p>
+	<p>Il est possible de changer l'ordre des documents via les chevrons (déplacement d'un cran) ou les fléches (début
+		ou fin de la liste)</p>
 <?php
 	$lignes = chercheLiensDocSongbook ( 'idSongbook', $id, "ordre", true );
 	$listeDocs = "<div><table>";
@@ -122,6 +129,11 @@ if ($mode == "MAJ") {
 	?>
 
 <h2>Insérer un document dans ce songbook</h2>
+	<p>Ici on rattache des documents au songbook. Ce seront des documents rattachés à une chanson. </p>
+	<p>Par exemple, grille, partoche, partition... Pour uploader sur le site des documents, il faut d'abord créer une
+		chanson, et lui rattacher des documents. </p>
+	<p>Dans la liste combo ci-dessous, vous trouverez les derniers documents uploadés sur le site.</p>
+
 <form action="songbook_form.php" method="post" name="form2">
 <?php
 	echo selectDocument ( "nomTable", "chanson", "id", false );
@@ -129,7 +141,6 @@ if ($mode == "MAJ") {
 	<input type="hidden" name="id" value="<?php echo $donnee[0];?>"> <input
 		type="submit" value="Envoyer">
 </form>
-</div>
 <?php
 }
 echo envoieFooter ( "Bienvenue chez nous !" );

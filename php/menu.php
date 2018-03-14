@@ -8,7 +8,22 @@ include_once ("utilisateur.php");
 
 // Si l'utilisateur n'est pas logué
 if (! isset ( $_SESSION ['user'] )) {
-	header('Location: ./login.php');
+	// version précédente : on présente un formulaire de login
+	//header('Location: ./login.php');
+
+	// Nouveauté mars 2018 : On le connecte en tant qu'invite
+
+	// Si oui, on crée une session avec user, idclub, nomClub
+	$donnee = login_utilisateur("invite", "invite");
+	if ($donnee) {
+		$_SESSION ['id'] = $donnee [0];
+		$_SESSION ['user'] = $donnee [1];
+		$_SESSION ['email'] = $donnee [7];
+		$_SESSION ['image'] = $donnee [5];
+		$_SESSION ['privilege'] = $donnee [11];
+	} else {
+		$sortie .= "erreur de login/mot de passe...";
+	}
 }
 
 $contenu = envoieHead("Top 5 Partoches", "../css/index.css");

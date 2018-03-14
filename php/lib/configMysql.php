@@ -17,7 +17,7 @@ if(FALSE == isset($configMysql) )
 	$mysqli = new mysqli($monserveur, $LOGIN, $MOTDEPASSE, $mabase);
 	
 	if ($mysqli->connect_error) {
-		die(' Erreur #1 configMysql : Impossible de creer une connexion persistante ! ' . $mysqli->connect_errno . ') '
+		die(' Erreur #1 configMysql : Impossible de créer une connexion persistante ! ' . $mysqli->connect_errno . ') '
 				. $mysqli->connect_error);
 	}
 	
