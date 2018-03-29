@@ -51,7 +51,7 @@ if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege
 	$contenu .= "<span class='icon-bar'></span>\n";
 $contenu .= "		</button>\n
 		<a class='navbar-brand' href='./songbook_portfolio.php'>Top 5 Partoches</a>\n
-	</div>\n
+	</div> <!--/.navbar-header -->\n
     <div id='main-menu' class='collapse navbar-collapse'>\n
           <ul class='nav navbar-nav'>\n
 			<li class='divider' role='separator'></li>\n
@@ -70,11 +70,11 @@ if (($_SESSION['user'] == $_SESSION['loginParam'])
 $contenu .= "
           </ul>\n
     </div><!--/.nav-collapse -->\n
-</div>\n
+</div><!--/.container -->\n
 </nav>\n\n";
 
 // Sous menu
-$contenu .= "<div>\n
+$contenu .= "<div class='container'>\n
 			<div class='starter-template'>\n";
 
 $contenu .= "<br><br><br> sur Top 5 partoches, les amis de Top5 partagent leurs partoches pour jouer des morceaux, venues du club ou d'ailleurs... <br>\n";
@@ -86,7 +86,7 @@ $heure = date ( "H:i" );
 
 $contenu .= Ancre("login.php?logoff=1", "logoff") . " | \n";
 $contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut ( $_SESSION ['privilege'] ) . ", nous sommes le $date et il est $heure<br>\n";
-$contenu .= " </div> </div>";
+$contenu .= " </div> <!--/.container --></div><!--/.starter-template -->";
 if (!isset($pasDeMenu) || false == $pasDeMenu)
 	echo $contenu . "\n\n";
 ?>

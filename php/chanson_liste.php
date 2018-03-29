@@ -9,9 +9,10 @@ $chansonForm = "chanson_form.php";
 $chansonPost = "chanson_post.php";
 $chansonVoir = "chanson_voir.php";
 $table = "chanson";
-$fichiersDuSongbook = "";
+$contenuHtml = "<div class='container'>
+  <div class='starter-template'> \n";
 
-$fichiersDuSongbook .= entreBalise("Chansons", "H1");
+$contenuHtml .= entreBalise("Chansons", "H1");
 
 // Gestion du paramètre de tri
 if (isset ($_GET ['tri'])) {
@@ -35,73 +36,89 @@ $numligne = 0;
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] > 1)
-    $fichiersDuSongbook .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "Ajouter une chanson");
+    $contenuHtml .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "Ajouter une chanson");
 // //////////////////////////////////////////////////////////////////////ADMIN
 
-$fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
+$contenuHtml .= Image($iconeAttention, "100%", 1, 1);
 
-$fichiersDuSongbook .= TblDebut(0);
-$fichiersDuSongbook .= TblDebutLigne() . TblCellule("  Tri  ");
-$fichiersDuSongbook .= TblCellule("  Pochette  ");
-$fichiersDuSongbook .= titreColonne("Nom", "nom");
-$fichiersDuSongbook .= titreColonne("Interprète", "interprete");
-$fichiersDuSongbook .= titreColonne("Année", "annee");
-$fichiersDuSongbook .= titreColonne("Tempo", "tempo");
-$fichiersDuSongbook .= titreColonne("Mesure", "mesure");
-$fichiersDuSongbook .= titreColonne("Pulsation", "pulsation");
-$fichiersDuSongbook .= titreColonne("Tonalité", "tonalite");
-$fichiersDuSongbook .= titreColonne("Date pub.", "datePub");
-$fichiersDuSongbook .= titreColonne("Publié par", "idUser");
-$fichiersDuSongbook .= titreColonne("Vues", "hits");
-$fichiersDuSongbook .= TblFinLigne();
+$contenuHtml .= TblDebut(0);
+$contenuHtml .= TblEnteteDebut(). TblDebutLigne();
+$contenuHtml .= TblEntete("  -  ")  ;
+$contenuHtml .= TblEntete("  Pochette  ");
+$contenuHtml .= titreColonne("Nom", "nom");
+$contenuHtml .= titreColonne("Interprète", "interprete");
+$contenuHtml .= titreColonne("Année", "annee");
+$contenuHtml .= titreColonne("Tempo", "tempo");
+$contenuHtml .= titreColonne("Mesure", "mesure");
+$contenuHtml .= titreColonne("Pulsation", "pulsation");
+$contenuHtml .= titreColonne("Tonalité", "tonalite");
+$contenuHtml .= titreColonne("Date pub.", "datePub");
+$contenuHtml .= titreColonne("Publié par", "idUser");
+$contenuHtml .= titreColonne("Vues", "hits");
+$contenuHtml .= TblFinLigne() . TblEnteteFin();
+$contenuHtml .= TblCorpsDebut();
 
 $cheminImagesChanson = "../data/chansons/";
 
 while ($ligne = $resultat->fetch_row()) {
     $numligne++;
-    $fichiersDuSongbook .= TblDebutLigne();
+    $contenuHtml .= TblDebutLigne();
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
     if ($_SESSION ['privilege'] > 1)
-        $fichiersDuSongbook .= TblCellule(Ancre("$chansonForm?id=$ligne[0]", Image($cheminImages . $iconeEdit, 32, 32))); // Nom));
+        $contenuHtml .= TblCellule(Ancre("$chansonForm?id=$ligne[0]", Image($cheminImages . $iconeEdit, 32, 32))); // Nom));
     else
-        $fichiersDuSongbook .= TblCellule(" "); // Nom));
+        $contenuHtml .= TblCellule(" "); // Nom));
 
-        $fichiersDuSongbook .= TblCellule(Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 32, 32, "couverture"));
-    $fichiersDuSongbook .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", entreBalise($ligne [1], "H3"))); // Nom
-    $fichiersDuSongbook .= TblCellule($ligne [2]); // interprete
-    $fichiersDuSongbook .= TblCellule($ligne [3]); // annee
-    $fichiersDuSongbook .= TblCellule($ligne [4]); // tempo
-    $fichiersDuSongbook .= TblCellule($ligne [5]); // mesure
-    $fichiersDuSongbook .= TblCellule($ligne [6]); // pulsation
-    $fichiersDuSongbook .= TblCellule($ligne [10]); // tonalité
-    $fichiersDuSongbook .= TblCellule(dateMysqlVersTexte($ligne[7])); // Date Pub
+        $contenuHtml .= TblCellule(Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 32, 32, "couverture"));
+    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", entreBalise(limiteLongueur($ligne[1],18), "EM"))); // Nom
+    $contenuHtml .= TblCellule(limiteLongueur($ligne [2],18)); // interprete
+    $contenuHtml .= TblCellule($ligne [3],1,1,"centrer"); // annee
+    $contenuHtml .= TblCellule($ligne [4],1,1,"alignerAdroite"); // tempo
+    $contenuHtml .= TblCellule($ligne [5],1,1,"centrer"); // mesure
+    $contenuHtml .= TblCellule($ligne [6],1,1,"centrer"); // pulsation
+    $contenuHtml .= TblCellule($ligne [10],1,1,"centrer"); // tonalité
+    $contenuHtml .= TblCellule(dateMysqlVersTexte($ligne[7])); // Date Pub
     $nomAuteur = chercheUtilisateur($ligne [8]);
     $nomAuteur = $nomAuteur[3];
-    $fichiersDuSongbook .= TblCellule($nomAuteur); // auteur
-    $fichiersDuSongbook .= TblCellule($ligne [9]); // hits
+    $contenuHtml .= TblCellule($nomAuteur,1,1,"centrer"); // auteur
+    $contenuHtml .= TblCellule($ligne [9],1,1,"alignerAdroite"); // hits
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
     if ($_SESSION ['privilege'] > 1) {
-        $fichiersDuSongbook .= TblCellule(boutonSuppression($chansonPost . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
+        $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
         // //////////////////////////////////////////////////////////////////////ADMIN
-        $fichiersDuSongbook .= TblFinLigne();
     }
+    $contenuHtml .= TblFinLigne();
+
 }
-$fichiersDuSongbook .= TblFin();
-$fichiersDuSongbook .= $nbreChansons . " chanson(s) dans la liste.<br>\n";
-$fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
+$contenuHtml .= TblCorpsFin();
+$contenuHtml .= TblFin();
+$contenuHtml .= $nbreChansons . " chanson(s) dans la liste.<br>\n";
+$contenuHtml .= Image($iconeAttention, "100%", 1, 1);
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] > 1)
-    $fichiersDuSongbook .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "Ajouter une chanson");
+    $contenuHtml .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "Ajouter une chanson");
 // //////////////////////////////////////////////////////////////////////ADMIN
-$fichiersDuSongbook .= envoieFooter("Bienvenue chez nous !");
-echo $fichiersDuSongbook;
+$contenuHtml .= "</div>\n
+</div><!-- /.container -->\n";
+$contenuHtml .= envoieFooter("Bienvenue chez nous !");
+echo $contenuHtml;
 
 function titreColonne($libelle, $nomRubrique)
 {
-    $chaine = TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
+    $lienCroissant = Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ");
+    $lienDecroissant = Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> ");
+    $chaine = TblEntete( $lienCroissant . "  $libelle " .  $lienDecroissant);
     return $chaine;
+}
+
+function limiteLongueur($chaine, $tailleMax)
+{
+    if (strlen($chaine) > $tailleMax)
+        return (substr($chaine, 0, $tailleMax) . "...");
+    else
+        return $chaine;
 }
 
 ?>

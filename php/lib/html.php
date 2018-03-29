@@ -37,7 +37,7 @@ if(!isset ($FichierHtml)){
 		$champSelect = "";
 		$champSelect .= "<select name = $nom size=\"1\">";
 		$choix = 0;
-		while($ligne = LigneSuivante($liste)){
+		while($ligne = $liste->fetch_row()){
 			$choix++;
 			$champSelect .= "<option ";
 			if($numero==$choix)
@@ -85,7 +85,7 @@ if(!isset ($FichierHtml)){
 		// parcours la chaine caractère par acaractère
 		// Quand la balise < est rencontrée, on augmente le niveau : il peut y a voir des < imbriqués
 		// L'indice indique l'élément du tableau dans lequel le bout sera rangé
-		$retour = "";
+
 		$indice = 0;
 		$niveau = 0;
 		$tableau = array();
@@ -144,17 +144,28 @@ if(!isset ($FichierHtml)){
 		"<!doctype html>
 		<html lang='fr'>
 		<head>
- 		<meta charset='UTF-8' >		
+		<meta charset='UTF-8' >";
+
+		// Pour BootStrap
+		$retour .= "<meta http-equiv='X-UA-Compatible' content='IE=edge'>
 		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    	<link href='../css/bootstrap.min.css' rel='stylesheet'>   	
-		<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' /> 
+    	<link href='../css/bootstrap.min.css' rel='stylesheet'>
+    	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+ 		<script src='https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js'></script>
+  		<script src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js'></script>
+		<![endif]-->
+    	";
+
+		$retour .= "<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
 		<script type='text/javascript' src='./lib/javascript.js'></script>
 		<title>$titrePage</title>
 		</head>";
 		return $retour;
 	}
 	
-	function envoieFooter($contenu){
+	function envoieFooter(){
 		$retour = 	
 		"<footer>
 		Top 5 club ukulélé :

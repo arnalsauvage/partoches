@@ -83,5 +83,9 @@ input[type=submit], input[type=reset] {
 }
 
 .centrer {
-	text-align: center;
+	 text-align: center;
+ }
+
+.alignerAdroite {
+	text-align: right;
 }

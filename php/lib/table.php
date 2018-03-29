@@ -15,39 +15,59 @@ if (! isset ( $ModuleTable )) {
 		if ($largeur != - 1)
 			$optionLargeur = " WIDTH='$largeur' ";
 		
-		$retour .= "<TABLE BORDER='$bordure' " . " CELLSPACING='$espCell' CELLPADDING='$remplCell' " . $optionLargeur . $optionClasse . ">\n";
+		$retour .= "<table BORDER='$bordure' " . " CELLSPACING='$espCell' CELLPADDING='$remplCell' " . $optionLargeur . $optionClasse . ">\n";
 		return $retour;
 	}
 	function TblFin() {
-		return "</TABLE>\n";
+		return "</table>\n";
+	}
+
+	function TblEnteteDebut() {
+		return "<thead>";
+	}
+
+	function TblEntete($contenu, $nbLig = 1, $nbCol = 1) {
+		return "<th ROWSPAN='$nbLig' COLSPAN='$nbCol'>$contenu</th>\n";
+	}
+
+	function TblEnteteFin() {
+		return "</thead>\n";
+	}
+
+
+	function TblCorpsDebut() {
+		return "<tbody>";
 	}
 	function TblDebutLigne($classe = -1) {
 		$optionClasse = "";
 		if ($classe != - 1)
 			$optionClasse = " CLASS='$classe'";
-		return "<TR" . $optionClasse . ">\n";
+		return "<tr" . $optionClasse . ">\n";
 	}
 	function TblFinLigne() {
-		return "</TR>\n";
+		return "</tr>\n";
 	}
-	function TblEntete($contenu, $nbLig = 1, $nbCol = 1) {
-		return "<TH ROWSPAN='$nbLig' COLSPAN='$nbCol'>$contenu</TH>\n";
-	}
+
+
 	function TblDebutCellule($classe = -1) {
 		$optionClasse = "";
 		if ($classe != - 1)
 			$optionClasse = " CLASS='$classe'";
-		return "<TD" . $optionClasse . ">\n";
+		return "<td" . $optionClasse . ">\n";
 	}
 	function TblFinCellule() {
-		return "</TD>\n";
+		return "</td>\n";
 	}
 	function TblCellule($contenu, $nbLig = 1, $nbCol = 1, $classe = -1) {
 		$optionClasse = "";
 		if ($classe != - 1)
 			$optionClasse = " CLASS='$classe'";
 		
-		return "<TD ROWSPAN='$nbLig' COLSPAN='$nbCol' " . $optionClasse . ">$contenu</TD>\n";
+		return "<td ROWSPAN='$nbLig' COLSPAN='$nbCol' " . $optionClasse . ">$contenu</td>\n";
+	}
+
+	function TblCorpsFin() {
+		return "</tbody>";
 	}
 } // Fin du module Table
 ?>
