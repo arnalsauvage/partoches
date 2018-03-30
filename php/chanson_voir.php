@@ -10,12 +10,6 @@ $monImage = "";
 
 $fichiersDuSongbook = fichiersChanson ( $_GET ['id'] );
 
-// foreach ( $fichiersDuSongbook as $fichier ) {
-// 	// echo $fichier [0] . " " . $fichier [1] . " " . $fichier [2] . " <br>";
-// 	if (stristr ( $fichier [1], "jpg" ) || stristr ( $fichier [1], "png" ))
-// 		$monImage = $fichier;
-// }
-
 // On choisit une des images du songbook
 $monImage = imageTableId("chanson", $_GET ['id']);
 
@@ -48,8 +42,6 @@ $contenuHtml .= "<div class='row'>";
                 }
         $contenuHtml .= "</div></div>";
 
-
-
     $contenuHtml .= "<div class='row'>";
         $contenuHtml .= " <div class='col-sm-11'><h3>$interprete - $annee </h3></div>\n";
     $contenuHtml .= "</div>";
@@ -67,7 +59,7 @@ $contenuHtml .= "<div class='row'>";
 
 
     if ("" != $monImage) {
-        $contenuHtml .= Image ( "../data/chansons/". $_GET ['id'] . "/" . $monImage, 200, "", "pochette" );
+        $contenuHtml .= Image ( "../data/chansons/". $_GET ['id'] . "/" . $monImage, 200, "", "pochette", "img-thumbnail"  );
     }
     $contenuHtml .= "</section>";
 $contenuHtml .= "</div>";
@@ -77,7 +69,7 @@ $contenuHtml .= "<h2> Documents attachés à cette chanson</h2>";
 // Cherche un document et le renvoie s'il existe
 $result = chercheDocumentsTableId ( "chanson", $idChanson );
 
-augmenteHits ( $table, $id );
+augmenteHits ( $table, $idChanson );
 
 $contenuHtml .= "<section class='row'>\n";
 

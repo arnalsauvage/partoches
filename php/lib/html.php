@@ -20,14 +20,14 @@ if(!isset ($FichierHtml)){
 	}
 
 	// Fonction retournant le code HTML pour une image ____________________
-	function Image ($urlImage, $largeur = -1, $hauteur = -1,  $alt = "image deco"){
+	function Image ($urlImage, $largeur = -1, $hauteur = -1,  $alt = "image deco", $class = ""){
 		$attrLargeur = "";
 		$attrHauteur = "";
 		if($largeur != -1)
 		$attrLargeur = " width = '$largeur' ";
 		if($hauteur != -1)
 		$attrHauteur = " height = '$hauteur' ";
-		return "<img src='$urlImage' " . $attrLargeur . $attrHauteur . "  alt='$alt'>\n";
+		return "<img src='$urlImage' " . $attrLargeur . $attrHauteur . "  alt='$alt' class ='$class''>\n";
 	}
 	// Fin de la fonction Image____________________________________________
 

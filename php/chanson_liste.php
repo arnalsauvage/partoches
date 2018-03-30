@@ -36,7 +36,7 @@ $numligne = 0;
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] > 1)
-    $contenuHtml .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "<button class='btn btn-default'>Ajouter une chanson</button>");
+    $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'></span> Ajouter une chanson</a>\n";
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 $contenuHtml .= Image($iconeAttention, "100%", 1, 1);
@@ -97,12 +97,13 @@ $contenuHtml .= TblFin();
 $contenuHtml .= $nbreChansons . " chanson(s) dans la liste.<br>\n";
 $contenuHtml .= Image($iconeAttention, "100%", 1, 1);
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
-if ($_SESSION ['privilege'] > 1)
-    $contenuHtml .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "<button class='btn btn-default'>Ajouter une chanson</button>");
+if ($_SESSION ['privilege'] > 1) {
+    $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'></span> Ajouter une chanson</a>\n";
+}
 // //////////////////////////////////////////////////////////////////////ADMIN
 $contenuHtml .= "</div>\n
 </div><!-- /.container -->\n";
-$contenuHtml .= envoieFooter("Bienvenue chez nous !");
+$contenuHtml .= envoieFooter();
 echo $contenuHtml;
 
 function titreColonne($libelle, $nomRubrique)
