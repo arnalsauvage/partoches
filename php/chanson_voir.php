@@ -72,10 +72,7 @@ $contenuHtml .= "<div class='row'>";
     $contenuHtml .= "</section>";
 $contenuHtml .= "</div>";
 
-
-
-
-$contenuHtml .= "<h2> Liste des documents attachés à cette chanson</h2>";
+$contenuHtml .= "<h2> Documents attachés à cette chanson</h2>";
 
 // Cherche un document et le renvoie s'il existe
 $result = chercheDocumentsTableId ( "chanson", $idChanson );
@@ -83,9 +80,6 @@ $result = chercheDocumentsTableId ( "chanson", $idChanson );
 augmenteHits ( $table, $id );
 
 $contenuHtml .= "<section class='row'>\n";
-
-
-
 
 // Pour chaque document
 while ( $ligne = $result->fetch_row () ) {
@@ -99,15 +93,11 @@ $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
     if (! file_exists ( "../images/icones/" . $extension . ".png" ))
         $icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
 
-    $contenuHtml .= "$icone <a href= '".lienUrlAffichageDocument($ligne [0])."' target='_blank'> " . htmlentities (  $fichierSec ) . "</a> <br>\n";
+    $contenuHtml .= "$icone <a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> <br>" . htmlentities($fichierSec) . "</a> <br>\n";
     $contenuHtml .= "</div>";
 }
 
 $contenuHtml .= " </section>\n";
-
-// foreach ( $retour as $fichier ) {
-
-// }
 $contenuHtml .= "</div>\n
 </div><!-- /.container -->\n";
 $contenuHtml .= envoieFooter (  );

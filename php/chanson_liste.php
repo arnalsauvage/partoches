@@ -36,7 +36,7 @@ $numligne = 0;
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] > 1)
-    $contenuHtml .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "Ajouter une chanson");
+    $contenuHtml .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "<button class='btn btn-default'>Ajouter une chanson</button>");
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 $contenuHtml .= Image($iconeAttention, "100%", 1, 1);
@@ -70,7 +70,7 @@ while ($ligne = $resultat->fetch_row()) {
     else
         $contenuHtml .= TblCellule(" "); // Nom));
 
-        $contenuHtml .= TblCellule(Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 32, 32, "couverture"));
+    $contenuHtml .= TblCellule(Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 48, 48, "couverture"));
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", entreBalise(limiteLongueur($ligne[1],18), "EM"))); // Nom
     $contenuHtml .= TblCellule(limiteLongueur($ligne [2],18)); // interprete
     $contenuHtml .= TblCellule($ligne [3],1,1,"centrer"); // annee
@@ -98,7 +98,7 @@ $contenuHtml .= $nbreChansons . " chanson(s) dans la liste.<br>\n";
 $contenuHtml .= Image($iconeAttention, "100%", 1, 1);
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] > 1)
-    $contenuHtml .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "Ajouter une chanson");
+    $contenuHtml .= "<BR>" . Ancre("$chansonForm", Image($cheminImages . $iconeCreer, 32, 32) . "<button class='btn btn-default'>Ajouter une chanson</button>");
 // //////////////////////////////////////////////////////////////////////ADMIN
 $contenuHtml .= "</div>\n
 </div><!-- /.container -->\n";
