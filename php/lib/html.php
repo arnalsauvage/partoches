@@ -169,8 +169,9 @@ if(!isset ($FichierHtml)){
 		$retour = 	
 		"<footer>
 		Top 5 club ukulélé :
-		<a href='http://www.facebook.com/top5.asso' target='_blank'>Facebook</a> | 
-		<a href='http://www.top5.re' target='_blank'>Site web</a> | 
+		<a href='http://www.top5.re' target='_blank'>Site web</a> |
+		<a href='http://forum.top5.re' target='_blank'>Le forum Top 5</a> |
+		<a href='http://www.facebook.com/top5.asso' target='_blank'>Facebook</a> |
 		<a href='https://www.youtube.com/channel/UCFKyqYcs5cnML-EgPgYmwdg' target='_blank'>Chaîne Youtube</a>
 		</footer>";
 		$retour .= "

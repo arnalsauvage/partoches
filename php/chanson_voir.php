@@ -102,7 +102,7 @@ while ($ligne = $result->fetch_row()) {
     $extension = substr(strrchr($ligne [1], '.'), 1);
     if ($extension == "mp3") {
         $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
-        $baliseAudio = htmlentities($fichierSec) . "<audio controls='controls'>   <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
+        $baliseAudio = htmlentities($fichierSec) . "<br><audio controls='controls'>   <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
             Votre navigateur ne prend pas en charge l'élément <code>audio</code></audio>";
         $contenuHtml .= $baliseAudio . "\n";
         $contenuHtml .= "</div>";
