@@ -4,7 +4,7 @@ $pasDeMenu = true;
 include_once ("menu.php");
 include_once ("songbook.php");
 include_once ("document.php");
-
+include_once("chanson.php");
 $table = "songbook";
 ?>
 <html>
@@ -13,6 +13,7 @@ $table = "songbook";
 <meta content="text/html; charset=UTF-8" http-equiv="content-type">
 <title>Songbooks ukulele en ligne</title>
 <link rel="stylesheet" type="text/css" href="../css/styles.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -59,8 +60,7 @@ $table = "songbook";
 						?>
                 
 					<img
-					src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>" alt="<?= $songbook[1] ?>" /> <br />
-					<br />
+						src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>" alt="<?= $songbook[1] ?>"/>
              <?php
 					} else {
 						// Sinon, on affiche un lien vers le doc + l'image
@@ -68,7 +68,7 @@ $table = "songbook";
 					<a href="../data/songbooks/<?= $songbook[0] ?>/<?= $nomFichier ?>"
 					target="_blank"> <img
 					src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>"
-					alt="<?= $songbook[1] ?>" /></a> <br />
+					alt="<?= $songbook[1] ?>"/></a>
             	<?php
 					}
 					?>
@@ -77,6 +77,7 @@ $table = "songbook";
                 <?php
 					$lignes = chercheLiensDocSongbook ( 'idSongbook', $songbook [0], "ordre", true );
 					$listeDocs = "";
+				$iconeMusique = "<span class='glyphicon glyphicon-music'></span>";
 					while ( $ligne = $lignes->fetch_row () ) {
 						$ligneDoc = chercheDocument ( $ligne [1] );
 						$fichierCourt = composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
@@ -85,8 +86,11 @@ $table = "songbook";
 						$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 						if (! file_exists ( "../images/icones/" . $fichier [2] . ".png" ))
 							$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
-						echo "<a href= '" . $fichier . "' target='_blank'> " . htmlentities ( $titresChansons [$ligneDoc [6]] ) . "</a> \n";
-						echo "<a href= 'getdoc.php?doc=" . $ligne [1] . "' target='_blank'> [t] </a> <br>\n";
+						$titreCourt = limiteLongueur($titresChansons [$ligneDoc [6]], 18);
+						echo "<a href= '" . $fichier . "' target='_blank' title='" . $titresChansons [$ligneDoc [6]] . "'> " . $titreCourt . "</a> \n";
+						//echo "<a href= 'getdoc.php?doc=" . $ligne [1] . "' target='_blank'> [t] </a> <br>\n";
+
+						echo "<a href= 'chanson_voir.php?id=" . $ligneDoc [6] . "' > $iconeMusique </a> <br>\n";
 						?>
                     <!--                <a href="http://www.rendevuke.com/eupelode/Quand-je-serai-K.O..pdf" target="_blank">Quand j’serai-->
 				<!--                    KO </a> <br/>-->

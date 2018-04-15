@@ -124,6 +124,15 @@ function fichiersChanson($id)
     return $retour;
 }
 
+// Limite la longeur d'une chaine à x caractères
+function limiteLongueur($chaine, $tailleMax)
+{
+    if (strlen($chaine) > $tailleMax)
+        return (mb_substr($chaine, 0, $tailleMax - 4) . "...");
+    else
+        return $chaine;
+}
+
 // Fonction de test
 function testeChanson()
 {

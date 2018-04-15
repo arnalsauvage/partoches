@@ -27,7 +27,7 @@ if(!isset ($FichierHtml)){
 		$attrLargeur = " width = '$largeur' ";
 		if($hauteur != -1)
 		$attrHauteur = " height = '$hauteur' ";
-		return "<img src='$urlImage' " . $attrLargeur . $attrHauteur . "  alt='$alt' class ='$class''>\n";
+		return "<img src='$urlImage' " . $attrLargeur . $attrHauteur . "  alt='$alt' class ='$class'>\n";
 	}
 	// Fin de la fonction Image____________________________________________
 

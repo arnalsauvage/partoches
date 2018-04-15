@@ -76,7 +76,7 @@ $contenuHtml .= "<section class='row'>\n";
 // Pour chaque document
 while ( $ligne = $result->fetch_row () ) {
 
-$contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
+    $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
     $fichierCourt = composeNomVersion ( $ligne [1], $ligne [4] );
     // $fichier = "../data/chansons/" . $_GET ['id'] . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
     $fichierSec = substr (  $ligne [1],0,strrpos ( $ligne [1], '.' ) );
@@ -85,12 +85,33 @@ $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
     if (! file_exists ( "../images/icones/" . $extension . ".png" ))
         $icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
 
-    $contenuHtml .= "$icone <a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> <br>" . htmlentities($fichierSec) . "</a> <br>\n";
+    $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" . htmlentities($fichierSec) . "</a> <br>\n";
     $contenuHtml .= "</div>";
 }
-
 $contenuHtml .= " </section>\n";
-$contenuHtml .= "</div>\n
+
+/// Affichage des audios mp3 avec un outil de lecture audio
+
+$contenuHtml .= "<br><section class='row'>\n";
+$result = chercheDocumentsTableId("chanson", $idChanson);
+
+// Pour chaque fichier audio
+while ($ligne = $result->fetch_row()) {
+    $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
+    $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
+    $extension = substr(strrchr($ligne [1], '.'), 1);
+    if ($extension == "mp3") {
+        $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
+        $baliseAudio = htmlentities($fichierSec) . "<audio controls='controls'>   <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
+            Votre navigateur ne prend pas en charge l'élément <code>audio</code></audio>";
+        $contenuHtml .= $baliseAudio . "\n";
+        $contenuHtml .= "</div>";
+    }
+}
+$contenuHtml .= " </section>\n";
+
+
+$contenuHtml .= "</div><!-- /.starter-template -->\n
 </div><!-- /.container -->\n";
 $contenuHtml .= envoieFooter (  );
 echo $contenuHtml;

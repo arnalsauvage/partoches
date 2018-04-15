@@ -71,8 +71,8 @@ while ($ligne = $resultat->fetch_row()) {
         $contenuHtml .= TblCellule(" "); // Nom));
 
     $contenuHtml .= TblCellule(Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 48, 48, "couverture"));
-    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", entreBalise(limiteLongueur($ligne[1],18), "EM"))); // Nom
-    $contenuHtml .= TblCellule(limiteLongueur($ligne [2],18)); // interprete
+    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", entreBalise(limiteLongueur($ligne[1], 21), "EM"))); // Nom
+    $contenuHtml .= TblCellule(limiteLongueur($ligne [2], 21)); // interprete
     $contenuHtml .= TblCellule($ligne [3],1,1,"centrer"); // annee
     $contenuHtml .= TblCellule($ligne [4],1,1,"alignerAdroite"); // tempo
     $contenuHtml .= TblCellule($ligne [5],1,1,"centrer"); // mesure
@@ -114,12 +114,5 @@ function titreColonne($libelle, $nomRubrique)
     return $chaine;
 }
 
-function limiteLongueur($chaine, $tailleMax)
-{
-    if (strlen($chaine) > $tailleMax)
-        return (substr($chaine, 0, $tailleMax) . "...");
-    else
-        return $chaine;
-}
 
 ?>
