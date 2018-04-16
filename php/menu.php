@@ -77,14 +77,19 @@ $contenu .= "
 $contenu .= "<div class='container'>\n
 			<div class='starter-template'>\n";
 
-$contenu .= "<br><br><br> sur Top 5 partoches, les amis de Top5 partagent leurs partoches pour jouer des morceaux, venues du club ou d'ailleurs... <br>\n";
+$contenu .= "<br><br><br> sur Top 5 partoches, les amis de Top5 partagent leurs partoches (venues du club ou d'ailleurs...) pour le plaisir de gratter l'ukulélé <br>\n";
 
 $contenu .= image("../images" . $_SESSION ['image'], 64) . "\n";
 
 $date = date ( "d/m/Y" );
 $heure = date ( "H:i" );
 
-$contenu .= Ancre("login.php?logoff=1", "logoff") . " | \n";
+if ($_SESSION ['user'] == "invite")
+	$msgLogin = "se connecter";
+else
+	$msgLogin = "se déconnecter";
+
+$contenu .= Ancre("login.php?logoff=1", $msgLogin) . " | \n";
 $contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut ( $_SESSION ['privilege'] ) . ", nous sommes le $date et il est $heure<br>\n";
 $contenu .= " </div> <!--/.container --></div><!--/.starter-template -->";
 if (!isset($pasDeMenu) || false == $pasDeMenu)
