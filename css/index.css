@@ -24,7 +24,7 @@ fieldset {
 
 legend {
 	color: #DF3F3F;
-	font-weight: bold
+	font-weight: bold;
 }
 
 label {
@@ -88,4 +88,15 @@ input[type=submit], input[type=reset] {
 
 .alignerAdroite {
 	text-align: right;
+}
+
+footer {
+	clear: both;
+	position: relative;
+	z-index: 10;
+	height: 6em;
+	margin-top: 1em;
+	text-align: center;
+	background-color: #AAA;
+	font-weight: bold
 }
