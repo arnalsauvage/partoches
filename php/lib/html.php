@@ -166,23 +166,7 @@ if(!isset ($FichierHtml)){
 	}
 	
 	function envoieFooter(){
-		$retour = 	
-		"<footer>
-		Top 5 club ukulélé :
-		<a href='http://www.top5.re' target='_blank'>Site web</a> |
-		<a href='http://forum.top5.re' target='_blank'>Le forum Top 5</a> |
-		<a href='http://www.facebook.com/top5.asso' target='_blank'>Facebook</a> |
-		<a href='https://www.youtube.com/channel/UCFKyqYcs5cnML-EgPgYmwdg' target='_blank'>Chaîne Youtube</a>
-		</footer>";
-		$retour .= "
-		<!-- Bootstrap core JavaScript
-	    ================================================== -->
-	    <!-- Placed at the end of the document so the pages load faster -->
-	    <script src= 'https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js '></script>
-	    <script>window.jQuery || document.write('<script src= \"../../assets/js/vendor/jquery.min.js\"><\/script>')</script>
-	    <script src= '../js/bootstrap.min.js '></script>
-	    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-	    <script src= '../js/ie10-viewport-bug-workaround.js '></script>";
+		$retour = file_get_contents('../html/footer.html', FILE_USE_INCLUDE_PATH);
 		return $retour;
 	}
 	
