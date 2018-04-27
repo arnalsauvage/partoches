@@ -62,5 +62,11 @@ if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
 	supprimeLienIdDocIdSongbook ( $_GET ['idDoc'], $_GET ['idSongbook'] );
 }
 
-redirection ( $nomTable . "_liste.php" );
+if ($mode== "GENEREPDF"){
+	creeSongbookPdf($id);
+}
+
+
+if ($mode != "GENEREPDF")
+	redirection ( $nomTable . "_liste.php" );
 ?>

@@ -87,20 +87,20 @@ echo $sortie;
 if ($mode == "MAJ") {
 	?>
 
-<h2>Envoyer un fichier pour ce songbook sur le serveur</h2>
-<form action="songbook_upload.php" method="post"
-	enctype="multipart/form-data">
-	<input type="hidden" name="MAX_FILE_SIZE" value="10000000"> <input
-		type="hidden" name="id" value="<?php echo $donnee[0];?>"> <label
-		class="inline" for="fichier"> </label> <input type="file" id="fichier"
-		name="fichierUploade" size="40"> <input type="submit" value="Envoyer">
-</form>
+	<h2>Envoyer un fichier pour ce songbook sur le serveur</h2>
+	<form action="songbook_upload.php" method="post"
+		  enctype="multipart/form-data">
+		<input type="hidden" name="MAX_FILE_SIZE" value="10000000"> <input
+			type="hidden" name="id" value="<?php echo $donnee[0];?>"> <label
+			class="inline" for="fichier"> </label> <input type="file" id="fichier"
+														  name="fichierUploade" size="40"> <input type="submit" value="Envoyer">
+	</form>
 
-<h2>Liste des documents dans ce songbook</h2>
+	<h2>Liste des documents dans ce songbook</h2>
 	<p>Voici la liste des documents rattachés au songbook :grilles, partoches, partitions...</p>
 	<p>Il est possible de changer l'ordre des documents via les chevrons (déplacement d'un cran) ou les fléches (début
 		ou fin de la liste)</p>
-<?php
+	<?php
 	$lignes = chercheLiensDocSongbook ( 'idSongbook', $id, "ordre", true );
 	$listeDocs = "<div><table>";
 	$numero=0;
@@ -119,29 +119,57 @@ if ($mode == "MAJ") {
 		if (! file_exists ( "../images/icones/" . $fichier [2] . ".png" ))
 			$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
 		$listeDocs .= $icone . "</td><td>";
-			$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=down'><span class='glyphicon glyphicon-chevron-down'></a>" ;
-			$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=pit'><span class='glyphicon glyphicon-arrow-down'></a>" ;
-        $listeDocs .= "</td><td><a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> ";
+		$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=down'><span class='glyphicon glyphicon-chevron-down'></a>" ;
+		$listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=pit'><span class='glyphicon glyphicon-arrow-down'></a>" ;
+		$listeDocs .= "</td><td><a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> ";
 		$listeDocs .= "</td><td>" .boutonSuppression ( $songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages );
 		$listeDocs .=  "</td></tr>\n";
 	}
 	echo $listeDocs."</table></div>";
 	?>
 
-<h2>Insérer un document dans ce songbook</h2>
+	<h2>Insérer un document dans ce songbook</h2>
 	<p>Ici on rattache des documents au songbook. Ce seront des documents rattachés à une chanson. </p>
 	<p>Par exemple, grille, partoche, partition... Pour uploader sur le site des documents, il faut d'abord créer une
 		chanson, et lui rattacher des documents. </p>
 	<p>Dans la liste combo ci-dessous, vous trouverez les derniers documents uploadés sur le site.</p>
 
-<form action="songbook_form.php" method="post" name="form2">
-<?php
+	<form action="songbook_form.php" method="post" name="form2">
+		<?php
 	echo selectDocument ( "nomTable", "chanson", "id", false );
 	?>
-	<input type="hidden" name="id" value="<?php echo $donnee[0];?>"> <input
-		type="submit" value="Envoyer">
-</form>
-<?php
+		<input type="hidden" name="id" value="<?php echo $donnee[0];?>"> <input
+			type="submit" value="Envoyer">
+	</form>
+	<button onclick='demandeUnPdf()'>Genère le songbook en pdf</button>
+
+	<div id="div1"> </div>
+	<script type='text/javascript'>
+		function demandeUnPdf(){
+			$.ajax({
+				type: "POST",
+				url: "songbook_get.php",
+				data: "id=" + <?=$id?> + "&mode=GENEREPDF",
+				datatype: 'html', // type de la donnée à recevoir
+					success : function(code_html, statut) { // success est toujours en place, bien sûr !
+						if (code_html.length < 4096)
+							toastr.success(code_html);
+						else {
+							toastr.warning("Erreur dans la génération du pdf... un des pdf à assembler n'est pas pris en compte par nos outils :");
+							$("#div1").html(code_html);
+						}
+					},
+				error : function(resultat, statut, erreur){
+					$("#div1").html(resultat);}
+
+			});
+		}
+		function formSuccess(){
+			$( "#msgSubmit" ).removeClass( "hidden" );
+		}
+	</script>
+	<?php
+	echo envoieFooter ( "Bienvenue chez nous !" );
+
 }
-echo envoieFooter ( "Bienvenue chez nous !" );
 ?>

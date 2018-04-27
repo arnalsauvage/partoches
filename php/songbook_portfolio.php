@@ -17,15 +17,13 @@ $table = "songbook";
 </head>
 
 <body>
-	<div class="navigation">
-		<h1>les songbooks en ligne</h1>
-		<ul>
-			<a href="chanson_liste.php">
-				<li>par genre</li>
-				<li>par interprète</li>
-				<li>par année ...</li>
+	<div class="navigation" >
+		<h1>les songbooks en ligne
+
+			<a href="chanson_liste.php" style="bottom: 45px; right: 24px; btn-floating btn-lg red">
+				<button type ="button" class="btn blue-gradient btn-s btn-rounded">entrez !</button>
 			</a>
-		</ul>
+		</h1>
 	</div>
 
 	<div class="content-box">
@@ -45,8 +43,10 @@ $table = "songbook";
 					$docsSongbook = chercheDocumentsTableId ( "songbook", $songbook [0] );
 					$nomFichier = "vide";
 					while ( $docSongbook = $docsSongbook->fetch_row () ) {
-						if (strstr ( strtolower ( $docSongbook [1] ), "pdf" ))
-							$nomFichier = composeNomVersion ( $docSongbook [1], $docSongbook [4] );
+						if (strstr ( strtolower ( $docSongbook [1] ), "pdf" )) {
+							$nomFichier = composeNomVersion($docSongbook [1], $docSongbook [4]);
+							echo "fichier trouvé : " . $nomFichier ." ";
+						}
 					}
 					$imageSongBook = imageSongbook ( $songbook [0] );
 					$dateSongbook = dateMysqlVersTexte ( $songbook [3] );

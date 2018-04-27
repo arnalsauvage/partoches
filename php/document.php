@@ -94,7 +94,7 @@ function modifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 	WHERE nom = '$nom'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème modifiedocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete );
 	
-	return true;
+	return $version;
 }
 
 // Supprime un document en base de données si il existe
@@ -111,10 +111,9 @@ function supprimeDocument($id) {
 function creeModifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 	$resultat = chercheDocumentNomTableId ( $nom, $nomTable, $idTable );
 	if ($resultat == NULL)
-		creeDocument ( $nom, $tailleKo, $nomTable, $idTable );
+		return creeDocument ( $nom, $tailleKo, $nomTable, $idTable );
 	else
-		modifieDocument ( $nom, $tailleKo, $nomTable, $idTable );
-	return;
+		return modifieDocument ( $nom, $tailleKo, $nomTable, $idTable );
 }
 
 // Prépare un combo en html avec les documents correspondant à un critere et triés selon un critereTri
