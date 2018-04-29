@@ -58,17 +58,21 @@ function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $list
         $idChanson = array_shift($listeIdChanson); // Pour récupérer l'id de la chanson
         $versionDoc = array_shift($listeVersionsDoc);
         $nomFichier = composeNomVersion($nomFichier, $versionDoc);
-        echo ("Tentative d'ajout du fichier : ".$nomFichier . "\n<br>");
-        ajouteFichier($pdf,"../data/chansons/".$idChanson."/".$nomFichier);
+        //echo ("Tentative d'ajout du fichier : ".$nomFichier . "\n<br>");
+        try {
+            ajouteFichier($pdf,"../data/chansons/".$idChanson."/".$nomFichier);
+        } catch (Exception $e) {
+            echo "Le fichier $nomFichier n'a pas été traité. Exception reçue : ",  $e->getMessage(), "\n<br>";
+        }
     }
 
     $pdf->Output("../data/songbooks/".$idSongBook."/".'songbook_auto.pdf','F');
-    echo ("Fichier <a href='songbook_auto.pdf'>compile.pdf</a> généré à partir de la liste des partoches");
     // Enregistrement du document en base de données
     $taille = filesize("../data/songbooks/".$idSongBook."/".'songbook_auto.pdf');
     $version = creeModifieDocument("songbook_auto.pdf", $taille, "songbook", $idSongBook );
     $nouveauNom = composeNomVersion("songbook_auto.pdf", $version);
     rename ("../data/songbooks/".$idSongBook."/".'songbook_auto.pdf',"../data/songbooks/".$idSongBook."/".$nouveauNom);
+    echo ("Fichier <a href='../data/songbooks/$idSongBook/$nouveauNom' target='_blank''>$nouveauNom</a> généré à partir de la liste des partoches");
 }
 
 function testeCreeSongBook(){
