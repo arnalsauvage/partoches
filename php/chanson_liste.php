@@ -70,7 +70,8 @@ while ($ligne = $resultat->fetch_row()) {
     else
         $contenuHtml .= TblCellule(" "); // Nom));
 
-    $contenuHtml .= TblCellule(Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 48, 48, "couverture"));
+    $imagePochette = Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 48, 48, "couverture");
+    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]",$imagePochette));
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", entreBalise(limiteLongueur($ligne[1], 21), "EM"))); // Nom
     $contenuHtml .= TblCellule(limiteLongueur($ligne [2], 21)); // interprete
     $contenuHtml .= TblCellule($ligne [3],1,1,"centrer"); // annee

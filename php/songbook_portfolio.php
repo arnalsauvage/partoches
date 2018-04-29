@@ -45,7 +45,7 @@ $table = "songbook";
 					while ( $docSongbook = $docsSongbook->fetch_row () ) {
 						if (strstr ( strtolower ( $docSongbook [1] ), "pdf" )) {
 							$nomFichier = composeNomVersion($docSongbook [1], $docSongbook [4]);
-							echo "fichier trouvé : " . $nomFichier ." ";
+							// echo "fichier trouvé : " . $nomFichier ." ";
 						}
 					}
 					$imageSongBook = imageSongbook ( $songbook [0] );

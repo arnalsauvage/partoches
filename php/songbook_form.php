@@ -152,7 +152,7 @@ if ($mode == "MAJ") {
 				data: "id=" + <?=$id?> + "&mode=GENEREPDF",
 				datatype: 'html', // type de la donnée à recevoir
 					success : function(code_html, statut) { // success est toujours en place, bien sûr !
-						if (code_html.length < 4096)
+						if (code_html.length < 2048)
 							toastr.success(code_html);
 						else {
 							toastr.warning("Erreur dans la génération du pdf... un des pdf à assembler n'est pas pris en compte par nos outils :");
