@@ -12,7 +12,6 @@ $monImage = "";
 // On augmente le compteur de vues du songbook
 augmenteHits($table, $_GET ['id']);
 
-
 // On choisit une des images du songbook
 $monImage = imageTableId("songbook", $_GET ['id']);
 

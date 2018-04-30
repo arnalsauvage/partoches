@@ -42,6 +42,7 @@ $table = "songbook";
 					
 					$docsSongbook = chercheDocumentsTableId ( "songbook", $songbook [0] );
 					$nomFichier = "vide";
+					// Boucle pour sélectionner le dernier pdf rattaché au songbook
 					while ( $docSongbook = $docsSongbook->fetch_row () ) {
 						if (strstr ( strtolower ( $docSongbook [1] ), "pdf" )) {
 							$nomFichier = composeNomVersion($docSongbook [1], $docSongbook [4]);

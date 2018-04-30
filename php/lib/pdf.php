@@ -62,7 +62,7 @@ function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $list
         try {
             ajouteFichier($pdf,"../data/chansons/".$idChanson."/".$nomFichier);
         } catch (Exception $e) {
-            echo "Le fichier $nomFichier n'a pas été traité. Exception reçue : ",  $e->getMessage(), "\n<br>";
+            echo "Le fichier $nomFichier n'a pas été traité. <br> Exception reçue : ",  $e->getMessage(), "\n<br>";
         }
     }
 

@@ -46,7 +46,7 @@ function chercheDocumentNomTableId($nom, $table, $id) {
 
 // Cherche les documents d'une entree d'une table et les renvoie s'ils existent
 function chercheDocumentsTableId($table, $id) {
-	$maRequete = "SELECT * FROM document WHERE document.idTable = '$id' AND document.nomTable = '$table'";
+	$maRequete = "SELECT * FROM document WHERE document.idTable = '$id' AND document.nomTable = '$table' ORDER BY document.id ASC";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème chercheDocumentsTableId #1 : " . $_SESSION ['mysql']->error );
 	return ($result);
 }

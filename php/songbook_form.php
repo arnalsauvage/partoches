@@ -153,7 +153,7 @@ if ($mode == "MAJ") {
 				datatype: 'html', // type de la donnée à recevoir
 					success : function(code_html, statut) { // success est toujours en place, bien sûr !
 						if (code_html.search("n'a pas été traité.")== -1)
-							toastr.success(code_html);
+							toastr.success("La génération du pdf a abouti ! <br> Un nouveau pdf a été rajouté aux fichiers du songbook. <br> Vous pouvez raffraîchir la page pour le voir.");
 						else {
 							toastr.warning("Erreur dans la génération du pdf... un des pdf à assembler n'est pas pris en compte par nos outils .<br>Message d'erreur en bas de la page.");
 							$("#div1").html(code_html);
