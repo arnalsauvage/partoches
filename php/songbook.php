@@ -143,7 +143,7 @@ function CreeSongBookPdf($id)
     $listeVersionsDoc = [];
 
     $maRequete = "SELECT document.nom as NomFichier, chanson.nom as NomChanson, chanson.id as IdChanson, document.version as VersionDoc from document LEFT JOIN liendocsongbook ON liendocsongbook.idDocument = document.id LEFT JOIN chanson ON document.idTable = chanson.id
-WHERE liendocsongbook.idSongbook =  '$id' ";
+WHERE liendocsongbook.idSongbook =  '$id' ORDER BY liendocsongbook.ordre ASC";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème CreeSongBookPdf #1 : requete" . $_SESSION ['mysql']->error);
     if (empty($result)) {
         $listeNomsFichier = [];
