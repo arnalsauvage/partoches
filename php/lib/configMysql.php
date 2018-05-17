@@ -41,4 +41,4 @@ if(FALSE == isset($configMysql) )
 		return $new_date;
 	}
 
-?>
+

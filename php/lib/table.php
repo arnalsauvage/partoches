@@ -70,4 +70,4 @@ if (! isset ( $ModuleTable )) {
 		return "</tbody>";
 	}
 } // Fin du module Table
-?>
+

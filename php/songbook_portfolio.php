@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection HtmlUnknownTarget */
 include_once ("lib/utilssi.php");
 $pasDeMenu = true;
 include_once ("menu.php");
@@ -103,9 +103,9 @@ $table = "songbook";
 			<div class="madate"><?= $dateSongbook; ?></div>
 		</div>
 
-        <?php
+        <?
 				}
-				?>
+				?>php
 
 </div>
 	<!-- content box -->

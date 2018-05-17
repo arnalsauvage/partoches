@@ -55,4 +55,3 @@ if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
 }
 
 redirection ( $nomTable . "_liste.php" );
-?>

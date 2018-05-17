@@ -137,4 +137,3 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 	return true;
 }
 
-?>

@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utilssi.php");
+include_once("./lib/utilssi.php");
 include_once "lib/configMysql.php";
 
 // Fonctions de gestion de la chanson
@@ -167,4 +167,3 @@ function testeChanson()
 }
 
 // TODO ajouter des logs pour tracer l'activité du site
-?>

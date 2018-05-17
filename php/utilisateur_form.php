@@ -73,11 +73,10 @@ if ($_SESSION ['privilege'] < 3) {
 	$sortie = str_replace("NAME='fdateDernierLogin'", "NAME='fdateDernierLogin' disabled='disabled' ", $sortie);
 	$sortie = str_replace("NAME='fnbreLogins'", "NAME='fnbreLogins' disabled='disabled' ", $sortie);
 }
-$sortie .= envoieFooter ( "Bienvenue chez nous !" );
+$sortie .= envoieFooter ( );
 echo $sortie;
 // privilege
 // 0 : utilisateur non validé
 // 1 : abonné (consultation + évaluation + commentaires)
 // 2 : éditeur (idem + possibilité de rédiger, envoyer des fichiers)
 // 3 : administrateur (droits complets sur le site)
-?>

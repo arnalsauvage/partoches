@@ -104,4 +104,3 @@ if (isset ($_GET ['doc'])) {
     readfile($fichier);
     augmenteHits("document", $idDoc);
 }
-?>

@@ -216,4 +216,3 @@ function imageTableId($table, $id) {
 
 // testeDocument ();
 // TODO ajouter des logs pour tracer l'activité du site
-?>

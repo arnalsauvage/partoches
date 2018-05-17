@@ -34,4 +34,3 @@ if(!isset ($FichierCompteur)){
 		}
 	}
 }
-?>

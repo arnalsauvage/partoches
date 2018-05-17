@@ -94,4 +94,3 @@ $contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut ( $_SESSION ['priv
 $contenu .= " </div> <!--/.container --></div><!--/.starter-template -->";
 if (!isset($pasDeMenu) || false == $pasDeMenu)
 	echo $contenu . "\n\n";
-?>

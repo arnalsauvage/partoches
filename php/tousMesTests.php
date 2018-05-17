@@ -18,4 +18,3 @@ if ($_SESSION ['privilege'] > 2) {
 
 else
 	redirection ("chanson_liste.php");
-?>

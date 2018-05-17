@@ -65,6 +65,5 @@ $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
 if ($_SESSION ['privilege'] > 2)
 	$fichiersDuSongbook .= "<BR>" . Ancre("?page=$utilisateurForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel utilisateur");
 // //////////////////////////////////////////////////////////////////////ADMIN
-$fichiersDuSongbook .= envoieFooter("Bienvenue chez nous !");
+$fichiersDuSongbook .= envoieFooter();
 echo $fichiersDuSongbook;
-?>

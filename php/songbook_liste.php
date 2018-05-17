@@ -80,7 +80,7 @@ $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
 if ($_SESSION ['privilege'] >= 2)
 	$fichiersDuSongbook .= "<BR>" . Ancre("?page=$songbookForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel songbook");
 // //////////////////////////////////////////////////////////////////////ADMIN
-$fichiersDuSongbook .= envoieFooter("Bienvenue chez nous !");
+$fichiersDuSongbook .= envoieFooter();
 echo $fichiersDuSongbook;
 
 function titreColonne($libelle, $nomRubrique)
@@ -88,4 +88,3 @@ function titreColonne($libelle, $nomRubrique)
 	$chaine = TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
 	return $chaine;
 }
-?>

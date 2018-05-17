@@ -46,7 +46,7 @@ if ($mode == "MAJ")
 if ($mode == "INS")
 	$sortie .= "<H1> Création - " . $table . "</H1>";
 
-$sortie .= "<Div class = 'centrer'>";
+$sortie .= "<div class = 'centrer'>";
 // Création du formulaire
 /*$f = new Formulaire ( "POST", $table . "_post.php", $sortie );
 $f->champCache ( "id", $donnee [0] );
@@ -157,5 +157,5 @@ if ($mode == "MAJ") {
 </div>
 <?php
 }
-echo envoieFooter ( "Bienvenue chez nous !" );
+echo envoieFooter ( );
 ?>

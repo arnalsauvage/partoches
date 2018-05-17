@@ -64,7 +64,6 @@ while ( $ligne = $lignes->fetch_row () ) {
 	$sortie .= "<a href= 'getdoc.php?doc=" . $ligneDoc [0] . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
 }
 
-$sortie .= envoieFooter ( "Bienvenue chez nous !" );
+$sortie .= envoieFooter ();
 echo $sortie;
 // TODO ajouter un bouton : supprimer fichiers
-?>

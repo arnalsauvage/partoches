@@ -34,4 +34,3 @@ if ($mode == "INS") {
 	creeUtilisateur($flogin, $fmdp, $fprenom, $fnom, $fimage, $fsite, $femail, $fsignature, $fprivilege);
 }
 	redirection ( $utilisteurListe );
-?>

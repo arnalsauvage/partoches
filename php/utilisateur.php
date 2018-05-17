@@ -220,4 +220,3 @@ function testeUtilisateur() {
 // testeUtilisateur ();
 // testUtilisateurs ();
 
-?>

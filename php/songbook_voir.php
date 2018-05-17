@@ -62,6 +62,5 @@ while ( $ligne = $lignes->fetch_row () ) {
 	$sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
 }
 
-$sortie .= envoieFooter ( "Bienvenue chez nous !" );
+$sortie .= envoieFooter ();
 echo $sortie;
-?>

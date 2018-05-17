@@ -52,4 +52,3 @@ if ($id && $mode == "SUPPR") {
 }
 
 // redirection ( $nomTable . "_liste.php" );
-?>

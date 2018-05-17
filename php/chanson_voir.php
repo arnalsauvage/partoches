@@ -115,4 +115,3 @@ $contenuHtml .= "</div><!-- /.starter-template -->\n
 </div><!-- /.container -->\n";
 $contenuHtml .= envoieFooter (  );
 echo $contenuHtml;
-?>

@@ -45,4 +45,3 @@ else {
 	echo $sortie;
 	include "../html/menuLogin.html";
 }
-?>

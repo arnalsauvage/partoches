@@ -13,7 +13,7 @@ if (! isset ( $ClasseFormulaire )) {
 		// ---- Partie privée : les méthodes
 		
 		// Constructeur de la classe
-		function Formulaire($pMethode, $pAction, &$retour, $pTransfertFichier = FALSE, $pNom = "Form") {
+		function __construct($pMethode, $pAction, &$retour, $pTransfertFichier = FALSE, $pNom = "Form") {
 			
 			// Mettre un attribut ENCTYPE si on transfère un fichier
 			if ($pTransfertFichier)
@@ -67,6 +67,8 @@ if (! isset ( $ClasseFormulaire )) {
 		
 		// Champ CHECKBOX ou RADIO
 		private function champBUTTONS($pType, $pNom, $pListe, $pDefaut) {
+		    $libelles = "";
+		    $champs = "";
 			// Toujours afficher dans une table
 			while ( list ( $val, $libelle ) = each ( $pListe ) ) {
 				$libelles .= "<TD><B>$libelle</B></TD>";
@@ -205,4 +207,3 @@ if (! isset ( $ClasseFormulaire )) {
 		}
 	}
 }
-?>

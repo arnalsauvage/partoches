@@ -116,4 +116,3 @@ function titreColonne($libelle, $nomRubrique)
 }
 
 
-?>

@@ -21,4 +21,4 @@ $tailleicones = 64;
 $cheminVignettes = "../vignettes/";
 $largeur_max = 128;
 $hauteur_max = 100;  
-?>
+

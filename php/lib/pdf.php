@@ -84,4 +84,3 @@ function testeCreeSongBook(){
 
 //testePdf();
 //testeCreeSongbook();
-?>

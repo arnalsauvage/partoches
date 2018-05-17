@@ -189,4 +189,3 @@ function testelienChansonPlaylist() {
 // testelienChansonPlaylist ();
 // ordonneLiensPlaylist(24);
 // TODO ajouter des logs pur tracer l'activité du site
-?>

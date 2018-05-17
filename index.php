@@ -7,4 +7,3 @@ else {
     header('Location: php/songbook_portfolio.php');
 //	header ( 'Location: html/index.html' );
 }
-?>

@@ -109,4 +109,3 @@ function renommeFichierChanson($nomFichier)
 	// 								 		"aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn" );
 	return $nomFichier;
 }
-?>

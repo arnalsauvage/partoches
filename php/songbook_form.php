@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection HtmlUnknownTarget */
 include_once ("lib/utilssi.php");
 include_once ("menu.php");
 include_once ("songbook.php");
@@ -169,7 +169,6 @@ if ($mode == "MAJ") {
 		}
 	</script>
 	<?php
-	echo envoieFooter ( "Bienvenue chez nous !" );
-
+	echo envoieFooter ();
 }
 ?>

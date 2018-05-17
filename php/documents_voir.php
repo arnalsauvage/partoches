@@ -29,6 +29,14 @@ $lignes = chercheDocuments ( "nomTable", "chanson", $tri, $ordreAsc );
 // On charge le tableau des utilisateurs
 $tabUsers = portraitDesUtilisateurs ();
 
+$sortie .= "<input type=text list=typesFichier >
+<datalist id=typesFichier >
+   <option> tous</option>
+   <option> document </option>
+   <option> son</option>p
+   <option> image</option>
+</datalist>";
+
 $sortie .= "<table> \n";
 $sortie .= "<tr>";
 $sortie .= titreColonne ( "Publicateur", "idUSer" );
@@ -64,10 +72,9 @@ while ( $ligneDoc = $lignes->fetch_row () ) {
 }
 
 $sortie .= "</table>";
-$sortie .= envoieFooter ( "Bienvenue chez nous !" );
+$sortie .= envoieFooter ( );
 echo $sortie;
 function titreColonne($libelle, $nomRubrique) {
 	$chaine = TblCellule ( Ancre ( "?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> " ) . "  $libelle   " . Ancre ( "?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> " ) );
 	return $chaine;
 }
-?>

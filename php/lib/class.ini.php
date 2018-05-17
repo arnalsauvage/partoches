@@ -171,6 +171,7 @@ class ini {
 	
 	// Si $fichier contient le nom d'un dossier, affiche le liste des fichiers ini que contient ce dossier
 	function print_dossier() {
+	    $retour = "";
 		if (is_dir ( $this->fichier )) {
 			$retour .= "<img src='dir.png' alt='Dossier' /><span style='position:relative; top:-10px;font-size:20px; font-weight:bold;'>" . $this->fichier . "</span><br />";
 			if ($handle = opendir ( $this->fichier )) {
@@ -225,4 +226,3 @@ elseif ($groupe == true && $this->item == reset ( $var ))
 	}
 }
 
-?>

@@ -1,6 +1,6 @@
 <?php
 include_once ("lib/utilssi.php");
-include_once "lib/configMysql.php";
+include_once "(./lib/configMysql.php";
 
 // Fonctions de gestion de la lienDocSongbook
 
@@ -152,25 +152,40 @@ function ordonneLiensSongbook($idSongbook) {
 	}
 }
 
+/**
+ * @param $idSongbook
+ * @param $rang
+ * @param $longueurSaut
+ * @return bool
+ */
 function remonteTitre($idSongbook, $rang, $longueurSaut)
 {
-    if ($rang < $longueurSaut)
-        return false;
+    $quelqueChoseAeteFait = false;
 
-    // cherche le doc à monter
-    $lienAmonter = chercheLienParIdSongbookOrdre($idSongbook, $rang);
-    if ($lienAmonter == 0)
-        return false;
+    while (0 < $longueurSaut) {
+        $coupleTrouve = true;
 
-    // cherche le doc à baisser
-    $lienAbaisser = chercheLienParIdSongbookOrdre($idSongbook, $rang - $longueurSaut);
-    if ($lienAbaisser == 0)
-        return false;
+        // cherche le doc à monter
+        $lienAmonter = chercheLienParIdSongbookOrdre($idSongbook, $rang);
+        if ($lienAmonter == 0)
+            $coupleTrouve = false;
 
-    //  changer l'ordre et enregistrer
-    modifielienDocSongbook($lienAmonter[0], $lienAmonter[1], $lienAmonter[2], $lienAmonter[3] - $longueurSaut);
-    modifielienDocSongbook($lienAbaisser[0], $lienAbaisser[1], $lienAbaisser[2], $lienAbaisser[3] + $longueurSaut);
-    return true;
+        // cherche le doc à baisser
+        $lienAbaisser = chercheLienParIdSongbookOrdre($idSongbook, $rang - 1);
+        if ($lienAbaisser == 0)
+            $coupleTrouve = false;
+
+        if ($coupleTrouve) {
+            //  changer l'ordre et enregistrer
+            modifielienDocSongbook( $lienAmonter[0], $lienAmonter[1], $lienAmonter[2], $lienAmonter[3] - 1);
+            modifielienDocSongbook( $lienAbaisser[0], $lienAbaisser[1], $lienAbaisser[2], $lienAbaisser[3] + 1);
+            $quelqueChoseAeteFait = true;
+        }
+        $longueurSaut--;
+        $rang--;
+    }
+    ordonneLiensSongbook($idSongbook);
+    return $quelqueChoseAeteFait;
 }
 
 // Fonction de test
@@ -185,4 +200,3 @@ function testelienDocSongbook() {
 // testelienDocSongbook ();
 // ordonneLiensSongbook(24);
 // TODO ajouter des logs pour tracer l'activité du site
-?>

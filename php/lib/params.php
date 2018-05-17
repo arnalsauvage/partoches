@@ -9,4 +9,3 @@
 	$_SESSION ['emailAdmin'] = $ini_objet->m_valeur ( "EmailAdmin", "general" );
 	$_SESSION ['loginParam'] = $ini_objet->m_valeur ( "loginParam", "general" );
 
-?>

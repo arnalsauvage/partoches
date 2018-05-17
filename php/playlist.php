@@ -155,4 +155,3 @@ function testePlaylist() {
 
 // testePlaylist ();
 // TODO ajouter des logs pur tracer l'activité du site
-?>

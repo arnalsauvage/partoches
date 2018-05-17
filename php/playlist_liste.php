@@ -79,7 +79,7 @@ $fichiersDuPlaylist .= Image($iconeAttention, "100%", 1, 1);
 if ($_SESSION ['privilege'] >= 2)
 	$fichiersDuPlaylist .= "<BR>" . Ancre("?page=$playlistForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer une nouvelle playlist");
 // //////////////////////////////////////////////////////////////////////ADMIN
-$fichiersDuPlaylist .= envoieFooter("Bienvenue chez nous !");
+$fichiersDuPlaylist .= envoieFooter();
 echo $fichiersDuPlaylist;
 
 function titreColonne($libelle, $nomRubrique)
@@ -87,4 +87,3 @@ function titreColonne($libelle, $nomRubrique)
 	$chaine = TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
 	return $chaine;
 }
-?>

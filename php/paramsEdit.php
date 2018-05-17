@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpMethodParametersCountMismatchInspection */
 include_once "lib/utilssi.php";
 include_once ("menu.php");
 $fichier = "../conf/params.ini";
@@ -59,6 +59,6 @@ $sortie .= "
 </fieldset></form> ";
 
 $sortie .= "</td></tr></table>";
-$sortie .= envoieFooter("Bienvenue chez nous !");
+/** @noinspection PhpMethodParametersCountMismatchInspection */
+$sortie .= envoieFooter();
 echo $sortie;
-?>

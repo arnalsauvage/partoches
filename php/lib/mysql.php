@@ -116,4 +116,3 @@ function augmenteHits ($nomTable,$id){
 	$marequete = "UPDATE $nomTable SET hits = '$nbHits' where id = '$id'";
 	$result =  $_SESSION ['mysql']->query ( $marequete) or die ( "Problème augmenteHits #2 : table $nomTable, id : $id " .  $_SESSION ['mysql']->error );
 }
-?>

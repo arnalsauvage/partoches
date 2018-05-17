@@ -69,4 +69,3 @@ if ($mode== "GENEREPDF"){
 
 if ($mode != "GENEREPDF")
 	redirection ( $nomTable . "_liste.php" );
-?>

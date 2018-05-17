@@ -21,14 +21,14 @@
 /*                                                                            */
 /* URL            : http://www.phpsources.org/scripts435-PHP.htm              */
 /* Auteur         : bud                                                       */
-/* Date édition   : 23 Juil 2008                                              */
+/* Date ï¿½dition   : 23 Juil 2008                                              */
 /*                                                                            */
 /******************************************************************************/
 
 /**
  *** int counter(string $dir)
  ***
- ***        \param $dir: chemin du dossier à parcourir
+ ***        \param $dir: chemin du dossier ï¿½ parcourir
  **/
 function counter($dir)
 {
@@ -60,12 +60,11 @@ function counter($dir)
     return $nbLines;
 }
 
-// dossier à parcourir
-// '.' signifie que je parcours le dossier où se trouve mon script
+// dossier ï¿½ parcourir
+// '.' signifie que je parcours le dossier oï¿½ se trouve mon script
 $dir = ".";
 
 $nb = counter($dir);
 print("<br />Le projet comporte un total de <strong>".$nb.
     "</strong> lignes<br />\n");
 
-?>
