@@ -26,7 +26,7 @@ function chercheDocuments($critere, $valeur, $critereTri = 'nom', $bTriAscendant
 function chercheDocument($id) {
 	$maRequete = "SELECT * FROM document WHERE document.id = '$id'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème cherchedocument #1 : " . $_SESSION ['mysql']->error );
-	// renvoie la lisgne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
+	// renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
 	if (($ligne = $result->fetch_row ()))
 		return ($ligne);
 	else
@@ -97,6 +97,40 @@ function modifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 	return $version;
 }
 
+// Renomme un document en base de données et sur disque si possible
+function renommeDocument($id, $nouveauNom)
+{
+    $document = chercheDocument( $id );
+    //id, nom, taille, date, version, nomTable, idTable, idUser
+    $tailleko = $document[2];
+    $nomTable = $document[5];
+    $idTable = $document[6];
+
+    // chercher un document avec le nouveau nom
+    if  (chercheDocumentNomTableId($nouveauNom, $nomTable, $idTable) != 0)
+        // s'il existe, renvoyer -1
+        return -1;
+
+    // regarder s'il existe un fichier avec le nouveau nom
+    $fichier = "../data/" . $nomTable . "s/" . $idTable . "/" . composeNomVersion($document [1], $document [4]);
+    if (file_exists($fichier))
+    // s'il existe, renvoyer -2
+        return -2;
+
+    // renommer le fichier
+    rename( "../data/" . $nomTable . "s/" . $idTable . "/" . composeNomVersion($document [1], $document [4],$fichier),
+            $nouveauNom );
+
+    // mettre a jour base de données
+    $maRequete = "UPDATE  document
+	SET nom = '$nouveauNom', idUser = '$idUser'
+	WHERE id = '$id'";
+    $result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème renommeDocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete );
+
+    // renvoyer vrai
+    return true;
+}
+
 // Supprime un document en base de données si il existe
 function supprimeDocument($id) {
 	// On supprime les enregistrements dans la table document
@@ -123,7 +157,8 @@ function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant =
 	// Ajouter des options
 	$lignes = chercheDocuments ( $critere, $valeur, $critereTri, $bTriAscendant );
 	while ( $ligne = $lignes->fetch_row () ) {
-		$retour .= "<option  value = '" . $ligne [0] . "'> " . htmlEntities ( $ligne [1] ) . "</option>\n";
+	    if (strstr($ligne[1],"pdf"))
+    		$retour .= "<option  value = '" . $ligne [0] . "'> " . htmlEntities ( $ligne [1] . " "  . $ligne[3] ) . "</option>\n";
 	}
 	$retour .= "</select>\n";
 	return $retour;

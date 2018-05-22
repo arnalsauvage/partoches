@@ -154,8 +154,45 @@ if ($mode == "MAJ") {
 		class="inline" for="fichier"> </label> <input type="file" id="fichier"
 		name="fichierUploade" size="40"> <input type="submit" value="Envoyer">
 </form>
+
+<h2> Corbeille des fichiers effacés</h2>
+    <?php
+    $fichiersEnBdd = [];
+        $resultat = chercheDocumentsTableId("chanson", "$id");
+        while (($fichierEnBdd = $resultat->fetch_row ())) {
+            array_push($fichiersEnBdd, $fichierEnBdd);
+        }
+
+        $fichiersSurDisque = fichiersChanson($id); // repertoire nom extension
+//    $maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')";
+
+    while ( count($fichiersSurDisque) >0) {
+            //echo "nb fichiers : "     .   count($fichiersSurDisque) / 3;
+
+            $fichierSurDisque[0] = array_shift($fichiersSurDisque);
+            $fichierSurDisque[1] = array_shift($fichiersSurDisque);
+            $fichierSurDisque[2] = array_shift($fichiersSurDisque);
+            //echo ".......FichierDisque ". $fichierSurDisque[1] ."<br>";
+            $fichierOk = false;
+            foreach ($fichiersEnBdd as $fichierEnBdd)
+            {
+                //echo "cherche version du " . $fichierEnBdd[1] . " " . $fichierEnBdd[4] . "<br>";
+                // si le fichierBDD est sur disque, alors fichierOk
+                if (composeNomVersion($fichierEnBdd[1],$fichierEnBdd[4])==$fichierSurDisque[1]) {
+                    $fichierOk = true;
+                    //echo "Fichier $fichierSurDisque[1] trouvé !!!!!!!!!!!!!!!!!!!<br>";
+                }
+            }
+        if ($fichierOk == false)
+            echo "Fichier corbeille : " . $fichierSurDisque[1] . " non répertorié par la Bdd<br>";
+
+        }
+    }
+    ?>
 </div>
+
+
 <?php
-}
+
 echo envoieFooter ( );
 ?>

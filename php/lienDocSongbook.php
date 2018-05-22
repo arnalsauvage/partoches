@@ -1,6 +1,6 @@
 <?php
 include_once ("lib/utilssi.php");
-include_once "(./lib/configMysql.php";
+include_once ("lib/configMysql.php");
 
 // Fonctions de gestion de la lienDocSongbook
 
