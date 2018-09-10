@@ -3,6 +3,8 @@ include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
+include_once ("chanson_comp_cherche.php");
+
 // DONE : ajouter un bouton "ajouter un doc pour cette chanson"
 // DONE : ajouter la date de publication et le tri par date de pub
 $chansonForm = "chanson_form.php";
@@ -27,8 +29,29 @@ if (isset ($_GET ['tri'])) {
         $ordreAsc = false;
     }
 }
+
+// Gestion parametre de recherche
+if (isset ($_GET ['cherche'])) {
+    $cherche = "%" . $_GET ['cherche'] . "%";
+}
+    else {
+        $cherche = "%";
+    }
+
+    $critere = "nom";
+// Gestion parametre de recherche
+if (isset ($_POST ['chercheT']) && (strlen($_POST['chercheT'])>0)) {
+    $cherche = "%" . $_POST ['chercheT'] . "%";
+}
+if (isset ($_POST ['chercheI']) && strlen($_POST['chercheI'])>0 ) {
+
+    $critere = "interprete";
+    $cherche = "%" . $_POST ['chercheI'] . "%";
+}
+
+
 // Chargement de la liste des chansons
-$resultat = chercheChansons("nom", "%", $tri, $ordreAsc);
+$resultat = chercheChansons($critere, $cherche, $tri, $ordreAsc);
 $nbreChansons = $_SESSION ['mysql']->affected_rows;
 $numligne = 0;
 
@@ -104,6 +127,11 @@ if ($_SESSION ['privilege'] > 1) {
 // //////////////////////////////////////////////////////////////////////ADMIN
 $contenuHtml .= "</div>\n
 </div><!-- /.container -->\n";
+
+
+// Affichage de la recherche
+$contenuHtml .= $contenuHtmlCompCherche;
+
 $contenuHtml .= envoieFooter();
 echo $contenuHtml;
 
