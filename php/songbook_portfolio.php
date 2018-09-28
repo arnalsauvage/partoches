@@ -103,9 +103,9 @@ $table = "songbook";
 			<div class="madate"><?= $dateSongbook; ?></div>
 		</div>
 
-        <?
+        <?php
 				}
-				?>php
+				?>
 
 </div>
 	<!-- content box -->

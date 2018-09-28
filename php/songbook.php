@@ -27,7 +27,7 @@ function chercheSongbooks($critere, $valeur, $critereTri = 'nom', $bTriAscendant
 }
 
 // Cherche un songbook et le renvoie s'il existe
-function cherchesongbook($id)
+function chercheSongbook($id)
 {
     $maRequete = "SELECT * FROM songbook WHERE songbook.id = '$id'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchesongbook #1 : " . $_SESSION ['mysql']->error);
@@ -39,7 +39,7 @@ function cherchesongbook($id)
 }
 
 // Cherche un songbook et la renvoie si elle existe
-function cherchesongbookParLeNom($nom)
+function chercheSongbookParLeNom($nom)
 {
     $maRequete = "SELECT * FROM songbook WHERE songbook.nom = '$nom'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchesongbookParLeNom #1 : " . $_SESSION ['mysql']->error);
@@ -51,7 +51,7 @@ function cherchesongbookParLeNom($nom)
 }
 
 // Crée un songbook
-function creesongbook($nom, $description, $date, $image, $hits)
+function creeSongbook($nom, $description, $date, $image, $hits)
 {
     $date = convertitDateJJMMAAAA($date);
     $idUSer = $_SESSION ['id'];
@@ -60,7 +60,7 @@ function creesongbook($nom, $description, $date, $image, $hits)
 }
 
 // Modifie en base la songbook
-function modifiesongbook($id, $nom, $description, $date, $image, $hits)
+function modifiesSongbook($id, $nom, $description, $date, $image, $hits)
 {
     $date = convertitDateJJMMAAAA($date);
     $maRequete = "UPDATE  songbook
@@ -70,7 +70,7 @@ function modifiesongbook($id, $nom, $description, $date, $image, $hits)
 }
 
 // Cette fonction supprime un songbook si il existe
-function supprimesongbook($idsongbook)
+function supprimeSongbook($idsongbook)
 {
     // On supprime les enregistrements dans songbook
     $maRequete = "DELETE FROM songbook
@@ -80,18 +80,17 @@ function supprimesongbook($idsongbook)
 }
 
 // Cette fonction modifie ou crée un songbook si besoin
-function creeModifiesongbook($id, $nom, $description, $date, $image, $hits)
+function creeModifieSongbook($id, $nom, $description, $date, $image, $hits)
 {
-    if (cherchesongbook($id))
-        modifiesongbook($id, $nom, $description, $date, $image, $hits);
+    if (chercheSongbook($id))
+        modifiesSongbook($id, $nom, $description, $date, $image, $hits);
     else
-        creesongbook($nom, $description, $date, $image, $hits);
+        creeSongbook($nom, $description, $date, $image, $hits);
 }
 
 // Cette fonction renvoie l'image vignette d'un songbook
 function imageSongbook($idSongbook)
 {
-
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
     $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imageSongbook #1 : " . $_SESSION ['mysql']->error);
@@ -109,18 +108,20 @@ function imageSongbook($idSongbook)
 }
 
 // Cette fonction renvoie une chaine de description de la songbook
-function infossongbook($id)
+function infosSongbook($id)
 {
-    $enr = cherchesongbook($id);
+    $enr = chercheSongbook($id);
     // id_journee id_joueur poste statut
     $retour = "Id : " . $enr [0] . " Nom : " . $enr [1] . " Description : " . $enr [2] . " Date : " . $enr [3] . " image : " . $enr [4] . " Hits : " . $enr [5];
     return $retour . "<BR>\n";
 }
 
-// Cette fonction renvoie la liste des fichiers attachés au songbook
+// Cette fonction renvoie la liste des fichiers présents dans le répertoire du songbook
+// Sous forme de tableau [0] répertoire [1] nomFichier [2] extension
+
 function fichiersSongbook($id)
 {
-    $enr = cherchesongbook($id);
+    $enr = chercheSongbook($id);
     $retour = array(); // repertoire, nom, extension
     $repertoire = "../data/songbooks/$id/";
     if (is_dir($repertoire)) {
@@ -157,7 +158,6 @@ WHERE liendocsongbook.idSongbook =  '$id' ORDER BY liendocsongbook.ordre ASC";
             array_push($listeVersionsDoc, $ligne["VersionDoc"]);
         }
     }
-
     $imageSongBook = imageSongBook($id);
 
     pdfCreeSongbook($id, $imageSongBook, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
@@ -166,34 +166,34 @@ WHERE liendocsongbook.idSongbook =  '$id' ORDER BY liendocsongbook.ordre ASC";
 // Fonction de test
 function testeSongbook()
 {
-    creesongbook("Songbook #1", "Chansons d été", "31/07/2017", "cover.jpg", 0);
-    $id = cherchesongbookParLeNom("Songbook #1");
+    creeSongbook("Songbook #1", "Chansons d été", "31/07/2017", "cover.jpg", 0);
+    $id = chercheSongbookParLeNom("Songbook #1");
     $id = $id [0];
-    echo infossongbook($id);
+    echo infosSongbook($id);
 
-    $enr = cherchesongbook($id);
+    $enr = chercheSongbook($id);
     $id = $id [0];
-    echo infossongbook($id);
+    echo infosSongbook($id);
 
-    creesongbook("Songbook #2", "Chansons d automne", "30/11/2017", "cover.jpg", 0);
-    $id = cherchesongbookParLeNom("Songbook #2");
+    creeSongbook("Songbook #2", "Chansons d automne", "30/11/2017", "cover.jpg", 0);
+    $id = chercheSongbookParLeNom("Songbook #2");
     $id = $id [0];
-    echo infossongbook($id);
+    echo infosSongbook($id);
 
-    creeModifiesongbook($id, "Songbook #2", "Chansons d automne !", "28/11/2017", "cover.jpg", 0);
-    $id = cherchesongbookParLeNom("Songbook #2");
+    creeModifieSongbook($id, "Songbook #2", "Chansons d automne !", "28/11/2017", "cover.jpg", 0);
+    $id = chercheSongbookParLeNom("Songbook #2");
     $id = $id [0];
-    echo infossongbook($id);
+    echo infosSongbook($id);
 
-    $id = cherchesongbookParLeNom("Songbook #2");
+    $id = chercheSongbookParLeNom("Songbook #2");
     $id = $id [0];
     // supprimesongbook($id);
-    echo infossongbook($id);
+    echo infosSongbook($id);
 
-    $id = cherchesongbookParLeNom("Songbook #1");
-    supprimesongbook($id[0]);
-    $id = cherchesongbookParLeNom("Songbook #2");
-    supprimesongbook($id[0]);
+    $id = chercheSongbookParLeNom("Songbook #1");
+    supprimeSongbook($id[0]);
+    $id = chercheSongbookParLeNom("Songbook #2");
+    supprimeSongbook($id[0]);
 
 }
 

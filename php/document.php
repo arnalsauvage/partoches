@@ -37,7 +37,7 @@ function chercheDocument($id) {
 function chercheDocumentNomTableId($nom, $table, $id) {
 	$maRequete = "SELECT * FROM document WHERE document.nom = '$nom' AND document.idTable = '$id' AND document.nomTable = '$table'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème cherchedocument #1 : " . $_SESSION ['mysql']->error );
-	// renvoie la lisgne sélectionnée : id, nom, interprète, année
+	// renvoie la ligne sélectionnée : id, nom, interprète, année
 	if (($ligne = $result->fetch_row ()))
 		return ($ligne);
 	else
@@ -79,6 +79,13 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable) {
 }
 
 // Modifie en base le document
+/**
+ * @param $nom : nom de fichier du document
+ * @param $tailleKo : taille du fichier en ko
+ * @param $nomTable : table à laquelle est rattaché le document
+ * @param $idTable : identifiant de l'objet auquel est rattaché ce document
+ * @return bool|int : false en cas d'erreur, sinon numéro de version du document
+ */
 function modifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 	$date = date ( "d/m/y" );
 	$date = convertitDateJJMMAAAA ( $date );
@@ -89,6 +96,7 @@ function modifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 		return false;
 	else
 		$version = $resultat [4] + 1;
+
 	$maRequete = "UPDATE  document
 	SET tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser'
 	WHERE nom = '$nom'";
@@ -105,6 +113,7 @@ function renommeDocument($id, $nouveauNom)
     $tailleko = $document[2];
     $nomTable = $document[5];
     $idTable = $document[6];
+    $idUser = $document[7];
 
     // chercher un document avec le nouveau nom
     if  (chercheDocumentNomTableId($nouveauNom, $nomTable, $idTable) != 0)
@@ -150,7 +159,7 @@ function creeModifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 		return modifieDocument ( $nom, $tailleKo, $nomTable, $idTable );
 }
 
-// Prépare un combo en html avec les documents correspondant à un critere et triés selon un critereTri
+// Prépare un combo en html avec les documents correspondant à un critère et triés selon un critereTri
 // SELECT * FROM document WHERE $critere LIKE '$valeur' ORDER BY $critereTri
 function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true) {
 	$retour = "<select name='documentJoint'>\n";

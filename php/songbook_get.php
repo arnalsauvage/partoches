@@ -37,30 +37,37 @@ if (isset ($_POST ['id'])) {
 if ($mode == "MAJ") {
 	if ($_SESSION ['privilege'] < 3) {
 		// On récupère les valeurs de hits et date en base, car ils ne sont pas dans le formulaire
-		$songbook = cherchesongbook($id);
+		$songbook = chercheSongbook($id);
 		$fhits = $songbook[5];
 		$fdate = dateMysqlVersTexte($songbook[3]);
 	}
-	modifiesongbook($id, $fnom, $fdescription, $fdate, $fimage, $fhits);
+	modifiesSongbook($id, $fnom, $fdescription, $fdate, $fimage, $fhits);
 }
 
 // Cas de l'ajout d'un Songbook
 if ($mode == "INS") {
 	$fhits = 0;
 	$fdate = date("d/m/Y");
-	creesongbook ( $fnom, $description, $fdate, $fimage, $fhits );
+	creeSongbook ( $fnom, $description, $fdate, $fimage, $fhits );
 }
 
 // Gestion de la demande de suppression
 if ($id && ($mode == "SUPPR")) {
-	supprimesongbook ( $id );
+	supprimeSongbook ( $id );
 }
 
 // Gestion de la demande de suppression de document dans le songbook
 if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
-	// echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
+//	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
 	supprimeLienIdDocIdSongbook ( $_GET ['idDoc'], $_GET ['idSongbook'] );
 }
+
+// Gestion de la demande de suppression de document dans le songbook
+if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
+//	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
+    unlink ($_GET['nomFic']);
+}
+
 
 if ($mode== "GENEREPDF"){
 	creeSongbookPdf($id);

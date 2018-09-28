@@ -82,7 +82,7 @@ $sortie .= "
     <option value='binaire'";
     if ($donnee[6]=="binaire")
        $sortie .=  " selected";
-$sortie .=  ">binaire
+$sortie .=   ">binaire
     </option>
     <option value='ternaire' ";
      if ($donnee[6]=="ternaire")
@@ -105,6 +105,7 @@ $sortie.= " VALUE='$donnee[9]' SIZE='10' MAXLENGTH='128'><br><INPUT TYPE=HIDDEN 
 ";
 $sortie .= "Pour trouver le tempo en tapant : <a href='http://www.tempotap.com' target='_blank'>tempotap.com</a><br>\n";
 if ($donnee[1]){
+
 
 	$sortie .= "Pour chercher la chanson sur youtube : <a href='https://www.youtube.com/results?search_query=" . urlencode($donnee[1]) . "' target='_blank'>ici</a><br>\n";
 	$sortie .= "Pour chercher des images : <a href='https://www.qwant.com/?q=" . urlencode($donnee[1]) . "&t=images=' target='_blank'>ici</a><br>\n";

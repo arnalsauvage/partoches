@@ -20,7 +20,7 @@ if (isset ( $_POST ['id'] ) && (isset ( $_POST ['documentJoint'] ))) {
 if (isset ($_POST ['id']) || (isset ($_GET ['id']) && $_GET ['id'] != "")) {
 	if (isset ( $_GET ['id'] ))
 		$id = $_GET ['id'];
-	$donnee = cherchesongbook ( $id );
+	$donnee = chercheSongbook ( $id );
 	$donnee [1] = htmlspecialchars ( $donnee [1] );
 	$donnee [2] = htmlspecialchars ( $donnee [2] );
 	$donnee [3] = dateMysqlVersTexte ( $donnee [3] );
@@ -78,8 +78,9 @@ foreach ($fichiersDuSongbook as $fichier) {
 	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
 		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
-		$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> \n";
-		$sortie .= boutonSuppression ( "songbook_get.php" . "?idSongbook=$id&idDoc=$fichier[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages ) . "<br>\n";
+	$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> \n";
+	$sortie .= boutonSuppression ( "songbook_get.php?nomFic=" . urlencode($fichier [0] . $fichier [1]) . "&mode=SUPPRFIC", $iconePoubelle, $cheminImages ) . "<br>\n";
+    echo "Fichier : $fichier[1]";
 }
 
 echo $sortie;
@@ -128,11 +129,11 @@ if ($mode == "MAJ") {
 	echo $listeDocs."</table></div>";
 	?>
 
-	<h2>Insérer un document dans ce songbook</h2>
+	<h2>Lier un document à ce songbook</h2>
 	<p>Ici on rattache des documents au songbook. Ce seront des documents rattachés à une chanson. </p>
 	<p>Par exemple, grille, partoche, partition... Pour uploader sur le site des documents, il faut d'abord créer une
 		chanson, et lui rattacher des documents. </p>
-	<p>Dans la liste combo ci-dessous, vous trouverez les derniers documents uploadés sur le site.</p>
+	<p>Dans la liste combo ci-dessous, vous trouverez les derniers documents uploadés sur le siteau format pdf.</p>
 
 	<form action="songbook_form.php" method="post" name="form2">
 		<?php

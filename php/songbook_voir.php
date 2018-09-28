@@ -18,7 +18,7 @@ $monImage = imageTableId("songbook", $_GET ['id']);
 // On charge le tableau des utilisateurs
 $tabUsers = portraitDesUtilisateurs();
 
-$donnee = cherchesongbook ( $_GET ['id'] );
+$donnee = chercheSongbook ( $_GET ['id'] );
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
 
 if ($_SESSION ['privilege'] > 1)
