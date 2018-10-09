@@ -80,7 +80,7 @@ foreach ($fichiersDuSongbook as $fichier) {
 		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
 	$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> \n";
 	$sortie .= boutonSuppression ( "songbook_get.php?nomFic=" . urlencode($fichier [0] . $fichier [1]) . "&mode=SUPPRFIC", $iconePoubelle, $cheminImages ) . "<br>\n";
-    echo "Fichier : $fichier[1]";
+	// echo "Fichier : $fichier[1]";
 }
 
 echo $sortie;
