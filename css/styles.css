@@ -96,3 +96,7 @@ h1 {
   text-decoration: none;
   color: black;
 }
+
+img {
+    border: 0;
+}

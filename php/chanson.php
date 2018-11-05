@@ -60,11 +60,11 @@ function modifieChanson($id, $nom, $interprete, $annee, $idUser, $tempo = 0, $me
     $nom = $_SESSION ['mysql']->real_escape_string($nom);
     $interprete = $_SESSION ['mysql']->real_escape_string($interprete);
     $annee = $_SESSION ['mysql']->real_escape_string($annee);
-    $datePub = convertitDateJJMMAAAA(date("d/m/Y"));
+//    $datePub = convertitDateJJMMAAAA(date("d/m/Y"));
 
     $maRequete = "UPDATE  chanson
 	SET nom = '$nom', interprete = '$interprete', annee = '$annee', idUser = $idUser, tempo = '$tempo', mesure='$mesure',
-	pulsation='$pulsation',  datePub = '$datePub', hits='$hits', tonalite='$tonalite'
+	pulsation='$pulsation',  hits='$hits', tonalite='$tonalite'
 	WHERE id='$id'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifieChanson #1 : " . $_SESSION ['mysql']->error);
 }

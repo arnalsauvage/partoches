@@ -159,7 +159,7 @@ if(!isset ($FichierHtml)){
     	";
 
 		$retour .= "<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
-		<script type='text/javascript' src='./lib/javascript.js'></script>
+		<script src='./lib/javascript.js'></script>
 		<link href='../css/toastr.min.css' rel='stylesheet' type='text/css'>
 		<title>$titrePage</title>
 		</head>";

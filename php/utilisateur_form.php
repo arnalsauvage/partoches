@@ -68,6 +68,17 @@ $f->champListe ( "Privileges :", "fprivilege", $donnee [11], 1, $pListe );
 $f->champCache ( "mode", $mode );
 $f->champValider ( "Valider la saisie", "valider" );
 $sortie .= $f->fin ();
+
+$sortie .= "<h2>Envoyer une image sur le serveur</h2>
+	<form action='utilisateur_upload.php' method='post'
+		  enctype='multipart/form-data'>
+		<input type='hidden' name='MAX_FILE_SIZE' value='150000'> 
+		<input type='hidden' name='id' value='" . $donnee[0] . "'>
+		<label	class='inline' for='fichier'> </label> <input type='file' id='fichier'
+														  name='fichierUploade' size='40'> <input type='submit' value='Envoyer'>
+	</form>";
+
+// Si l'utilisateur n'est pas Admin
 if ($_SESSION ['privilege'] < 3) {
 	// On désactive les champs dateDernierLogin et nbreLogins
 	$sortie = str_replace("NAME='fdateDernierLogin'", "NAME='fdateDernierLogin' disabled='disabled' ", $sortie);

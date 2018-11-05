@@ -32,14 +32,16 @@ while ( $ligne = $resultat->fetch_row () ) {
 	if (($_SESSION ['privilege'] > 1) || $_SESSION ['user'] == $ligne [1]) {
 		$fichiersDuSongbook .= TblDebutLigne();
 
-		if ($ligne [5])
-			// //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-			if (($_SESSION ['privilege'] > 2) || $_SESSION ['user'] == $ligne [1])
-				$fichiersDuSongbook .= TblCellule(Ancre($utilisateurForm . "?id=$ligne[0]", Image(($cheminImages . $ligne [5]), 32, 32))); // image
-			// //////////////////////////////////////////////////////////////////////ADMIN
-			else
-				$fichiersDuSongbook .= TblCellule(Image(($cheminImages . $ligne [5]), 32, 32)); // image
-		else
+        if ($ligne [5]) {
+            $ligne [5] = str_replace("/utilisateur", "/", $ligne[5]);
+            afficheVignette($ligne [5], $cheminImages . "utilisateur", $cheminVignettes);
+            // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
+            if (($_SESSION ['privilege'] > 2) || $_SESSION ['user'] == $ligne [1])
+                $fichiersDuSongbook .= TblCellule(Ancre($utilisateurForm . "?id=$ligne[0]", Image(($cheminVignettes . $ligne [5]), 32, 32))); // image
+            // //////////////////////////////////////////////////////////////////////ADMIN
+            else
+                $fichiersDuSongbook .= TblCellule(Image(($cheminVignettes . $ligne [5]), 32, 32)); // image
+        } else
 			$fichiersDuSongbook .= TblCellule(Ancre($utilisateurForm . "?id=$ligne[0]", "voir"));
 
 		$fichiersDuSongbook .= TblCellule(entreBalise($ligne [1], "H2")); // Login

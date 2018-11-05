@@ -1,11 +1,12 @@
 <?php
 // On utilise la librairue fpdf http://www.fpdf.org/
-// qui s'appui sur la librairie fpdi https://www.setasign.com/products/fpdi/downloads
+// qui s'appuie sur la librairie fpdi https://www.setasign.com/products/fpdi/downloads
 
 require_once('fpdf/fpdf.php');
 require_once('fpdi/autoload.php');
 require_once('fpdi/Fpdi.php');
-use \setasign\Fpdi\Fpdi;
+
+use setasign\Fpdi\Fpdi;
 
 
 function ajouteFichier($pdf, $file)
@@ -43,15 +44,21 @@ function testePdf()
 function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
 {
     $pdf = new FPDI();
+
+    // On fait une couverture avec l'image
     $pdf->AddPage();
+    // TODO : ici on pourrait déterminer le ration de l'image pour ne pas avoir d'image trop étirée
     $pdf->Image("../data/songbooks/".$idSongBook."/".$imageCouverture, 5, 5, 200, 287);
+
+    // On crée un sommaire
     $pdf->AddPage();
     $pdf->SetFont('Arial','B',16);
     $pdf->SetTextColor(50,50,50);
     $pdf->Cell(0,10,'Sommaire',1,1,'C'); // Centré
     $pdf->Cell(10,10," ",0,1,"L");
+    $numeroChanson = 1;
     foreach ($listeNomsChanson as $nomChanson){
-        $pdf->Cell(10,10,$nomChanson,0,1,"L");
+        $pdf->Cell(10, 10, $numeroChanson++ . " - " . utf8_decode($nomChanson), 0, 1, "L");
     }
 
     foreach ($listeNomsFichiers as $nomFichier){

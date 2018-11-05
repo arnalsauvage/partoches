@@ -48,10 +48,15 @@ if ($mode == "INS") {
 	creeChanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
 }
 
-// Gestion de la demande de suppression de document dans le songbook
+// Gestion de la demande de suppression de document dans la chanson
 if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
 	// 	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
 	supprimeDocument ( $_GET ['idDoc']);
 }
 
-redirection ( $nomTable . "_liste.php" );
+// Gestion de la demande de suppression de fichier dans la chanson
+if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
+    // echo "Appel avec mode = $mode, id = $id, nomFic = " . $_GET ['nomFic'];
+    unlink($_GET['nomFic']);
+}
+redirection($nomTable . "_form.php?id=$id");

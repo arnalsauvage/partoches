@@ -99,7 +99,7 @@ function modifieDocument($nom, $tailleKo, $nomTable, $idTable) {
 
 	$maRequete = "UPDATE  document
 	SET tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser'
-	WHERE nom = '$nom'";
+	WHERE nom = '$nom' AND nomTable = '$nomTable' and idTable = '$idTable'";
 	$result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème modifiedocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete );
 	
 	return $version;

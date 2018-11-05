@@ -39,8 +39,8 @@ function afficheVignette($image, $cheminImages, $cheminVignettes) {
 /* $image: Nom de l'image originale */
 /* $largeur_max : largeur max de la vignette */
 /* $hauteur_max : hauteur max de la vignette */
-/* $source: Chemin relatif du r�pertoire de l'image originale */
-/* $destination: Chemin relatif du r�pertoire de l'image r�duite */
+/* $source: Chemin relatif du répertoire de l'image originale */
+/* $destination: Chemin relatif du répertoire de l'image réduite */
 /* $prefixe : Prefixe de la vignette */
 /**
  * ***********************************
@@ -71,7 +71,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 		
 		// 2ieme verification -> on verifie que le type du fichier est un jpg,jpeg,gif ou bmp
 		// rappel
-		// retourne un tableau de 4 �l�ments.
+        // retourne un tableau de 4 éléments.
 		// L'index 0 contient la largeur.
 		// L'index 1 contient la longueur.
 		// L'index 2 contient le type de l'image :
@@ -119,7 +119,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 					$ratio = $hauteur / $hauteur_src;
 				}
 			} else {
-				$ratio = 1; // l'image cr�ee sera identique � l'originale
+                $ratio = 1; // l'image créée sera identique à l'originale
 			}
 			
 			$image_dest = imagecreatetruecolor ( round ( $largeur_src * $ratio ), round ( $hauteur_src * $ratio ) );
@@ -128,7 +128,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 			$log = "vignette.php Image : $image, largeur : " . round ( $largeur_src * $ratio ) . ", $hauteur : " . round ( $hauteur_src * $ratio ) . ", source : $source, destination : $destination";
 			ecritFichierLog ( "../logs/fichierlog.htm", $log );
 			if (! imagejpeg ( $image_dest, $destination . $prefixe . $image )) {
-				$log = "la cr�ation de la vignette a echoué pour l'image $destination$prefixe$image";
+                $log = "la création de la vignette a echoué pour l'image $destination$prefixe$image";
 				ecritFichierLog ( "../logs/fichierlog.htm", $log );
 				return false;
 			}

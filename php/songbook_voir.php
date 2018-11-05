@@ -40,7 +40,8 @@ foreach ($fichiersDuSongbook as $fichier) {
 	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
 		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
-	$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> <br>\n";
+    $sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> ";
+    $sortie .= intval(filesize(($fichier [0] . $fichier [1])) / 1024) . " (ko) <br>\n";
 }
 
 $sortie .= "<h2>Liste des documents dans ce songbook</h2>";
@@ -59,7 +60,8 @@ while ( $ligne = $lignes->fetch_row () ) {
 	$vignetteChanson = Image("../data/chansons/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
 	$vignettePublicateur = Image("../images" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
 	$sortie .= $vignettePublicateur . $vignetteChanson . $icone;
-	$sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
+    $sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a>";
+    $sortie .= " (" . intval($ligneDoc[2] / 1024) . " ko)<br>\n";
 }
 
 $sortie .= envoieFooter ();

@@ -3,6 +3,7 @@ include_once ("lib/utilssi.php");
 include_once ("menu.php");
 include_once ("chanson.php");
 include_once ("document.php");
+include_once("lib/formulaire.php");
 $table = "chanson";
 $sortie = "";
 
@@ -15,16 +16,16 @@ if (isset ( $_POST ['id'] ))
 if (isset ( $_GET ['id'] ) && $_GET ['id'] != "") {
 	$id = $_GET ['id'];
 	$donnee = chercheChanson ( $id );
-	$donnee [1] = htmlspecialchars ( $donnee [1] ); // nom
-	$donnee [2] = htmlspecialchars ( $donnee [2] ); // interprete
-	$donnee [3] = intval ( htmlspecialchars ( $donnee [3] ) ); // annee
-	$donnee [4] = intval ( htmlspecialchars ( $donnee [4] ) ); // tempo
-	$donnee [5] = htmlspecialchars ( $donnee [5] ); // mesure
-	$donnee [6] = htmlspecialchars ( $donnee [6] ); // pulsation
-	$donnee [7] = htmlspecialchars ( $donnee [7] ); // datePub
+    $donnee [1] = htmlspecialchars($donnee [1], ENT_QUOTES); // nom
+    $donnee [2] = htmlspecialchars($donnee [2], ENT_QUOTES); // interprete
+    $donnee [3] = intval(htmlspecialchars($donnee [3], ENT_QUOTES)); // annee
+    $donnee [4] = intval(htmlspecialchars($donnee [4], ENT_QUOTES)); // tempo
+    $donnee [5] = htmlspecialchars($donnee [5], ENT_QUOTES); // mesure
+    $donnee [6] = htmlspecialchars($donnee [6], ENT_QUOTES); // pulsation
+    $donnee [7] = htmlspecialchars($donnee [7], ENT_QUOTES); // datePub
 //	$donnee [8] = $donnee [8]; // idUser
-	$donnee [9] = intval ( htmlspecialchars ( $donnee [9] ) ); // hits
-	$donnee [10] = htmlspecialchars ( $donnee [10] ); // tonalite
+    $donnee [9] = intval(htmlspecialchars($donnee [9], ENT_QUOTES)); // hits
+    $donnee [10] = htmlspecialchars($donnee [10], ENT_QUOTES); // tonalite
 	$mode = "MAJ";
 } else {
 	$mode = "INS";
@@ -69,16 +70,16 @@ $sortie .= "
 <INPUT TYPE=HIDDEN NAME='id' VALUE='$donnee[0]'>
 <label class='inline'>Nom :</label><INPUT TYPE='TEXT' NAME='fnom' VALUE='$donnee[1]' SIZE='64' MAXLENGTH='128' placeholder='titre de la chanson'><br>
 <label class='inline'>Interprète :</label><INPUT TYPE='TEXT' NAME='finterprete' VALUE='$donnee[2]' SIZE='64'  placeholder='interprète'><br>
-<label class='inline'>Annee :</label><INPUT TYPE='number' min='0' max='2100' NAME='fannee' VALUE='$donnee[3]' SIZE='4' MAXLENGTH='128'><br>
+<label class='inline'>Annee :</label><INPUT TYPE='number' min='0' max='2100' NAME='fannee' VALUE='$donnee[3]' SIZE='4'><br>
 
-<script type='text/javascript' >function outputUpdate(vol) {
+<script>function outputUpdate(vol) {
 	document.querySelector('#tempo').value = vol;
 }</script>
 
-<label for='slider'>Tempo :</label><INPUT TYPE='range' id='fader' min='30' max='250' step='1' oninput='outputUpdate(value)' NAME='ftempo' VALUE='$donnee[4]' SIZE='3' >
+<label for='fader'>Tempo :</label><INPUT TYPE='range' id='fader' min='30' max='250' step='1' oninput='outputUpdate(value)' NAME='ftempo' VALUE='$donnee[4]' SIZE='3' >
 <output for='fader' id='tempo'>$donnee[4]</output><br>
 <label class='inline'>Mesure :</label><INPUT TYPE='TEXT' NAME='fmesure' VALUE='$donnee[5]' SIZE='4' MAXLENGTH='128'><br>
-<label class='inline'>Pulsation :</label><select NAME='fpulsation' VALUE='$donnee[6]'  >
+<label class='inline'>Pulsation :</label><select NAME='fpulsation' >
     <option value='binaire'";
     if ($donnee[6]=="binaire")
        $sortie .=  " selected";
@@ -89,16 +90,16 @@ $sortie .=   ">binaire
        $sortie .=  " selected";
        $sortie.= ">ternaire</option>
     </select>
-<br>
+  ";
+// TODO : ajouter un combo des utilisateurs pour l'admin
+//  $listeUsers =
+//  $sortie .= champSELECT("idUser", $listeUSers, $idUser );
+$sortie .= "<br>
 <label class='inline'>Tonalité :</label><INPUT TYPE='TEXT' NAME='ftonalite' VALUE='$donnee[10]' SIZE='10' placeholder='ex :Am ou C ou F#'><br>
 <INPUT TYPE=HIDDEN NAME='fidUser' VALUE='$donnee[8]'>
 <label class='inline'>Date publication :</label><INPUT TYPE='TEXT' NAME='fdate'";
-if ($_SESSION ['privilege'] <3)
- $sortie .= "disabled='disabled'  ";
 $sortie.= "VALUE='" . dateMysqlVersTexte($donnee[7]) ."' SIZE='10' MAXLENGTH='128'><br>
 <label class='inline'>Hits :</label><INPUT TYPE='TEXT' NAME='fhits' ";
-if ($_SESSION ['privilege'] <3)
- $sortie .= "disabled='disabled'  ";
 $sortie.= " VALUE='$donnee[9]' SIZE='10' MAXLENGTH='128'><br><INPUT TYPE=HIDDEN NAME='mode' VALUE='$mode'>
 <label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' ><br>
 </FORM>
@@ -108,7 +109,7 @@ if ($donnee[1]){
 
 
 	$sortie .= "Pour chercher la chanson sur youtube : <a href='https://www.youtube.com/results?search_query=" . urlencode($donnee[1]) . "' target='_blank'>ici</a><br>\n";
-	$sortie .= "Pour chercher des images : <a href='https://www.qwant.com/?q=" . urlencode($donnee[1]) . "&t=images=' target='_blank'>ici</a><br>\n";
+    $sortie .= "Pour chercher des images : <a href='https://www.qwant.com/?q=" . urlencode($donnee[1]) . "&amp;t=images=' target='_blank'>ici</a><br>\n";
 
 	$rechercheBpm = urlencode(str_replace(" ", "-", strtolower($donnee[1]) . "-" .strtolower($donnee[2])));
 	$sortie .= "Pour chercher le tempo sur <a href='https://songbpm.com/$rechercheBpm' target='_blank'>songbpm</a><br>\n";
@@ -142,7 +143,8 @@ if ($mode == "MAJ") {
 		$icone = Image ( "../images/icones/$extension.png", 32, 32, "icone" );
 		if (! file_exists ( "../images/icones/$extension.png" ))
 			$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
-		$listeDocs .= "$icone <a href= '" . htmlentities ( $fichier ) . "' target='_blank'> " . htmlentities ( $fichierCourt ) . "</a> ";
+        $listeDocs .= "$icone <a href= '" . urlencode($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
+        $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
 		$listeDocs .= boutonSuppression ( "chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages ) . "<br>\n";
 	}
 	echo $listeDocs;
@@ -167,6 +169,7 @@ if ($mode == "MAJ") {
         $fichiersSurDisque = fichiersChanson($id); // repertoire nom extension
 //    $maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')";
 
+    $nbFichiersKO = 0;
     while ( count($fichiersSurDisque) >0) {
             //echo "nb fichiers : "     .   count($fichiersSurDisque) / 3;
 
@@ -184,16 +187,18 @@ if ($mode == "MAJ") {
                     //echo "Fichier $fichierSurDisque[1] trouvé !!!!!!!!!!!!!!!!!!!<br>";
                 }
             }
-        if ($fichierOk == false)
-            echo "Fichier corbeille : " . $fichierSurDisque[1] . " non répertorié par la Bdd<br>";
-
+        if ($fichierOk == false) {
+            $nbFichiersKO++;
+            echo "Fichier corbeille : " . $fichierSurDisque[1] . " non répertorié par la Bdd ";
+            echo boutonSuppression("chanson_post.php?nomFic=" . urlencode("../data/chansons/" . $id . "/" . $fichierSurDisque[1]) . "&mode=SUPPRFIC&id=$id", $iconePoubelle, $cheminImages) . "<br>";
         }
+    }
+    if ($nbFichiersKO == 0)
+        echo "La corbeille est vide pour cette chanson.";
     }
     ?>
 </div>
 
-
 <?php
-
 echo envoieFooter ( );
 ?>

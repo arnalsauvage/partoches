@@ -132,7 +132,7 @@ if (! isset ( $FichierUtilsSi )) {
 	}
 	// Cette fonction retourne un bouton de suppression avec message de confirmation
 	function boutonSuppression($lien, $iconePoubelle, $cheminImages) { // <img src="x.png" onclick="getattrs(this);">
-		return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer la fiche' onclick =\"confirmeSuppr('" . $lien . "','Voulez-vous vraiment supprimer cet élément ?');\" border='0'>";
+        return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer la fiche' onclick =\"confirmeSuppr('" . $lien . "','Voulez-vous vraiment supprimer cet élément ?');\" >";
 	}
 	
 }
