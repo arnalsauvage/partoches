@@ -47,18 +47,22 @@ function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $list
 
     // On fait une couverture avec l'image
     $pdf->AddPage();
-    // TODO : ici on pourrait déterminer le ration de l'image pour ne pas avoir d'image trop étirée
+    // TODO : ici on pourrait déterminer le ratio de l'image pour ne pas avoir d'image trop étirée
     $pdf->Image("../data/songbooks/".$idSongBook."/".$imageCouverture, 5, 5, 200, 287);
 
     // On crée un sommaire
     $pdf->AddPage();
-    $pdf->SetFont('Arial','B',16);
+    $pdf->SetFont('Arial', 'B', 20);
     $pdf->SetTextColor(50,50,50);
     $pdf->Cell(0,10,'Sommaire',1,1,'C'); // Centré
     $pdf->Cell(10,10," ",0,1,"L");
+
+    // On a une hauteur de 240 à répartir sur la feuille
+    $hauteur_ligne = 240 / (count($listeNomsChanson) + 1);
+    $pdf->SetFont('Arial', 'B', $hauteur_ligne);
     $numeroChanson = 1;
     foreach ($listeNomsChanson as $nomChanson){
-        $pdf->Cell(10, 10, $numeroChanson++ . " - " . utf8_decode($nomChanson), 0, 1, "L");
+        $pdf->Cell(10, $hauteur_ligne, $numeroChanson++ . " - " . utf8_decode($nomChanson), 0, 1, "L");
     }
 
     foreach ($listeNomsFichiers as $nomFichier){

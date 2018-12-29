@@ -80,9 +80,10 @@ $sortie .= "<h2>Envoyer une image sur le serveur</h2>
 
 // Si l'utilisateur n'est pas Admin
 if ($_SESSION ['privilege'] < 3) {
-	// On désactive les champs dateDernierLogin et nbreLogins
+    // On désactive les champs dateDernierLogin, nbreLogins et provilege pour les non admins
 	$sortie = str_replace("NAME='fdateDernierLogin'", "NAME='fdateDernierLogin' disabled='disabled' ", $sortie);
 	$sortie = str_replace("NAME='fnbreLogins'", "NAME='fnbreLogins' disabled='disabled' ", $sortie);
+    $sortie = str_replace("NAME='fprivilege'", "NAME='fprivilege' disabled='disabled' ", $sortie);
 }
 $sortie .= envoieFooter ( );
 echo $sortie;

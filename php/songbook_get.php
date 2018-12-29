@@ -59,13 +59,14 @@ if ($id && ($mode == "SUPPR")) {
 // Gestion de la demande de suppression de document dans le songbook
 if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
 //	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
-	supprimeLienIdDocIdSongbook ( $_GET ['idDoc'], $_GET ['idSongbook'] );
+    supprimeLienIdDocIdSongbook($_GET ['idDoc'], $_GET ['id']);
 }
 
 // Gestion de la demande de suppression de document dans le songbook
 if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
 //	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
     unlink ($_GET['nomFic']);
+    supprimeDocument($_GET ['idDoc']);
 }
 
 

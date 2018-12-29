@@ -52,6 +52,7 @@ function creeChanson($nom, $interprete, $annee, $idUser, $tempo = 0, $mesure = "
     $maRequete = "INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
 	VALUES (NULL, '$nom', '$interprete', '$annee', '$idUser', '$tempo', '$mesure', '$pulsation', '$datePub' ,  '$hits', '$tonalite')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creeChanson#1 : " . $_SESSION ['mysql']->error);
+    return ($_SESSION ['mysql']->insert_id);
 }
 
 // Modifie en base la chanson

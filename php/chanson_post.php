@@ -45,7 +45,7 @@ if ($id && $mode == "SUPPR" && $_SESSION ['privilege'] > 1) {
 }
 
 if ($mode == "INS") {
-	creeChanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
+    $id = creeChanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
 }
 
 // Gestion de la demande de suppression de document dans la chanson

@@ -70,18 +70,39 @@ if ($_SESSION ['privilege'] < 3) {
 $sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
 $sortie .= "<p>Les fichiers à rattacher ici seront relatifs au songbook lui-même : illustration de couverture, pdf contenant toutes les chansons...</p>";
 
+// Cherche un document et le renvoie s'il existe
+$lignes = chercheDocumentsTableId("songbook", $id);
+$listeDocs = "";
+// Pour chaque document
+while ($ligneDoc = $lignes->fetch_row()) {
+    // var_dump( $ligneDoc);
+    // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
+    $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+    // echo "Chanson id : $id fichier court : $fichierCourt";
+    $fichier = "../data/songbook/$id/" . $fichierCourt;
+    $extension = substr(strrchr($ligneDoc[1], '.'), 1);
+    $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
+    if (!file_exists("../images/icones/$extension.png"))
+        $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+    $listeDocs .= "$icone <a href= '" . urlencode($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
+    $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
+    $listeDocs .= boutonSuppression("songbook_get.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages) . "<br>\n";
+}
+$sortie .= $listeDocs;
+
 
 // On récupère les fichiers du Songbook
-$fichiersDuSongbook = fichiersSongbook($id);
-
-foreach ($fichiersDuSongbook as $fichier) {
-	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
-	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
-		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
-	$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> \n";
-	$sortie .= boutonSuppression ( "songbook_get.php?nomFic=" . urlencode($fichier [0] . $fichier [1]) . "&mode=SUPPRFIC", $iconePoubelle, $cheminImages ) . "<br>\n";
-	// echo "Fichier : $fichier[1]";
-}
+//$fichiersDuSongbook = fichiersSongbook($id);
+//$lignes = chercheDocumentsTableId ( "chanson", $id );
+//
+//foreach ($fichiersDuSongbook as $fichier) {
+//	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
+//	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
+//		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
+//	$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> \n";
+//	$sortie .= boutonSuppression ( "songbook_get.php?nomFic=" . urlencode($fichier [0] . $fichier [1]) . "&idDoc=$fichier[0]&mode=SUPPRFIC", $iconePoubelle, $cheminImages ) . "<br>\n";
+//	// echo "Fichier : $fichier[1]";
+//}
 
 echo $sortie;
 
