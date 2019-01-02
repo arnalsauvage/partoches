@@ -25,7 +25,24 @@ class Chiffrement {
 	}
 }
 
+$nomtable = "utilisateur";
+
 // Fonctions de gestion de l'utilisateur
+
+// Cherche les utilisateurs correspondant à un critère
+function chercheUtilisateurs($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
+{
+    global $nomtable;
+    $maRequete = "SELECT * FROM " . $nomtable . " WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
+    if ($bTriAscendant == false)
+        $maRequete .= " DESC";
+    else
+        $maRequete .= " ASC";
+    // echo "ma requete : " . $maRequete;
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheUtilisateurs #1 : " . $_SESSION ['mysql']->error);
+    return $result;
+}
+
 
 // Cherche un utilisateur par son identifiant et le renvoie s'il existe
 function chercheUtilisateur($id) {
@@ -183,6 +200,26 @@ function testUtilisateurs() {
 		{
 			echo (infos($ligne[0]) . " Pass : " . Chiffrement::decrypt ($ligne[2]) . "<br> \n\r");
 		}
+}
+
+// Prépare un combo en html avec les utilisateurs
+// SELECT * FROM utilisateur WHERE $critere LIKE '$valeur' ORDER BY $critereTri
+function selectUtilisateur($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true, $idSelectionne = 0)
+{
+    $retour = "<select name='fidUser'>\n";
+    // Ajouter des options
+    $lignes = chercheUtilisateurs($critere, $valeur, $critereTri, $bTriAscendant);
+    while ($ligne = $lignes->fetch_row()) {
+        //if (strstr($ligne[1],"pdf"))
+        if ($ligne [0] == $idSelectionne)
+            $selected = " selected";
+        else
+            $selected = "";
+        $retour .= "<option  value = '" . $ligne [0] . "' " . $selected . "> " . htmlEntities($ligne [1] . " - " . $ligne[3] . " " . $ligne[4]);
+        $retour .= "</option>\n";
+    }
+    $retour .= "</select>\n";
+    return $retour;
 }
 
 // Fonction de test

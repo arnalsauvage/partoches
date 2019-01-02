@@ -41,16 +41,20 @@ function chercheChansonParLeNom($nom)
         return (0);
 }
 
-// Crée un chanson
-function creeChanson($nom, $interprete, $annee, $idUser, $tempo = 0, $mesure = "4/4", $pulsation = "binaire", $hits = 0, $tonalite = "")
+// Créée un chanson
+function creeChanson($nom, $interprete, $annee, $idUser = 0, $tempo = 0, $mesure = "4/4", $pulsation = "binaire", $hits = 0, $tonalite = "")
 {
     $nom = $_SESSION ['mysql']->real_escape_string($nom);
     $interprete = $_SESSION ['mysql']->real_escape_string($interprete);
     $annee = $_SESSION ['mysql']->real_escape_string($annee);
     $datePub = convertitDateJJMMAAAA(date("d/m/Y"));
-    $idUser = $_SESSION ['id'];
+    if ($idUser == 0)
+        $idUser = $_SESSION ['id'];
+    if ($hits == "")
+        $hits = 0;
     $maRequete = "INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
 	VALUES (NULL, '$nom', '$interprete', '$annee', '$idUser', '$tempo', '$mesure', '$pulsation', '$datePub' ,  '$hits', '$tonalite')";
+    echo $maRequete;
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creeChanson#1 : " . $_SESSION ['mysql']->error);
     return ($_SESSION ['mysql']->insert_id);
 }
@@ -67,6 +71,7 @@ function modifieChanson($id, $nom, $interprete, $annee, $idUser, $tempo = 0, $me
 	SET nom = '$nom', interprete = '$interprete', annee = '$annee', idUser = $idUser, tempo = '$tempo', mesure='$mesure',
 	pulsation='$pulsation',  hits='$hits', tonalite='$tonalite'
 	WHERE id='$id'";
+    // echo $maRequete;
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifieChanson #1 : " . $_SESSION ['mysql']->error);
 }
 

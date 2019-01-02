@@ -31,7 +31,7 @@ if (isset ($_GET ['id']) && $_GET ['id'] != "") {
     $donnee [5] = htmlspecialchars($donnee [5], ENT_QUOTES); // mesure
     $donnee [6] = htmlspecialchars($donnee [6], ENT_QUOTES); // pulsation
     $donnee [7] = htmlspecialchars($donnee [7], ENT_QUOTES); // datePub
-//	$donnee [8] = $donnee [8]; // idUser
+    $donnee [8] = $donnee [8]; // idUser
     $donnee [9] = intval(htmlspecialchars($donnee [9], ENT_QUOTES)); // hits
     $donnee [10] = htmlspecialchars($donnee [10], ENT_QUOTES); // tonalite
     $mode = "MAJ";
@@ -102,14 +102,20 @@ $sortie .= ">ternaire</option>
 // TODO : ajouter un combo des utilisateurs pour l'admin
 //  $listeUsers =
 //  $sortie .= champSELECT("idUser", $listeUSers, $idUser );
+//<INPUT TYPE=HIDDEN NAME='fidUser' VALUE='$donnee[8]'>
 $sortie .= "<br>
 <label class='inline'>Tonalité :</label><INPUT TYPE='TEXT' NAME='ftonalite' VALUE='$donnee[10]' SIZE='10' placeholder='ex :Am ou C ou F#'><br>
-<INPUT TYPE=HIDDEN NAME='fidUser' VALUE='$donnee[8]'>
 <label class='inline'>Date publication :</label><INPUT TYPE='TEXT' NAME='fdate'";
+
 $sortie .= " VALUE='" . dateMysqlVersTexte($donnee[7]) . "' SIZE='10' MAXLENGTH='128'><br>
-<label class='inline'>Hits :</label><INPUT TYPE='TEXT' NAME='fhits' ";
-$sortie .= " VALUE='$donnee[9]' SIZE='10' MAXLENGTH='128'><br><INPUT TYPE=HIDDEN NAME='mode' VALUE='$mode'>
-<label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' ><br>
+<label class='inline'>Hits :</label><INPUT TYPE='number' NAME='fhits'  VALUE='$donnee[9]' SIZE='10' MAXLENGTH='128'><br>";
+
+$sortie .= "<label class='inline'>Utilisateur :</label>" . selectUtilisateur("nom", "%", "login", true, $donnee[8]);
+
+$sortie .= "<INPUT TYPE=HIDDEN NAME='mode' VALUE='$mode'>
+<label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' ><br>";
+
+$sortie .= "
 </FORM>
 ";
 
@@ -127,9 +133,10 @@ if ($donnee[1]) {
 }
 
 if ($_SESSION ['privilege'] < 3) {
-    // On verrouille les champs hits, date publication
+    // On verrouille les champs hits, date publication, et utilisateur
     $sortie = str_replace("NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie);
     $sortie = str_replace("NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie);
+    $sortie = str_replace("name='fidUser'", "NAME='fidUser' disabled='disabled' ", $sortie);
 }
 
 echo $sortie;

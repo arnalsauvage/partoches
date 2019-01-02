@@ -12,14 +12,17 @@ if ($_SESSION ['privilege'] <= 1)
 if ((isset ( $_GET ['id'] ))) {
 	$id = $_GET ['id'];
 	$mode = $_GET ['mode'];
+    //echo "On est en get <br> " ;
 }
 
 if ((isset ( $_POST ['id'] ))) {
+    echo "On est en post <br> ";
 	$id = $_POST ['id'];
 	$fnom = $_POST ['fnom'];
 	$finterprete = $_POST ['finterprete'];
 	$fannee = $_POST ['fannee'];
 	$fidUser = $_POST ['fidUser'];
+    echo "fiduser = " . $fidUser;
 	$ftempo = $_POST ['ftempo'];
 	$fmesure = $_POST ['fmesure'];
 	$fpulsation = $_POST ['fpulsation'];
@@ -31,10 +34,11 @@ if ((isset ( $_POST ['id'] ))) {
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
 if ($mode == "MAJ") {
 	if ($_SESSION ['privilege'] < 3) {
-		// On doit recharger les hits et la date pour qu'ils ne soient remis à zéro
+        // On doit recharger les hits, le user et la date pour qu'ils ne soient remis à zéro
 		$chanson = chercheChanson($id);
 		$fhits = $chanson[9];
 		$fdate = dateMysqlVersTexte($chanson[7]);
+        $fidUser = $chanson[8];
 	}
 	modifieChanson($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
 }
@@ -45,6 +49,8 @@ if ($id && $mode == "SUPPR" && $_SESSION ['privilege'] > 1) {
 }
 
 if ($mode == "INS") {
+    echo "FHits = " . $fhits;
+
     $id = creeChanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
 }
 
