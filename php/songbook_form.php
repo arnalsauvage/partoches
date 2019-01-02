@@ -24,7 +24,7 @@ if (isset ( $_POST ['id'] ) && (isset ( $_POST ['documentJoint'] ))) {
 	$id = $_POST ['id'];
 }
 
-// Chargement des donnees de la songbook si l'identifiant est fourni
+// Chargement des donnees du songbook si l'identifiant est fourni
 if (isset ($_POST ['id']) || (isset ($_GET ['id']) && $_GET ['id'] != "")) {
 	if (isset ( $_GET ['id'] ))
 		$id = $_GET ['id'];
@@ -158,11 +158,11 @@ if ($mode == "MAJ") {
 	echo $listeDocs."</table></div>";
 	?>
 
-	<h2>Lier un document à ce songbook</h2>
+    <h2>Lier un document existant à ce songbook</h2>
 	<p>Ici on rattache des documents au songbook. Ce seront des documents rattachés à une chanson. </p>
 	<p>Par exemple, grille, partoche, partition... Pour uploader sur le site des documents, il faut d'abord créer une
 		chanson, et lui rattacher des documents. </p>
-	<p>Dans la liste combo ci-dessous, vous trouverez les derniers documents uploadés sur le siteau format pdf.</p>
+    <p>Dans la liste combo ci-dessous, vous trouverez les derniers documents uploadés sur le site au format pdf.</p>
 
 	<form action="songbook_form.php" method="post" name="form2">
 		<?php

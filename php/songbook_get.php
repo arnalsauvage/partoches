@@ -74,6 +74,6 @@ if ($mode== "GENEREPDF"){
 	creeSongbookPdf($id);
 }
 
-
+// On fait une redirection dans tous les cas, sauf la demande de génération de PDF - appel ajax
 if ($mode != "GENEREPDF")
 	redirection ( $nomTable . "_liste.php" );

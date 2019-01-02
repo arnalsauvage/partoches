@@ -59,4 +59,16 @@ if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
     // echo "Appel avec mode = $mode, id = $id, nomFic = " . $_GET ['nomFic'];
     unlink($_GET['nomFic']);
 }
+
+if ($mode == "RESTAUREDOC") {
+
+    $repertoire = "../data/chansons/" . $_POST ['id'] . "/";
+    $size = filesize($repertoire . $_POST ['nomFic']);
+    $version = creeModifieDocument($_POST ['nomFic'], $size, "chanson", $id);
+    // Il faut renommer le doc en lui accolant son numéro de version
+    rename($repertoire . $_POST ['nomFic'], $repertoire . composeNomVersion($_POST ['nomFic'], $version));
+}
+
+// On fait une redirection dans tous les cas, sauf la demande de restauration d'un fichier - appel ajax
+if ($mode != "RESTAUREDOC")
 redirection($nomTable . "_form.php?id=$id");
