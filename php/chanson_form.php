@@ -7,6 +7,14 @@ include_once("lib/formulaire.php");
 $table = "chanson";
 $sortie = "";
 
+// Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
+if ($_SESSION ['privilege'] < 2) {
+    $urlRedirection = $table . "_voir.php";
+    if (isset ($_GET ['id']))
+        $urlRedirection .= "?id=" . $_GET ['id'];
+    redirection($urlRedirection);
+}
+
 // $id, $nom, $interprete, $annee, $idUser, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
 
 // Chargement des donnees de la chanson si l'identifiant est fourni
