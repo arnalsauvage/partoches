@@ -9,6 +9,14 @@ $sortie = "";
 
 // Cette page est dupliquée depuis songbook_form...
 
+// Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
+if ($_SESSION ['privilege'] < 2) {
+    $urlRedirection = $table . "_voir.php";
+    if (isset ($_GET ['id']))
+        $urlRedirection .= "?id=" . $_GET ['id'];
+    redirection($urlRedirection);
+}
+
 // Traitement de l'ajout de chanson
 if (isset ( $_POST ['id'] ) && (isset ( $_POST ['chanson'] ))) {
 
