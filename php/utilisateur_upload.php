@@ -16,7 +16,7 @@ if (!isset ($_FILES ['fichierUploade'])) {
 }
 
 $autorisees = "gif jpg png jpeg";
-$repertoire = "../images/";
+$repertoire = "../images/utilisateur/";
 if (!file_exists($repertoire)) {
     mkdir($repertoire, 0755);
     // echo " -=> Création du repertoire $repertoire réussi<br>";
