@@ -94,7 +94,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
         $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
     $listeDocs .= "$icone <a href= '" . urlencode($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
     $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
-    $listeDocs .= boutonSuppression("songbook_get.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages) . "<br>\n";
+    $listeDocs .= boutonSuppression("songbook_get.php" . "?idSongbook=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
 }
 $sortie .= $listeDocs;
 

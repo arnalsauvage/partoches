@@ -52,7 +52,7 @@ if ($mode == "INS") {
 }
 
 // Gestion de la demande de suppression
-if ($id && ($mode == "SUPPR")) {
+if (isset($id) && ($mode == "SUPPR")) {
 	supprimeSongbook ( $id );
 }
 
@@ -64,8 +64,8 @@ if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
 
 // Gestion de la demande de suppression de document dans le songbook
 if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
-//	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
-    unlink ($_GET['nomFic']);
+    echo "Appel avec mode = $mode, nomFic = $nomFic , idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
+    unlink("../data/songbooks/" . $_GET['idSongbook'] . "/" . $_GET['nomFic']);
     supprimeDocument($_GET ['idDoc']);
 }
 
@@ -75,5 +75,5 @@ if ($mode== "GENEREPDF"){
 }
 
 // On fait une redirection dans tous les cas, sauf la demande de génération de PDF - appel ajax
-if ($mode != "GENEREPDF")
-	redirection ( $nomTable . "_liste.php" );
+//if ($mode != "GENEREPDF")
+//	redirection ( $nomTable . "_liste.php" );
