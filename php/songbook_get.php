@@ -14,7 +14,7 @@ if ($_SESSION ['privilege'] <= 1)
 if (($mode == "MAJ") || ($mode == "INS")) {
 	$id = $_POST ['id'];
 	$fnom = $_SESSION ['mysql']->real_escape_string ( $_POST ['fnom'] );
-	$description = $_SESSION ['mysql']->real_escape_string($_POST ['fdescription']);
+    $fdescription = $_SESSION ['mysql']->real_escape_string($_POST ['fdescription']);
 	$fimage = $_POST ['fimage'];
 	// Seul admin peut modifier hits et date
 	if ($_SESSION ['privilege'] > 2) {
@@ -48,7 +48,7 @@ if ($mode == "MAJ") {
 if ($mode == "INS") {
 	$fhits = 0;
 	$fdate = date("d/m/Y");
-	creeSongbook ( $fnom, $description, $fdate, $fimage, $fhits );
+    creeSongbook($fnom, $fdescription, $fdate, $fimage, $fhits);
 }
 
 // Gestion de la demande de suppression
@@ -64,7 +64,7 @@ if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
 
 // Gestion de la demande de suppression de document dans le songbook
 if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
-    echo "Appel avec mode = $mode, nomFic = $nomFic , idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
+    // echo "Appel avec mode = $mode, nomFic = $_GET['nomFic'] , idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
     unlink("../data/songbooks/" . $_GET['idSongbook'] . "/" . $_GET['nomFic']);
     supprimeDocument($_GET ['idDoc']);
 }
@@ -75,5 +75,5 @@ if ($mode== "GENEREPDF"){
 }
 
 // On fait une redirection dans tous les cas, sauf la demande de génération de PDF - appel ajax
-//if ($mode != "GENEREPDF")
-//	redirection ( $nomTable . "_liste.php" );
+if ($mode != "GENEREPDF")
+    redirection($nomTable . "_liste.php");
