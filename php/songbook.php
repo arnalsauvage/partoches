@@ -77,6 +77,45 @@ function supprimeSongbook($idsongbook)
 	WHERE id='$idsongbook'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimesongbook : " . $_SESSION ['mysql']->error);
     supprimeliensDocSongbookDuSongbook($idsongbook);
+
+    // TODO : supprimer également le dossier et les fichiers
+}
+
+// Cette fonction duplique un songbook si il existe
+function dupliqueSongbook($idSongbook)
+{
+    echo " Duplication du songbook $idSongbook";
+
+    // On charge le songbook demandé
+    $songbookModele = chercheSongbook($idSongbook);
+    if ($songbookModele == 0) {
+        return (0);
+    }
+
+    // On duplique les enregistrements dans songbook
+    $nomModele = $songbookModele[1];
+
+    // On crée un nouveau songbook nommé "copie de $nomModele"
+    creeSongbook("copie de " . $nomModele, "songbook créé par copie", date("d/m/Y"), "", 0);
+    $idDoublon = $_SESSION ['mysql']->insert_id;
+
+    // En suite, on va recopier tous les liens BDD songbook-document
+    $result = chercheLiensDocSongbook("idSongbook", $idSongbook, "ordre", true);
+    $tabIdDocs = array();
+    $indice = 0;
+    while ($ligne = mysqli_fetch_assoc($result)) {
+        $tabIdDocs[$indice] = $ligne["idDocument"]; // idDocument
+        $indice++;
+        echo "Ajout de l'iddoc " . var_dump($ligne) . " à l'indice $indice";
+    }
+
+    // Boucle, insérer tout $tabIddoc dans le nouvel IDSongbook !
+    $parcours = 0;
+    while ($parcours < $indice) {
+        creelienDocSongbook($tabIdDocs[$parcours], $idDoublon);
+        $parcours++;
+    }
+    return (1);
 }
 
 // Cette fonction modifie ou crée un songbook si besoin
@@ -121,7 +160,6 @@ function infosSongbook($id)
 
 function fichiersSongbook($id)
 {
-    $enr = chercheSongbook($id);
     $retour = array(); // repertoire, nom, extension
     $repertoire = "../data/songbooks/$id/";
     if (is_dir($repertoire)) {
@@ -171,7 +209,7 @@ function testeSongbook()
     $id = $id [0];
     echo infosSongbook($id);
 
-    $enr = chercheSongbook($id);
+    chercheSongbook($id);
     $id = $id [0];
     echo infosSongbook($id);
 

@@ -8,8 +8,10 @@ $nomTable = "songbook";
 if ($_SESSION ['privilege'] <= 1)
 	redirection ( $nomTable . "_liste.php" );
 
-// On gère 4 cas : création d'une songbook, modif, suppression, ou suppression d'un docJoint
-
+// On gère 5 cas : création d'une songbook, modif, suppression, ou suppression d'un docJoint, duplication songbook
+if (isset($_POST ['MODE'])) {
+    $mode = $_GET ['MODE'];
+}
 // En mode création ou mise à jour, on récupère les données du formulaire
 if (($mode == "MAJ") || ($mode == "INS")) {
 	$id = $_POST ['id'];
@@ -21,6 +23,12 @@ if (($mode == "MAJ") || ($mode == "INS")) {
 		$fdate = $_POST ['fdate'];
 		$fhits = $_POST ['fhits'];
 	}
+}
+
+if (isset($_GET ['DUP'])) {
+    $mode = "DUP";
+    $id = $_GET ['DUP'];
+    dupliqueSongbook($id);
 }
 
 // On récupère l'identifiant du songbook passé par POST ou GET
@@ -68,7 +76,6 @@ if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
     unlink("../data/songbooks/" . $_GET['idSongbook'] . "/" . $_GET['nomFic']);
     supprimeDocument($_GET ['idDoc']);
 }
-
 
 if ($mode== "GENEREPDF"){
 	creeSongbookPdf($id);

@@ -68,6 +68,7 @@ while ( $ligne = $resultat->fetch_row () ) {
 	// //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
 	if ($_SESSION ['privilege'] >= 2) {
 		$fichiersDuSongbook .= TblCellule(boutonSuppression($songbookGet . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
+        $fichiersDuSongbook .= TblCellule(Ancre($songbookGet . "?DUP=$ligne[0]", "dupliquer"));
 		// //////////////////////////////////////////////////////////////////////ADMIN
 
 		$fichiersDuSongbook .= TblFinLigne();
