@@ -84,7 +84,7 @@ function supprimeSongbook($idsongbook)
 // Cette fonction duplique un songbook si il existe
 function dupliqueSongbook($idSongbook)
 {
-    echo " Duplication du songbook $idSongbook";
+    //   echo " Duplication du songbook $idSongbook";
 
     // On charge le songbook demandé
     $songbookModele = chercheSongbook($idSongbook);
@@ -93,7 +93,7 @@ function dupliqueSongbook($idSongbook)
     }
 
     // On duplique les enregistrements dans songbook
-    $nomModele = $songbookModele[1];
+    $nomModele = $_SESSION ['mysql']->real_escape_string($songbookModele[1]);
 
     // On crée un nouveau songbook nommé "copie de $nomModele"
     creeSongbook("copie de " . $nomModele, "songbook créé par copie", date("d/m/Y"), "", 0);
@@ -106,7 +106,7 @@ function dupliqueSongbook($idSongbook)
     while ($ligne = mysqli_fetch_assoc($result)) {
         $tabIdDocs[$indice] = $ligne["idDocument"]; // idDocument
         $indice++;
-        echo "Ajout de l'iddoc " . var_dump($ligne) . " à l'indice $indice";
+        //     echo "Ajout de l'iddoc " . var_dump($ligne) . " à l'indice $indice";
     }
 
     // Boucle, insérer tout $tabIddoc dans le nouvel IDSongbook !
