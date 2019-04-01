@@ -16,7 +16,7 @@ if ((isset ( $_GET ['id'] ))) {
 }
 
 if ((isset ( $_POST ['id'] ))) {
-    echo "On est en post <br> ";
+//    echo "On est en post <br> ";
 	$id = $_POST ['id'];
 	$fnom = $_POST ['fnom'];
 	$finterprete = $_POST ['finterprete'];
@@ -60,6 +60,16 @@ if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
 	supprimeDocument ( $_GET ['idDoc']);
 }
 
+// Gestion de la demande de renommage de document dans la chanson
+if ($mode == "RENDOC" && $_SESSION ['privilege'] > 1) {
+    echo "Appel avec idDoc = " . $_POST ['idDoc'] . " nomDoc = " . $_POST ['nomDoc'];
+    $retour = renommeDocument($_POST ['idDoc'], $_POST ['nomDoc']);
+    if ($retour == 1)
+        echo "Tout s'est bien passé";
+    else
+        echo "La demande n'a pas été traitée... Erreur " . $retour;
+}
+
 // Gestion de la demande de suppression de fichier dans la chanson
 if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
     // echo "Appel avec mode = $mode, id = $id, nomFic = " . $_GET ['nomFic'];
@@ -76,5 +86,5 @@ if ($mode == "RESTAUREDOC") {
 }
 
 // On fait une redirection dans tous les cas, sauf la demande de restauration d'un fichier - appel ajax
-if ($mode != "RESTAUREDOC")
+if ($mode != "RESTAUREDOC" && $mode != "RENDOC")
 redirection($nomTable . "_form.php?id=$id");

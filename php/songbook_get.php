@@ -10,6 +10,9 @@ if ($_SESSION ['privilege'] <= 1)
 
 // On gère 5 cas : création d'une songbook, modif, suppression, ou suppression d'un docJoint, duplication songbook
 if (isset($_POST ['MODE'])) {
+    $mode = $_POST ['MODE'];
+}
+if (isset($_GET ['MODE'])) {
     $mode = $_GET ['MODE'];
 }
 // En mode création ou mise à jour, on récupère les données du formulaire
@@ -65,9 +68,9 @@ if (isset($id) && ($mode == "SUPPR")) {
 }
 
 // Gestion de la demande de suppression de document dans le songbook
-if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
+if ($mode == "SUPPRDOC") {
 //	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
-    supprimeLienIdDocIdSongbook($_GET ['idDoc'], $_GET ['id']);
+    supprimeLienIdDocIdSongbook($_GET ['idDoc'], $_GET ['idSongbook']);
 }
 
 // Gestion de la demande de suppression de document dans le songbook

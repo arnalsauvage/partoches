@@ -160,6 +160,7 @@ if(!isset ($FichierHtml)){
 
 		$retour .= "<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
 		<script src='./lib/javascript.js'></script>
+		<script src=\"https://code.jquery.com/jquery-1.10.2.js\"></script>
 		<link href='../css/toastr.min.css' rel='stylesheet' type='text/css'>
 		<title>$titrePage</title>
 		</head>";

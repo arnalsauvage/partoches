@@ -100,3 +100,17 @@ footer {
 	background-color: #AAA;
 	font-weight: bold;
 }
+
+
+li.fichiers {
+    background-color: #fff;
+    color: #000;
+    font-size: 14px;
+    list-style-type: none;
+    width: 40%;
+    margin: 0px auto;
+    border-radius: 3px;
+    border: 1px solid #000;
+    padding: 10px;
+    margin-bottom: 10px;
+}

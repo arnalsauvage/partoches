@@ -108,7 +108,7 @@ $sortie .= "<br>
 <label class='inline'>Date publication :</label><INPUT TYPE='TEXT' NAME='fdate'";
 
 $sortie .= " VALUE='" . dateMysqlVersTexte($donnee[7]) . "' SIZE='10' MAXLENGTH='128'><br>
-<label class='inline'>Hits :</label><INPUT TYPE='number' NAME='fhits'  VALUE='$donnee[9]' SIZE='10' MAXLENGTH='128'><br>";
+<label class='inline'>Hits :</label><INPUT TYPE='number' NAME='fhits'  VALUE='$donnee[9]' SIZE='10'><br>";
 
 $sortie .= "<label class='inline'>Utilisateur :</label>" . selectUtilisateur("nom", "%", "login", true, $donnee[8]);
 
@@ -143,27 +143,34 @@ echo $sortie;
 if ($mode == "MAJ") {
     ?>
     <h2>Liste des documents de cette chanson</h2>
-    <?php
-    // Cherche un document et le renvoie s'il existe
-    $lignes = chercheDocumentsTableId("chanson", $id);
-    $listeDocs = "";
-    // Pour chaque document
-    while ($ligneDoc = $lignes->fetch_row()) {
-        // var_dump( $ligneDoc);
-        // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-        $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-        // echo "Chanson id : $id fichier court : $fichierCourt";
-        $fichier = "../data/chansons/$id/" . htmlentities($fichierCourt);
-        $extension = substr(strrchr($ligneDoc[1], '.'), 1);
-        $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
-        if (!file_exists("../images/icones/$extension.png"))
-            $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
-        $listeDocs .= "$icone <a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
-        $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
-        $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages) . "<br>\n";
-    }
-    echo $listeDocs;
-    ?>
+    <ul>
+        <?php
+        // Cherche un document et le renvoie s'il existe
+        $lignes = chercheDocumentsTableId("chanson", $id);
+        $listeDocs = "";
+        // Pour chaque document
+        while ($ligneDoc = $lignes->fetch_row()) {
+            // var_dump( $ligneDoc);
+            $idDoc = $ligneDoc [0];
+            // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
+            $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+            // echo "Chanson id : $id fichier court : $fichierCourt";
+            $fichier = "../data/chansons/$id/" . htmlentities($fichierCourt);
+            $extension = substr(strrchr($ligneDoc[1], '.'), 1);
+            $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
+            if (!file_exists("../images/icones/$extension.png"))
+                $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+            $listeDocs .= "<li class='fichiers'> <a href= '" . urlencode($fichier) . "' target='_blank'> $icone </a> ";
+            $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
+            $listeDocs .= "<label>" . htmlentities($fichierCourt) . "</label>
+		<input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
+		<button name='renommer' style='display:none;'>renommer</button>
+  <button style='display:none;'>x</button>";
+            $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages) . "</li>\n";
+        }
+        echo $listeDocs;
+        ?>
+    </ul>
     <h2>Envoyer un fichier pour cette chanson sur le serveur</h2>
     <form action="chanson_upload.php" method="post"
           enctype="multipart/form-data">
@@ -206,16 +213,18 @@ if ($mode == "MAJ") {
             $nbFichiersKO++;
             echo "Fichier corbeille : " . $fichierSurDisque[1] . " non répertorié par la Bdd ";
             echo boutonSuppression("chanson_post.php?nomFic=" . urlencode("../data/chansons/" . $id . "/" . $fichierSurDisque[1]) . "&mode=SUPPRFIC&id=$id", $iconePoubelle, $cheminImages) . "<br>";
+            $numeroElement = count($fichiersSurDisque) + 1;
             ?>
-            <button onclick='restaureDocument()'>Restaurer le document dans la chanson</button>
+            <button onclick='restaureDocument<?php echo $numeroElement; ?>()'>Restaurer le document dans la chanson
+            </button>
 
-            <div id="div1"></div>
-            <script type='text/javascript'>
-                function restaureDocument() {
+            <div id="div<?php echo $numeroElement; ?>"></div>
+            <script>
+                function restaureDocument<?php echo $numeroElement;?>() {
                     $.ajax({
                         type: "POST",
                         url: "chanson_post.php",
-                        data: "id=<?=$id?>&nomFic=<?=$fichierSurDisque[1]?>&mode=RESTAUREDOC",
+                        data: "id=<?php echo $id;?>&nomFic=<?php echo $fichierSurDisque[1];?>&mode=RESTAUREDOC",
                         datatype: 'html', // type de la donnée à recevoir
                         success: function (code_html, statut) { // success est toujours en place, bien sûr !
                             if (code_html.search("n'a pas été traité.") == -1)
@@ -226,7 +235,7 @@ if ($mode == "MAJ") {
                             }
                         },
                         error: function (resultat, statut, erreur) {
-                            $("#div1").html(resultat);
+                            $("#div<?php echo $numeroElement;?>").html(resultat);
                         }
 
                     });
@@ -236,6 +245,7 @@ if ($mode == "MAJ") {
                     $("#msgSubmit").removeClass("hidden");
                 }
             </script>
+
             <?php
         }
     }
@@ -243,5 +253,7 @@ if ($mode == "MAJ") {
         echo "La corbeille est vide pour cette chanson.\n";
 }
 echo "    </div> \n";
+echo "        	<script src='../js/chansonForm.js '></script>";
 echo envoieFooter();
+
 ?>

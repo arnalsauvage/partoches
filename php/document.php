@@ -115,20 +115,18 @@ function renommeDocument($id, $nouveauNom)
     $idTable = $document[6];
     $idUser = $document[7];
 
-    // chercher un document avec le nouveau nom
-    if  (chercheDocumentNomTableId($nouveauNom, $nomTable, $idTable) != 0)
-        // s'il existe, renvoyer -1
-        return -1;
-
     // regarder s'il existe un fichier avec le nouveau nom
-    $fichier = "../data/" . $nomTable . "s/" . $idTable . "/" . composeNomVersion($document [1], $document [4]);
+    $fichier = "../data/" . $nomTable . "s/" . $idTable . "/" . $nouveauNom;
     if (file_exists($fichier))
     // s'il existe, renvoyer -2
         return -2;
 
+    $ancienNomFic = "../data/" . $nomTable . "s/" . $idTable . "/" . composeNomVersion($document[1], $document[4]);
+    $nouveauNomFic = "../data/" . $nomTable . "s/" . $idTable . "/" . composeNomVersion($nouveauNom, $document[4]);
     // renommer le fichier
-    rename( "../data/" . $nomTable . "s/" . $idTable . "/" . composeNomVersion($document [1], $document [4],$fichier),
-            $nouveauNom );
+    $resultRename = rename($ancienNomFic, $nouveauNomFic);
+    if ($resultRename == false)
+        return -3;
 
     // mettre a jour base de données
     $maRequete = "UPDATE  document
@@ -137,7 +135,7 @@ function renommeDocument($id, $nouveauNom)
     $result = $_SESSION ['mysql']->query ( $maRequete ) or die ( "Problème renommeDocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete );
 
     // renvoyer vrai
-    return true;
+    return 1;
 }
 
 // Supprime un document en base de données si il existe
