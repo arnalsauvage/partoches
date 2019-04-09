@@ -16,6 +16,10 @@ form {
 	margin-right: auto;
 }
 
+form.login {
+	width: 396px;
+}
+
 fieldset {
 	padding: 0 20px 20px 20px;
 	margin-bottom: 10px;
@@ -30,8 +34,12 @@ legend {
 label {
 	margin-top: 1px;
 	display: block;
-	width: 150px;
+	width: 200px;
 	float: left;
+}
+
+label.login {
+	width: 120px;
 }
 
 label.inline {
@@ -49,6 +57,10 @@ input, textarea, select {
 	border-radius: 5px;
 	width: 200px;
 	box-shadow: 1px 1px 2px #C0C0C0 inset;
+}
+
+input#login, input#pass {
+	width: 150px;
 }
 
 select {
@@ -113,4 +125,33 @@ li.fichiers {
     border: 1px solid #000;
     padding: 10px;
     margin-bottom: 10px;
+}
+
+
+.doc {
+	margin-top: 1px;
+	display: inline;
+	width: 200px;
+	float: none;
+	color: #DF3333;
+}
+
+/* Gestion de popin jquery */
+.contenu_popup {
+	background-color: #FFFFFF;
+	border: 1px solid #DF3333;
+	cursor: default;
+	display: none;
+	margin-top: 15px;
+	position: absolute;
+	text-align: left;
+	width: 400px;
+	z-index: 50;
+	padding: 2px 2px;
+}
+
+span.selected {
+	background-color: #1F75CC;
+	color: white;
+	z-index: 100;
 }

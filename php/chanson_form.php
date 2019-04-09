@@ -50,44 +50,44 @@ if (isset ($_GET ['id']) && $_GET ['id'] != "") {
     $donnee [10] = ""; // tonalite
 }
 
-$sortie .= "<div class = 'centrer'>";
+$sortie .= "
+<link rel='stylesheet' media='screen' type='text/css' title='cssForm' href='..\css\listeDocs.css'/>
+<div class='col-lg-12 centrer'>";
 if ($mode == "MAJ")
     $sortie .= "<H1> Mise à jour - " . $table . "</H1>";
 if ($mode == "INS")
     $sortie .= "<H1> Création - " . $table . "</H1>";
 
 // Création du formulaire
-/*$f = new Formulaire ( "POST", $table . "_post.php", $sortie );
-$f->champCache ( "id", $donnee [0] );
-// TODO : La longueur du champ n'est pas prise en compte dans formulaire!
-$f->champTexte ( "Nom :", "fnom", $donnee [1], 64, 128 );
-$f->champTexte ( "Interprète :", "finterprete", $donnee [2], 64, 128 );
-$f->champTexte ( "Annee :", "fannee", $donnee [3], 4, 4 );
-$f->champTexte ( "Tempo :", "ftempo", $donnee [4], 4, 4 );
-$f->champTexte ( "Mesure :", "fmesure", $donnee [5], 4, 4 );
-$f->champTexte ( "Pulsation :", "fpulsation", $donnee [6], 10, 10 );
-$f->champTexte ( "Tonalité :", "ftonalite", $donnee [10], 10, 10 );
-$f->champCache ( "fidUser", $donnee [8]);
-$f->champTexte ( "Date publication :", "fdate", dateMysqlVersTexte ( $donnee [7] ), 10, 10 );
-$f->champTexte ( "Hits :", "fhits", $donnee [9], 10, 10 );
-$f->champCache ( "mode", $mode );
-$f->champValider ( " Valider ", "valider" );
-$sortie .= $f->fin ();*/
+
 $sortie .= "
 <FORM  METHOD='POST' ACTION='chanson_post.php' NAME='Form'>
 <INPUT TYPE=HIDDEN NAME='id' VALUE='$donnee[0]'>
-<label class='inline'>Nom :</label><INPUT TYPE='TEXT' NAME='fnom' VALUE='$donnee[1]' SIZE='64' MAXLENGTH='128' placeholder='titre de la chanson'><br>
-<label class='inline'>Interprète :</label><INPUT TYPE='TEXT' NAME='finterprete' VALUE='$donnee[2]' SIZE='64'  placeholder='interprète'><br>
-<label class='inline'>Annee :</label><INPUT TYPE='number' min='0' max='2100' NAME='fannee' VALUE='$donnee[3]' SIZE='4'><br>
-
+<div class = 'row'>
+<label class='inline col-sm-3'>Nom :</label><INPUT class= 'col-sm-7' TYPE='TEXT' NAME='fnom' VALUE='$donnee[1]' SIZE='64' MAXLENGTH='128' placeholder='titre de la chanson'><br>
+</div>
+<div class = 'row'>
+<label class='inline col-sm-3'>Interprète :</label><INPUT class = 'col-sm-7' TYPE='TEXT' NAME='finterprete' VALUE='$donnee[2]' SIZE='64'  placeholder='interprète'><br>
+</div>
+<div class = 'row'>
+<label class='inline col-sm-3'>Année :</label><INPUT class= 'col-sm-7' TYPE='number' min='0' max='2100' NAME='fannee' VALUE='$donnee[3]' SIZE='4'><br>
+</div>
 <script>function outputUpdate(vol) {
 	document.querySelector('#tempo').value = vol;
 }</script>
-
-<label for='fader'>Tempo :</label><INPUT TYPE='range' id='fader' min='30' max='250' step='1' oninput='outputUpdate(value)' NAME='ftempo' VALUE='$donnee[4]' SIZE='3' >
-<output for='fader' id='tempo'>$donnee[4]</output><br>
-<label class='inline'>Mesure :</label><INPUT TYPE='TEXT' NAME='fmesure' VALUE='$donnee[5]' SIZE='4' MAXLENGTH='128'><br>
-<label class='inline'>Pulsation :</label><select NAME='fpulsation' >
+<div class = 'row'>
+    <label class='inline col-sm-3' for='fader'>Tempo :</label>
+        <div class = 'col-sm-5'>
+        <input  TYPE='range' id='fader' min='30' max='250' step='1' oninput='outputUpdate(value)' name='ftempo' value='$donnee[4]' size='3' >
+        </div>
+    <output class = 'inline col-sm-2' for='fader' id='tempo'>$donnee[4]</output>
+</div>
+<div class = 'row'>
+<label class='inline col-sm-3'>Mesure :</label><INPUT class= 'col-sm-7' TYPE='TEXT' NAME='fmesure' VALUE='$donnee[5]' SIZE='4' MAXLENGTH='128'>
+</div>
+<div class = 'row'>
+<label class='inline col-sm-3'> Pulsation :</label>
+    <select class= 'col-sm-7' NAME='fpulsation' >
     <option value='binaire'";
 if ($donnee[6] == "binaire")
     $sortie .= " selected";
@@ -98,29 +98,29 @@ if ($donnee[6] == "ternaire")
     $sortie .= " selected";
 $sortie .= ">ternaire</option>
     </select>
-  ";
-// TODO : ajouter un combo des utilisateurs pour l'admin
-//  $listeUsers =
-//  $sortie .= champSELECT("idUser", $listeUSers, $idUser );
-//<INPUT TYPE=HIDDEN NAME='fidUser' VALUE='$donnee[8]'>
-$sortie .= "<br>
-<label class='inline'>Tonalité :</label><INPUT TYPE='TEXT' NAME='ftonalite' VALUE='$donnee[10]' SIZE='10' placeholder='ex :Am ou C ou F#'><br>
-<label class='inline'>Date publication :</label><INPUT TYPE='TEXT' NAME='fdate'";
-
-$sortie .= " VALUE='" . dateMysqlVersTexte($donnee[7]) . "' SIZE='10' MAXLENGTH='128'><br>
-<label class='inline'>Hits :</label><INPUT TYPE='number' NAME='fhits'  VALUE='$donnee[9]' SIZE='10'><br>";
-
-$sortie .= "<label class='inline'>Utilisateur :</label>" . selectUtilisateur("nom", "%", "login", true, $donnee[8]);
-
-$sortie .= "<INPUT TYPE=HIDDEN NAME='mode' VALUE='$mode'>
-<label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' ><br>";
-
-$sortie .= "
+</div>
+<div class = 'row'>
+<label class='inline col-sm-3'> Tonalité :</label>
+<INPUT class= 'col-sm-7' TYPE='TEXT' NAME='ftonalite' VALUE='$donnee[10]' SIZE='10' placeholder='ex :Am ou C ou F#'>
+</div>
+<div class = 'row'>
+<label class='inline col-sm-3'> Date publication :</label>
+<INPUT class= 'col-sm-7' TYPE='TEXT' NAME='fdate' VALUE='" . dateMysqlVersTexte($donnee[7]) . "' SIZE='10' MAXLENGTH='128'>
+ </div>
+<div class = 'row'>
+<label class='inline col-sm-3'> Hits :</label>
+<INPUT class= 'col-sm-7' TYPE='number' NAME='fhits'  VALUE='$donnee[9]' SIZE='10'>
+</div>
+<div class = 'row'>
+<label class='inline col-sm-3'> Utilisateur :</label>"
+    . selectUtilisateur("nom", "%", "login", true, $donnee[8]) . "
+<INPUT TYPE=HIDDEN NAME='mode' VALUE='$mode'>
+<label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' >
+</div>
 </FORM>
 ";
 
 if ($donnee[1]) {
-
 
     $sortie .= "Pour chercher la chanson sur youtube : <a href='https://www.youtube.com/results?search_query=" . urlencode($donnee[1]) . "' target='_blank'>ici</a><br>\n";
     $sortie .= "Pour chercher des images : <a href='https://www.qwant.com/?q=" . urlencode($donnee[1]) . "&amp;t=images=' target='_blank'>ici</a><br>\n";
@@ -155,18 +155,19 @@ if ($mode == "MAJ") {
             // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
             $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
             // echo "Chanson id : $id fichier court : $fichierCourt";
-            $fichier = "../data/chansons/$id/" . htmlentities($fichierCourt);
+            $fichier = "../data/chansons/$id/" . urlencode($fichierCourt);
             $extension = substr(strrchr($ligneDoc[1], '.'), 1);
             $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
             if (!file_exists("../images/icones/$extension.png"))
                 $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
-            $listeDocs .= "<li class='fichiers'> <a href= '" . urlencode($fichier) . "' target='_blank'> $icone </a> ";
-            $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
-            $listeDocs .= "<label>" . htmlentities($fichierCourt) . "</label>
-		<input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
-		<button name='renommer' style='display:none;'>renommer</button>
-  <button style='display:none;'>x</button>";
-            $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages) . "</li>\n";
+            $listeDocs .= "<li class='fichiers'> <div> <a href= '" . $fichier . "' target='_blank'> $icone </a> ";
+            $listeDocs .= "<label class='doc'>" . htmlentities($fichierCourt) . "</label>";
+            $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )
+		    <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
+		    <button name='renommer' style='display:none;'>renommer</button>
+            <button style='display:none;'>x</button>";
+            $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
+            $listeDocs . "</li>\n </div>\n";
         }
         echo $listeDocs;
         ?>

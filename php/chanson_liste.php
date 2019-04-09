@@ -3,7 +3,7 @@ include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
-include_once ("chanson_comp_cherche.php");
+include_once("chanson_comp_cherche.php");
 
 // DONE : ajouter un bouton "ajouter un doc pour cette chanson"
 // DONE : ajouter la date de publication et le tri par date de pub
@@ -33,17 +33,16 @@ if (isset ($_GET ['tri'])) {
 // Gestion parametre de recherche
 if (isset ($_GET ['cherche'])) {
     $cherche = "%" . $_GET ['cherche'] . "%";
+} else {
+    $cherche = "%";
 }
-    else {
-        $cherche = "%";
-    }
 
-    $critere = "nom";
+$critere = "nom";
 // Gestion parametre de recherche
-if (isset ($_POST ['chercheT']) && (strlen($_POST['chercheT'])>0)) {
+if (isset ($_POST ['chercheT']) && (strlen($_POST['chercheT']) > 0)) {
     $cherche = "%" . $_POST ['chercheT'] . "%";
 }
-if (isset ($_POST ['chercheI']) && strlen($_POST['chercheI'])>0 ) {
+if (isset ($_POST ['chercheI']) && strlen($_POST['chercheI']) > 0) {
 
     $critere = "interprete";
     $cherche = "%" . $_POST ['chercheI'] . "%";
@@ -65,8 +64,8 @@ if ($_SESSION ['privilege'] > 1)
 $contenuHtml .= Image($iconeAttention, "100%", 1, 1);
 
 $contenuHtml .= TblDebut(0);
-$contenuHtml .= TblEnteteDebut(). TblDebutLigne();
-$contenuHtml .= TblEntete("  -  ")  ;
+$contenuHtml .= TblEnteteDebut() . TblDebutLigne();
+$contenuHtml .= TblEntete("  -  ");
 $contenuHtml .= TblEntete("  Pochette  ");
 $contenuHtml .= titreColonne("Nom", "nom");
 $contenuHtml .= titreColonne("Interprète", "interprete");
@@ -78,6 +77,11 @@ $contenuHtml .= titreColonne("Tonalité", "tonalite");
 $contenuHtml .= titreColonne("Date pub.", "datePub");
 $contenuHtml .= titreColonne("Publié par", "idUser");
 $contenuHtml .= titreColonne("Vues", "hits");
+// //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
+if ($_SESSION ['privilege'] > 1) {
+    $contenuHtml .= TblCellule(" ");
+}
+// //////////////////////////////////////////////////////////////////////ADMIN
 $contenuHtml .= TblFinLigne() . TblEnteteFin();
 $contenuHtml .= TblCorpsDebut();
 
@@ -94,19 +98,19 @@ while ($ligne = $resultat->fetch_row()) {
         $contenuHtml .= TblCellule(" "); // Nom));
 
     $imagePochette = Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 48, 48, "couverture");
-    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]",$imagePochette));
+    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", $imagePochette));
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", entreBalise(limiteLongueur($ligne[1], 21), "EM"))); // Nom
     $contenuHtml .= TblCellule(limiteLongueur($ligne [2], 21)); // interprete
-    $contenuHtml .= TblCellule($ligne [3],1,1,"centrer"); // annee
-    $contenuHtml .= TblCellule($ligne [4],1,1,"alignerAdroite"); // tempo
-    $contenuHtml .= TblCellule($ligne [5],1,1,"centrer"); // mesure
-    $contenuHtml .= TblCellule($ligne [6],1,1,"centrer"); // pulsation
-    $contenuHtml .= TblCellule($ligne [10],1,1,"centrer"); // tonalité
+    $contenuHtml .= TblCellule($ligne [3], 1, 1, "centrer"); // annee
+    $contenuHtml .= TblCellule($ligne [4], 1, 1, "alignerAdroite"); // tempo
+    $contenuHtml .= TblCellule($ligne [5], 1, 1, "centrer"); // mesure
+    $contenuHtml .= TblCellule($ligne [6], 1, 1, "centrer"); // pulsation
+    $contenuHtml .= TblCellule($ligne [10], 1, 1, "centrer"); // tonalité
     $contenuHtml .= TblCellule(dateMysqlVersTexte($ligne[7])); // Date Pub
     $nomAuteur = chercheUtilisateur($ligne [8]);
     $nomAuteur = $nomAuteur[3];
-    $contenuHtml .= TblCellule($nomAuteur,1,1,"centrer"); // auteur
-    $contenuHtml .= TblCellule($ligne [9],1,1,"alignerAdroite"); // hits
+    $contenuHtml .= TblCellule($nomAuteur, 1, 1, "centrer"); // auteur
+    $contenuHtml .= TblCellule($ligne [9], 1, 1, "alignerAdroite"); // hits
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
     if ($_SESSION ['privilege'] > 1) {
@@ -122,25 +126,23 @@ $contenuHtml .= $nbreChansons . " chanson(s) dans la liste.<br>\n";
 $contenuHtml .= Image($iconeAttention, "100%", 1, 1);
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] > 1) {
-    $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'></span> Ajouter une chanson</a>\n";
+    $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Ajouter une chanson</a>\n";
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
-$contenuHtml .= "</div>\n
-</div><!-- /.container -->\n";
 
 
 // Affichage de la recherche
 $contenuHtml .= $contenuHtmlCompCherche;
-
+$contenuHtml .= "
+</div>\n
+</div><!-- /.container -->\n";
 $contenuHtml .= envoieFooter();
 echo $contenuHtml;
 
 function titreColonne($libelle, $nomRubrique)
 {
-    $lienCroissant = Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ");
-    $lienDecroissant = Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> ");
-    $chaine = TblEntete( $lienCroissant . "  $libelle " .  $lienDecroissant);
+    $lienCroissant = Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> </span>");
+    $lienDecroissant = Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> </span>");
+    $chaine = TblEntete($lienCroissant . "  $libelle " . $lienDecroissant);
     return $chaine;
 }
-
-

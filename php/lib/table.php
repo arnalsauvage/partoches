@@ -14,8 +14,8 @@ if (! isset ( $ModuleTable )) {
 			$optionClasse = " CLASS='$classe' ";
 		if ($largeur != - 1)
 			$optionLargeur = " WIDTH='$largeur' ";
-		
-		$retour .= "<table BORDER='$bordure' " . " CELLSPACING='$espCell' CELLPADDING='$remplCell' " . $optionLargeur . $optionClasse . ">\n";
+
+        $retour .= "<table " . $optionLargeur . $optionClasse . ">\n";
 		return $retour;
 	}
 	function TblFin() {

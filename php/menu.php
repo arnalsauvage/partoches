@@ -84,13 +84,18 @@ $contenu .= image("../images" . $_SESSION ['image'], 64) . "\n";
 $date = date ( "d/m/Y" );
 $heure = date ( "H:i" );
 
-if ($_SESSION ['user'] == "invite")
-	$msgLogin = "se connecter";
-else
+if ($_SESSION ['user'] != "invite") {
 	$msgLogin = "se déconnecter";
-
-$contenu .= Ancre("login.php?logoff=1", $msgLogin) . " | \n";
+    $contenu .= Ancre("login.php?logoff=1", $msgLogin) . " | \n";
+} else {
+    $msgLogin = "se connecter";
+    $contenu .= file_get_contents('../html/menuLogin.html');
+    $contenu .= "<a id='afficherPopup'>$msgLogin</a> <script src='../js/utilsJquery.js'></script>";
+}
 $contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut ( $_SESSION ['privilege'] ) . ", nous sommes le $date et il est $heure<br>\n";
 $contenu .= " </div> <!--/.container --></div><!--/.starter-template -->";
 if (!isset($pasDeMenu) || false == $pasDeMenu)
 	echo $contenu . "\n\n";
+
+echo "
+";
