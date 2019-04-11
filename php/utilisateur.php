@@ -119,6 +119,21 @@ function modifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site, $em
 		die ( "Problème modifieUtilisateur#1 : " . $_SESSION ['mysql']->error);
 }
 
+// Modifie en base le utilisateur
+function modifieMdpUtilisateur($id, $mdp)
+{
+    // Crypter le mdp
+    $crypt = Chiffrement::crypt($mdp);
+
+    $maRequete = "UPDATE  utilisateur
+	SET  mdp = '$crypt'
+	WHERE id='$id'";
+    $result = $_SESSION ['mysql']->query($maRequete);
+    if (!$result)
+        die ("Problème modifieMdpUtilisateur#1 : " . $_SESSION ['mysql']->error);
+}
+
+
 // Cette fonction supprime un utilisateur si il existe
 function supprimeUtilisateur($idUtilisateur) {
 	
