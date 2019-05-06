@@ -58,7 +58,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 		$source = $cheminImages;
 	
 	if (! file_exists ( $source . $image )) {
-		$log = "vignette.php : function creation_vignette : Le fichier source $source$image n'a pas �t� trouv�.";
+        $log = "vignette.php : function creation_vignette : Le fichier source $source$image n'a pas été trouvé.";
 		ecritFichierLog ( "../logs/fichierlog.htm", $log );
 		return false;
 	}
@@ -105,10 +105,10 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 				// format png
 				$image_src = imagecreatefrompng ( $source . $image );
 			}
-			if ($size [2] == 6) {
-				// format bmp
-				$image_src = imagecreatefromwbmp ( $source . $image );
-			}
+            /*			if ($size [2] == 6) {
+                            // format bmp
+                            $image_src = imagecreatefromwbmp ( $source . $image );
+                        }*/
 			
 			// on verifie que l'image source ne soit pas plus petite que l'image de destination
 			if ($largeur_src > $largeur_max or $hauteur_src > $hauteur_max) {

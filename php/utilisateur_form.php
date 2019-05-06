@@ -7,7 +7,7 @@ $sortie = "";
 
 // Chargement des donnees de l'utilisateur si l'identifiant est fourni
 if ((isset ( $_GET ['id'] ) && $_GET ['id'] != "")) {
-	$donnee = chercheUtilisateur ( $id );
+    $donnee = chercheUtilisateur($_GET ['id']);
 	if (($_SESSION ['privilege'] > 2) || $_SESSION ['user'] == $donnee [1]) {
 		$mode = "MAJ";
 		$donnee [2] = Chiffrement::decrypt ( $donnee [2] );

@@ -5,22 +5,25 @@ include_once ("songbook.php");
 include_once ("lienDocSongbook.php");
 $nomTable = "songbook";
 
-if ($_SESSION ['privilege'] <= 1)
-	redirection ( $nomTable . "_liste.php" );
+/*if ($_SESSION ['privilege'] <= 1)
+	redirection ( $nomTable . "_liste.php" );*/
 
 // On gère 5 cas : création d'une songbook, modif, suppression, ou suppression d'un docJoint, duplication songbook
-if (isset($_POST ['MODE'])) {
-    $mode = $_POST ['MODE'];
+if (isset($_POST ['mode'])) {
+    $mode = $_POST ['mode'];
+} elseif (isset($_GET ['mode'])) {
+    $mode = $_GET ['mode'];
 }
-if (isset($_GET ['MODE'])) {
-    $mode = $_GET ['MODE'];
-}
+echo "mode : " . $mode;
 // En mode création ou mise à jour, on récupère les données du formulaire
 if (($mode == "MAJ") || ($mode == "INS")) {
-	$id = $_POST ['id'];
-	$fnom = $_SESSION ['mysql']->real_escape_string ( $_POST ['fnom'] );
-    $fdescription = $_SESSION ['mysql']->real_escape_string($_POST ['fdescription']);
-	$fimage = $_POST ['fimage'];
+    // Il faut au moins être éditeur
+    if ($_SESSION ['privilege'] > 1) {
+        $id = $_POST ['id'];
+        $fnom = $_SESSION ['mysql']->real_escape_string($_POST ['fnom']);
+        $fdescription = $_SESSION ['mysql']->real_escape_string($_POST ['fdescription']);
+        $fimage = $_POST ['fimage'];
+    }
 	// Seul admin peut modifier hits et date
 	if ($_SESSION ['privilege'] > 2) {
 		$fdate = $_POST ['fdate'];

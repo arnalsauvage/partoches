@@ -25,7 +25,7 @@ if ($_SESSION ['privilege'] > 1)
 	$sortie .= Ancre ( $songbookForm . "?id=" . $_GET ['id'], Image ( ($cheminImages . $iconeEdit), 32, 32, "modifier" ) );
 
 if ("" != $monImage) {
-	$repertoire = "../data/songbooks/$id/";
+    $repertoire = "../data/songbooks/" . $_GET ['id'] . "/";
 	$sortie .= Image ( $repertoire . $monImage, 200, "", "pochette" );
 }
 

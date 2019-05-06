@@ -31,7 +31,7 @@ $numligne = 0;
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] >= 2)
-	$fichiersDuSongbook .= "<BR>" . Ancre("$songbookForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel songbook");
+    $fichiersDuSongbook .= "<BR>" . Ancre("$songbookForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau songbook");
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
@@ -53,9 +53,9 @@ while ( $ligne = $resultat->fetch_row () ) {
 	if ($ligne [4])
 		// //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
 		if ($_SESSION ['privilege'] >= 2)
-			$fichiersDuSongbook .= TblCellule(Ancre($songbookForm . "?id=$ligne[0]", Image(($cheminImagesSongbook . $ligne[0] . "/" . imageTableId("songbook", $ligne[0])), 32, 32, "couverture"))); // image
+            $fichiersDuSongbook .= TblCellule(Ancre($songbookForm . "?id=$ligne[0]", Image(($cheminImagesSongbook . $ligne[0] . "/" . urlencode(imageTableId("songbook", $ligne[0]))), 32, 32, "couverture"))); // image
 		else
-			$fichiersDuSongbook .= TblCellule(Image(($cheminImagesSongbook . $ligne[0] . "/" . imageTableId("songbook", $ligne[0])), 32, 32)); // image
+            $fichiersDuSongbook .= TblCellule(Image(($cheminImagesSongbook . $ligne[0]) . "/" . urlencode(imageTableId("songbook", $ligne[0])), 32, 32)); // image
 	else
 		$fichiersDuSongbook .= TblCellule(Ancre($songbookForm . "?id=$ligne[0]", "voir"));
 

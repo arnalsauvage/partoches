@@ -169,7 +169,7 @@ if(!isset ($FichierHtml)){
 	
 	function envoieFooter(){
 		$retour = file_get_contents('../html/footer.html', FILE_USE_INCLUDE_PATH);
+        $retour .= "\n</html>";
 		return $retour;
 	}
-	
 }

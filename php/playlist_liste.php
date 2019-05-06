@@ -7,6 +7,7 @@ $table = "playlist";
 $fichiersDuPlaylist = "";
 $fichiersDuPlaylist .= entreBalise("Playlists", "H1");
 $fichiersDuPlaylist .= TblDebut(0);
+$cheminPlaylist = ".data/playlists/";
 
 // Gestion du paramètre de tri
 if (isset ($_GET ['tri'])) {
@@ -54,7 +55,7 @@ while ( $ligne = $resultat->fetch_row () ) {
 		if ($_SESSION ['privilege'] >= 2)
 			$fichiersDuPlaylist .= TblCellule(Ancre($playlistForm . "?id=$ligne[0]", "modifier"));
 		else
-			$fichiersDuPlaylist .= TblCellule(Image(($cheminImagesPlaylist . $ligne[0] . "/" . $ligne [4]), 32, 32)); // image
+            $fichiersDuPlaylist .= TblCellule(Image(($cheminPlaylist . $ligne[0] . "/" . $ligne [4]), 32, 32)); // image
 	else
 		$fichiersDuPlaylist .= TblCellule(Ancre($playlistForm . "?id=$ligne[0]", "voir"));
 

@@ -12,8 +12,8 @@ unset ( $a );
 
 // Ce code remplace la récupération automatique des variables post et GET en php4
 // TODO : sécurité - supprimer l'extraction automatique des get et posts
-extract ( $_GET, EXTR_OVERWRITE );
-extract ( $_POST, EXTR_OVERWRITE );
+//extract ( $_GET, EXTR_OVERWRITE );
+//extract ( $_POST, EXTR_OVERWRITE );
 
 if (! isset ( $FichierUtilsSi )) {
 	// Déclaration des variables globales

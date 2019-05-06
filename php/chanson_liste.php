@@ -11,7 +11,7 @@ $chansonForm = "chanson_form.php";
 $chansonPost = "chanson_post.php";
 $chansonVoir = "chanson_voir.php";
 $table = "chanson";
-$contenuHtml = "<div class='container'>
+$contenuHtml = "<div class='container'> \n
   <div class='starter-template'> \n";
 
 $contenuHtml .= entreBalise("Chansons", "H1");
@@ -50,7 +50,7 @@ if (isset ($_POST ['chercheI']) && strlen($_POST['chercheI']) > 0) {
 
 
 // Chargement de la liste des chansons
-$resultat = chercheChansons($critere, $cherche, $tri, $ordreAsc);
+$resultat = Chanson::chercheChansons($critere, $cherche, $tri, $ordreAsc);
 $nbreChansons = $_SESSION ['mysql']->affected_rows;
 $numligne = 0;
 
@@ -86,39 +86,42 @@ $contenuHtml .= TblFinLigne() . TblEnteteFin();
 $contenuHtml .= TblCorpsDebut();
 
 $cheminImagesChanson = "../data/chansons/";
+$_chanson = new Chanson();
 
+/** @noinspection PhpUndefinedMethodInspection */
 while ($ligne = $resultat->fetch_row()) {
     $numligne++;
     $contenuHtml .= TblDebutLigne();
 
+    $_chanson->chercheChanson($ligne[0]);
+    $_id = $_chanson->getId();
+
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
     if ($_SESSION ['privilege'] > 1)
-        $contenuHtml .= TblCellule(Ancre("$chansonForm?id=$ligne[0]", Image($cheminImages . $iconeEdit, 32, 32))); // Nom));
+        $contenuHtml .= TblCellule(Ancre("$chansonForm?id=" . $_id, Image($cheminImages . $iconeEdit, 32, 32)));
     else
-        $contenuHtml .= TblCellule(" "); // Nom));
-
-    $imagePochette = Image(($cheminImagesChanson . $ligne[0] . "/" . imageTableId("chanson", $ligne[0])), 48, 48, "couverture");
-    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", $imagePochette));
-    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$ligne[0]", entreBalise(limiteLongueur($ligne[1], 21), "EM"))); // Nom
-    $contenuHtml .= TblCellule(limiteLongueur($ligne [2], 21)); // interprete
-    $contenuHtml .= TblCellule($ligne [3], 1, 1, "centrer"); // annee
-    $contenuHtml .= TblCellule($ligne [4], 1, 1, "alignerAdroite"); // tempo
-    $contenuHtml .= TblCellule($ligne [5], 1, 1, "centrer"); // mesure
-    $contenuHtml .= TblCellule($ligne [6], 1, 1, "centrer"); // pulsation
-    $contenuHtml .= TblCellule($ligne [10], 1, 1, "centrer"); // tonalité
-    $contenuHtml .= TblCellule(dateMysqlVersTexte($ligne[7])); // Date Pub
-    $nomAuteur = chercheUtilisateur($ligne [8]);
+        $contenuHtml .= TblCellule(" ");
+    $imagePochette = Image(($cheminImagesChanson . $_id . "/" . rawurlencode(imageTableId("chanson", $_id))), 48, 48, "couverture");
+    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", $imagePochette));
+    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"))); // Nom
+    $contenuHtml .= TblCellule(limiteLongueur($_chanson->getInterprete(), 21)); // interprete
+    $contenuHtml .= TblCellule($_chanson->getAnnee(), 1, 1, "centrer"); // annee
+    $contenuHtml .= TblCellule($_chanson->getTempo(), 1, 1, "alignerAdroite"); // tempo
+    $contenuHtml .= TblCellule($_chanson->getMesure(), 1, 1, "centrer"); // mesure
+    $contenuHtml .= TblCellule($_chanson->getPulsation(), 1, 1, "centrer"); // pulsation
+    $contenuHtml .= TblCellule($_chanson->getTonalite(), 1, 1, "centrer"); // tonalité
+    $contenuHtml .= TblCellule(dateMysqlVersTexte($_chanson->getDatePub())); // Date Pub
+    $nomAuteur = chercheUtilisateur($_chanson->getIdUser());
     $nomAuteur = $nomAuteur[3];
     $contenuHtml .= TblCellule($nomAuteur, 1, 1, "centrer"); // auteur
-    $contenuHtml .= TblCellule($ligne [9], 1, 1, "alignerAdroite"); // hits
+    $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite"); // hits
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
     if ($_SESSION ['privilege'] > 1) {
-        $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
+        $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages));
         // //////////////////////////////////////////////////////////////////////ADMIN
     }
     $contenuHtml .= TblFinLigne();
-
 }
 $contenuHtml .= TblCorpsFin();
 $contenuHtml .= TblFin();
@@ -146,3 +149,5 @@ function titreColonne($libelle, $nomRubrique)
     $chaine = TblEntete($lienCroissant . "  $libelle " . $lienDecroissant);
     return $chaine;
 }
+
+?>

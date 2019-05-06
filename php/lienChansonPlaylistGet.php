@@ -23,7 +23,7 @@ include("lienChansonPlaylist.php");
 if ($_SESSION ['privilege'] > 1) {
     if ($_GET['idPlaylist'] > 0) {
         if ($_GET['dir'] == "down") {
-            echo "remonteTitre $ordre +1  1";
+            echo "remonteTitre " . $_GET['ordre'] + 1 . "  1";
             remonteTitre($_GET['idPlaylist'], $_GET['ordre']+1, 1);
         }
         if ($_GET['dir'] == "pit") {

@@ -43,7 +43,7 @@ $path = $_FILES ['fichierUploade'] ['name'];
 $ext = pathinfo($path, PATHINFO_EXTENSION); // on récupère l'extension
 
 if (strstr($autorisees, $ext) == FALSE) {
-	$errors ['fichierUploade'] = "le fichier n'a pas une extension autorisée ($type_file) .";
+    $errors ['fichierUploade'] = "le fichier n'a pas une extension autorisée ($autorisees) .";
 	$errors ['fichierUploade'] .= "Extensions autorisées :  . $autorisees";
 	echo $errors ['fichierUploade'];
 	return 0;
