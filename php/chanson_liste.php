@@ -4,6 +4,7 @@ include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
 include_once("chanson_comp_cherche.php");
+include_once("Pagination.php");
 
 // DONE : ajouter un bouton "ajouter un doc pour cette chanson"
 // DONE : ajouter la date de publication et le tri par date de pub
@@ -11,6 +12,8 @@ $chansonForm = "chanson_form.php";
 $chansonPost = "chanson_post.php";
 $chansonVoir = "chanson_voir.php";
 $table = "chanson";
+$nombreChansonsParPage = 20;
+
 $contenuHtml = "<div class='container'> \n
   <div class='starter-template'> \n";
 
@@ -54,6 +57,13 @@ $resultat = Chanson::chercheChansons($critere, $cherche, $tri, $ordreAsc);
 $nbreChansons = $_SESSION ['mysql']->affected_rows;
 $numligne = 0;
 
+$pagination = new Pagination ($nbreChansons, $nombreChansonsParPage);
+if (isset ($_GET['page']))
+    $page = $_GET['page'];
+else
+    $page = 1;
+$pagination->setPageEnCours($page);
+
 // Affichage de la liste
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
@@ -91,6 +101,8 @@ $_chanson = new Chanson();
 /** @noinspection PhpUndefinedMethodInspection */
 while ($ligne = $resultat->fetch_row()) {
     $numligne++;
+    if (($numligne < $pagination->getItemDebut()) || $numligne > $pagination->getItemFin())
+        continue;
     $contenuHtml .= TblDebutLigne();
 
     $_chanson->chercheChanson($ligne[0]);
@@ -125,6 +137,7 @@ while ($ligne = $resultat->fetch_row()) {
 }
 $contenuHtml .= TblCorpsFin();
 $contenuHtml .= TblFin();
+$contenuHtml .= $pagination->barrePagination() . "   ";
 $contenuHtml .= $nbreChansons . " chanson(s) dans la liste.<br>\n";
 $contenuHtml .= Image($iconeAttention, "100%", 1, 1);
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
