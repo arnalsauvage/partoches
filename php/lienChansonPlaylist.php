@@ -30,7 +30,7 @@ function chercheLienChansonPlaylist($id) {
 // Renvoie le nombre de chansons dans une playlist
 /**
  * @param $idPlaylist
- * @return mixed
+ * @return nombre de lignes trouvées
  */
 function nombreDeLiensDeLaPlaylist($idPlaylist)
 {
@@ -132,6 +132,7 @@ function infoslienChansonPlaylist($id) {
 	$retour = "Id : " . $enr [0] . " idChanson : " . $enr [1] . " IdPlaylist : " . $enr [2] . " Ordre : " . $enr [3];
 	return $retour . "<BR>\n";
 }
+
 
 // Cette fonction s'assure que les chansons d'une playlist soient numérotées de 1 à n
 function ordonneLiensPlaylist($idPlaylist) {

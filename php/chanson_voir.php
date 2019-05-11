@@ -1,8 +1,10 @@
-<?php
+<?php /** @noinspection PhpUndefinedMethodInspection */
+/** @noinspection PhpUndefinedMethodInspection */
 include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
+include_once("songbook.php");
 $table = "chanson";
 $contenuHtml = "<div class='container'>
   <div class='starter-template'> \n";
@@ -15,11 +17,9 @@ $fichiersDuSongbook = $_chanson->fichiersChanson();
 // On choisit une des images du songbook
 $monImage = imageTableId("chanson", $idChanson);
 
-
 $datePub = dateMysqlVersTexte($_chanson->getDatePub()); // datePub
 $utilisateur = chercheUtilisateur($_chanson->getIdUser())[1];
 $hits = $_chanson->getHits() + 1; // hits
-
 
 $contenuHtml .= "<div class='row'>";
 $contenuHtml .= "<section class='col-sm-8'>";
@@ -42,13 +42,12 @@ $contenuHtml .= ", mesure : " . $_chanson->getMesure() . ", pulsation : " . $_ch
 $contenuHtml .= " Publiée le  :$datePub, par $utilisateur, affichée $hits fois. <br>\n</div>\n";
 
 // Propose des recherches sur la chanson
-$contenuHtml .= "<div class='col-sm-4'><a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank'><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png' width='64'></a>\n";
+$contenuHtml .= "<div class='col-sm-4'><a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank'><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png' alt = 'recherche youtube' width='64'></a>\n";
 $rechercheWikipedia = "https://fr.wikipedia.org/w/index.php?search=" . urlencode(($_chanson->getNom() . " " . $_chanson->getInterprete()));
-$contenuHtml .= "<a href='$rechercheWikipedia' target='_blank'><img src='https://fr.wikipedia.org/static/images/project-logos/frwiki.png' width='64'></a><br>\n</div>\n";
+$contenuHtml .= "<a href='$rechercheWikipedia' target='_blank'><img src='https://fr.wikipedia.org/static/images/project-logos/frwiki.png' alt='recherche wikipedia' width='64'></a><br>\n</div>\n";
 $contenuHtml .= "</div>";
 $contenuHtml .= "</section>";
 $contenuHtml .= "<section class='col-sm-4'>";
-
 
 if ("" != $monImage) {
     $contenuHtml .= Image("../data/chansons/" . $idChanson . "/" . $monImage, 200, "", "pochette", "img-thumbnail");
@@ -56,53 +55,79 @@ if ("" != $monImage) {
 $contenuHtml .= "</section>";
 $contenuHtml .= "</div>";
 
-$contenuHtml .= "<h2> Documents attachés à cette chanson</h2>";
 
+augmenteHits($table, $idChanson);
 // Cherche un document et le renvoie s'il existe
 $result = chercheDocumentsTableId("chanson", $idChanson);
 
-augmenteHits($table, $idChanson);
-
-$contenuHtml .= "<section class='row'>\n";
+if ($result->num_rows > 0) {
+    $contenuHtml .= "<h2> Documents attachés à cette chanson</h2>";
+    $contenuHtml .= "<section class='row'>\n";
 
 // Pour chaque document
-while ($ligne = $result->fetch_row()) {
+    /** @noinspection PhpUndefinedMethodInspection */
+    /** @noinspection PhpUndefinedMethodInspection */
+    while ($ligne = $result->fetch_row()) {
 
-    $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
-    $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
-    // $fichier = "../data/chansons/" . $idChanson . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
-    $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
-    $extension = substr(strrchr($ligne [1], '.'), 1);
-    $icone = Image("../images/icones/" . $extension . ".png", 32, 32, "icone");
-    if (!file_exists("../images/icones/" . $extension . ".png"))
-        $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+        $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
+        $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
+        // $fichier = "../data/chansons/" . $idChanson . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
+        $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
+        $extension = substr(strrchr($ligne [1], '.'), 1);
+        $icone = Image("../images/icones/" . $extension . ".png", 32, 32, "icone");
+        if (!file_exists("../images/icones/" . $extension . ".png"))
+            $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
 
-    $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" . htmlentities($fichierSec) . "</a> <br>\n";
-    $contenuHtml .= "</div>";
-}
-$contenuHtml .= " </section>\n";
+        $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" . htmlentities($fichierSec) . "</a> <br>\n";
+        $contenuHtml .= "</div>";
+    }
+    $contenuHtml .= " </section>\n";
 
 /// Affichage des audios mp3 avec un outil de lecture audio
 
-$contenuHtml .= "<br><section class='row'>\n";
-$result = chercheDocumentsTableId("chanson", $idChanson);
+    $contenuHtml .= "<br><section class='row'>\n";
+    $result = chercheDocumentsTableId("chanson", $idChanson);
 
 // Pour chaque fichier audio
-while ($ligne = $result->fetch_row()) {
-    $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
-    $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
-    $extension = substr(strrchr($ligne [1], '.'), 1);
-    if ($extension == "mp3") {
-        $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
-        $baliseAudio = htmlentities($fichierSec) . "<br><audio controls='controls'>   <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
+    while ($ligne = $result->fetch_row()) {
+        $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
+        $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
+        $extension = substr(strrchr($ligne [1], '.'), 1);
+        if ($extension == "mp3") {
+            $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
+            $baliseAudio = htmlentities($fichierSec) . "<br><audio controls='controls'>   <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
             Votre navigateur ne prend pas en charge l'élément <code>audio</code></audio>";
-        $contenuHtml .= $baliseAudio . "\n";
-        $contenuHtml .= "</div>";
+            $contenuHtml .= $baliseAudio . "\n";
+            $contenuHtml .= "</div>";
+        }
     }
+    $contenuHtml .= " </section>\n";
 }
-$contenuHtml .= " </section>\n";
 
+$songbooks = $_chanson->chercheSongbooksDocuments();
 
+if ($songbooks->num_rows > 0) {
+
+    $contenuHtml .= "<h2> Songbooks associés à cette chanson</h2>";
+    $contenuHtml .= "<br><section class='row'>";
+
+    while ($songbook = $songbooks->fetch_row()) {
+        $nom = $songbook[1];
+        $id = $songbook[0];
+        $image = imageSongbook($id);
+        $contenuHtml .= "
+
+<div class=\"col-xs-4 col-sm-3 col-md-2 centrer\">
+<a href = 'songbook_voir.php?id=$id'>
+<img src = '../data/songbooks/$id/$image' height='128' alt = 'couverture songbook'>
+<p>  $nom</p>
+</a>
+</div>
+
+";
+    }
+    $contenuHtml .= "</section>";
+}
 $contenuHtml .= "</div><!-- /.starter-template -->\n
 </div><!-- /.container -->\n";
 $contenuHtml .= envoieFooter();

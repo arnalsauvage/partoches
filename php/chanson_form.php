@@ -25,18 +25,6 @@ if (isset ($_POST ['id']))
 if (isset ($_GET ['id']) && $_GET ['id'] != "") {
     $id = $_GET ['id'];
     $_chanson->chercheChanson($id);
-    /* TODO : vérifier le htmlspecialchar
-    $donnee [1] = htmlspecialchars($donnee [1], ENT_QUOTES); // nom
-    $donnee [2] = htmlspecialchars($donnee [2], ENT_QUOTES); // interprete
-    $donnee [3] = intval(htmlspecialchars($donnee [3], ENT_QUOTES)); // annee
-    $donnee [4] = intval(htmlspecialchars($donnee [4], ENT_QUOTES)); // tempo
-    $donnee [5] = htmlspecialchars($donnee [5], ENT_QUOTES); // mesure
-    $donnee [6] = htmlspecialchars($donnee [6], ENT_QUOTES); // pulsation
-    $donnee [7] = htmlspecialchars($donnee [7], ENT_QUOTES); // datePub
-    $donnee [8] = $donnee [8]; // idUser
-    $donnee [9] = intval(htmlspecialchars($donnee [9], ENT_QUOTES)); // hits
-    $donnee [10] = htmlspecialchars($donnee [10], ENT_QUOTES); // tonalite
-    */
     $mode = "MAJ";
 } else {
     $mode = "INS";
@@ -159,7 +147,6 @@ if ($mode == "MAJ") {
 		    <button name='renommer' style='display:none;'>renommer</button>
             <button style='display:none;'>x</button>";
             $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
-            $listeDocs . "</li>\n </div>\n";
         }
         echo $listeDocs;
         ?>
@@ -220,7 +207,7 @@ if ($mode == "MAJ") {
                         data: "id=<?php echo $id;?>&nomFic=<?php echo $fichierSurDisque[1];?>&mode=RESTAUREDOC",
                         datatype: 'html', // type de la donnée à recevoir
                         success: function (code_html, statut) { // success est toujours en place, bien sûr !
-                            if (code_html.search("n'a pas été traité.") == -1)
+                            if (code_html.search("n'a pas été traité.") === -1)
                                 toastr.success("Le document a été restauré ! <br> Le fichier a été raccroché à la chanson <br> Vous pouvez raffraîchir la page pour le voir.");
                             else {
                                 toastr.warning("Erreur dans l'opération...<br>Le document n'a pas pu être raccroché...");

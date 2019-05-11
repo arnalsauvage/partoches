@@ -20,16 +20,16 @@ if (! isset ( $FichierUtilsSi )) {
 	$FichierUtilsSi = 1;
 	
 	// Inclusion des différentes librairies
-	require_once ("lib/class.ini.php");
-	require_once ("lib/compteur.php");
-	require_once ("lib/configMysql.php");
-	include_once "lib/config-images.php";
-	require_once ("lib/formulaire.php");
-	require_once ("lib/html.php");
-	require_once ("lib/mysql.php");
-	include_once ("lib/params.php");
-	include_once ("lib/table.php");
-	require_once ("lib/vignette.php");
+    require_once("class.ini.php");
+    require_once("compteur.php");
+    require_once("configMysql.php");
+    include_once "config-images.php";
+    require_once("formulaire.php");
+    require_once("html.php");
+    require_once("mysql.php");
+    include_once("params.php");
+    include_once("table.php");
+    require_once("vignette.php");
 	
 	if (! isset ( $_SESSION ["privilege"] )) {
 		// session_register("privilege");

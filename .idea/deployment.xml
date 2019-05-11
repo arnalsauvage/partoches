@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="OVH-Top5" overwriteAll="false">
+  <component name="PublishConfigData" serverName="OVH-Top5" overwriteAll="false" uploadOnCheckin="cf3f63fa-5164-46df-b89f-32f2da66a065">
     <serverData>
       <paths name="OVH-Top5">
         <serverdata>
@@ -27,5 +27,6 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myUploadOnCheckinName" value="OVH-Top5" />
   </component>
 </project>

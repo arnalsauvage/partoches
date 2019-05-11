@@ -1,6 +1,7 @@
 <?php
-include_once("./lib/utilssi.php");
+include_once("lib/utilssi.php");
 include_once "lib/configMysql.php";
+include_once "document.php";
 
 // Fonctions de gestion de la chanson
 
@@ -15,7 +16,7 @@ class Chanson
     private $_tempo; // bpm principal de la chanson, entier entre 0 et 300 environ
     private $_mesure; // chaine indiquant la mesure, le plus souvent "4/4" ou "3/4"
     private $_pulsation; // chaine, indique si les temps se découpent en "binaire" ou "ternaire"
-    private $_datePub; // date de publication de la chanson
+    private $_datePub; // date de publication de la chanson en chaine de caractères JJ/MM/AAAA
     private $_hits; // compteur de visites de la chanson, corresponds aux affichages de la page chanson
     private $_tonalite;
 
@@ -69,7 +70,7 @@ class Chanson
         $this->setTempo($_tempo);
         $this->setMesure($_mesure);
         $this->setPulsation($_pulsation);
-        $this->setDatePub(date());
+        $this->setDatePub(date("d/m/Y"));
         $this->setHits($_hits);
         $this->setTonalite($_tonalite);
     }
@@ -150,7 +151,8 @@ class Chanson
      */
     public function setAnnee($annee)
     {
-        $this->_annee = $annee;
+        if ($annee > 0)
+            $this->_annee = $annee;
     }
 
     /**
@@ -182,7 +184,8 @@ class Chanson
      */
     public function setTempo($tempo)
     {
-        $this->_tempo = $tempo;
+        if ($tempo > 0)
+            $this->_tempo = $tempo;
     }
 
     /**
@@ -317,36 +320,32 @@ class Chanson
      */
     public function creeModifieChansonBDD()
     {
-        $this->_nom = $_SESSION ['mysql']->real_escape_string($this->_nom);
-        $this->_interprete = $_SESSION ['mysql']->real_escape_string($this->_interprete);
-        $this->_annee = $_SESSION ['mysql']->real_escape_string($this->_annee);
         if ($this->_id == 0) {
-            $this->_datePub = convertitDateJJMMAAAA(date("d/m/Y"));
-            $maRequete = "INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
-	VALUES (NULL, '$this->_nom', '$this->_interprete', '$this->_annee', '$this->_idUser', '$this->_tempo', '$this->_mesure', '$this->_pulsation', '$this->_datePub' ,  '$this->_hits', '$this->_tonalite')";
-            // echo $maRequete;
-            $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creation dans creeModifieChansonBDD #1 : " . $_SESSION ['mysql']->error);
-            // On renseigne l'id de l'objet avec l'id créé en BDD
+            $this->creeChansonBDD();
             $this->setId($_SESSION ['mysql']->insert_id);
+            return ($this->getId());
         } else {
-            $maRequete = "UPDATE  chanson
-	SET nom = '$this->_nom', interprete = '$this->_interprete', annee = '$this->_annee', idUser = $this->_idUser, tempo = '$this->_tempo', mesure='$this->_mesure',
-	pulsation='$this->_pulsation',  hits='$this->_hits', tonalite='$this->_tonalite'
-	WHERE id='$this->_id'";
+            $_nom = $_SESSION ['mysql']->real_escape_string($this->_nom);
+            $_interprete = $_SESSION ['mysql']->real_escape_string($this->_interprete);
+            $_annee = $_SESSION ['mysql']->real_escape_string($this->_annee);
+            $maRequete = "UPDATE  chanson SET nom = '$_nom', interprete = '$_interprete', annee = '$_annee',
+            idUser = $this->_idUser, tempo = '$this->_tempo', mesure='$this->_mesure', pulsation='$this->_pulsation', 
+            hits='$this->_hits', tonalite='$this->_tonalite' WHERE id='$this->_id'";
             // echo $maRequete;
             $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modif dans creeModifieChanson #2 : " . $_SESSION ['mysql']->error);
         }
     }
 
-    // Modifie une chanson et renvoie l'id de la chanson créée
+    // Cree une chanson et renvoie l'id de la chanson créée
     public function creeChansonBDD()
     {
-        $this->_nom = $_SESSION ['mysql']->real_escape_string($this->_nom);
-        $this->_interprete = $_SESSION ['mysql']->real_escape_string($this->_interprete);
-        $this->_annee = $_SESSION ['mysql']->real_escape_string($this->_annee);
-        $this->_datePub = convertitDateJJMMAAAA(date("d/m/Y"));
+        $_nom = $_SESSION ['mysql']->real_escape_string($this->_nom);
+        $_interprete = $_SESSION ['mysql']->real_escape_string($this->_interprete);
+        $_annee = $_SESSION ['mysql']->real_escape_string($this->_annee);
+        $_datePub = convertitDateJJMMAAAA(date("d/m/Y"));
         $maRequete = "INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
-	VALUES (NULL, '$this->_nom', '$this->_interprete', '$this->_annee', '$this->_idUser', '$this->_tempo', '$this->_mesure', '$this->_pulsation', '$this->_datePub' ,  '$this->_hits', '$this->_tonalite')";
+	        VALUES (NULL, '$_nom', '$_interprete', '$_annee', '$this->_idUser', '$this->_tempo', '$this->_mesure', 
+	        '$this->_pulsation', '$_datePub' ,  '$this->_hits', '$this->_tonalite')";
         // echo $maRequete;
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creeChansonBDD#1 : " . $_SESSION ['mysql']->error);
         // On renseigne l'id de l'objet avec l'id créé en BDD
@@ -411,6 +410,24 @@ class Chanson
         return $result;
     }
 
+// Cherche la présence d'une chanson dans des songbooks
+//idSongbook	nomSongBook
+//24            Madelon 2017
+//28        	Les Face A
+//32        	Vergers de l îlot
+//33        	Fête de Printemps
+//33         	Fête de Printemps
+
+    public function chercheSongbooksDocuments()
+    {
+        $maRequete = "SELECT DISTINCT songbook.id, songbook.nom from songbook, liendocsongbook , document ,
+        chanson WHERE liendocsongbook.idDocument = document.id AND document.nomTable='chanson' 
+        AND document.idTable = chanson.id AND chanson.id = " . $this->_id . "  AND songbook.id = liendocsongbook.idSongbook";
+        //echo "ma requête : " . $maRequete;
+        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheSongbooksDocuments #1 : " . $_SESSION ['mysql']->error);
+        //var_dump($result);
+        return $result;
+    }
 }
 
 /// TODO fonctions à supprimer
@@ -438,38 +455,3 @@ function limiteLongueur($chaine, $tailleMax)
         return $chaine;
 }
 
-// Fonction de test
-// TODO : implémenter dans le projet les tests avecPhpUnit
-function testeChanson()
-{
-    echo "On crée la nuit je mens.<br>\n";
-    creeChanson("La nuit je mens", "Bashung", 1998, $_SESSION ['id'], 120, "4/4", "binaire", 10, "Em");
-    $id = chercheChansonParLeNom("La nuit je mens");
-    $id = $id [0];
-    echo infosChanson($id);
-
-    $id = $id [0];
-    echo infosChanson($id);
-
-    creeChanson("La javanaise", "Gainsbourg", 1962, $_SESSION ['id'], 110, "3/4", "binaire", 50, "Dm");
-    $id = chercheChansonParLeNom("La javanaise");
-    $id = $id [0];
-    echo infosChanson($id);
-
-    creeModifieChanson($id, "La javanaise remake", "Gainsbarre", 1979, $_SESSION ['id'], 80, "4/4", "ternaire", 1, "C");
-    $id = chercheChansonParLeNom("La javanaise remake");
-    $id = $id [0];
-    echo infosChanson($id);
-
-    $id = chercheChansonParLeNom("La nuit je mens");
-    $id = $id [0];
-    // supprimeChanson($id);
-    echo infosChanson($id);
-
-    $id = chercheChansonParLeNom("La javanaise remake");
-    // supprimeChanson($id[0]);
-    $id = chercheChansonParLeNom("La javanaise");
-    // supprimechanson($id[0]);
-}
-
-// TODO ajouter des logs pour tracer l'activité du site
