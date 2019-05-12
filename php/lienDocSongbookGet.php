@@ -12,7 +12,7 @@ include("lienDocSongbook.php");
 if ($_SESSION ['privilege'] > 1) {
     if ($_GET['idSongbook'] > 0) {
         if ($_GET['dir'] == "down") {
-            remonteTitre($_GET['idSongbook'], $_GET['ordre']+1, 1);
+            remonteTitre($_GET['idSongbook'], $_GET['ordre'] + 1, 1);
         }
         if ($_GET['dir'] == "pit") {
             $ordre = $_GET['ordre'];
@@ -22,7 +22,7 @@ if ($_SESSION ['privilege'] > 1) {
         }
         if ($_GET['ordre'] > 1) {
             if ($_GET['dir'] == "up") {
-                remonteTitre($_GET['idSongbook'], $_GET['ordre'] , 1);
+                remonteTitre($_GET['idSongbook'], $_GET['ordre'], 1);
             }
             if ($_GET['dir'] == "top") {
                 $nb = nombreDeLiensDuSongbook($_GET['idSongbook']);

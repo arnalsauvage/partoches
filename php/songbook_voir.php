@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/utilssi.php");
+include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("songbook.php");
 include_once("lienDocSongbook.php");
@@ -18,18 +18,18 @@ $monImage = imageTableId("songbook", $_GET ['id']);
 // On charge le tableau des utilisateurs
 $tabUsers = portraitDesUtilisateurs();
 
-$donnee = chercheSongbook ( $_GET ['id'] );
+$donnee = chercheSongbook($_GET ['id']);
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
 
 if ($_SESSION ['privilege'] > 1)
-	$sortie .= Ancre ( $songbookForm . "?id=" . $_GET ['id'], Image ( ($cheminImages . $iconeEdit), 32, 32, "modifier" ) );
+    $sortie .= Ancre($songbookForm . "?id=" . $_GET ['id'], Image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
 
 if ("" != $monImage) {
     $repertoire = "../data/songbooks/" . $_GET ['id'] . "/";
-	$sortie .= Image ( $repertoire . $monImage, 200, "", "pochette" );
+    $sortie .= Image($repertoire . $monImage, 200, "", "pochette");
 }
 
-$sortie .= $donnee [2] . "-" . $donnee [3] ."-". $donnee [5] . " hit(s)<br>\n";
+$sortie .= $donnee [2] . "-" . $donnee [3] . "-" . $donnee [5] . " hit(s)<br>\n";
 
 $sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
 
@@ -37,32 +37,32 @@ $sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
 $fichiersDuSongbook = fichiersSongbook($_GET ['id']);
 
 foreach ($fichiersDuSongbook as $fichier) {
-	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
-	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
-		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
+    $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, "icone");
+    if (!file_exists("../images/icones/" . $fichier [2] . ".png"))
+        $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
     $sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> ";
     $sortie .= intval(filesize(($fichier [0] . $fichier [1])) / 1024) . " (ko) <br>\n";
 }
 
 $sortie .= "<h2>Liste des documents dans ce songbook</h2>";
 
-$lignes = chercheLiensDocSongbook ( 'idSongbook', $_GET ['id'], "ordre", true );
+$lignes = chercheLiensDocSongbook('idSongbook', $_GET ['id'], "ordre", true);
 $listeDocs = "";
-while ( $ligne = $lignes->fetch_row () ) {
-	$ligneDoc = chercheDocument ( $ligne [1] );
-	$fichierCourt = composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
-	$fichier = "../data/chansons/" .$ligneDoc [6]. "/" . composeNomVersion ( $ligneDoc [1], $ligneDoc [4] );
-	$extension = substr(strrchr($ligneDoc [1], '.'), 1);
-	$icone = Image("../images/icones/" . $extension . ".png", 32, 32, "icone");
+while ($ligne = $lignes->fetch_row()) {
+    $ligneDoc = chercheDocument($ligne [1]);
+    $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+    $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+    $extension = substr(strrchr($ligneDoc [1], '.'), 1);
+    $icone = Image("../images/icones/" . $extension . ".png", 32, 32, "icone");
 
-	if (!file_exists("../images/icones/" . $extension . ".png"))
-		$icone = Image ( "../images/icones/fichier.png", 32, 32, "icone" );
-	$vignetteChanson = Image("../data/chansons/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
-	$vignettePublicateur = Image("../images" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
-	$sortie .= $vignettePublicateur . $vignetteChanson . $icone;
+    if (!file_exists("../images/icones/" . $extension . ".png"))
+        $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+    $vignetteChanson = Image("../data/chansons/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
+    $vignettePublicateur = Image("../images" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
+    $sortie .= $vignettePublicateur . $vignetteChanson . $icone;
     $sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a>";
     $sortie .= " (" . intval($ligneDoc[2] / 1024) . " ko)<br>\n";
 }
 
-$sortie .= envoieFooter ();
+$sortie .= envoieFooter();
 echo $sortie;

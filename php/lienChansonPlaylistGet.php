@@ -24,13 +24,13 @@ if ($_SESSION ['privilege'] > 1) {
     if ($_GET['idPlaylist'] > 0) {
         if ($_GET['dir'] == "down") {
             echo "remonteTitre " . $_GET['ordre'] + 1 . "  1";
-            remonteTitre($_GET['idPlaylist'], $_GET['ordre']+1, 1);
+            remonteTitre($_GET['idPlaylist'], $_GET['ordre'] + 1, 1);
         }
         if ($_GET['dir'] == "pit") {
             $ordre = $_GET['ordre'];
             $nb = nombreDeLiensDuPlaylist($_GET['idPlaylist']);
 
-            while($ordre++ < $nb)
+            while ($ordre++ < $nb)
                 remonteTitre($_GET['idPlaylist'], $ordre, 1);
         }
         if ($_GET['ordre'] > 1) {

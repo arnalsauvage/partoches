@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUndefinedMethodInspection */
+<?php
 /** @noinspection PhpUndefinedMethodInspection */
 include_once("lib/utilssi.php");
 include_once("menu.php");
@@ -54,7 +54,6 @@ if ("" != $monImage) {
 }
 $contenuHtml .= "</section>";
 $contenuHtml .= "</div>";
-
 
 augmenteHits($table, $idChanson);
 // Cherche un document et le renvoie s'il existe

@@ -51,6 +51,11 @@ class Pagination
     public function barrePagination()
     {
         $chaine = "<div class = nav> Pages :  ";
+        $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=1", "<<");
+        $pagePrecedente = $this->getPageEnCours();
+        if ($pagePrecedente == 0)
+            $pagePrecedente == 1;
+        $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=$pagePrecedente", "préc.");
         for ($compteur = 1; $compteur <= ($this->getNombreDePages()); $compteur++) {
             if ($compteur > 1)
                 $chaine .= " - ";
@@ -59,6 +64,12 @@ class Pagination
             else
                 $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=" . $compteur, $compteur);
         }
+        $pageSuivante = $this->getPageEnCours() + 1;
+        if ($pageSuivante > $this->getNombreDePages())
+            $pageSuivante = $this->getNombreDePages();
+
+        $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=$pageSuivante", "suiv.");
+        $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=" . $this->getNombreDePages(), ">>");
         $chaine .= "</div>";
         return $chaine;
     }
