@@ -175,7 +175,7 @@ function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant =
     $lignes = chercheDocuments($critere, $valeur, $critereTri, $bTriAscendant);
     while ($ligne = $lignes->fetch_row()) {
         if (strstr($ligne[1], "pdf"))
-            $retour .= "<option  value = '" . $ligne [0] . "'> " . htmlEntities($ligne [1] . " " . $ligne[3]) . "</option>\n";
+            $retour .= "<option  value = '" . $ligne [0] . "'> " . htmlEntities($ligne [1] . " " . $ligne[3], ENT_HTML5) . "</option>\n";
     }
     $retour .= "</select>\n";
     return $retour;

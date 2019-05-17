@@ -17,7 +17,6 @@ if ($_SESSION ['privilege'] < 2) {
 
 // Traitement de l'ajout de document
 if (isset ($_POST ['id']) && (isset ($_POST ['documentJoint']))) {
-
     $id = $_POST ['id'];
     ordonneLiensSongbook($id);
     creeLienDocSongbook($_POST ['documentJoint'], $_POST ['id']);
@@ -67,6 +66,7 @@ $f->champTexte("Hits :", "fhits", $donnee [5], 10, 10);
 $f->champCache("mode", $mode);
 $f->champValider(" Valider ", "valider");
 $sortie .= $f->fin();
+$sortie .= "</div>\n";
 
 if ($_SESSION ['privilege'] < 3) {
     // On verrouille les champs hits, date publication
@@ -97,7 +97,6 @@ while ($ligneDoc = $lignes->fetch_row()) {
 }
 $sortie .= $listeDocs;
 
-
 // On récupère les fichiers du Songbook
 //$fichiersDuSongbook = fichiersSongbook($id);
 //$lignes = chercheDocumentsTableId ( "chanson", $id );
@@ -115,15 +114,14 @@ echo $sortie;
 
 if ($mode == "MAJ") {
     ?>
-
     <h2>Envoyer un fichier pour ce songbook sur le serveur</h2>
     <form action="songbook_upload.php" method="post"
           enctype="multipart/form-data">
-        <input type="hidden" name="MAX_FILE_SIZE" value="10000000"> <input
-                type="hidden" name="id" value="<?php echo $donnee[0]; ?>"> <label
-                class="inline" for="fichier"> </label> <input type="file" id="fichier"
-                                                              name="fichierUploade" size="40"> <input type="submit"
-                                                                                                      value="Envoyer">
+        <input type="hidden" name="MAX_FILE_SIZE" value="10000000">
+        <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
+        <label class="inline" for="fichier"> </label>
+        <input type="file" id="fichier" name="fichierUploade" size="40">
+        <input type="submit" value="Envoyer">
     </form>
 
     <h2>Liste des documents dans ce songbook</h2>
@@ -132,30 +130,23 @@ if ($mode == "MAJ") {
         ou fin de la liste)</p>
     <?php
     $lignes = chercheLiensDocSongbook('idSongbook', $id, "ordre", true);
-    $listeDocs = "<div><table>";
+    $listeDocs = "<ul id='sortable'>";
     $numero = 0;
     while ($ligne = $lignes->fetch_row()) {
         $numero++;
         $ligneDoc = chercheDocument($ligne [1]);
+        $idDoc = $ligneDoc[0];
         $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-        $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-        $listeDocs .= "<tr><td>";
-        if ($numero > 1) {
-            $listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=top'><span class='glyphicon glyphicon-arrow-up'></a>";
-            $listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=up'><span class='glyphicon glyphicon-chevron-up'></a>";
-        }
-        $listeDocs .= "</td><td>";
+        $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . urlencode($fichierCourt);
+        $listeDocs .= "<li class='ui-state-default' data-index='$idDoc' data-position='$numero'>";
         $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, "icone");
         if (!file_exists("../images/icones/" . $fichier [2] . ".png"))
             $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
-        $listeDocs .= $icone . "</td><td>";
-        $listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=down'><span class='glyphicon glyphicon-chevron-down'></a>";
-        $listeDocs .= "<a href='lienDocSongbookGet.php?idSongbook=$id&ordre=$numero&dir=pit'><span class='glyphicon glyphicon-arrow-down'></a>";
-        $listeDocs .= "</td><td><a href= '" . htmlentities($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
-        $listeDocs .= "</td><td>" . boutonSuppression($songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
-        $listeDocs .= "</td></tr>\n";
+        $listeDocs .= "<a href= '" . htmlentities($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
+        $listeDocs .= boutonSuppression($songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
+        $listeDocs .= "</li>\n";
     }
-    echo $listeDocs . "</table></div>";
+    echo $listeDocs . "</ul>";
     ?>
 
     <h2>Lier un document existant à ce songbook</h2>
@@ -168,13 +159,13 @@ if ($mode == "MAJ") {
         <?php
         echo selectDocument("nomTable", "chanson", "id", false);
         ?>
-        <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>"> <input
-                type="submit" value="Envoyer">
+        <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
+        <input type="submit" value="Envoyer">
     </form>
     <button onclick='demandeUnPdf()'>Genère le songbook en pdf</button>
 
     <div id="div1"></div>
-    <script type='text/javascript'>
+    <script>
         function demandeUnPdf() {
             $.ajax({
                 type: "POST",
@@ -199,6 +190,34 @@ if ($mode == "MAJ") {
         function formSuccess() {
             $("#msgSubmit").removeClass("hidden");
         }
+
+        // Gestion de l'ordre dans le songbook
+        // On va renvoyer à la page traiteOrdre.php l'identifiant du songbook, et un tableau avec
+        // positions[idDoc,ancienRang]
+        // ex : si le 1er élémelent est passé en 2 :
+        // positions[387,2][366,1][167,3][274,4]
+
+         //   $('#sortable').sortable();
+            $('#sortable').sortable({
+                axis: 'y',
+                update: function(index) {
+                    var positions = [];
+                    $(this).children().each(function( index)
+                    {
+                        console.log($(this).attr('data-index'));
+                        positions.push([$(this).attr('data-index'),$(this).attr('data-position')]);
+                    });
+                    $.ajax({
+                        data: {
+                            idSongbook :  <?=$id?>,
+                            positions : positions
+                        },
+                        type: 'POST',
+                        url: 'traiteOrdre.php'
+                    });
+                }
+            });
+            $('#sortable').disableSelection();
     </script>
     <?php
     echo envoieFooter();

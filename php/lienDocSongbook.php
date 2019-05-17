@@ -85,6 +85,16 @@ function modifielienDocSongbook($id, $idDocument, $idSongbook, $ordre)
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifielienDocSongbook #1 : " . $_SESSION ['mysql']->error);
 }
 
+// Modifie en base l'ordre du lienDocSongbook
+function modifieOrdreLienDocSongbook( $idDocument, $idSongbook, $ordre)
+{
+    $maRequete = "UPDATE  liendocsongbook
+	SET  ordre = '$ordre'
+	WHERE idDocument = '$idDocument' AND idSongbook = '$idSongbook'";
+// 	echo $maRequete . "<br>";
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifielienDocSongbook #1 : " . $_SESSION ['mysql']->error);
+}
+
 // Cette fonction supprime un lienDocSongbook si il existe
 function supprimelienDocSongbook($idlienDocSongbook)
 {

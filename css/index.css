@@ -155,3 +155,24 @@ span.selected {
 	color: white;
 	z-index: 100;
 }
+
+
+#sortable {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	width: 60%;
+}
+
+#sortable li {
+	margin: 1px 1px 1px 1px;
+	padding: 0.1em;
+	padding-left: 1.5em;
+	font-size: 1em;
+	/* height: 18px; */
+}
+
+#sortable li span {
+	position: absolute;
+	margin-left: -1.3em;
+}
