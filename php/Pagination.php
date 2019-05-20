@@ -8,10 +8,10 @@
 class Pagination
 {
 
-    private $_nombreDePages; // identifiant en BDD
-    private $_nombreItemsTotal; // titre de la chanson , chaine de caractères
-    private $_nombreItemsParPage; // titre de la chanson , chaine de caractères
-    private $_pageEnCours; // interprete de reference de la chanson, chaîne de caractères
+    private $_nombreDePages; // nombre de pages pour contenir les items
+    private $_nombreItemsTotal; // nombre d'items à gérer
+    private $_nombreItemsParPage; // nomnbre d'items par page
+    private $_pageEnCours; // numéro de la page en cours
 
 
     // Fonction conseillée pour gérer plusieurs constructeurs

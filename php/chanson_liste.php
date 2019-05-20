@@ -51,7 +51,7 @@ else {
     }
 }
 
-// Gestion parametre de recherche
+// Gestion paramètre de recherche
 
 // Gestion parametre de recherche
 if (isset ($_POST ['cherche'])) {
@@ -61,7 +61,6 @@ if (isset ($_POST ['cherche'])) {
 else
     if (! isset($_SESSION['cherche']))
     $_SESSION['cherche'] = "";
-
 
 if ($_SESSION['cherche'] != "")
     $critere_cherche = "%" . $_SESSION['cherche'] . "%";
@@ -75,6 +74,7 @@ $resultat = Chanson::chercheChansons( $critere_cherche , $_SESSION['tri'] , $_SE
 $nbreChansons = count($resultat);
 $numligne = 0;
 
+// Gestion de la pagination
 $pagination = new Pagination ($nbreChansons, $nombreChansonsParPage);
 if (isset ($_GET['page']))
     $page = $_GET['page'];
@@ -90,7 +90,6 @@ if ($_SESSION ['privilege'] > 1)
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 $contenuHtml .= Image($iconeAttention, "100%", 1, 1);
-
 $contenuHtml .= TblDebut(0);
 $contenuHtml .= TblEnteteDebut() . TblDebutLigne();
 $contenuHtml .= TblEntete("  -  ");
@@ -163,7 +162,6 @@ if ($_SESSION ['privilege'] > 1) {
     $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Ajouter une chanson</a>\n";
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
-
 
 // Affichage de la recherche
 include_once("chanson_comp_cherche.php");
