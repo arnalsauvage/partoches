@@ -51,11 +51,17 @@ class Pagination
     public function barrePagination()
     {
         $chaine = "<div class = nav> Pages :  ";
-        $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=1", "<<");
-        $pagePrecedente = $this->getPageEnCours();
+        if ($this->getPageEnCours() > 1)
+            $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=1", "<< ");
+        else
+            $chaine .= "<< ";
+        $pagePrecedente = $this->getPageEnCours() - 1;
         if ($pagePrecedente == 0)
             $pagePrecedente == 1;
-        $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=$pagePrecedente", "préc.");
+        if ($this->getPageEnCours() > 1)
+            $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=$pagePrecedente", " préc. ");
+        else
+            $chaine.= " préc. ";
         for ($compteur = 1; $compteur <= ($this->getNombreDePages()); $compteur++) {
             if ($compteur > 1)
                 $chaine .= " - ";
@@ -67,9 +73,13 @@ class Pagination
         $pageSuivante = $this->getPageEnCours() + 1;
         if ($pageSuivante > $this->getNombreDePages())
             $pageSuivante = $this->getNombreDePages();
-
-        $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=$pageSuivante", "suiv.");
-        $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=" . $this->getNombreDePages(), ">>");
+        if ($this->getPageEnCours() < $this->getNombreDePages()) {
+            $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=$pageSuivante", " suiv. ");
+            $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=" . $this->getNombreDePages(), " >>");
+        }
+        else {
+            $chaine .= " suiv. >>";
+        }
         $chaine .= "</div>";
         return $chaine;
     }
