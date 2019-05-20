@@ -3,7 +3,6 @@ include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
-include_once("chanson_comp_cherche.php");
 include_once("Pagination.php");
 
 // DONE : ajouter un bouton "ajouter un doc pour cette chanson"
@@ -20,41 +19,60 @@ $contenuHtml = "<div class='container'> \n
 $contenuHtml .= entreBalise("Chansons", "H1");
 
 // Gestion du paramètre de tri
+// On prend en compte une demande de tri ascendant
 if (isset ($_GET ['tri'])) {
-    $tri = $_GET ['tri'];
-    $ordreAsc = true;
-} else {
+    $_SESSION['tri'] = $_GET ['tri'];
+    $_SESSION['ordreAsc'] = true;
+    // echo "session tri = get tro = " . $_SESSION['tri'] = $_GET ['tri'];
+}
+// On prend en compte une demande de tri descendant
+else {
     if (isset ($_GET ['triDesc'])) {
-        $tri = $_GET ['triDesc'];
-        $ordreAsc = false;
-    } else {
-        $tri = "datePub";
-        $ordreAsc = false;
+        $_SESSION['tri'] = $_GET ['triDesc'];
+        $_SESSION['ordreAsc'] = false;
+        // echo "session tri desc = get tro = " . $_SESSION['tri'] = $_GET ['triDesc'];
+    }
+    // Sinon, on installe le tri par date dégressif
+    else {
+        if (!isset ($_SESSION['tri'])) {
+            $_SESSION['tri'] = "datePub";
+            $_SESSION['ordreAsc'] = false;
+            // echo "tri par défaut ";
+        }
+        else {
+            // echo "session tri = " . $_SESSION['tri'];
+            /*
+            if ( $_SESSION['ordreAsc'] )
+                echo "Tri ascendant";
+            else
+                echo "Tri descendant";
+            */
+        }
     }
 }
 
 // Gestion parametre de recherche
-if (isset ($_GET ['cherche'])) {
-    $cherche = "%" . $_GET ['cherche'] . "%";
-} else {
-    $cherche = "%";
-}
 
-$critere = "nom";
 // Gestion parametre de recherche
-if (isset ($_POST ['chercheT']) && (strlen($_POST['chercheT']) > 0)) {
-    $cherche = "%" . $_POST ['chercheT'] . "%";
-}
-if (isset ($_POST ['chercheI']) && strlen($_POST['chercheI']) > 0) {
+if (isset ($_POST ['cherche'])) {
 
-    $critere = "interprete";
-    $cherche = "%" . $_POST ['chercheI'] . "%";
+    $_SESSION['cherche'] = $_POST['cherche'];
 }
+else
+    if (! isset($_SESSION['cherche']))
+    $_SESSION['cherche'] = "";
 
+
+if ($_SESSION['cherche'] != "")
+    $critere_cherche = "%" . $_SESSION['cherche'] . "%";
+else
+    $critere_cherche = "%";
+
+// echo " Recherche = " . $critere_cherche;
 
 // Chargement de la liste des chansons
-$resultat = Chanson::chercheChansons($critere, $cherche, $tri, $ordreAsc);
-$nbreChansons = $_SESSION ['mysql']->affected_rows;
+$resultat = Chanson::chercheChansons( $critere_cherche , $_SESSION['tri'] , $_SESSION['ordreAsc'] );
+$nbreChansons = count($resultat);
 $numligne = 0;
 
 $pagination = new Pagination ($nbreChansons, $nombreChansonsParPage);
@@ -99,13 +117,13 @@ $cheminImagesChanson = "../data/chansons/";
 $_chanson = new Chanson();
 
 /** @noinspection PhpUndefinedMethodInspection */
-while ($ligne = $resultat->fetch_row()) {
+foreach ($resultat as $ligne) {
     $numligne++;
     if (($numligne < $pagination->getItemDebut()) || $numligne > $pagination->getItemFin())
         continue;
     $contenuHtml .= TblDebutLigne();
 
-    $_chanson->chercheChanson($ligne[0]);
+    $_chanson->chercheChanson($ligne);
     $_id = $_chanson->getId();
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
@@ -148,6 +166,7 @@ if ($_SESSION ['privilege'] > 1) {
 
 
 // Affichage de la recherche
+include_once("chanson_comp_cherche.php");
 $contenuHtml .= $contenuHtmlCompCherche;
 $contenuHtml .= "
 </div>\n
@@ -162,5 +181,3 @@ function titreColonne($libelle, $nomRubrique)
     $chaine = TblEntete($lienCroissant . "  $libelle " . $lienDecroissant);
     return $chaine;
 }
-
-?>
