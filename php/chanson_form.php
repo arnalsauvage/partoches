@@ -31,6 +31,8 @@ if (isset ($_GET ['id']) && $_GET ['id'] != "") {
     $_chanson->setIdUser($_SESSION ['id']);
 }
 
+// echo "Session id : " . $_SESSION ['id'];
+
 $sortie .= "
 <div class='col-lg-12 centrer'>";
 if ($mode == "MAJ")

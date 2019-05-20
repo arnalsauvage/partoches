@@ -25,9 +25,12 @@ if ((isset ($_POST ['id']))) {
     $ftempo = $_POST ['ftempo'];
     $fmesure = $_POST ['fmesure'];
     $fpulsation = $_POST ['fpulsation'];
-    $fhits = $_POST ['fhits'];
+    if (isset($_POST ['fhits']))
+        $fhits = $_POST ['fhits'];
     $ftonalite = $_POST ['ftonalite'];
     $mode = $_POST ['mode'];
+    if (isset($_POST ['fhits']))
+        $fidUser = $_POST ['fiduser'];
 }
 
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
@@ -51,9 +54,9 @@ if ($id && $mode == "SUPPR" && $_SESSION ['privilege'] > 1) {
 }
 
 if ($mode == "INS") {
-    echo "FHits = " . $fhits;
-    $fhits = $_chanson->getHits();
-    $fidUser = $_chanson->getIdUser();
+    // echo "FHits = " . $fhits;
+    $fhits = 0;
+    $fidUser = $_SESSION ['id'];
     $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
     $id = $_chanson->creeChansonBDD();
 }

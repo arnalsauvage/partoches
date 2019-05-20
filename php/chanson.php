@@ -396,18 +396,23 @@ class Chanson
         return $retour;
     }
 
-
-// Cherche les chansons correspondant à un critère
-    public static function chercheChansons($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
+// Cherche les chansons sur le titre ou l'interprete, renvoie le tableau des identifiants
+    public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true)
     {
-        $maRequete = "SELECT id FROM chanson WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
+        if ($critere!= "" && $critere!="%")
+            $maRequete = "SELECT id FROM chanson WHERE nom  LIKE '$critere' OR interprete LIKE '$critere' ORDER BY $critereTri";
+        else
+            $maRequete = "SELECT id FROM chanson ORDER BY $critereTri";
         if ($bTriAscendant == false)
             $maRequete .= " DESC";
         else
             $maRequete .= " ASC";
         // echo "ma requête : " . $maRequete;
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
-        return $result;
+        $tableau = [];
+        while ($idChanson = $result->fetch_row())
+            array_push($tableau, $idChanson[0]);
+        return $tableau;
     }
 
 // Cherche la présence d'une chanson dans des songbooks

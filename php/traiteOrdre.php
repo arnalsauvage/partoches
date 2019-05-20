@@ -8,19 +8,21 @@ if ($_SESSION ['privilege'] < 2) {
     // TODO : ajouter un log ?
 }
 
-// Traitement de l'ajout de document
+// Traitement des paramètres de changement d'ordre
 if (isset ($_POST ['idSongbook']) && (isset ($_POST ['positions']))) {
     $idSongbook = $_POST ['idSongbook'];
     $positions = $_POST ['positions'];
-    //var_dump($positions);
     $rang = 1;
-
+    // Les enregistrements arrivent dans le nouvel ordre voulu,
+    // avec pour chaque entrée l'identifiant linDocSongbbok et la position dans l'ordre existant en BDD
     foreach ($positions as $position) {
-        $index = $position[0];
+        $idLienDS = $position[0];
         $position = $position[1];
+        // Si l'enregistrement a changé de place
         if ($rang <> $position) {
-            modifieOrdreLienDocSongbook($index, $idSongbook, $rang);
-            echo "Modification du doc $index du rang $position vers le rang $rang pour le songbook $idSongbook <br> \n";
+            // On modifie l'ordre de BDD pour mettre le nouveau souhaité
+            modifieOrdreLienDocSongbook($idLienDS, $idSongbook, $rang);
+            // echo "Modification du doc $idLienDS du rang $position vers le rang $rang pour le songbook $idSongbook <br> \n";
         }
         $rang++;
     }
