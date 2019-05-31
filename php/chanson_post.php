@@ -29,8 +29,8 @@ if ((isset ($_POST ['id']))) {
         $fhits = $_POST ['fhits'];
     $ftonalite = $_POST ['ftonalite'];
     $mode = $_POST ['mode'];
-    if (isset($_POST ['fhits']))
-        $fidUser = $_POST ['fiduser'];
+    if (isset($_POST ['fidUser']))
+        $fidUser = $_POST ['fidUser'];
 }
 
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson

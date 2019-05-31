@@ -332,7 +332,7 @@ class Chanson
             idUser = $this->_idUser, tempo = '$this->_tempo', mesure='$this->_mesure', pulsation='$this->_pulsation', 
             hits='$this->_hits', tonalite='$this->_tonalite' WHERE id='$this->_id'";
             // echo $maRequete;
-            $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modif dans creeModifieChanson #2 : " . $_SESSION ['mysql']->error);
+            $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modif dans creeModifieChanson #2 : " . $_SESSION ['mysql']->error . " requete : " . $maRequete);
         }
     }
 
