@@ -54,7 +54,7 @@ class Pagination
         if ($this->getPageEnCours() > 1)
             $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=1", "<< ");
         else
-            $chaine .= "<< ";
+            $chaine .= " &lt;&lt; ";
         $pagePrecedente = $this->getPageEnCours() - 1;
         if ($pagePrecedente == 0)
             $pagePrecedente == 1;

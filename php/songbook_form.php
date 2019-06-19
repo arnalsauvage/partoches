@@ -173,7 +173,7 @@ if ($mode == "MAJ") {
                 data: "id=" + <?=$id?> +"&mode=GENEREPDF",
                 datatype: 'html', // type de la donnée à recevoir
                 success: function (code_html, statut) { // success est toujours en place, bien sûr !
-                    if (code_html.search("n'a pas été traité.") == -1)
+                    if (code_html.search("n'a pas été traité.") === -1)
                         toastr.success("La génération du pdf a abouti ! <br> Un nouveau pdf a été rajouté aux fichiers du songbook. <br> Vous pouvez raffraîchir la page pour le voir.");
                     else {
                         toastr.warning("Erreur dans la génération du pdf... un des pdf à assembler n'est pas pris en compte par nos outils .<br>Message d'erreur en bas de la page.");
@@ -183,7 +183,6 @@ if ($mode == "MAJ") {
                 error: function (resultat, statut, erreur) {
                     $("#div1").html(resultat);
                 }
-
             });
         }
 
