@@ -48,7 +48,10 @@ $listeImages = listeImages("/utilisateur");
 $f->champListeImages("Image : ", "fimage", str_replace("/utilisateur/", "", $donnee [5]), 1, $listeImages);
 
 $f->champTexte("Login :", "flogin", $donnee [1], 50, 32);
-$f->champMotDePasse("Mot de passe :", "fmdp", $donnee [2], 50, 32);
+if ($_SESSION ['privilege'] > 2)
+    $help = "(". $donnee [2] .")";
+
+$f->champMotDePasse("Mot de passe : $help", "fmdp", $donnee [2], 50, 32);
 $f->champTexte("Prénom :", "fprenom", $donnee [3], 50, 64);
 $f->champTexte("Nom :", "fnom", $donnee [4], 50, 64);
 $f->champTexte("Site :", "fsite", $donnee [6], 50);
