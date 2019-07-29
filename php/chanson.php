@@ -271,12 +271,12 @@ class Chanson
     } // Indique la tonalité de la chanson ex : "Am" , "C#m"
 
 
-    // Cherche une chanson et la renvoie s'elle existe
+    // Cherche une chanson et la renvoie si elle existe
     public function chercheChanson($id)
     {
         $maRequete = "SELECT * FROM chanson WHERE chanson.id = '$id'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
-        // renvoie la lisgne sélectionnée : id, nom, interprète, année
+        // renvoie la ligne sélectionnée : id, nom, interprète, année
         if (($ligne = $result->fetch_row())) {
             $this->mysqlRowVersObjet($ligne);
             return (1);

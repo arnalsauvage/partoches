@@ -5,6 +5,8 @@ include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
 include_once("songbook.php");
+include_once ("UtilisateurNote.php");
+
 $table = "chanson";
 $contenuHtml = "<div class='container'>
   <div class='starter-template'> \n";
@@ -52,6 +54,9 @@ $contenuHtml .= "<section class='col-sm-4'>";
 if ("" != $monImage) {
     $contenuHtml .= Image("../data/chansons/" . $idChanson . "/" . $monImage, 200, "", "pochette", "img-thumbnail");
 }
+
+$contenuHtml .=  UtilisateurNote::starBar( "chanson", $idChanson, 5, 25); // 5 stars, Media ID 201, 25px star image
+
 $contenuHtml .= "</section>";
 $contenuHtml .= "</div>";
 

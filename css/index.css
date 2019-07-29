@@ -176,3 +176,7 @@ span.selected {
 	position: absolute;
 	margin-left: -1.3em;
 }
+
+
+.star { display: inline-block; background: url("../images/icones/star.png") no-repeat; width: 25px; height: 25px }
+.star_hover { display: inline-block; background: url("../images/icones/star.png") no-repeat; background-position: 0 -25px; width: 25px; height: 25px }
