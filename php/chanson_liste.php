@@ -4,6 +4,7 @@ include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
 include_once("Pagination.php");
+include_once ("UtilisateurNote.php");
 
 // DONE : ajouter un bouton "ajouter un doc pour cette chanson"
 // DONE : ajouter la date de publication et le tri par date de pub
@@ -96,6 +97,7 @@ $contenuHtml .= TblEntete("  -  ");
 $contenuHtml .= TblEntete("  Pochette  ");
 $contenuHtml .= titreColonne("Nom", "nom");
 $contenuHtml .= titreColonne("Interprète", "interprete");
+$contenuHtml .= TblEntete("  Vote  ");
 $contenuHtml .= titreColonne("Année", "annee");
 $contenuHtml .= titreColonne("Tempo", "tempo");
 $contenuHtml .= titreColonne("Mesure", "mesure");
@@ -134,6 +136,11 @@ foreach ($resultat as $ligne) {
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", $imagePochette));
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"))); // Nom
     $contenuHtml .= TblCellule(limiteLongueur($_chanson->getInterprete(), 21)); // interprete
+    if ($_SESSION ['privilege'] > 0)
+        $contenuHtml .= TblCellule(  UtilisateurNote::starBarUtilisateur( "chanson", $_id, 5, 25), 1, 1, "centrer");
+    else
+        $contenuHtml .= TblCellule(  UtilisateurNote::starBar( "chanson", $_id, 5, 25), 1, 1, "centrer");
+
     $contenuHtml .= TblCellule($_chanson->getAnnee(), 1, 1, "centrer"); // annee
     $contenuHtml .= TblCellule($_chanson->getTempo(), 1, 1, "alignerAdroite"); // tempo
     $contenuHtml .= TblCellule($_chanson->getMesure(), 1, 1, "centrer"); // mesure

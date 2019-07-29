@@ -22,17 +22,16 @@ class UtilisateurNote
         $this->setNote($_note);
     }
 
-    // Créée un champ html de vote à étoiles
+    // Créée un champ html de vote à étoiles pour que l'utilisateur vote
 
-    static function starBar($mediaNom, $mediaId, $nombreEtoiles, $largeurEtoiles) {
+    static function starBarUtilisateur($mediaNom, $mediaId, $nombreEtoiles, $largeurEtoiles) {
 
-        // $cookie_name = 'tcRatingSystem2'.$mediaNom.$mediaId;
+        $maNote = new UtilisateurNote( 0, 1, 1, 1);
+        $maNote->chercheNoteUtilisateur($_SESSION['id'],$mediaNom, $mediaId);
+
         $nbrPixelsInDiv = $nombreEtoiles * $largeurEtoiles; // Calcule la largeur du DIV en pixels
 
-        $result = UtilisateurNote::scoreEtNombreDeVotes($mediaNom, $mediaId);
-
-        //nombre de pixels à colorier en jaune selon le score atteint
-        $numEnlightedPX = round($nbrPixelsInDiv * $result['average'] / $nombreEtoiles, 0);
+        $numEnlightedPX = round($nbrPixelsInDiv * $maNote->getNote() / $nombreEtoiles, 0);
 
         $getJSON = array('nombreEtoiles' => $nombreEtoiles, 'mediaId' => $mediaId); // We create a JSON with the number of stars and the media ID
         $getJSON = json_encode($getJSON);
@@ -54,10 +53,47 @@ class UtilisateurNote
         }
         $starBar .= '</div>';
         $starBar .= '<div class="resultMedia'.$mediaId.'" style="font-size: small; color: grey">'; // We show the rate score and number of rates
+        if ($maNote->getNote() == 0)
+            $starBar .= 'Pas (encore) de vote';
+        else {
+
+            $starBar .= 'Note : ' . $maNote->getNote() ;
+        }
+        $starBar .= '</div>';
+        $starBar .= '<div class="box'.$mediaId.'"></div>';
+        $starBar .= '</div>';
+        return $starBar;
+    }
+
+    // Créée un champ html de vote à étoiles pour visualiser les votes
+
+    static function starBar ($mediaNom, $mediaId, $nombreEtoiles, $largeurEtoiles) {
+
+        // $cookie_name = 'tcRatingSystem2'.$mediaNom.$mediaId;
+        $nbrPixelsInDiv = $nombreEtoiles * $largeurEtoiles; // Calcule la largeur du DIV en pixels
+
+        $result = UtilisateurNote::scoreEtNombreDeVotes($mediaNom, $mediaId);
+
+        //nombre de pixels à colorier en jaune selon le score atteint
+        $numEnlightedPX = round($nbrPixelsInDiv * $result['average'] / $nombreEtoiles, 0);
+
+        $getJSON = array('nombreEtoiles' => $nombreEtoiles, 'mediaId' => $mediaId); // We create a JSON with the number of stars and the media ID
+        $getJSON = json_encode($getJSON);
+
+        $starBar = '<div id="'.$mediaId.'">';
+        $starBar .= '<div class="star_bar" style="width:'.$nbrPixelsInDiv.'px; height:'.$largeurEtoiles.'px; background: 
+    linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX.'px,#ccc '.$numEnlightedPX.'px,#ccc '.$nbrPixelsInDiv.'px);" rel=\''.$getJSON.'\'>';
+        // Une boucle pour créer le nombre d'étoiles demandées
+        for ($i=1; $i<=$nombreEtoiles; $i++) {
+            $starBar .= '<div title="'.$i.'/'.$nombreEtoiles.'" id="'.$i.'" class="star"';
+            $starBar .= '></div>';
+        }
+        $starBar .= '</div>';
+        $starBar .= '<div class="resultMedia'.$mediaId.'" style="font-size: small; color: grey">'; // We show the rate score and number of rates
         if ($result['nbrRate'] == 0)
             $starBar .= 'Pas (encore) de vote';
         else
-            $starBar .= 'Rating: ' . $result['average'] . '/' . $nombreEtoiles . ' (' . $result['nbrRate'] . ' votes)';
+            $starBar .=  $result['average'] . '/' . $nombreEtoiles . ' (' . $result['nbrRate'] . ' votes)';
         $starBar .= '</div>';
         $starBar .= '<div class="box'.$mediaId.'"></div>';
         $starBar .= '</div>';

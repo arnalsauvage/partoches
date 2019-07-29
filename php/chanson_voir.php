@@ -55,7 +55,9 @@ if ("" != $monImage) {
     $contenuHtml .= Image("../data/chansons/" . $idChanson . "/" . $monImage, 200, "", "pochette", "img-thumbnail");
 }
 
-$contenuHtml .=  UtilisateurNote::starBar( "chanson", $idChanson, 5, 25); // 5 stars, Media ID 201, 25px star image
+if ($_SESSION['privilege']>0)
+    $contenuHtml .=   UtilisateurNote::starBarUtilisateur( "chanson", $idChanson, 5, 25); // 5 stars, Media ID 201, 25px star image
+$contenuHtml .=   UtilisateurNote::starBar( "chanson", $idChanson, 5, 25); // 5 stars, Media ID 201, 25px star image
 
 $contenuHtml .= "</section>";
 $contenuHtml .= "</div>";
