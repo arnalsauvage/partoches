@@ -79,7 +79,7 @@ $contenu .= "<div class='container'>\n
 
 $contenu .= "<br><br><br> sur Top 5 partoches, les amis de Top5 partagent leurs partoches (venues du club ou d'ailleurs...) pour le plaisir de gratter l'ukulélé <br>\n";
 
-$contenu .= image("../images" . $_SESSION ['image'], 64) . "\n";
+$contenu .= image("../vignettes/" . $_SESSION ['image'], 64) . "\n";
 
 $date = date("d/m/Y");
 $heure = date("H:i");
