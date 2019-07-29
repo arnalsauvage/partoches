@@ -1,7 +1,7 @@
 <?php
 require("lib/utilssi.php");
 require("document.php");
-//require ("lib/vignette.php");
+require_once ("lib/vignette.php");
 
 // On vérifie que l'utilisateur est connecté
 if (!isset ($_SESSION ['user'])) {
@@ -67,7 +67,10 @@ if (!move_uploaded_file($tmp_file, $repertoire . $name_file)) {
 }
 
 // Génération d'une vignette
-afficheVignette($name_file, $cheminImages, $cheminVignettes);
+
+$cheminImages = $repertoire;
+$cheminVignettes = "../vignettes/";
+    afficheVignette($name_file, $cheminImages, $cheminVignettes);
 
 // On récupère l'url du fichier envoyé
 $get_the_file = "<a href=\"http://" . $_SERVER ['SERVER_NAME'] . dirname($_SERVER ['REQUEST_URI']) . "/" . $repertoire . $name_file . "\" target=\"_blank\">Accéder au fichier</a>";

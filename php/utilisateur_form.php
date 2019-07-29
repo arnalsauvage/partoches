@@ -46,12 +46,8 @@ $f = new Formulaire ("POST", $table . "_get.php", $sortie);
 $f->champCache("id", $donnee [0]);
 $listeImages = listeImages("/utilisateur");
 $f->champListeImages("Image : ", "fimage", str_replace("/utilisateur/", "", $donnee [5]), 1, $listeImages);
-
 $f->champTexte("Login :", "flogin", $donnee [1], 50, 32);
-if ($_SESSION ['privilege'] > 2)
-    $help = "(". $donnee [2] .")";
-
-$f->champMotDePasse("Mot de passe : $help", "fmdp", $donnee [2], 50, 32);
+$f->champMotDePasse("Mot de passe : ", "fmdp", $donnee [2], 50, 32);
 $f->champTexte("Prénom :", "fprenom", $donnee [3], 50, 64);
 $f->champTexte("Nom :", "fnom", $donnee [4], 50, 64);
 $f->champTexte("Site :", "fsite", $donnee [6], 50);
@@ -83,11 +79,16 @@ $sortie .= "<h2>Envoyer une image sur le serveur</h2>
 
 // Si l'utilisateur n'est pas Admin
 if ($_SESSION ['privilege'] < 3) {
-    // On désactive les champs dateDernierLogin, nbreLogins et provilege pour les non admins
+    // On désactive les champs dateDernierLogin, nbreLogins et privilege pour les non admins
     $sortie = str_replace("NAME='fdateDernierLogin'", "NAME='fdateDernierLogin' disabled='disabled' ", $sortie);
     $sortie = str_replace("NAME='fnbreLogins'", "NAME='fnbreLogins' disabled='disabled' ", $sortie);
     $sortie = str_replace("NAME='fprivilege'", "NAME='fprivilege' disabled='disabled' ", $sortie);
 }
+
+if ($_SESSION ['privilege'] > 2)
+    $help = "(". $donnee [2] .")";
+$sortie .= "<img src='../vignettes/upload.png' title=' ".$donnee [2]."'>";
+
 $sortie .= envoieFooter();
 echo $sortie;
 // privilege
