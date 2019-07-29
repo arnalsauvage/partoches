@@ -55,7 +55,7 @@ class UtilisateurNote
         $starBar .= '</div>';
         $starBar .= '<div class="resultMedia'.$mediaId.'" style="font-size: small; color: grey">'; // We show the rate score and number of rates
         if ($result['nbrRate'] == 0)
-            $starBar .= 'Not rated yet';
+            $starBar .= 'Pas (encore) de vote';
         else
             $starBar .= 'Rating: ' . $result['average'] . '/' . $nombreEtoiles . ' (' . $result['nbrRate'] . ' votes)';
         $starBar .= '</div>';
