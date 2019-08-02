@@ -12,9 +12,9 @@ function rateMedia(mediaName, mediaId, rate, numStar, starWidth) {
         timeout: 3000,
         success: function(data) {
             // Remercie pour le vote
-            $('.box' + mediaId).html('<div style="font-size: small; color: green">Merci pour votre vote !</div>');
+            $('.box' + mediaId).html('<div style="font-size: x-small; color: green">Merci pour ce vote (' + rate + ' / ' +numStar + ')</div>');
             // On met à jour la note et le nombre de votes
-            $('.resultMedia' + mediaId).html('<div style="font-size: small; color: grey">Vote : ' + data.avg + '/' + numStar + ' (' + data.nbrRate + ' votes)</div>');
+            $('.resultMedia' + mediaId).html('<div style="font-size: small; color: grey"> Moy.'+ data.avg + '/' + numStar + ' (' + data.nbrRate + ' votes)</div>');
             // On recalcule quelle portion doit être affichée en surbrillance selon le score,
             var nbrPixelsInDiv = numStar * starWidth;
             var numEnlightedPX = Math.round(nbrPixelsInDiv * data.avg / numStar);
