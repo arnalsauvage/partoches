@@ -6,8 +6,6 @@ include_once("document.php");
 include_once("Pagination.php");
 include_once ("UtilisateurNote.php");
 
-// DONE : ajouter un bouton "ajouter un doc pour cette chanson"
-// DONE : ajouter la date de publication et le tri par date de pub
 $chansonForm = "chanson_form.php";
 $chansonPost = "chanson_post.php";
 $chansonVoir = "chanson_voir.php";
@@ -52,9 +50,9 @@ else {
     }
 }
 
-// Gestion paramètre de recherche
+// Gestion paramètres de recherche
 
-// Gestion parametre de recherche
+// Gestion paramètres de recherche
 if (isset ($_POST ['cherche'])) {
 
     $_SESSION['cherche'] = $_POST['cherche'];

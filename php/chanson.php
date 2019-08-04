@@ -419,7 +419,7 @@ class Chanson
             $maRequete .= " DESC";
         else
             $maRequete .= " ASC";
-        echo "ma requête : " . $maRequete;
+        // echo "ma requête : " . $maRequete;
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
         $tableau = [];
         while ($idChanson = $result->fetch_row())
