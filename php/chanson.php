@@ -401,13 +401,25 @@ class Chanson
     {
         if ($critere!= "" && $critere!="%")
             $maRequete = "SELECT id FROM chanson WHERE nom  LIKE '$critere' OR interprete LIKE '$critere' ORDER BY $critereTri";
-        else
+        else {
             $maRequete = "SELECT id FROM chanson ORDER BY $critereTri";
-        if ($bTriAscendant == false)
+            if ($critere=="votes"|| $critereTri =="votes"){
+                if ($_SESSION['privilege']==0)
+                    $maRequete = "SELECT chanson.id  FROM chanson 
+                    RIGHT JOIN noteUtilisateur on noteUtilisateur.idObjet = chanson.id 
+                    WHERE noteUtilisateur.nomObjet = 'chanson' OR noteUtilisateur.nomObjet = NULL
+                    GROUP BY chanson.id ORDER BY COALESCE(AVG(noteUtilisateur.note),0) ";
+                else
+                    $maRequete = "SELECT  noteUtilisateur.idObjet FROM noteUtilisateur 
+                    WHERE noteUtilisateur.nomObjet = 'chanson' AND noteUtilisateur.idUtilisateur = '" . $_SESSION['id'] ."'
+                    ORDER BY noteUtilisateur.note";
+            }
+        }
+            if ($bTriAscendant == false)
             $maRequete .= " DESC";
         else
             $maRequete .= " ASC";
-        // echo "ma requête : " . $maRequete;
+        echo "ma requête : " . $maRequete;
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
         $tableau = [];
         while ($idChanson = $result->fetch_row())
