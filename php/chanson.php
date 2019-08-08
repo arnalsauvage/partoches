@@ -399,6 +399,8 @@ class Chanson
 // Cherche les chansons sur le titre ou l'interprete, renvoie le tableau des identifiants
     public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true)
     {
+        $critere = $_SESSION ['mysql']->real_escape_string($critere);
+
         if ($critere!= "" && $critere!="%")
             $maRequete = "SELECT id FROM chanson WHERE nom  LIKE '$critere' OR interprete LIKE '$critere' ORDER BY $critereTri";
         else {

@@ -1,6 +1,8 @@
 <?php
-if (isset ($_SESSION['cherche']  ))
+if (isset ($_SESSION['cherche']  )) {
     $nom = $_SESSION['cherche'];
+    $nom = htmlspecialchars($nom,ENT_QUOTES );
+    }
 else
     $nom = "";
 
