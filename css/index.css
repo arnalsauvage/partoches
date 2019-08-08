@@ -16,6 +16,10 @@ form {
 	margin-right: auto;
 }
 
+form.login {
+	width: 396px;
+}
+
 fieldset {
 	padding: 0 20px 20px 20px;
 	margin-bottom: 10px;
@@ -30,8 +34,12 @@ legend {
 label {
 	margin-top: 1px;
 	display: block;
-	width: 150px;
+	width: 200px;
 	float: left;
+}
+
+label.login {
+	width: 120px;
 }
 
 label.inline {
@@ -49,6 +57,10 @@ input, textarea, select {
 	border-radius: 5px;
 	width: 200px;
 	box-shadow: 1px 1px 2px #C0C0C0 inset;
+}
+
+input#login, input#pass {
+	width: 150px;
 }
 
 select {
@@ -114,3 +126,57 @@ li.fichiers {
     padding: 10px;
     margin-bottom: 10px;
 }
+
+
+.doc {
+	margin-top: 1px;
+	display: inline;
+	width: 200px;
+	float: none;
+	color: #DF3333;
+}
+
+/* Gestion de popin jquery */
+.contenu_popup {
+	background-color: #FFFFFF;
+	border: 1px solid #DF3333;
+	cursor: default;
+	display: none;
+	margin-top: 15px;
+	position: absolute;
+	text-align: left;
+	width: 400px;
+	z-index: 50;
+	padding: 2px 2px;
+}
+
+span.selected {
+	background-color: #1F75CC;
+	color: white;
+	z-index: 100;
+}
+
+
+#sortable {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	width: 60%;
+}
+
+#sortable li {
+	margin: 1px 1px 1px 1px;
+	padding: 0.1em;
+	padding-left: 1.5em;
+	font-size: 1em;
+	/* height: 18px; */
+}
+
+#sortable li span {
+	position: absolute;
+	margin-left: -1.3em;
+}
+
+
+.star { display: inline-block; background: url("../images/icones/star.png") no-repeat; width: 25px; height: 25px }
+.star_hover { display: inline-block; background: url("../images/icones/star.png") no-repeat; background-position: 0 -25px; width: 25px; height: 25px }

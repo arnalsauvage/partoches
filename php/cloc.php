@@ -36,22 +36,16 @@ function counter($dir)
 
     $nbLines = 0;
 
-    while( ($file = readdir($handle)) != false )
-    {
-        if( $file != "." && $file != "..")
-        {
-            if( !is_dir($dir."/".$file) )
-            {
-                if( preg_match("#\.(php|html|txt)$#", $file) )
-                {
-                    $nb = count(file($dir."/".$file));
-                    echo $dir,"/",$file," => <strong>",$nb,"</strong><br />n";
+    while (($file = readdir($handle)) != false) {
+        if ($file != "." && $file != "..") {
+            if (!is_dir($dir . "/" . $file)) {
+                if (preg_match("#\.(php|html|txt)$#", $file)) {
+                    $nb = count(file($dir . "/" . $file));
+                    echo $dir, "/", $file, " => <strong>", $nb, "</strong><br />n";
                     $nbLines += $nb;
                 }
-            }
-            else
-            {
-                $nbLines += counter($dir."/".$file);
+            } else {
+                $nbLines += counter($dir . "/" . $file);
             }
         }
     }
@@ -65,6 +59,6 @@ function counter($dir)
 $dir = ".";
 
 $nb = counter($dir);
-print("<br />Le projet comporte un total de <strong>".$nb.
+print("<br />Le projet comporte un total de <strong>" . $nb .
     "</strong> lignes<br />\n");
 

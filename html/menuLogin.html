@@ -1,40 +1,11 @@
-<!--suppress ALL -->
-
-<br>
-<br>
-<p> Les membres de Top 5 peuvent se connecter avec leur login / mot de passe.</p>
-
-<FORM action="login.php" method="post">
-	<fieldset>
-		<legend> Identification : </legend>
-		<div id="labels">
-			<label for='login'>Login :</label>
-			<label for='pass'>Mot de passe :</label>
-		</div>
-		<div id="champs">
+<div class='contenu_popup'>
+	<FORM action="login.php" class="login" method="post">
+		<label class="login" for='login'>Login :</label>
 			<input size="16" id='login' name="user" value="" placeholder="prenom">
+		<label class="login" for='pass'>Mot de passe :</label>
 			<input size="16" type="password" id="pass" name="pass" value="" placeholder="mot de passe">
-		</div>
-	</fieldset>
-	<input type="submit" value="Ok">
-</FORM>
-
-<div>
-
-	<p> Pour les amis, il est possible de se connecter comme invité.</p>
-
-	<p> En ce cas, validez par le bouton ok, et vous accèderez aux partoches publiques.</p>
-
-	<FORM action="login.php" method="post">
-		<fieldset>
-			<legend> Invité :</legend>
-
-			<div id="champs">
-				<input size="16" type="hidden" id='login' name="user" value="invite">
-				<input size="16" type="hidden" id="pass" name="pass" value="invite">
-			</div>
-		</fieldset>
 		<input type="submit" value="Ok">
 	</FORM>
-
+	<span> <a href="oubliMotDePasse.php">oubli de mot de passe </a></span>
+	<span class=close>Fermer la fenêtre</span>
 </div>

@@ -1,24 +1,24 @@
 <?php
-require ("lib/utilssi.php");
+require("lib/utilssi.php");
 require("document.php");
 
 // On vérifie que l'utilisateur est connecté
 if (!isset ($_SESSION ['user'])) {
-	echo "Vous devez vous authentifier !";
-	return (0);
+    echo "Vous devez vous authentifier !";
+    return (0);
 }
 
 // On vérifie qu'on a un fichier joint
 if (!isset ($_FILES ['fichierUploade'])) {
-	echo "Pas de fichier joint !";
-	return (0);
+    echo "Pas de fichier joint !";
+    return (0);
 }
 
 $autorisees = "pdf doc docx gif jpg png swf mp3 odt";
 $repertoire = "../data/songbooks/" . $_POST ['id'] . "/";
 if (!file_exists($repertoire)) {
-	mkdir($repertoire, 0755);
-	// echo " -=> Création du repertoire $repertoire réussi<br>";
+    mkdir($repertoire, 0755);
+    // echo " -=> Création du repertoire $repertoire réussi<br>";
 }
 
 // taille autorisées (min & max -- en octets)
@@ -26,16 +26,16 @@ $file_min_size = 0;
 $file_max_size = 10000000;
 // On vérifie la présence d'un fichier à uploader
 if (($_FILES ['fichierUploade'] ['size'] < $file_min_size) || ($_FILES ['fichierUploade'] ['size'] > $file_max_size)) {
-	echo "La taille du fichier doit être comprise entre 1 et $file_max_size octets ! ";
-	return (0);
+    echo "La taille du fichier doit être comprise entre 1 et $file_max_size octets ! ";
+    return (0);
 }
 
 // dossier où sera déplacé le fichier
 $tmp_file = $_FILES ['fichierUploade'] ['tmp_name'];
 if (!is_uploaded_file($tmp_file)) {
-	$errors ['fichierUploade'] = "le fichier est introuvable";
-	echo $errors ['fichierUploade'];
-	return 0;
+    $errors ['fichierUploade'] = "le fichier est introuvable";
+    echo $errors ['fichierUploade'];
+    return 0;
 }
 
 // on vérifie l'extension
@@ -43,10 +43,10 @@ $path = $_FILES ['fichierUploade'] ['name'];
 $ext = pathinfo($path, PATHINFO_EXTENSION); // on récupère l'extension
 
 if (strstr($autorisees, $ext) == FALSE) {
-	$errors ['fichierUploade'] = "le fichier n'a pas une extension autorisée ($type_file) .";
-	$errors ['fichierUploade'] .= "Extensions autorisées :  . $autorisees";
-	echo $errors ['fichierUploade'];
-	return 0;
+    $errors ['fichierUploade'] = "le fichier n'a pas une extension autorisée ($autorisees) .";
+    $errors ['fichierUploade'] .= "Extensions autorisées :  . $autorisees";
+    echo $errors ['fichierUploade'];
+    return 0;
 }
 
 // On met le nom au propre pour éviter les pb de caractères accentués
@@ -60,16 +60,16 @@ $name_file = str_replace(".$ext", "-v" . ($doc [4]), $path) . ".$ext";
 
 // Si le formulaire est validé, on copie le fichier dans le dossier de destination
 if (!move_uploaded_file($tmp_file, $repertoire . $name_file)) {
-	$errors ['fichierUploade'] = "Il y a des erreurs! Impossible de copier le fichier dans le dossier cible";
-	echo $errors ['fichierUploade'];
-	return 0;
+    $errors ['fichierUploade'] = "Il y a des erreurs! Impossible de copier le fichier dans le dossier cible";
+    echo $errors ['fichierUploade'];
+    return 0;
 }
 
 // On récupère l'url du fichier envoyé
 $get_the_file = "<a href=\"http://" . $_SERVER ['SERVER_NAME'] . dirname($_SERVER ['REQUEST_URI']) . "/" . $repertoire . $name_file . "\" target=\"_blank\">Accéder au fichier</a>";
 
 // On redirige vers la liste des songbooks
-header ( 'Location: ./songbook_voir.php?id=' . $_POST ['id'] );
+header('Location: ./songbook_voir.php?id=' . $_POST ['id']);
 // }
 // echo "Vous �tes identifi� avec : " . $email . "<BR>";
 // $texte = " Bonjour, un fichier ($toto_name) a �t� upload� sur http://medina.arnaud.free.fr/$repertoire, par l'ip $REMOTE_ADDR, identifi� avec le nom $email.";
@@ -81,31 +81,31 @@ header ( 'Location: ./songbook_voir.php?id=' . $_POST ['id'] );
 
 function renommeFichierChanson($nomFichier)
 {
-	$trans = array (
-			"#" => "diese",
-		"strm" => "strum");
-	$nomFichier = str_replace(
-		array(
-			'à', 'â', 'ä', 'á', 'ã', 'å',
-			'î', 'ï', 'ì', 'í',
-			'ô', 'ö', 'ò', 'ó', 'õ', 'ø',
-			'ù', 'û', 'ü', 'ú',
-			'é', 'è', 'ê', 'ë',
-			'ç', 'ÿ', 'ñ', '#'
-		),
-		array(
-			'a', 'a', 'a', 'a', 'a', 'a',
-			'i', 'i', 'i', 'i',
-			'o', 'o', 'o', 'o', 'o', 'o',
-			'u', 'u', 'u', 'u',
-			'e', 'e', 'e', 'e',
-			'c', 'y', 'n', "Diese"
-		),
-		$nomFichier
-	);
+    $trans = array(
+        "#" => "diese",
+        "strm" => "strum");
+    $nomFichier = str_replace(
+        array(
+            'à', 'â', 'ä', 'á', 'ã', 'å',
+            'î', 'ï', 'ì', 'í',
+            'ô', 'ö', 'ò', 'ó', 'õ', 'ø',
+            'ù', 'û', 'ü', 'ú',
+            'é', 'è', 'ê', 'ë',
+            'ç', 'ÿ', 'ñ', '#'
+        ),
+        array(
+            'a', 'a', 'a', 'a', 'a', 'a',
+            'i', 'i', 'i', 'i',
+            'o', 'o', 'o', 'o', 'o', 'o',
+            'u', 'u', 'u', 'u',
+            'e', 'e', 'e', 'e',
+            'c', 'y', 'n', "Diese"
+        ),
+        $nomFichier
+    );
 
-	// 	$nomFichier = strtr_unicode( $nomFichier, $trans );
-	// 	$nomFichier = strtr_unicode( $nomFichier, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ",
-	// 								 		"aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn" );
-	return $nomFichier;
+    // 	$nomFichier = strtr_unicode( $nomFichier, $trans );
+    // 	$nomFichier = strtr_unicode( $nomFichier, "ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ",
+    // 								 		"aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn" );
+    return $nomFichier;
 }
