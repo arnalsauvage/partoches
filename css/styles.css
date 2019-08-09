@@ -102,3 +102,13 @@ img {
     border: 0;
 }
 
+.mentionsLegales {
+    background: rgba(255, 255, 255, 0.89);
+    margin: 0 auto;
+    position: relative;
+    top: 100px;
+    width: 80%;
+   /* display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;*/
+}
