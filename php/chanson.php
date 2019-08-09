@@ -81,6 +81,12 @@ class Chanson
         $this->setId($_id);
     }
 
+    public function __construct11($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_date, $_hits, $_tonalite)
+    {
+        $this->__construct10($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite);
+        $this->setDatePub($_date);
+    }
+
     // Un constructeur qui charge directement depuis la BDD
     public function __construct1($_id)
     {
@@ -330,7 +336,7 @@ class Chanson
             $_annee = $_SESSION ['mysql']->real_escape_string($this->_annee);
             $maRequete = "UPDATE  chanson SET nom = '$_nom', interprete = '$_interprete', annee = '$_annee',
             idUser = $this->_idUser, tempo = '$this->_tempo', mesure='$this->_mesure', pulsation='$this->_pulsation', 
-            hits='$this->_hits', tonalite='$this->_tonalite' WHERE id='$this->_id'";
+            hits='$this->_hits', tonalite='$this->_tonalite', datePub='$this->_datePub' WHERE id='$this->_id'";
             // echo $maRequete;
             $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modif dans creeModifieChanson #2 : " . $_SESSION ['mysql']->error . " requete : " . $maRequete);
         }

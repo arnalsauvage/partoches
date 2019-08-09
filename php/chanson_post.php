@@ -31,6 +31,7 @@ if ((isset ($_POST ['id']))) {
     $mode = $_POST ['mode'];
     if (isset($_POST ['fidUser']))
         $fidUser = $_POST ['fidUser'];
+    $fdateModif = $_POST['fdate'];
 }
 
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
@@ -39,10 +40,13 @@ if ($mode == "MAJ") {
         // On doit recharger les hits, le user et la date pour qu'ils ne soient remis à zéro
         $_chanson->chercheChanson($id);
         $fhits = $_chanson->getHits();
-        $fdate = dateMysqlVersTexte($_chanson->getDatePub());
         $fidUser = $_chanson->getIdUser();
+        $fdate = $_chanson->getDatePub();
     }
-    $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
+    else
+        $fdate = dateTexteVersMysql($fdateModif);
+        echo 'date' . $fdate;
+    $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
     $_chanson->creeModifieChansonBDD();
 }
 
