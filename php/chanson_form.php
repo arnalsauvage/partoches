@@ -118,7 +118,7 @@ if ($_SESSION ['privilege'] < 3) {
     // On verrouille les champs hits, date publication, et utilisateur
     $sortie = str_replace("NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie);
     $sortie = str_replace("NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie);
-    $sortie = str_replace("NAME='fidUser'", "NAME='fidUser' disabled='disabled' ", $sortie);
+    $sortie = str_replace("name='fidUser'", "NAME='fidUser' disabled='disabled' ", $sortie);
 }
 
 echo $sortie;

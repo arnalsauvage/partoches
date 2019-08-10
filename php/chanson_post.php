@@ -31,7 +31,7 @@ if ((isset ($_POST ['id']))) {
     $mode = $_POST ['mode'];
     if (isset($_POST ['fidUser']))
         $fidUser = $_POST ['fidUser'];
-    $fdateModif = $_POST['fdate'];
+    $fdate = $_POST['fdate'];
 }
 
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
@@ -44,8 +44,7 @@ if ($mode == "MAJ") {
         $fdate = $_chanson->getDatePub();
     }
     else
-        $fdate = dateTexteVersMysql($fdateModif);
-        echo 'date' . $fdate;
+        $fdate = dateTexteVersMysql($fdate);
     $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
     $_chanson->creeModifieChansonBDD();
 }
@@ -60,7 +59,9 @@ if ($id && $mode == "SUPPR" && $_SESSION ['privilege'] > 1) {
 if ($mode == "INS") {
     // echo "FHits = " . $fhits;
     $fhits = 0;
-    $fidUser = $_SESSION ['id'];
+    // Seul admin peut attribuer une chanson à un autre
+    if ($_SESSION ['privilege'] < 3)
+        $fidUser = $_SESSION ['id'];
     $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
     $id = $_chanson->creeChansonBDD();
 }
