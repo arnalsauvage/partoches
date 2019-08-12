@@ -86,12 +86,12 @@ while ($ligneDoc = $lignes->fetch_row()) {
     // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     // echo "Chanson id : $id fichier court : $fichierCourt";
-    $fichier = "../data/songbook/$id/" . $fichierCourt;
+    $fichier = "../data/songbooks/$id/" . urlencode($fichierCourt);
     $extension = substr(strrchr($ligneDoc[1], '.'), 1);
     $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
     if (!file_exists("../images/icones/$extension.png"))
         $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
-    $listeDocs .= "$icone <a href= '" . urlencode($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
+    $listeDocs .= "$icone <a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
     $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
     $listeDocs .= boutonSuppression("songbook_get.php" . "?idSongbook=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
 }

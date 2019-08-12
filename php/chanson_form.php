@@ -137,7 +137,7 @@ if ($mode == "MAJ") {
             // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
             $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
             // echo "Chanson id : $id fichier court : $fichierCourt";
-            $fichier = "../data/chansons/$id/" . urlencode($fichierCourt);
+            $fichier = "../data/chansons/$id/" . rawurlencode($fichierCourt);
             $extension = substr(strrchr($ligneDoc[1], '.'), 1);
             $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
             if (!file_exists("../images/icones/$extension.png"))

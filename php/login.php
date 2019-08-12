@@ -12,6 +12,7 @@ if (isset ($_GET ['logoff'])) {
     unset ($_SESSION ['privilege']);
     unset ($_SESSION ['id']);
     $donnee = login_utilisateur("invite", "invite");
+    $_login= "logout";
 } else {
 // Traitement du formulaire si besoin
     if (isset ($_POST ['user'])) {
@@ -36,18 +37,16 @@ if ($donnee) {
     $_SESSION ['email'] = $donnee [7];
     $_SESSION ['image'] = $donnee [5];
     $_SESSION ['privilege'] = $donnee [11];
-} else {
-
-    //$donnee = login_utilisateur("invite", "invite");
-    $sortie .= "erreur de login/mot de passe...";
+    if ($_login != "logout")
+        $_login = ok;
 }
+else {
 
-// Si l'utilisateur est logué
-if (isset ($_SESSION ['user'])) {
-    // echo ;
-    header('Location: ' . $_SERVER['HTTP_REFERER']);
-    //header ( 'Location: ' . $_SERVER['PHP_SELF'] );
-} else {
-    echo $sortie;
-    include "../html/menuLogin.html";
+    // erreur de login/mot de passe...
+    $_login = ko;
 }
+if (strchr ($_SERVER['HTTP_REFERER'], '?'))
+    $_fin = "&login=$_login";
+else
+    $_fin = "&login=?_login";
+header('Location: ' . $_SERVER['HTTP_REFERER']. $_fin);

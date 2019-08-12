@@ -1,6 +1,6 @@
 <?php
-// On utilise la librairue fpdf http://www.fpdf.org/
-// qui s'appuie sur la librairie fpdi https://www.setasign.com/products/fpdi/downloads
+// On utilise la librairie fpdf http://www.fpdf.org/
+// ainsi que la librairie fpdi pour importer des pdf existants https://www.setasign.com/products/fpdi/manual/
 
 require_once('fpdf/fpdf.php');
 require_once('fpdi/autoload.php');
@@ -8,6 +8,39 @@ require_once('fpdi/Fpdi.php');
 
 use setasign\Fpdi\Fpdi;
 
+class SongBookPDF extends FPDI
+{
+
+    public $_nombrePages;
+
+// Page header
+    function Header()
+    {
+/*
+        // Arial bold 15
+        $this->SetFont('Arial','B',15);
+        // Move to the right
+        $this->Cell(80);
+        // Title
+        $this->Cell(30,10,'Songbook ',1,0,'C');
+        // Line break
+        $this->Ln(20);
+*/
+    }
+
+// Page footer
+    function Footer()
+    {
+        if ($this->PageNo() >2) {
+            // Position at 1.5 cm from bottom
+            $this->SetY(-15);
+            // Arial italic 8
+            $this->SetFont('Arial', 'I', 8);
+            // Page number
+            $this->Cell(0, 10, 'Page ' . $this->PageNo(), 0, 0, 'C');
+        }
+    }
+}
 
 function ajouteFichier($pdf, $file)
 {
@@ -43,7 +76,7 @@ function testePdf()
 
 function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
 {
-    $pdf = new FPDI();
+    $pdf = new SongBookPDF();
 
     // On fait une couverture avec l'image
     $pdf->AddPage();
@@ -52,18 +85,26 @@ function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $list
 
     // On crée un sommaire
     $pdf->AddPage();
+    // Logo
     $pdf->SetFont('Arial', 'B', 20);
     $pdf->SetTextColor(50, 50, 50);
-    $pdf->Cell(0, 10, 'Sommaire', 1, 1, 'C'); // Centré
-    $pdf->Cell(10, 10, " ", 0, 1, "L");
+
+    $pdf->Cell(30, 10, ' ', 0, 0, "C"); // Centré
+    $pdf->Cell(150, 10, 'Sommaire', 1, 1, "C"); // Centré
+    // $pdf->Cell(10, 10, " ", 0, 1, "L");
+    $pdf->Image('../images/icones/top5.png',10,6,20);
 
     // On a une hauteur de 240 à répartir sur la feuille
     $hauteur_ligne = 240 / (count($listeNomsChanson) + 1);
+    if ($hauteur_ligne > 40)
+        $hauteur_ligne = 40;
+
     $pdf->SetFont('Arial', 'B', $hauteur_ligne);
     $numeroChanson = 1;
     foreach ($listeNomsChanson as $nomChanson) {
         $pdf->Cell(10, $hauteur_ligne, $numeroChanson++ . " - " . utf8_decode($nomChanson), 0, 1, "L");
     }
+    /// *** FIN SOMMAIRE /////
 
     foreach ($listeNomsFichiers as $nomFichier) {
         $idChanson = array_shift($listeIdChanson); // Pour récupérer l'id de la chanson
@@ -88,10 +129,16 @@ function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $list
 
 function testeCreeSongBook()
 {
-    $listeNomsChanson = ["Carmen", "Carmen Tab"];
+/*    $listeNomsChanson = ["Carmen", "Carmen Tab"];
     $listeNomsFichiers = ["Habanera-v1.pdf", "Habanera-Tablature-v1.pdf"];
 
-    pdfCreeSongbook(28, "songbook-LesFacesA-v1.jpg", $listeNomsChanson, $listeNomsFichiers);
+    pdfCreeSongbook(28, "songbook-LesFacesA-v1.jpg", $listeNomsChanson, $listeNomsFichiers);*/
+    $listeNomsChanson = ["Chanson 1"];
+    $listeNomsFichiers = ["AfficheTop5-Rentree2019.pdf"];
+    $listeIdChanson = [154];
+    $listeVersionsDoc = [4];
+
+    pdfCreeSongbook(45, "AuBonheurDesDames-v1.jpg", $listeNomsChanson, $listeNomsFichiers, $listeIdChanson , $listeVersionsDoc);
 }
 
 //testePdf();
