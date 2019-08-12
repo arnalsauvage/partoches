@@ -184,3 +184,18 @@ span.selected {
 
 .star { display: inline-block; background: url("../images/icones/star.png") no-repeat; width: 25px; height: 25px }
 .star_hover { display: inline-block; background: url("../images/icones/star.png") no-repeat; background-position: 0 -25px; width: 25px; height: 25px }
+
+.ok {
+    font-size: medium;
+    color: #119911;
+}
+
+.ko {
+    font-size: 2em;
+    color: #992211;
+}
+
+.info {
+    font-size: 2medium;
+    color: #115599;
+}

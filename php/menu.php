@@ -21,9 +21,25 @@ if (!isset ($_SESSION ['user'])) {
         $_SESSION ['email'] = $donnee [7];
         $_SESSION ['image'] = $donnee [5];
         $_SESSION ['privilege'] = $donnee [11];
-    } else {
-        $sortie .= "erreur de login/mot de passe...";
     }
+    else {
+        $infoLogin = "<p class='ko'> Compte invité défaillant...</p>";
+    }
+}
+
+if ($_SESSION['login'] == "ok"){
+    $infoLogin = "<p class='ok'>Vous vous êtes bien connecté.e</p>";
+    $_SESSION['login'] = "";
+}
+
+if ($_SESSION['login'] == "logout"){
+    $infoLogin = "<p class='info'>Vous vous êtes bien déconnecté.e</p>";
+    $_SESSION['login'] = "";
+}
+
+if ($_SESSION['login'] == "ko"){
+    $infoLogin = "<p class='ko'> erreur de login/mot de passe...</p>";
+    $_SESSION['login'] = "";
 }
 
 $contenu = envoieHead("Top 5 Partoches", "../css/index.css");
@@ -79,7 +95,7 @@ $contenu .= "<div class='container'>\n
 
 $contenu .= "<br><br><br> sur Top 5 partoches, les amis de Top5 partagent leurs partoches (venues du club ou d'ailleurs...) pour le plaisir de gratter l'ukulélé <br>\n";
 
-$contenu .= image("../vignettes/" . $_SESSION ['image'], 64) . "\n";
+$contenu .= image("../vignettes/" . $_SESSION ['image'], 64, 64, $_SESSION['user']) . "\n";
 
 $date = date("d/m/Y");
 $heure = date("H:i");
@@ -92,6 +108,7 @@ if ($_SESSION ['user'] != "invite") {
     $contenu .= file_get_contents('../html/menuLogin.html');
     $contenu .= "<a id='afficherPopup'>$msgLogin</a> <script src='../js/utilsJquery.js'></script>";
 }
+$contenu .= $infoLogin . "<br>\n";
 $contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut($_SESSION ['privilege']) . ", nous sommes le $date et il est $heure<br>\n";
 $contenu .= " </div> <!--/.container --></div><!--/.starter-template -->";
 if (!isset($pasDeMenu) || false == $pasDeMenu)

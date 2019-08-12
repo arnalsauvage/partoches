@@ -38,15 +38,13 @@ if ($donnee) {
     $_SESSION ['image'] = $donnee [5];
     $_SESSION ['privilege'] = $donnee [11];
     if ($_login != "logout")
-        $_login = ok;
+        $_login = "ok";
 }
 else {
 
     // erreur de login/mot de passe...
-    $_login = ko;
+    $_login = "ko";
 }
-if (strchr ($_SERVER['HTTP_REFERER'], '?'))
-    $_fin = "&login=$_login";
-else
-    $_fin = "&login=?_login";
-header('Location: ' . $_SERVER['HTTP_REFERER']. $_fin);
+
+    $_SESSION['login'] = $_login;
+    header('Location: ' . $_SERVER['HTTP_REFERER']. $_fin);
