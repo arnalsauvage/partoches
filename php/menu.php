@@ -108,7 +108,8 @@ if ($_SESSION ['user'] != "invite") {
     $contenu .= file_get_contents('../html/menuLogin.html');
     $contenu .= "<a id='afficherPopup'>$msgLogin</a> <script src='../js/utilsJquery.js'></script>";
 }
-$contenu .= $infoLogin . "<br>\n";
+if (isset($infoLogin))
+    $contenu .= $infoLogin . "<br>\n";
 $contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut($_SESSION ['privilege']) . ", nous sommes le $date et il est $heure<br>\n";
 $contenu .= " </div> <!--/.container --></div><!--/.starter-template -->";
 if (!isset($pasDeMenu) || false == $pasDeMenu)
