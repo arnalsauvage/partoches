@@ -30,7 +30,7 @@ while ($ligne = $resultat->fetch_row()) {
 
         $affichage .= "<div>
         <input type='checkbox' id='". $ligne[0] ."' value='". $ligne[0] ."' name='utilisateur[]'";
-        if (strchr($listeUtilisateurs,$ligne[0]))
+        if (in_array($ligne[0],$_POST['utilisateur']))
             $affichage .= " checked ";
         $affichage .=">
         <label for='". $ligne[0] ."'>";
