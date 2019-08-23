@@ -98,10 +98,10 @@ while ($ligneDoc = $lignes->fetch_row()) {
 $sortie .= $listeDocs;
 
 // On récupère les fichiers du Songbook
-//$fichiersDuSongbook = fichiersSongbook($id);
+//$affichage = fichiersSongbook($id);
 //$lignes = chercheDocumentsTableId ( "chanson", $id );
 //
-//foreach ($fichiersDuSongbook as $fichier) {
+//foreach ($affichage as $fichier) {
 //	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
 //	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
 //		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
