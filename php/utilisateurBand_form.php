@@ -46,17 +46,17 @@ if (isset($_POST['utilisateur'])) {
         }
      */
 
-    $marequete = "select chanson.nom , SUM(noteUtilisateur.note) as score from chanson, noteUtilisateur
+    $marequete = "select chanson.id , chanson.nom , SUM(noteUtilisateur.note) as score from chanson, noteUtilisateur
             where chanson.id = noteUtilisateur.idObjet and noteUtilisateur.nomObjet='chanson'
             AND noteUtilisateur.idUtilisateur in ($listeUtilisateurs)
-            GROUP BY chanson.nom ORDER BY score DESC";
+            GROUP BY chanson.id ORDER BY score DESC";
     //$affichage .= "Requete :" . $marequete;
     $resultat = $_SESSION ['mysql']->query($marequete);
 
     if ($resultat) {
         while ($ligne = $resultat->fetch_row()) {
-            $affichage .= $ligne[0] . " ";
-            $affichage .= $ligne[1] . "<br>";
+            $affichage .= $ligne[1] . " ";
+            $affichage .= $ligne[2] . "<br>";
         }
     }
 }
