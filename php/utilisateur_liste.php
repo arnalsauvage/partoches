@@ -25,7 +25,11 @@ if ($_SESSION ['privilege'] > 2)
     $fichiersDuSongbook .= "<BR>" . Ancre("$utilisateurForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel utilisateur");
 // //////////////////////////////////////////////////////////////////////ADMIN
 
-$fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
+// On affiche pour l'admin le lien de la page pour les meilleurs résultats pour un band
+if ($_SESSION ['privilege'] > 1)
+    $fichiersDuSongbook .= "<a href='utilisateurBand_form.php'>Morceaux pour un band</a>";
+
+    $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
 
 while ($ligne = $resultat->fetch_row()) {
     $numligne++;

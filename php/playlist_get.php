@@ -37,12 +37,14 @@ if ($mode == "MAJ") {
         $fhits = $playlist[5];
         $fdate = dateMysqlVersTexte($playlist[3]);
     }
+    /** @noinspection PhpUndefinedVariableInspection */
     modifieplaylist($id, $fnom, $description, $fdate, $fimage, $fhits);
 }
 
 if ($mode == "INS") {
     $fhits = 0;
     $fdate = date("d/m/Y");
+    /** @noinspection PhpUndefinedVariableInspection */
     creeplaylist($fnom, $description, $fdate, $fimage, $fhits);
 }
 

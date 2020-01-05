@@ -36,7 +36,7 @@ if ($_SESSION ['privilege'] >= 2)
 
 $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
 $fichiersDuSongbook .= TblDebut(0);
-TblCellule(Ancre("?tri=hits", "Hits")) . TblFinLigne();
+$fichiersDuSongbook .= TblCellule(Ancre("?tri=hits", "Hits")) . TblFinLigne();
 
 $fichiersDuSongbook .= TblDebut(0);
 $fichiersDuSongbook .= TblDebutLigne() . TblCellule("  Tri  ");

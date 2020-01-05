@@ -5,8 +5,9 @@ include_once("songbook.php");
 include_once("lienDocSongbook.php");
 $nomTable = "songbook";
 
-/*if ($_SESSION ['privilege'] <= 1)
-	redirection ( $nomTable . "_liste.php" );*/
+// Les modifs sont reservées aux utilisateurs authentifiés et habilités
+if ($_SESSION ['privilege'] <= 1)
+	redirection ( $nomTable . "_liste.php" );
 
 // On gère 5 cas : création d'une songbook, modif, suppression, ou suppression d'un docJoint, duplication songbook
 if (isset($_POST ['mode'])) {
@@ -14,16 +15,23 @@ if (isset($_POST ['mode'])) {
 } elseif (isset($_GET ['mode'])) {
     $mode = $_GET ['mode'];
 }
-echo "mode : " . $mode;
+
+// On récupère l'identifiant du songbook passé par POST ou GET
+if (isset ($_GET ['id'])) {
+    $id = $_GET ['id'];
+}
+if (isset ($_POST ['id'])) {
+    $id = $_POST ['id'];
+}
+
 // En mode création ou mise à jour, on récupère les données du formulaire
 if (($mode == "MAJ") || ($mode == "INS")) {
-    // Il faut au moins être éditeur
-    if ($_SESSION ['privilege'] > 1) {
-        $id = $_POST ['id'];
-        $fnom = $_SESSION ['mysql']->real_escape_string($_POST ['fnom']);
-        $fdescription = $_SESSION ['mysql']->real_escape_string($_POST ['fdescription']);
-        $fimage = $_POST ['fimage'];
-    }
+
+    $id = $_POST ['id'];
+    $fnom = $_SESSION ['mysql']->real_escape_string($_POST ['fnom']);
+    $fdescription = $_SESSION ['mysql']->real_escape_string($_POST ['fdescription']);
+    $fimage = $_POST ['fimage'];
+
     // Seul admin peut modifier hits et date
     if ($_SESSION ['privilege'] > 2) {
         $fdate = $_POST ['fdate'];
@@ -37,24 +45,14 @@ if (isset($_GET ['DUP'])) {
     dupliqueSongbook($id);
 }
 
-// On récupère l'identifiant du songbook passé par POST ou GET
-
-if (isset ($_GET ['id'])) {
-    $id = $_GET ['id'];
-}
-
-if (isset ($_POST ['id'])) {
-    $id = $_POST ['id'];
-}
-
 // Cas de la mise à jour
 if ($mode == "MAJ") {
-    if ($_SESSION ['privilege'] < 3) {
         // On récupère les valeurs de hits et date en base, car ils ne sont pas dans le formulaire
-        $songbook = chercheSongbook($id);
-        $fhits = $songbook[5];
-        $fdate = dateMysqlVersTexte($songbook[3]);
-    }
+    $songbook = chercheSongbook($id);
+    $fhits = $songbook[5];
+    $fdate = dateMysqlVersTexte($songbook[3]);
+
+    /** @noinspection PhpUndefinedVariableInspection */
     modifiesSongbook($id, $fnom, $fdescription, $fdate, $fimage, $fhits);
 }
 
@@ -62,6 +60,7 @@ if ($mode == "MAJ") {
 if ($mode == "INS") {
     $fhits = 0;
     $fdate = date("d/m/Y");
+    /** @noinspection PhpUndefinedVariableInspection */
     creeSongbook($fnom, $fdescription, $fdate, $fimage, $fhits);
 }
 
@@ -83,6 +82,7 @@ if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
     supprimeDocument($_GET ['idDoc']);
 }
 
+// Ce cas est appelé en ajax, donc on ne redirigera pas
 if ($mode == "GENEREPDF") {
     creeSongbookPdf($id);
 }

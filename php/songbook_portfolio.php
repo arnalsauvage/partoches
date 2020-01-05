@@ -1,4 +1,4 @@
-<?php /** @noinspection HtmlUnknownTarget */
+<?php
 include_once("lib/utilssi.php");
 $pasDeMenu = true;
 include_once("menu.php");

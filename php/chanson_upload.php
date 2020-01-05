@@ -70,7 +70,7 @@ if (!move_uploaded_file($tmp_file, $repertoire . $name_file)) {
 $get_the_file = "<a href=\"http://" . $_SERVER ['SERVER_NAME'] . dirname($_SERVER ['REQUEST_URI']) . "/" . $repertoire . $name_file . "\" target=\"_blank\">Accéder au fichier</a>";
 
 // On redirige vers la liste des songbooks
-header('Location: ./chanson_voir.php?id=' . $_POST ['id']);
+header('Location: ./chanson_form.php?id=' . $_POST ['id']);
 // }
 // echo "Vous �tes identifié avec : " . $email . "<BR>";
 // $texte = " Bonjour, un fichier ($toto_name) a �t� upload� sur http://medina.arnaud.free.fr/$repertoire, par l'ip $REMOTE_ADDR, identifi� avec le nom $email.";
