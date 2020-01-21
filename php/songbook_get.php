@@ -49,8 +49,11 @@ if (isset($_GET ['DUP'])) {
 if ($mode == "MAJ") {
         // On récupère les valeurs de hits et date en base, car ils ne sont pas dans le formulaire
     $songbook = chercheSongbook($id);
-    $fhits = $songbook[5];
-    $fdate = dateMysqlVersTexte($songbook[3]);
+    // Seul admin peut modifier hits et date
+    if ($_SESSION ['privilege'] < 2) {
+        $fhits = $songbook[5];
+        $fdate = dateMysqlVersTexte($songbook[3]);
+    }
 
     /** @noinspection PhpUndefinedVariableInspection */
     modifiesSongbook($id, $fnom, $fdescription, $fdate, $fimage, $fhits);
