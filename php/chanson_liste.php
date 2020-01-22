@@ -38,19 +38,8 @@ else {
             $_SESSION['ordreAsc'] = false;
             // echo "tri par défaut ";
         }
-        else {
-            // echo "session tri = " . $_SESSION['tri'];
-            /*
-            if ( $_SESSION['ordreAsc'] )
-                echo "Tri ascendant";
-            else
-                echo "Tri descendant";
-            */
-        }
     }
 }
-
-// Gestion paramètres de recherche
 
 // Gestion paramètres de recherche
 if (isset ($_POST ['cherche'])) {
@@ -65,6 +54,15 @@ if ($_SESSION['cherche'] != "")
     $critere_cherche = "%" . $_SESSION['cherche'] . "%";
 else
     $critere_cherche = "%";
+
+// Gestion razFiltres
+if (isset ($_GET ['razFiltres'])) {
+    $_SESSION['tri'] = "datePub";
+    $_SESSION['ordreAsc'] = false;
+    $_SESSION['cherche'] = "";
+    $critere_cherche = "%";
+}
+
 
 // echo " Recherche = " . $critere_cherche;
 
@@ -161,7 +159,8 @@ $contenuHtml .= TblCorpsFin();
 $contenuHtml .= TblFin();
 $contenuHtml .= $pagination->barrePagination() . "   ";
 $contenuHtml .= $nbreChansons . " chanson(s) dans la liste.<br>\n";
-$contenuHtml .= Image($iconeAttention, "100%", 1, 1);
+if ($nbreChansons==0)
+    $contenuHtml .= "Pas de résultat ... <BR><a href='?razFiltres' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Supprimer les filtres et tris</a>\n";
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] > 1) {
     $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Ajouter une chanson</a>\n";
