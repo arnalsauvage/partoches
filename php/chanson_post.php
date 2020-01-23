@@ -76,7 +76,7 @@ if ($mode == "SUPPRDOC" && $_SESSION ['privilege'] > 1) {
 
 // Gestion de la demande de renommage de document dans la chanson
 if ($mode == "RENDOC" && $_SESSION ['privilege'] > 1) {
-    echo "Appel avec idDoc = " . $_POST ['idDoc'] . " nomDoc = " . $_POST ['nomDoc'];
+    //echo "Appel avec idDoc = " . $_POST ['idDoc'] . " nomDoc = " . $_POST ['nomDoc'];
     $retour = renommeDocument($_POST ['idDoc'], $_POST ['nomDoc']);
     if ($retour == 1)
         echo "Tout s'est bien passé";

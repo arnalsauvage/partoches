@@ -40,6 +40,7 @@ if ($mode == "MAJ")
 if ($mode == "INS")
     $sortie .= "<H1> Création - " . $table . "</H1>";
 
+$sortie .= "<a href = 'chanson_voir.php?id=".$_chanson->getId()."'>voir la chanson</a>";
 // Création du formulaire
 
 $sortie .= "
@@ -142,9 +143,9 @@ if ($mode == "MAJ") {
             if (!file_exists("../images/icones/$extension.png"))
                 $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
             $listeDocs .= "<li class='fichiers'> <div> <a href= '" . $fichier . "' target='_blank'> $icone </a> ";
-            $listeDocs .= "Id chanson : $id  id doc : " . $ligneDoc[0] . "fichier court : $fichierCourt <br>";
+            //    $listeDocs .= "Id chanson : $id  id doc : " . $ligneDoc[0] . "fichier court : $fichierCourt <br>";
             $listeDocs .= "<label class='doc'>" . htmlentities($fichierCourt) . "</label>";
-            $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )
+            $listeDocs .= " (" . intval($ligneDoc [2] / 1024) . " ko )
 		    <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
 		    <button name='renommer' style='display:none;'>renommer</button>
             <button style='display:none;'>x</button>";
