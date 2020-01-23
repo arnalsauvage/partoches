@@ -27,7 +27,7 @@ class UtilisateurNote
     static function starBarUtilisateur($mediaNom, $mediaId, $nombreEtoiles, $largeurEtoiles) {
 
         $maNote = new UtilisateurNote( 0, 1, 1, 1);
-        $maNote->chercheNoteUtilisateur($_SESSION['id'],$mediaNom, $mediaId);
+        $maNote->chercheNoteUtilisateur($_SESSION['id'], $mediaNom, $mediaId);
 
         $nbrPixelsInDiv = $nombreEtoiles * $largeurEtoiles; // Calcule la largeur du DIV en pixels
 

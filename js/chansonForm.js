@@ -15,14 +15,15 @@ $("button[name='renommer']").click(function () {
     $(this).parent().children("label").text(nouveauNom);
     //alert("nouveau nom : " + nouveauNom);
     $.ajax({
-        type: "POST",
         url: "chanson_post.php",
-        data: "mode=RENDOC&idDoc=" + id + "&nomDoc=" + encodeURI(nouveauNom),
-        datatype: 'html', // type de la donnée à recevoir
+        type: "POST",
+        data: {mode: "RENDOC", idDoc: id , id: "nonprecise", nomDoc : encodeURI(nouveauNom)},
+        contentType: 'application/x-www-form-urlencoded',
+        datatype: 'json', // type de la donnée à recevoir
         success: function (code_html, statut) { // success est toujours en place, bien sûr !
             alert("Code retourné : " + code_html);
             if (code_html.search("n'a pas été traité.") == -1)
-                toastr.success("Le document a été renommé ! <br> Le fichier a été renommé <br> Vous pouvez raffraîchir la page pour le voir.");
+                toastr.success("Le document a été renommé ! <br> Le fichier a été renommé !");
             else {
                 toastr.warning("Erreur dans l'opération...<br>Le document n'a pas pu être renommé...");
                 $("#div1").html(code_html);

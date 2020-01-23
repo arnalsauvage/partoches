@@ -41,6 +41,11 @@ else {
     }
 }
 
+// Gestion du parametre nonVote
+if (isset ($_GET ['nonVote'])) {
+    $critere_cherche = "%";
+}
+
 // Gestion paramètres de recherche
 if (isset ($_POST ['cherche'])) {
 
@@ -86,7 +91,6 @@ if ($_SESSION ['privilege'] > 1)
     $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'></span> Ajouter une chanson</a>\n";
 // //////////////////////////////////////////////////////////////////////ADMIN
 
-$contenuHtml .= Image($iconeAttention, "100%", 1, 1);
 $contenuHtml .= TblDebut(0);
 $contenuHtml .= TblEnteteDebut() . TblDebutLigne();
 $contenuHtml .= TblEntete("  -  ");
@@ -112,6 +116,7 @@ $contenuHtml .= TblCorpsDebut();
 
 $cheminImagesChanson = "../data/chansons/";
 $_chanson = new Chanson();
+$maNote = new UtilisateurNote( 0, 1, 1, 1);
 
 /** @noinspection PhpUndefinedMethodInspection */
 foreach ($resultat as $ligne) {
@@ -122,6 +127,14 @@ foreach ($resultat as $ligne) {
 
     $_chanson->chercheChanson($ligne);
     $_id = $_chanson->getId();
+    if (isset ($_GET ['nonVote']))
+    {
+        if ($maNote->chercheNoteUtilisateur($_SESSION['id'], 'chanson', $_id)==1) {
+            echo "session id: " . $_SESSION['id'];
+            $nbreChansons --;
+            continue;
+        }
+    }
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
     if ($_SESSION ['privilege'] > 1)

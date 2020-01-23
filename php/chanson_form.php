@@ -136,13 +136,13 @@ if ($mode == "MAJ") {
             $idDoc = $ligneDoc [0];
             // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
             $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-            // echo "Chanson id : $id fichier court : $fichierCourt";
             $fichier = "../data/chansons/$id/" . rawurlencode($fichierCourt);
             $extension = substr(strrchr($ligneDoc[1], '.'), 1);
             $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
             if (!file_exists("../images/icones/$extension.png"))
                 $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
             $listeDocs .= "<li class='fichiers'> <div> <a href= '" . $fichier . "' target='_blank'> $icone </a> ";
+            $listeDocs .= "Id chanson : $id  id doc : " . $ligneDoc[0] . "fichier court : $fichierCourt <br>";
             $listeDocs .= "<label class='doc'>" . htmlentities($fichierCourt) . "</label>";
             $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )
 		    <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>

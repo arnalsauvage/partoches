@@ -1,6 +1,6 @@
 <?php
 include_once("lib/utilssi.php");
-include_once("menu.php");
+//include_once("menu.php");
 include_once("document.php");
 include_once("chanson.php");
 
@@ -17,7 +17,7 @@ if ((isset ($_GET ['id']))) {
 }
 
 if ((isset ($_POST ['id']))) {
-//    echo "On est en post <br> ";
+    //echo "On est en post !!!  \n\n\n ";
     $id = $_POST ['id'];
     $fnom = $_POST ['fnom'];
     $finterprete = $_POST ['finterprete'];
@@ -33,6 +33,8 @@ if ((isset ($_POST ['id']))) {
         $fidUser = $_POST ['fidUser'];
     $fdate = $_POST['fdate'];
 }
+//else
+//    echo "On est PAS enPOST!!!";
 
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
 if ($mode == "MAJ") {
