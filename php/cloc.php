@@ -28,7 +28,7 @@
 /**
  *** int counter(string $dir)
  ***
- ***        \param $dir: chemin du dossier � parcourir
+ ***        @param $dir: chemin du dossier � parcourir
  **/
 function counter($dir)
 {

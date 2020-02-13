@@ -50,11 +50,11 @@ if (strstr($autorisees, $ext) == FALSE) {
     return 0;
 }
 
-// On met le nom au propre pour éviter les pb de caractères accentués
-$name_file = renommeFichierChanson($path); // on crée un nom compatible url
+// On met le contenuFiltrer au propre pour éviter les pb de caractères accentués
+$name_file = renommeFichierChanson($path); // on crée un contenuFiltrer compatible url
 //$name_file = urlencode($name_file);
 
-// On enregistre notre nom de fichier en BDD, on récupère un n°de version
+// On enregistre notre contenuFiltrer de fichier en BDD, on récupère un n°de version
 creeModifieDocument($name_file, $_FILES ['fichierUploade'] ['size'], "chanson", $_POST ['id']);
 $doc = chercheDocumentNomTableId($name_file, "chanson", $_POST ['id']);
 $name_file = str_replace(".$ext", "-v" . ($doc [4]), $name_file) . ".$ext";
@@ -73,7 +73,7 @@ $get_the_file = "<a href=\"http://" . $_SERVER ['SERVER_NAME'] . dirname($_SERVE
 header('Location: ./chanson_form.php?id=' . $_POST ['id']);
 // }
 // echo "Vous �tes identifié avec : " . $email . "<BR>";
-// $texte = " Bonjour, un fichier ($toto_name) a �t� upload� sur http://medina.arnaud.free.fr/$repertoire, par l'ip $REMOTE_ADDR, identifi� avec le nom $email.";
+// $texte = " Bonjour, un fichier ($toto_name) a �t� upload� sur http://medina.arnaud.free.fr/$repertoire, par l'ip $REMOTE_ADDR, identifi� avec le contenuFiltrer $email.";
 // $texte = $texte . "\n" . date ( "D M j G:i:s T Y" );
 // mail ( "medina.arnaud@free.fr", "Fichier uploadé sur http://medina.arnaud.free.fr", $texte, "webmaster@medina.arnaud.free.fr" );
 // echo "Ceci est un espace privé, merci de le respecter.<BR>";

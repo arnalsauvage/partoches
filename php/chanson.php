@@ -48,7 +48,6 @@ class Chanson
 
     /**
      * Chanson constructor.
-     * @param $_id
      * @param $_nom
      * @param $_interprete
      * @param $_annee
@@ -56,7 +55,6 @@ class Chanson
      * @param $_tempo
      * @param $_mesure
      * @param $_pulsation
-     * @param $_datePub
      * @param $_hits
      * @param $_tonalite
      */
@@ -282,7 +280,7 @@ class Chanson
     {
         $maRequete = "SELECT * FROM chanson WHERE chanson.id = '$id'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
-        // renvoie la ligne sélectionnée : id, nom, interprète, année
+        // renvoie la ligne sélectionnée : id, contenuFiltrer, interprète, année
         if (($ligne = $result->fetch_row())) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
@@ -309,9 +307,9 @@ class Chanson
     // Cherche un chanson, la charge et renvoie vrai si elle existe
     public function chercheChansonParLeNom($nom)
     {
-        $maRequete = "SELECT * FROM chanson WHERE chanson.nom = '$nom'";
+        $maRequete = "SELECT * FROM chanson WHERE chanson.contenuFiltrer = '$nom'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChansonParLeNom #1 : " . $_SESSION ['mysql']->error);
-        // renvoie la lisgne sélectionnée : id, nom, taille, date
+        // renvoie la lisgne sélectionnée : id, contenuFiltrer, taille, date
         if (($ligne = $result->fetch_row())) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
@@ -334,7 +332,7 @@ class Chanson
             $_nom = $_SESSION ['mysql']->real_escape_string($this->_nom);
             $_interprete = $_SESSION ['mysql']->real_escape_string($this->_interprete);
             $_annee = $_SESSION ['mysql']->real_escape_string($this->_annee);
-            $maRequete = "UPDATE  chanson SET nom = '$_nom', interprete = '$_interprete', annee = '$_annee',
+            $maRequete = "UPDATE  chanson SET contenuFiltrer = '$_nom', interprete = '$_interprete', annee = '$_annee',
             idUser = $this->_idUser, tempo = '$this->_tempo', mesure='$this->_mesure', pulsation='$this->_pulsation', 
             hits='$this->_hits', tonalite='$this->_tonalite', datePub='$this->_datePub' WHERE id='$this->_id'";
             // echo $maRequete;
@@ -349,7 +347,7 @@ class Chanson
         $_interprete = $_SESSION ['mysql']->real_escape_string($this->_interprete);
         $_annee = $_SESSION ['mysql']->real_escape_string($this->_annee);
         $_datePub = convertitDateJJMMAAAA(date("d/m/Y"));
-        $maRequete = "INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
+        $maRequete = "INSERT INTO chanson (id, contenuFiltrer, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
 	        VALUES (NULL, '$_nom', '$_interprete', '$_annee', '$this->_idUser', '$this->_tempo', '$this->_mesure', 
 	        '$this->_pulsation', '$_datePub' ,  '$this->_hits', '$this->_tonalite')";
         // echo $maRequete;
@@ -383,10 +381,10 @@ class Chanson
         return $retour . "<BR>\n";
     }
 
-// Cette fonction renvoie la liste des fichiers dans le repertpore de la chanson ../data/chansons/#id/
+// Cette fonction renvoie la liste des fichiers dans le repertoire de la chanson ../data/chansons/#id/
     public function fichiersChanson()
     {
-        $retour = array();// repertoire, nom, extension
+        $retour = array();// repertoire, contenuFiltrer, extension
         $repertoire = "../data/chansons/$this->_id/";
         if (is_dir($repertoire)) {
             foreach (new DirectoryIterator ($repertoire) as $fileInfo) {
@@ -403,12 +401,12 @@ class Chanson
     }
 
 // Cherche les chansons sur le titre ou l'interprete, renvoie le tableau des identifiants
-    public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true)
+    public static function chercheChansons($critere, $critereTri = 'contenuFiltrer', $bTriAscendant = true)
     {
         $critere = $_SESSION ['mysql']->real_escape_string($critere);
 
         if ($critere!= "" && $critere!="%")
-            $maRequete = "SELECT id FROM chanson WHERE nom  LIKE '$critere' OR interprete LIKE '$critere' ORDER BY $critereTri";
+            $maRequete = "SELECT id FROM chanson WHERE contenuFiltrer  LIKE '$critere' OR interprete LIKE '$critere' ORDER BY $critereTri";
         else {
             $maRequete = "SELECT id FROM chanson ORDER BY $critereTri";
             if ($critere=="votes"|| $critereTri =="votes"){
@@ -445,7 +443,7 @@ class Chanson
 
     public function chercheSongbooksDocuments()
     {
-        $maRequete = "SELECT DISTINCT songbook.id, songbook.nom from songbook, liendocsongbook , document ,
+        $maRequete = "SELECT DISTINCT songbook.id, songbook.contenuFiltrer from songbook, liendocsongbook , document ,
         chanson WHERE liendocsongbook.idDocument = document.id AND document.nomTable='chanson' 
         AND document.idTable = chanson.id AND chanson.id = " . $this->_id . "  AND songbook.id = liendocsongbook.idSongbook";
         //echo "ma requête : " . $maRequete;
@@ -458,7 +456,7 @@ class Chanson
 /// TODO fonctions à supprimer
 
 // Cherche les chansons correspondant à un critère
-function chercheChansons($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
+function chercheChansons($critere, $valeur, $critereTri = 'contenuFiltrer', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM chanson WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
     if ($bTriAscendant == false)

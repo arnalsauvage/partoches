@@ -35,7 +35,7 @@ $nomtable = "utilisateur";
 // Fonctions de gestion de l'utilisateur
 
 // Cherche les utilisateurs correspondant à un critère
-function chercheUtilisateurs($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
+function chercheUtilisateurs($critere, $valeur, $critereTri = 'contenuFiltrer', $bTriAscendant = true)
 {
     global $nomtable;
     $maRequete = "SELECT * FROM " . $nomtable . " WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
@@ -56,7 +56,7 @@ function chercheUtilisateur($id)
     $result = $_SESSION ['mysql']->query($maRequete);
     if (!$result)
         die ("Problème chercheutilisateur #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la lisgne sélectionnée : id, nom, taille, date
+    // renvoie la lisgne sélectionnée : id, contenuFiltrer, taille, date
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else
@@ -70,7 +70,7 @@ function chercheUtilisateurParLeLogin($login)
     $result = $_SESSION ['mysql']->query($maRequete);
     if (!$result)
         die ("Problème chercheutilisateurParLeNom #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la lisgne sélectionnée : id, nom, taille, date
+    // renvoie la lisgne sélectionnée : id, contenuFiltrer, taille, date
     $ligne = $result->fetch_row();
     if ($ligne)
         return ($ligne);
@@ -120,7 +120,7 @@ function modifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site, $em
 
     $maRequete = "UPDATE  utilisateur
 	SET id = '$id', login = '$login', mdp = '$crypt',
-	prenom = '$prenom' ,nom = '$nom', image = '$image', site = '$site', email = '$email',
+	prenom = '$prenom' ,contenuFiltrer = '$nom', image = '$image', site = '$site', email = '$email',
 	signature = '$signature', dateDernierLogin = '$date', nbreLogins = '$nbreLogins', privilege = '$privilege'
 	WHERE id='$id'";
     $result = $_SESSION ['mysql']->query($maRequete);
@@ -225,7 +225,7 @@ function testUtilisateurs()
     $result = $_SESSION ['mysql']->query($maRequete);
     if (!$result)
         die ("Problème testUtilisateurs #1 : pas d'utilisateurs trouvés ! - " . $_SESSION ['mysql']->error);
-    // renvoie la lisgne sélectionnée : id, nom, taille, date
+    // renvoie la lisgne sélectionnée : id, contenuFiltrer, taille, date
     while ($ligne = $result->fetch_row()) {
         echo(infos($ligne[0]) . " Pass : " . Chiffrement::decrypt($ligne[2]) . "<br> \n\r");
     }
@@ -233,7 +233,7 @@ function testUtilisateurs()
 
 // Prépare un combo en html avec les utilisateurs
 // SELECT * FROM utilisateur WHERE $critere LIKE '$valeur' ORDER BY $critereTri
-function selectUtilisateur($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true, $idSelectionne = 0)
+function selectUtilisateur($critere, $valeur, $critereTri = 'contenuFiltrer', $bTriAscendant = true, $idSelectionne = 0)
 {
     $retour = "<select name='fidUser'>\n";
     // Ajouter des options

@@ -9,7 +9,7 @@ class UtilisateurNote
     private  $_id; // id ds BDD
     private $_note; // note de 1 à 5
     private $_idUtilisateur; // identifiant de l'utilisateur
-    private $_nomObjet; // nom de la table de l'objet noté
+    private $_nomObjet; // contenuFiltrer de la table de l'objet noté
     private $_idObjet; // id de l'objet noté
 
 

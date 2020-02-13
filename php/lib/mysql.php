@@ -78,7 +78,7 @@ function dateDuJourMysql()
 }
 
 // Chargement de la liste des libelles
-// ex : chargeLibelles($conn, "auteurs", "nom") donne la liste des noms dans un tab[id]=nom trié par nom
+// ex : chargeLibelles($conn, "auteurs", "contenuFiltrer") donne la liste des noms dans un tab[id]=contenuFiltrer trié par contenuFiltrer
 function chargeLibelles($table, $libelle)
 {
 
@@ -99,7 +99,7 @@ function chansonEstEnregistree($idChanson, $connexion)
 {
     $marequete = "select id, idchanson from enregistrement where idchanson = '$idChanson'";
     $resultat = ExecRequete($marequete, $connexion);
-    $nbReponses = mysql_num_rows($resultat);
+    $nbReponses = mysqli_num_rows($resultat);
 
     if ($nbReponses > 0) {
         //echo "ok";

@@ -68,7 +68,6 @@ if (isset ($_GET ['razFiltres'])) {
     $critere_cherche = "%";
 }
 
-
 // echo " Recherche = " . $critere_cherche;
 
 // Chargement de la liste des chansons
@@ -95,7 +94,7 @@ $contenuHtml .= TblDebut(0);
 $contenuHtml .= TblEnteteDebut() . TblDebutLigne();
 $contenuHtml .= TblEntete("  -  ");
 $contenuHtml .= TblEntete("  Pochette  ");
-$contenuHtml .= titreColonne("Nom", "nom");
+$contenuHtml .= titreColonne("Nom", "contenuFiltrer");
 $contenuHtml .= titreColonne("Interprète", "interprete");
 $contenuHtml .= titreColonne("  Votes  ", "votes");
 $contenuHtml .= titreColonne("Année", "annee");

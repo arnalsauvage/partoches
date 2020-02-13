@@ -5,7 +5,7 @@ include_once("lib/configMysql.php");
 // Fonctions de gestion de la lienDocSongbook
 
 // Cherche les lienDocSongbooks correspondant à un critère
-function chercheLiensDocSongbook($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
+function chercheLiensDocSongbook($critere, $valeur, $critereTri = 'contenuFiltrer', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM liendocsongbook WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
     if ($bTriAscendant == false)
@@ -22,7 +22,7 @@ function chercheLienDocSongbook($id)
 {
     $maRequete = "SELECT * FROM liendocsongbook WHERE id = '$id'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchelienDocSongbook #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la lisgne sélectionnée : id, nom, interprète, année
+    // renvoie la lisgne sélectionnée : id, contenuFiltrer, interprète, année
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else
@@ -47,7 +47,7 @@ function chercheLienParIdSongbookIdDoc($idSongbook, $idDoc)
 {
     $maRequete = "SELECT * FROM liendocsongbook WHERE idDocument = '$idDoc' AND idSongbook = '$idSongbook'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheIdSongbookIdDoc #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, nom, interprète, année
+    // renvoie la ligne sélectionnée : id, contenuFiltrer, interprète, année
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else
@@ -59,7 +59,7 @@ function chercheLienParIdSongbookOrdre($idSongbook, $ordre)
 {
     $maRequete = "SELECT * FROM liendocsongbook WHERE ordre = '$ordre' AND idSongbook = '$idSongbook'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienParIdSongbookOrdre #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, nom, interprète, année
+    // renvoie la ligne sélectionnée : id, contenuFiltrer, interprète, année
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else

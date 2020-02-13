@@ -83,7 +83,7 @@ $listeDocs = "";
 // Pour chaque document
 while ($ligneDoc = $lignes->fetch_row()) {
     // var_dump( $ligneDoc);
-    // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
+    // renvoie la ligne sélectionnée : id, contenuFiltrer, taille, date, version, nomTable, idTable, idUser
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     // echo "Chanson id : $id fichier court : $fichierCourt";
     $fichier = "../data/songbooks/$id/" . urlencode($fichierCourt);

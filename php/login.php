@@ -47,4 +47,4 @@ else {
 }
 
     $_SESSION['login'] = $_login;
-    header('Location: ' . $_SERVER['HTTP_REFERER']. $_fin);
+    header('Location: ' . $_SERVER['HTTP_REFERER']);

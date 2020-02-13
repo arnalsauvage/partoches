@@ -24,7 +24,7 @@ if (isset ($_GET ['tri'])) {
 }
 
 // Chargement de la liste des songbooks
-$resultat = chercheSongbooks("nom", "%", $tri, $ordreAsc);
+$resultat = chercheSongbooks("contenuFiltrer", "%", $tri, $ordreAsc);
 $numligne = 0;
 
 // Affichage de la liste
@@ -40,7 +40,7 @@ $fichiersDuSongbook .= TblCellule(Ancre("?tri=hits", "Hits")) . TblFinLigne();
 
 $fichiersDuSongbook .= TblDebut(0);
 $fichiersDuSongbook .= TblDebutLigne() . TblCellule("  Tri  ");
-$fichiersDuSongbook .= titreColonne("Nom", "nom");
+$fichiersDuSongbook .= titreColonne("Nom", "contenuFiltrer");
 $fichiersDuSongbook .= titreColonne("Description", "description");
 $fichiersDuSongbook .= titreColonne("Date", "date");
 $fichiersDuSongbook .= titreColonne("Vues", "hits");
@@ -49,7 +49,7 @@ $fichiersDuSongbook .= TblFinLigne();
 while ($ligne = $resultat->fetch_row()) {
     $numligne++;
     $fichiersDuSongbook .= TblDebutLigne();
-    // Songbook : 	[0]id 	[1]nom 	[2]description 	[3]date  	[4]image 	[5]hits 	[6]idUser
+    // Songbook : 	[0]id 	[1]contenuFiltrer 	[2]description 	[3]date  	[4]image 	[5]hits 	[6]idUser
     if ($ligne [4])
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
         if ($_SESSION ['privilege'] >= 2)
