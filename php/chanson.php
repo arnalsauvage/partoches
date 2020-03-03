@@ -1,4 +1,7 @@
-<?php
+<?php /** @noinspection ALL */
+/** @noinspection PhpUndefinedMethodInspection */
+/** @noinspection ALL */
+/** @noinspection ALL */
 include_once("lib/utilssi.php");
 include_once "lib/configMysql.php";
 include_once "document.php";
@@ -7,7 +10,8 @@ include_once "document.php";
 
 class Chanson
 {
-
+    const D_M_Y = "d/m/Y";
+    const MYSQL = 'mysql';
     private $_id; // identifiant en BDD
     private $_nom; // titre de la chanson , chaine de caractères
     private $_interprete; // interprete de reference de la chanson, chaîne de caractères
@@ -41,8 +45,9 @@ class Chanson
         $this->setTempo(120);
         $this->setMesure("4/4");
         $this->setPulsation("binaire");
-        $this->setDatePub(convertitDateJJMMAAAA(date("d/m/Y")));
+        $this->setDatePub(convertitDateJJMMAAAA(date(self::D_M_Y)));
         $this->setHits(0);
+
         $this->setTonalite("C");
     }
 
@@ -58,7 +63,8 @@ class Chanson
      * @param $_hits
      * @param $_tonalite
      */
-    public function __construct9($_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
+    public
+    function __construct9($_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
     {
         $this->setId(0);
         $this->setNom($_nom);
@@ -68,36 +74,40 @@ class Chanson
         $this->setTempo($_tempo);
         $this->setMesure($_mesure);
         $this->setPulsation($_pulsation);
-        $this->setDatePub(date("d/m/Y"));
+        $this->setDatePub(date(self::D_M_Y));
         $this->setHits($_hits);
         $this->setTonalite($_tonalite);
     }
 
-    public function __construct10($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
+    public
+    function __construct10($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
     {
         $this->__construct9($_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite);
         $this->setId($_id);
     }
 
-    public function __construct11($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_date, $_hits, $_tonalite)
+    public
+    function __construct11($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_date, $_hits, $_tonalite)
     {
         $this->__construct10($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite);
         $this->setDatePub($_date);
     }
 
-    // Un constructeur qui charge directement depuis la BDD
-    public function __construct1($_id)
+// Un constructeur qui charge directement depuis la BDD
+    public
+    function __construct1($_id)
     {
         $this->__construct0();
         $this->chercheChanson($_id);
     }
 
-    /// Getters et Setters
+/// Getters et Setters
 
     /**
      * @return mixed
      */
-    public function getId()
+    public
+    function getId()
     {
         return $this->_id;
     }
@@ -105,7 +115,8 @@ class Chanson
     /**
      * @param mixed $id
      */
-    public function setId($id)
+    public
+    function setId($id)
     {
         $this->_id = $id;
     }
@@ -113,7 +124,8 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getNom()
+    public
+    function getNom()
     {
         return $this->_nom;
     }
@@ -121,7 +133,8 @@ class Chanson
     /**
      * @param mixed $nom
      */
-    public function setNom($nom)
+    public
+    function setNom($nom)
     {
         $this->_nom = $nom;
     }
@@ -129,7 +142,8 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getInterprete()
+    public
+    function getInterprete()
     {
         return $this->_interprete;
     }
@@ -137,7 +151,8 @@ class Chanson
     /**
      * @param mixed $interprete
      */
-    public function setInterprete($interprete)
+    public
+    function setInterprete($interprete)
     {
         $this->_interprete = $interprete;
     }
@@ -145,7 +160,8 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getAnnee()
+    public
+    function getAnnee()
     {
         return $this->_annee;
     }
@@ -153,16 +169,19 @@ class Chanson
     /**
      * @param mixed $annee
      */
-    public function setAnnee($annee)
+    public
+    function setAnnee($annee)
     {
-        if ($annee > 0)
+        if ($annee > 0) {
             $this->_annee = $annee;
+        }
     }
 
     /**
      * @return int
      */
-    public function getIdUser()
+    public
+    function getIdUser()
     {
         return $this->_idUser;
     }
@@ -170,7 +189,8 @@ class Chanson
     /**
      * @param int $idUser
      */
-    public function setIdUser($idUser)
+    public
+    function setIdUser($idUser)
     {
         $this->_idUser = $idUser;
     }
@@ -178,7 +198,8 @@ class Chanson
     /**
      * @return int
      */
-    public function getTempo()
+    public
+    function getTempo()
     {
         return $this->_tempo;
     }
@@ -186,16 +207,19 @@ class Chanson
     /**
      * @param int $tempo
      */
-    public function setTempo($tempo)
+    public
+    function setTempo($tempo)
     {
-        if ($tempo > 0)
+        if ($tempo > 0) {
             $this->_tempo = $tempo;
+        }
     }
 
     /**
      * @return mixed
      */
-    public function getMesure()
+    public
+    function getMesure()
     {
         return $this->_mesure;
     }
@@ -203,7 +227,8 @@ class Chanson
     /**
      * @param mixed $mesure
      */
-    public function setMesure($mesure)
+    public
+    function setMesure($mesure)
     {
         $this->_mesure = $mesure;
     }
@@ -211,7 +236,8 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getPulsation()
+    public
+    function getPulsation()
     {
         return $this->_pulsation;
     }
@@ -219,16 +245,19 @@ class Chanson
     /**
      * @param mixed $pulsation
      */
-    public function setPulsation($pulsation)
+    public
+    function setPulsation($pulsation)
     {
-        if (($pulsation >= 0) && ($pulsation < 300))
+        if (($pulsation >= 0) && ($pulsation < 300)) {
             $this->_pulsation = $pulsation;
+        }
     }
 
     /**
      * @return mixed
      */
-    public function getDatePub()
+    public
+    function getDatePub()
     {
         return $this->_datePub;
     }
@@ -236,7 +265,8 @@ class Chanson
     /**
      * @param mixed $datePub
      */
-    public function setDatePub($datePub)
+    public
+    function setDatePub($datePub)
     {
         $this->_datePub = $datePub;
     }
@@ -244,7 +274,8 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getHits()
+    public
+    function getHits()
     {
         return $this->_hits;
     }
@@ -252,16 +283,19 @@ class Chanson
     /**
      * @param mixed $hits
      */
-    public function setHits($hits)
+    public
+    function setHits($hits)
     {
-        if ($hits >= 0)
+        if ($hits >= 0) {
             $this->_hits = $hits;
+        }
     }
 
     /**
      * @return mixed
      */
-    public function getTonalite()
+    public
+    function getTonalite()
     {
         return $this->_tonalite;
     }
@@ -269,7 +303,8 @@ class Chanson
     /**
      * @param mixed $tonalite
      */
-    public function setTonalite($tonalite)
+    public
+    function setTonalite($tonalite)
     {
         $this->_tonalite = $tonalite;
     } // Indique la tonalité de la chanson ex : "Am" , "C#m"
@@ -284,12 +319,14 @@ class Chanson
         if (($ligne = $result->fetch_row())) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
-        } else
+        } else {
             return (0);
+        }
     }
 
-    // Charge une ligne mysql vers un objet
-    private function mysqlRowVersObjet($ligne)
+// Charge une ligne mysql vers un objet
+    private
+    function mysqlRowVersObjet($ligne)
     {
         $this->_id = $ligne[0];
         $this->_nom = $ligne[1];
@@ -313,11 +350,12 @@ class Chanson
         if (($ligne = $result->fetch_row())) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
-        } else
+        } else {
             return (0);
+        }
     }
 
-    // Créée une chanson en BDD
+// Crée une chanson en BDD
 
     /**
      *      enregistre l'objet en BDD
@@ -326,43 +364,46 @@ class Chanson
     {
         if ($this->_id == 0) {
             $this->creeChansonBDD();
-            $this->setId($_SESSION ['mysql']->insert_id);
+            $this->setId($_SESSION [self::MYSQL]->insert_id);
             return ($this->getId());
         } else {
-            $_nom = $_SESSION ['mysql']->real_escape_string($this->_nom);
-            $_interprete = $_SESSION ['mysql']->real_escape_string($this->_interprete);
-            $_annee = $_SESSION ['mysql']->real_escape_string($this->_annee);
-            $maRequete = "UPDATE  chanson SET contenuFiltrer = '$_nom', interprete = '$_interprete', annee = '$_annee',
+            $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
+            $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
+            $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
+            $maRequete = "UPDATE  chanson SET nom = '$this->_nom', interprete = '$this->_interprete', annee = '$this->_annee',
             idUser = $this->_idUser, tempo = '$this->_tempo', mesure='$this->_mesure', pulsation='$this->_pulsation', 
             hits='$this->_hits', tonalite='$this->_tonalite', datePub='$this->_datePub' WHERE id='$this->_id'";
             // echo $maRequete;
-            $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modif dans creeModifieChanson #2 : " . $_SESSION ['mysql']->error . " requete : " . $maRequete);
+            $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème modif dans creeModifieChanson #2 : " . $_SESSION [self::MYSQL]->error . " requete : " . $maRequete);
+            return $this->_id;
         }
+        return 0;
     }
 
     // Cree une chanson et renvoie l'id de la chanson créée
     public function creeChansonBDD()
     {
-        $_nom = $_SESSION ['mysql']->real_escape_string($this->_nom);
-        $_interprete = $_SESSION ['mysql']->real_escape_string($this->_interprete);
-        $_annee = $_SESSION ['mysql']->real_escape_string($this->_annee);
-        $_datePub = convertitDateJJMMAAAA(date("d/m/Y"));
-        $maRequete = "INSERT INTO chanson (id, contenuFiltrer, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
-	        VALUES (NULL, '$_nom', '$_interprete', '$_annee', '$this->_idUser', '$this->_tempo', '$this->_mesure', 
-	        '$this->_pulsation', '$_datePub' ,  '$this->_hits', '$this->_tonalite')";
+        $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
+        $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
+        $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
+        $this->_datePub = convertitDateJJMMAAAA(date(self::D_M_Y));
+        $maRequete = "INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
+	        VALUES (NULL, '$this->_nom', '$this->_interprete', '$this->_annee', '$this->_idUser', '$this->_tempo', '$this->_mesure', 
+	        '$this->_pulsation', '$this->_datePub' ,  '$this->_hits', '$this->_tonalite')";
         // echo $maRequete;
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creeChansonBDD#1 : " . $_SESSION ['mysql']->error);
+        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème creeChansonBDD#1 : " . $_SESSION [self::MYSQL]->error);
         // On renseigne l'id de l'objet avec l'id créé en BDD
-        $this->setId($_SESSION ['mysql']->insert_id);
+        $this->setId($_SESSION [self::MYSQL]->insert_id);
         return ($this->getId());
     }
 
-    // Supprime un chanson si elle existe
-    public function supprimeChanson()
+// Supprime un chanson si elle existe
+    public
+    function supprimeChanson()
     {
         // On supprime les enregistrements dans chanson
         $maRequete = "DELETE FROM chanson WHERE id='" . $this->getId() . "'";
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimeChanson : " . $_SESSION ['mysql']->error);
+        $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème #1 dans supprimeChanson : " . $_SESSION [self::MYSQL]->error);
 
         // On supprime ensuite tous les documents de la chanson
         $result = chercheDocumentsTableId("chanson", $this->getId());
@@ -373,7 +414,8 @@ class Chanson
     }
 
 // Renvoie une chaine de description de la chanson
-    public function infosChanson()
+    public
+    function infosChanson()
     {
         $retour = "Id : " . $this->_id . " Nom : " . $this->_nom . " Interprète : " . $this->_interprete . " Année : " . $this->_annee;
         $retour .= " idUSer : " . $this->_idUser . " tempo : " . $this->_tempo . " mesure : " . $this->_mesure . " pulsation : " . $this->_pulsation;
@@ -388,8 +430,9 @@ class Chanson
         $repertoire = "../data/chansons/$this->_id/";
         if (is_dir($repertoire)) {
             foreach (new DirectoryIterator ($repertoire) as $fileInfo) {
-                if ($fileInfo->isDot() || strpos($fileInfo->getFilename(), ".") == 0)
+                if ($fileInfo->isDot() || strpos($fileInfo->getFilename(), ".") == 0) {
                     continue;
+                }
                 array_push($retour,
                     $repertoire,
                     $fileInfo->getFilename(),
@@ -403,7 +446,7 @@ class Chanson
 // Cherche les chansons sur le titre ou l'interprete, renvoie le tableau des identifiants
     public static function chercheChansons($critere, $critereTri = 'contenuFiltrer', $bTriAscendant = true)
     {
-        $critere = $_SESSION ['mysql']->real_escape_string($critere);
+        $critere = $_SESSION [self::MYSQL]->real_escape_string($critere);
 
         if ($critere!= "" && $critere!="%")
             $maRequete = "SELECT id FROM chanson WHERE contenuFiltrer  LIKE '$critere' OR interprete LIKE '$critere' ORDER BY $critereTri";
@@ -415,21 +458,24 @@ class Chanson
                     RIGHT JOIN noteUtilisateur on noteUtilisateur.idObjet = chanson.id 
                     WHERE noteUtilisateur.nomObjet = 'chanson' OR noteUtilisateur.nomObjet = NULL
                     GROUP BY chanson.id ORDER BY COALESCE(AVG(noteUtilisateur.note),0) ";
-                else
+                } else{
                     $maRequete = "SELECT  noteUtilisateur.idObjet FROM noteUtilisateur 
-                    WHERE noteUtilisateur.nomObjet = 'chanson' AND noteUtilisateur.idUtilisateur = '" . $_SESSION['id'] ."'
+                    WHERE noteUtilisateur.nomObjet = 'chanson' AND noteUtilisateur.idUtilisateur = '" . $_SESSION['id'] . "'
                     ORDER BY noteUtilisateur.note";
+                }
             }
         }
-            if ($bTriAscendant == false)
+        if (! $bTriAscendant) {
             $maRequete .= " DESC";
-        else
+        } else {
             $maRequete .= " ASC";
+        }
         // echo "ma requête : " . $maRequete;
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
+        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION [self::MYSQL]->error);
         $tableau = [];
-        while ($idChanson = $result->fetch_row())
+        while ($idChanson = $result->fetch_row()) {
             array_push($tableau, $idChanson[0]);
+        }
         return $tableau;
     }
 
@@ -447,7 +493,7 @@ class Chanson
         chanson WHERE liendocsongbook.idDocument = document.id AND document.nomTable='chanson' 
         AND document.idTable = chanson.id AND chanson.id = " . $this->_id . "  AND songbook.id = liendocsongbook.idSongbook";
         //echo "ma requête : " . $maRequete;
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheSongbooksDocuments #1 : " . $_SESSION ['mysql']->error);
+        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheSongbooksDocuments #1 : " . $_SESSION [self::MYSQL]->error);
         //var_dump($result);
         return $result;
     }
@@ -459,22 +505,23 @@ class Chanson
 function chercheChansons($critere, $valeur, $critereTri = 'contenuFiltrer', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM chanson WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
-    if ($bTriAscendant == false)
+    if (!$bTriAscendant) {
         $maRequete .= " DESC";
-    else
+    } else {
         $maRequete .= " ASC";
+    }
     // echo "ma requête : " . $maRequete;
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #3 : " . $_SESSION ['mysql']->error);
     return $result;
 }
 
 // TODO : Mettre cette function dans une bibli ou utiliser une existante
-// Limite la longeur d'une chaine à x caractères
+// Limite la longueur d'une chaine à x caractères
 function limiteLongueur($chaine, $tailleMax)
 {
-    if (strlen($chaine) > $tailleMax)
+    if (strlen($chaine) > $tailleMax) {
         return (mb_substr($chaine, 0, $tailleMax - 4) . "...");
-    else
+    } else {
         return $chaine;
+    }
 }
-

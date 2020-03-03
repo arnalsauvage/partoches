@@ -3,9 +3,9 @@ if (isset ($_SESSION['cherche']  )) {
     $nom = $_SESSION['cherche'];
     $nom = htmlspecialchars($nom,ENT_QUOTES );
     }
-else
+else {
     $nom = "";
-
+}
 $contenuHtmlCompCherche = "
 <FORM  METHOD='POST' ACTION='chanson_liste.php' NAME='Form'>
 <label class='inline'>Titre ou interprète:</label>
@@ -14,3 +14,5 @@ $contenuHtmlCompCherche = "
 <label class='inline'> </label><INPUT TYPE='submit' NAME='chercher' VALUE=' chercher ' >
 <br>
 </FORM>";
+
+// echo $contenuHtmlCompCherche;

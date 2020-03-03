@@ -1,15 +1,22 @@
 <?php
+const PRIVILEGE = 'privilege';
+const CHANSON = "chanson";
+const ORDRE_ASC = 'ordreAsc';
+const TRI = 'tri';
+const DATE_PUB = "datePub";
+const CHERCHE = 'cherche';
+const CENTRER = "centrer";
 include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
 include_once("Pagination.php");
-include_once ("UtilisateurNote.php");
+include_once("UtilisateurNote.php");
 
 $chansonForm = "chanson_form.php";
 $chansonPost = "chanson_post.php";
 $chansonVoir = "chanson_voir.php";
-$table = "chanson";
+$table = CHANSON;
 $nombreChansonsParPage = 20;
 
 $contenuHtml = "<div class='container'> \n
@@ -19,23 +26,21 @@ $contenuHtml .= entreBalise("Chansons", "H1");
 
 // Gestion du paramètre de tri
 // On prend en compte une demande de tri ascendant
-if (isset ($_GET ['tri'])) {
-    $_SESSION['tri'] = $_GET ['tri'];
-    $_SESSION['ordreAsc'] = true;
+if (isset ($_GET [TRI])) {
+    $_SESSION[TRI] = $_GET [TRI];
+    $_SESSION[ORDRE_ASC] = true;
     // echo "session tri = get tro = " . $_SESSION['tri'] = $_GET ['tri'];
-}
-// On prend en compte une demande de tri descendant
+} // On prend en compte une demande de tri descendant
 else {
     if (isset ($_GET ['triDesc'])) {
-        $_SESSION['tri'] = $_GET ['triDesc'];
-        $_SESSION['ordreAsc'] = false;
+        $_SESSION[TRI] = $_GET ['triDesc'];
+        $_SESSION[ORDRE_ASC] = false;
         // echo "session tri desc = get tro = " . $_SESSION['tri'] = $_GET ['triDesc'];
-    }
-    // Sinon, on installe le tri par date dégressif
+    } // Sinon, on installe le tri par date dégressif
     else {
-        if (!isset ($_SESSION['tri'])) {
-            $_SESSION['tri'] = "datePub";
-            $_SESSION['ordreAsc'] = false;
+        if (!isset ($_SESSION[TRI])) {
+            $_SESSION[TRI] = DATE_PUB;
+            $_SESSION[ORDRE_ASC] = false;
             // echo "tri par défaut ";
         }
     }
@@ -47,47 +52,51 @@ if (isset ($_GET ['nonVote'])) {
 }
 
 // Gestion paramètres de recherche
-if (isset ($_POST ['cherche'])) {
+if (isset ($_POST [CHERCHE])) {
 
-    $_SESSION['cherche'] = $_POST['cherche'];
+    $_SESSION[CHERCHE] = $_POST[CHERCHE];
+} else {
+    if (!isset($_SESSION[CHERCHE])) {
+        $_SESSION[CHERCHE] = "";
+    }
 }
-else
-    if (! isset($_SESSION['cherche']))
-    $_SESSION['cherche'] = "";
 
-if ($_SESSION['cherche'] != "")
-    $critere_cherche = "%" . $_SESSION['cherche'] . "%";
-else
+if ($_SESSION[CHERCHE] != "") {
+    $critere_cherche = "%" . $_SESSION[CHERCHE] . "%";
+} else {
     $critere_cherche = "%";
+}
 
 // Gestion razFiltres
 if (isset ($_GET ['razFiltres'])) {
-    $_SESSION['tri'] = "datePub";
-    $_SESSION['ordreAsc'] = false;
-    $_SESSION['cherche'] = "";
+    $_SESSION[TRI] = DATE_PUB;
+    $_SESSION[ORDRE_ASC] = false;
+    $_SESSION[CHERCHE] = "";
     $critere_cherche = "%";
 }
 
 // echo " Recherche = " . $critere_cherche;
 
 // Chargement de la liste des chansons
-$resultat = Chanson::chercheChansons( $critere_cherche , $_SESSION['tri'] , $_SESSION['ordreAsc'] );
+$resultat = Chanson::chercheChansons($critere_cherche, $_SESSION[TRI], $_SESSION[ORDRE_ASC]);
 $nbreChansons = count($resultat);
 $numligne = 0;
 
 // Gestion de la pagination
 $pagination = new Pagination ($nbreChansons, $nombreChansonsParPage);
-if (isset ($_GET['page']))
+if (isset ($_GET['page'])) {
     $page = $_GET['page'];
-else
+} else {
     $page = 1;
+}
 $pagination->setPageEnCours($page);
 
 // Affichage de la liste
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
-if ($_SESSION ['privilege'] > 1)
+if ($_SESSION [PRIVILEGE] > 1) {
     $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'></span> Ajouter une chanson</a>\n";
+}
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 $contenuHtml .= TblDebut(0);
@@ -102,11 +111,11 @@ $contenuHtml .= titreColonne("Tempo", "tempo");
 $contenuHtml .= titreColonne("Mesure", "mesure");
 $contenuHtml .= titreColonne("Pulsation", "pulsation");
 $contenuHtml .= titreColonne("Tonalité", "tonalite");
-$contenuHtml .= titreColonne("Date pub.", "datePub");
+$contenuHtml .= titreColonne("Date pub.", DATE_PUB);
 $contenuHtml .= titreColonne("Publié par", "idUser");
 $contenuHtml .= titreColonne("Vues", "hits");
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-if ($_SESSION ['privilege'] > 1) {
+if ($_SESSION [PRIVILEGE] > 1) {
     $contenuHtml .= TblCellule(" ");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
@@ -115,53 +124,57 @@ $contenuHtml .= TblCorpsDebut();
 
 $cheminImagesChanson = "../data/chansons/";
 $_chanson = new Chanson();
-$maNote = new UtilisateurNote( 0, 1, 1, 1);
+$maNote = new UtilisateurNote(0, 1, 1, 1);
 
 /** @noinspection PhpUndefinedMethodInspection */
 foreach ($resultat as $ligne) {
     $numligne++;
-    if (($numligne < $pagination->getItemDebut()) || $numligne > $pagination->getItemFin())
+    if (($numligne < $pagination->getItemDebut()) || $numligne > $pagination->getItemFin()) {
         continue;
+    }
+
     $contenuHtml .= TblDebutLigne();
 
     $_chanson->chercheChanson($ligne);
     $_id = $_chanson->getId();
-    if (isset ($_GET ['nonVote']))
-    {
-        if ($maNote->chercheNoteUtilisateur($_SESSION['id'], 'chanson', $_id)==1) {
-            echo "session id: " . $_SESSION['id'];
-            $nbreChansons --;
-            continue;
-        }
+    if ((isset ($_GET ['nonVote'])) && ($maNote->chercheNoteUtilisateur($_SESSION['id'], CHANSON, $_id) == 1)) {
+        echo "session id: " . $_SESSION['id'];
+        $nbreChansons--;
+        continue;
     }
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-    if ($_SESSION ['privilege'] > 1)
+    if ($_SESSION [PRIVILEGE] > 1)
+    {
         $contenuHtml .= TblCellule(Ancre("$chansonForm?id=" . $_id, Image($cheminImages . $iconeEdit, 32, 32)));
+    }
     else
+    {
         $contenuHtml .= TblCellule(" ");
-    $imagePochette = Image(($cheminImagesChanson . $_id . "/" . rawurlencode(imageTableId("chanson", $_id))), 48, 48, "couverture");
+    }
+    $imagePochette = Image(($cheminImagesChanson . $_id . "/" . rawurlencode(imageTableId(CHANSON, $_id))), 48, 48, "couverture");
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", $imagePochette));
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"))); // Nom
     $contenuHtml .= TblCellule(limiteLongueur($_chanson->getInterprete(), 21)); // interprete
-    if ($_SESSION ['privilege'] > 0)
-        $contenuHtml .= TblCellule(  UtilisateurNote::starBarUtilisateur( "chanson", $_id, 5, 25), 1, 1, "centrer");
-    else
-        $contenuHtml .= TblCellule(  UtilisateurNote::starBar( "chanson", $_id, 5, 25), 1, 1, "centrer");
+    if ($_SESSION [PRIVILEGE] > 0) {
+        $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
+    } else {
+        $contenuHtml .= TblCellule(UtilisateurNote::starBar(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
+    }
 
-    $contenuHtml .= TblCellule($_chanson->getAnnee(), 1, 1, "centrer"); // annee
+    $contenuHtml .= TblCellule($_chanson->getAnnee(), 1, 1, CENTRER); // annee
     $contenuHtml .= TblCellule($_chanson->getTempo(), 1, 1, "alignerAdroite"); // tempo
-    $contenuHtml .= TblCellule($_chanson->getMesure(), 1, 1, "centrer"); // mesure
-    $contenuHtml .= TblCellule($_chanson->getPulsation(), 1, 1, "centrer"); // pulsation
-    $contenuHtml .= TblCellule($_chanson->getTonalite(), 1, 1, "centrer"); // tonalité
+    $contenuHtml .= TblCellule($_chanson->getMesure(), 1, 1, CENTRER); // mesure
+    $contenuHtml .= TblCellule($_chanson->getPulsation(), 1, 1, CENTRER); // pulsation
+    $contenuHtml .= TblCellule($_chanson->getTonalite(), 1, 1, CENTRER); // tonalité
     $contenuHtml .= TblCellule(dateMysqlVersTexte($_chanson->getDatePub())); // Date Pub
     $nomAuteur = chercheUtilisateur($_chanson->getIdUser());
     $nomAuteur = $nomAuteur[3];
-    $contenuHtml .= TblCellule($nomAuteur, 1, 1, "centrer"); // auteur
+    $contenuHtml .= TblCellule($nomAuteur, 1, 1, CENTRER); // auteur
     $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite"); // hits
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-    if ($_SESSION ['privilege'] > 1) {
+    if ($_SESSION [PRIVILEGE] > 1) {
         $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages));
         // //////////////////////////////////////////////////////////////////////ADMIN
     }
@@ -171,10 +184,11 @@ $contenuHtml .= TblCorpsFin();
 $contenuHtml .= TblFin();
 $contenuHtml .= $pagination->barrePagination() . "   ";
 $contenuHtml .= $nbreChansons . " chanson(s) dans la liste.<br>\n";
-if ($nbreChansons==0)
+if ($nbreChansons == 0) {
     $contenuHtml .= "Pas de résultat ... <BR><a href='?razFiltres' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Supprimer les filtres et tris</a>\n";
+}
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
-if ($_SESSION ['privilege'] > 1) {
+if ($_SESSION [PRIVILEGE] > 1) {
     $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Ajouter une chanson</a>\n";
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
@@ -192,6 +206,5 @@ function titreColonne($libelle, $nomRubrique)
 {
     $lienCroissant = Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> </span>");
     $lienDecroissant = Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> </span>");
-    $chaine = TblEntete($lienCroissant . "  $libelle " . $lienDecroissant);
-    return $chaine;
+    return TblEntete($lienCroissant . "  $libelle " . $lienDecroissant);
 }

@@ -95,7 +95,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
-    echo "extension " . $extension . " et filtre : " . $contenuFiltrer . " - " ;
+    //echo "extension " . $extension . " et filtre : " . $contenuFiltrer . " - " ;
 
     if ($contenuFiltrer) {
         if (($contenuFiltrer == "son") && ($extension <> "mp3")) {
