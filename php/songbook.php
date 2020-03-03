@@ -197,8 +197,8 @@ WHERE liendocsongbook.idSongbook =  '$id' ORDER BY liendocsongbook.ordre ASC";
         }
     }
     $imageSongBook = imageSongBook($id);
-
-    pdfCreeSongbook($id, $imageSongBook, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
+    $ligneSongbook = chercheSongbook($id);
+    pdfCreeSongbook($id, $ligneSongbook[1], $imageSongBook, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
 }
 
 // Fonction de test

@@ -42,6 +42,7 @@ class SongBookPDF extends FPDI
     }
 }
 
+// Ajoute le fichier pdf $file à notre $pdf
 function ajouteFichier($pdf, $file)
 {
     $nbPage = $pdf->setSourceFile($file);
@@ -74,7 +75,7 @@ function testePdf()
     echo("Fichier <a href='compile.pdf'>compile.pdf</a> généré à partir de Germaine et La Jument de Michao");
 }
 
-function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
+function pdfCreeSongbook($idSongBook, $intitule, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
 {
     $pdf = new SongBookPDF();
 
@@ -100,7 +101,9 @@ function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $list
         $hauteur_ligne = 40;
 
     $pdf->SetFont('Arial', 'B', $hauteur_ligne);
-    $numeroChanson = 1;
+    // On met une petite ligne vide pour faire de la place
+    $pdf->cell(10, $hauteur_ligne, " ",0,1, "L");
+    $numeroChanson = 3;
     foreach ($listeNomsChanson as $nomChanson) {
         $pdf->Cell(10, $hauteur_ligne, $numeroChanson++ . " - " . utf8_decode($nomChanson), 0, 1, "L");
     }
@@ -117,14 +120,31 @@ function pdfCreeSongbook($idSongBook, $imageCouverture, $listeNomsChanson, $list
             echo "Le fichier $nomFichier n'a pas été traité. <br> Exception reçue : ", $e->getMessage(), "\n<br>";
         }
     }
-
-    $pdf->Output("../data/songbooks/" . $idSongBook . "/" . 'songbook_auto.pdf', 'F');
+    $intitule = make_alias ($intitule);
+    $intitule = str_replace("'","",$intitule);
+    $nom_pdf_songbook = "songbook_".$intitule . ".pdf";
+    $pdf->Output("../data/songbooks/" . $idSongBook . "/" . $nom_pdf_songbook, 'F');
     // Enregistrement du document en base de données
-    $taille = filesize("../data/songbooks/" . $idSongBook . "/" . 'songbook_auto.pdf');
-    $version = creeModifieDocument("songbook_auto.pdf", $taille, "songbook", $idSongBook);
-    $nouveauNom = composeNomVersion("songbook_auto.pdf", $version);
-    rename("../data/songbooks/" . $idSongBook . "/" . 'songbook_auto.pdf', "../data/songbooks/" . $idSongBook . "/" . $nouveauNom);
+    $taille = filesize("../data/songbooks/" . $idSongBook . "/" . $nom_pdf_songbook);
+    $version = creeModifieDocument($nom_pdf_songbook, $taille, "songbook", $idSongBook);
+    $nouveauNom = composeNomVersion($nom_pdf_songbook, $version);
+    rename("../data/songbooks/" . $idSongBook . "/" . $nom_pdf_songbook, "../data/songbooks/" . $idSongBook . "/" . $nouveauNom);
     echo("Fichier <a href='../data/songbooks/$idSongBook/$nouveauNom' target='_blank''>$nouveauNom</a> généré à partir de la liste des partoches");
+}
+
+function make_alias($name)
+{
+    $alias = mb_strtolower($name, 'UTF-8');
+    $alias = mb_strtolower(trim($alias));
+    $search = array(utf8_decode('@[ÈÉÊËèéêë]@i'), utf8_decode('@[ÀÁÂÃÄÅàáâãäå]@i'), utf8_decode('@[ÌÍÎÏìíîï]@i'), utf8_decode('@[ÙÚÛÜùúûü]@i'), utf8_decode('@[ÒÓÔÕÖðòóôõö]@i'), utf8_decode('@[çÇ]@i'), utf8_decode('@[Ýýÿ]@i'), utf8_decode('@[,;:!§/.?*°+\'\-]@i'), utf8_decode('@[\s]@'));
+    $replace = array('e', 'a', 'i', 'u', 'o', 'c', 'y', '', '-');
+    $alias = preg_replace($search, $replace, utf8_decode($alias));
+    $search = array('.', ',', '?', ';', ':', '/', '!', '§', '%', 'ù', '*', 'µ', '¨', '^', '$', '£', 'ø', '=', '+', '}', ')', '°', ']', '@', '^', '\\', '|', '[', '{', '#', '~', '}', ']', '&', '²');
+    $alias = str_replace($search, '', $alias);
+    $search = array('@-{2,}@i');
+    $alias = preg_replace($search, '-', $alias);
+    $alias = utf8_encode($alias);
+    return $alias;
 }
 
 function testeCreeSongBook()
@@ -138,7 +158,7 @@ function testeCreeSongBook()
     $listeIdChanson = [154];
     $listeVersionsDoc = [4];
 
-    pdfCreeSongbook(45, "AuBonheurDesDames-v1.jpg", $listeNomsChanson, $listeNomsFichiers, $listeIdChanson , $listeVersionsDoc);
+    pdfCreeSongbook(45, "Songbook test", "AuBonheurDesDames-v1.jpg", $listeNomsChanson, $listeNomsFichiers, $listeIdChanson , $listeVersionsDoc);
 }
 
 //testePdf();
