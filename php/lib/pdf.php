@@ -2,6 +2,8 @@
 // On utilise la librairie fpdf http://www.fpdf.org/
 // ainsi que la librairie fpdi pour importer des pdf existants https://www.setasign.com/products/fpdi/manual/
 
+const DATA_SONGBOOKS = "../data/songbooks/";
+const ARIAL = 'Arial';
 require_once('fpdf/fpdf.php');
 require_once('fpdi/autoload.php');
 require_once('fpdi/Fpdi.php');
@@ -11,6 +13,7 @@ use setasign\Fpdi\Fpdi;
 class SongBookPDF extends FPDI
 {
 
+    const ARIAL = 'Arial';
     public $_nombrePages;
 
 // Page header
@@ -35,7 +38,7 @@ class SongBookPDF extends FPDI
             // Position at 1.5 cm from bottom
             $this->SetY(-15);
             // Arial italic 8
-            $this->SetFont('Arial', 'I', 8);
+            $this->SetFont(self::ARIAL, 'I', 8);
             // Page number
             $this->Cell(0, 10, 'Page ' . $this->PageNo(), 0, 0, 'C');
         }
@@ -63,7 +66,7 @@ function testePdf()
     $pdf->AddPage();
     $pdf->Image("songbook-Madelon-v2.png", 5, 5, 200, 287);
     $pdf->AddPage();
-    $pdf->SetFont('Arial', 'B', 16);
+    $pdf->SetFont(ARIAL, 'B', 16);
     $pdf->SetTextColor(50, 50, 50);
     $pdf->Cell(0, 10, 'Sommaire', 1, 1, 'C'); // Centré
     $pdf->Cell(10, 10, " ", 0, 1, "L");
@@ -72,7 +75,7 @@ function testePdf()
     ajouteFichier($pdf, "germaine.pdf");
     ajouteFichier($pdf, "laJument.pdf");
     $pdf->Output('compile.pdf', 'F');
-    echo("Fichier <a href='compile.pdf'>compile.pdf</a> généré à partir de Germaine et La Jument de Michao");
+    echo "Fichier <a href='compile.pdf'>compile.pdf</a> généré à partir de Germaine et La Jument de Michao";
 }
 
 function pdfCreeSongbook($idSongBook, $intitule, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
@@ -82,12 +85,12 @@ function pdfCreeSongbook($idSongBook, $intitule, $imageCouverture, $listeNomsCha
     // On fait une couverture avec l'image
     $pdf->AddPage();
     // TODO : ici on pourrait déterminer le ratio de l'image pour ne pas avoir d'image trop étirée
-    $pdf->Image("../data/songbooks/" . $idSongBook . "/" . $imageCouverture, 5, 5, 200, 287);
+    $pdf->Image(DATA_SONGBOOKS . $idSongBook . "/" . $imageCouverture, 5, 5, 200, 287);
 
     // On crée un sommaire
     $pdf->AddPage();
     // Logo
-    $pdf->SetFont('Arial', 'B', 20);
+    $pdf->SetFont(ARIAL, 'B', 20);
     $pdf->SetTextColor(50, 50, 50);
 
     $pdf->Cell(30, 10, ' ', 0, 0, "C"); // Centré
@@ -97,10 +100,11 @@ function pdfCreeSongbook($idSongBook, $intitule, $imageCouverture, $listeNomsCha
 
     // On a une hauteur de 240 à répartir sur la feuille
     $hauteur_ligne = 240 / (count($listeNomsChanson) + 1);
-    if ($hauteur_ligne > 40)
+    if ($hauteur_ligne > 40){
         $hauteur_ligne = 40;
+    }
 
-    $pdf->SetFont('Arial', 'B', $hauteur_ligne);
+    $pdf->SetFont(ARIAL, 'B', $hauteur_ligne);
     // On met une petite ligne vide pour faire de la place
     $pdf->cell(10, $hauteur_ligne, " ",0,1, "L");
     $numeroChanson = 3;
@@ -123,13 +127,13 @@ function pdfCreeSongbook($idSongBook, $intitule, $imageCouverture, $listeNomsCha
     $intitule = make_alias ($intitule);
     $intitule = str_replace("'","",$intitule);
     $nom_pdf_songbook = "songbook_".$intitule . ".pdf";
-    $pdf->Output("../data/songbooks/" . $idSongBook . "/" . $nom_pdf_songbook, 'F');
+    $pdf->Output(DATA_SONGBOOKS . $idSongBook . "/" . $nom_pdf_songbook, 'F');
     // Enregistrement du document en base de données
-    $taille = filesize("../data/songbooks/" . $idSongBook . "/" . $nom_pdf_songbook);
+    $taille = filesize(DATA_SONGBOOKS . $idSongBook . "/" . $nom_pdf_songbook);
     $version = creeModifieDocument($nom_pdf_songbook, $taille, "songbook", $idSongBook);
     $nouveauNom = composeNomVersion($nom_pdf_songbook, $version);
-    rename("../data/songbooks/" . $idSongBook . "/" . $nom_pdf_songbook, "../data/songbooks/" . $idSongBook . "/" . $nouveauNom);
-    echo("Fichier <a href='../data/songbooks/$idSongBook/$nouveauNom' target='_blank''>$nouveauNom</a> généré à partir de la liste des partoches");
+    rename(DATA_SONGBOOKS . $idSongBook . "/" . $nom_pdf_songbook, DATA_SONGBOOKS . $idSongBook . "/" . $nouveauNom);
+    echo "Fichier <a href='../data/songbooks/$idSongBook/$nouveauNom' target='_blank''>$nouveauNom</a> généré à partir de la liste des partoches";
 }
 
 function make_alias($name)
