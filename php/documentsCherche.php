@@ -59,18 +59,16 @@ $listeDocs = chercheDocuments("nom", "%".$nomContient."%", $triPar, $triCroissan
 
 // On retourne l'objet json
 $sortie = "<table>";
-//var_dump($listeDocs);
 $nombreItems = 0;
 $nombreItemsMax = 10;
 while (($ligneDoc = $listeDocs->fetch_row()) && ($nombreItems<$nombreItemsMax)) {
-
-    // var_dump($ligneDoc);
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
     //echo "extension " . $extension . " et filtre : " . $contenuFiltrer . " - " ;
-    if ($typeDocument != $extension)
+    if ($typeDocument != $extension) {
         continue;
+    }
 
     if ($typeDocument!="*") {
         if (($typeDocument == "son") && ($extension <> "mp3")) {
@@ -104,5 +102,6 @@ while (($ligneDoc = $listeDocs->fetch_row()) && ($nombreItems<$nombreItemsMax)) 
 }
 $sortie .= "</table>";
 echo $sortie;
-if ($nombreItems >= $nombreItemsMax)
+if ($nombreItems >= $nombreItemsMax) {
     echo "le nombre de résultats est limité à $nombreItemsMax... Mettre plus de critères !";
+}
