@@ -21,6 +21,10 @@ if (isset ($_POST ['id']) && (isset ($_POST ['documentJoint']))) {
     ordonneLiensSongbook($id);
     creeLienDocSongbook($_POST ['documentJoint'], $_POST ['id']);
     $id = $_POST ['id'];
+    if ($_POST ['ajax']==11) {
+        echo("succes");
+        exit();
+    }
 }
 
 // Chargement des donnees du songbook si l'identifiant est fourni

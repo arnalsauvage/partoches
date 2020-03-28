@@ -202,6 +202,25 @@ WHERE liendocsongbook.idSongbook =  '$id' ORDER BY liendocsongbook.ordre ASC";
     pdfCreeSongbook($id, $ligneSongbook[1], $imageSongBook, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
 }
 
+// Renvoie la liste des songbooks en base
+function listeSongbooks()
+{
+    // Cas de demande de liste des songbooks
+
+    $maListeSongbooks = chercheSongbooks("nom", "%", $critereTri = 'id', $bTriAscendant = false);
+    $index = 0;
+    $liste = [];
+    while (($ligne = $maListeSongbooks->fetch_row())) {
+        // id
+        $liste[$index][0] = $ligne[0];
+        // nom
+        $liste[$index][1] = $ligne[1];
+        $index++;
+    }
+    return $liste;
+
+}
+
 // Fonction de test
 function testeSongbook()
 {

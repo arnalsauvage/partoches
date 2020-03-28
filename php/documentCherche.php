@@ -9,7 +9,7 @@ $(document).ready(function(){
         donnees += "&triCroissant=" + $("#triCroissant").val();
         //alert("donnees :" + donnees);
         $.ajax({
-                url: '../php/documentsCherche.php',
+                url: '../php/documentChercheAjax.php',
                 type: 'POST', // Le type de la requête HTTP, ici devenu POST
                 data: donnees,
                 dataType: 'html'
@@ -18,7 +18,7 @@ $(document).ready(function(){
 }) ;
 
     $( document ).ajaxSuccess(function( event, xhr, settings ) {
-        if ( settings.url == "../php/documentsCherche.php" ) {
+        if ( settings.url == "documentChercheAjax.php" ) {
             $( "#storage" ).html( "Triggered ajaxSuccess handler. The Ajax response was: " + xhr.responseText );
             //alert (xhr.responseText);
         }
@@ -43,10 +43,19 @@ $(document).ready(function(){
             <input id="nomCherche" name="nomCherche" type="text" value="" size="20" />
         </label>
         <label>Tri par:
-            <input id="triPar" name="triPar" type="text" value="date" size="20" />
+            <select id="triPar">
+                <option value="id">identifiant</option>
+                <option value="nom">nom</option>
+                <option value="tailleKo">taille</option>
+                <option value="version">version</option>
+                <option value="version">hits</option>
+            </select>
         </label>
         <label>Croissant (asc) ou décroissant (desc):
-            <input id="triCroissant" name="triCroissant" type="text" value="desc" size="20" />
+            <select id="triCroissant">
+                <option value="desc">décroissant</option>
+                <option value="asc">croissant</option>
+            </select>
         </label>
     </p>
     <p>
