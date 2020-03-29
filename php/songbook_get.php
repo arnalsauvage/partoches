@@ -1,4 +1,5 @@
 <?php
+const PRIVILEGE = 'privilege';
 include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("songbook.php");
@@ -6,10 +7,10 @@ include_once("lienDocSongbook.php");
 $nomTable = "songbook";
 
 // Les modifs sont reservées aux utilisateurs authentifiés et habilités
-if ($_SESSION ['privilege'] <= 1)
-	redirection ( $nomTable . "_liste.php" );
-
-// On gère 5 cas : création d'une songbook, modif, suppression, ou suppression d'un docJoint, duplication songbook
+if ($_SESSION [PRIVILEGE] <= 1) {
+    redirection($nomTable . "_liste.php");
+}
+// On gère 6 cas : création d'une songbook, modif, suppression, ou suppression d'un docJoint, duplication songbook, liste songbooks
 if (isset($_POST ['mode'])) {
     $mode = $_POST ['mode'];
 } elseif (isset($_GET ['mode'])) {
@@ -33,12 +34,13 @@ if (($mode == "MAJ") || ($mode == "INS")) {
     $fimage = $_POST ['fimage'];
 
     // Seul admin peut modifier hits et date
-    if ($_SESSION ['privilege'] > 2) {
+    if ($_SESSION [PRIVILEGE] > 2) {
         $fdate = $_POST ['fdate'];
         $fhits = $_POST ['fhits'];
     }
 }
 
+// Cas de la duplication
 if (isset($_GET ['DUP'])) {
     $mode = "DUP";
     $id = $_GET ['DUP'];
@@ -50,7 +52,7 @@ if ($mode == "MAJ") {
         // On récupère les valeurs de hits et date en base, car ils ne sont pas dans le formulaire
     $songbook = chercheSongbook($id);
     // Seul admin peut modifier hits et date
-    if ($_SESSION ['privilege'] < 2) {
+    if ($_SESSION [PRIVILEGE] < 2) {
         $fhits = $songbook[5];
         $fdate = dateMysqlVersTexte($songbook[3]);
     }
@@ -74,12 +76,12 @@ if (isset($id) && ($mode == "SUPPR")) {
 
 // Gestion de la demande de suppression de document dans le songbook
 if ($mode == "SUPPRDOC") {
-//	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
+    //	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
     supprimeLienIdDocIdSongbook($_GET ['idDoc'], $_GET ['idSongbook']);
 }
 
 // Gestion de la demande de suppression de document dans le songbook
-if ($mode == "SUPPRFIC" && $_SESSION ['privilege'] > 1) {
+if ($mode == "SUPPRFIC" && $_SESSION [PRIVILEGE] > 1) {
     // echo "Appel avec mode = $mode, nomFic = $_GET['nomFic'] , idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
     unlink("../data/songbooks/" . $_GET['idSongbook'] . "/" . $_GET['nomFic']);
     supprimeDocument($_GET ['idDoc']);
@@ -91,5 +93,6 @@ if ($mode == "GENEREPDF") {
 }
 
 // On fait une redirection dans tous les cas, sauf la demande de génération de PDF - appel ajax
-if ($mode != "GENEREPDF")
+if ($mode != "GENEREPDF") {
     redirection($nomTable . "_liste.php");
+}

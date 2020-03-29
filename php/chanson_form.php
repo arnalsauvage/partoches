@@ -4,9 +4,25 @@ include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
+include_once ("songbook.php");
 include_once("lib/formulaire.php");
 $table =  CHANSON;
 $sortie = "";
+
+$listeSongbooks =[];
+$listeSongbooks = listeSongbooks();
+
+function comboAjoutSongbook($listeSongbooks)
+{
+    $monCombo = " <br>   <label class='inline col-sm-4'> * Ajouter au songbook :</label> 
+    <select name= 'idSongbook' >";
+    foreach ( $listeSongbooks as $songbook)
+        {
+            $monCombo .= " <option value='".$songbook[0]."'>".$songbook[1]."</option>";
+        }
+    $monCombo .= "   </select>";
+    return($monCombo);
+}
 
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
 if ($_SESSION ['privilege'] < 2) {
@@ -35,8 +51,6 @@ if (isset ($_GET ['id']) && $_GET ['id'] != "") {
     $mode = "INS";
     $_chanson->setIdUser($_SESSION ['id']);
 }
-
-// echo "Session id : " . $_SESSION ['id'];
 
 $sortie .= "
 <div class='col-lg-12 centrer'>";
@@ -88,8 +102,11 @@ $sortie .= ">binaire
 if ($_chanson->getPulsation() == "ternaire"){
     $sortie .= " selected";
 }
-$sortie .= ">ternaire</option>
-    </select>
+$sortie .= "
+>ternaire</option>
+    </select>";
+
+$sortie .= "
 </div>
 <div class = 'row'>
 <label class='inline col-sm-3'> Tonalité :</label>
@@ -161,7 +178,11 @@ if ($mode == "MAJ") {
 		    <button name='renommer' style='display:none;'>renommer</button>
             <button style='display:none;'>x</button>";
             $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
+            $listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
+            $listeDocs .= "</li>";
+            $listeDocs .= "<button onclick=envoieFichierDansSongbook(".$ligneDoc[0].") >ajouter au songbook</button>";
         }
+        $listeDocs .= "<br><div>" . comboAjoutSongbook($listeSongbooks) ."</div><br>";
         echo $listeDocs;
         ?>
     </ul>
@@ -250,6 +271,39 @@ if ($mode == "MAJ") {
 }
 echo "    </div> \n";
 echo "        	<script src='../js/chansonForm.js '></script>";
+
+?>
+
+            <script>
+                function envoieFichierDansSongbook(idFichier) {
+                    // Récupérer l'id du songbook dans la combo
+                    var idSongbook = $("select[name='idSongbook'] option:selected").val() ;
+                    // alert('idSongbook = ' + idSongbook);
+                    // Appel Ajax
+                    $.ajax({
+                        type: "POST",
+                    url: "songbook_form.php",
+                    data: "id="+idSongbook+"&documentJoint="+idFichier+"&ajax=11",
+                    datatype: 'html', // type de la donnée à recevoir
+                        success: function (code_html, statut) { // success est toujours en place, bien sûr !
+                        if (code_html.search("succes") > -1)
+                        toastr.success("Le document a été ajouté au songbook ! <br> Le fichier a été raccroché au songbook <br> Vous pouvez raffraîchir la page pour le voir.");
+                    else {
+                            toastr.warning("Erreur dans l'opération...<br>Le document n'a pas pu être raccroché... :-(");
+                            $("#div1").html(code_html);
+                        }
+                    },
+                    error: function (resultat, statut, erreur) {
+                        $("#div1").html(resultat);
+                    }
+
+                });
+                    // Retour ok : toast vert
+
+                    // Retour ko : toast rouge
+                }
+            </script>
+<?php
 echo envoieFooter();
 
 ?>
