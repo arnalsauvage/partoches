@@ -1,13 +1,17 @@
 <?php
 /** @noinspection PhpUndefinedMethodInspection */
+const CHANSON = "chanson";
+const DIV_CLASS_ROW = "<div class='row'>";
+const FIN_DIV = "</div>";
+const FIN_SECTION = "</section>";
 include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
 include_once("songbook.php");
-include_once ("UtilisateurNote.php");
+include_once("UtilisateurNote.php");
 
-$table = "chanson";
+$table = CHANSON;
 $contenuHtml = "<div class='container'>
   <div class='starter-template'> \n";
 $monImage = "";
@@ -17,54 +21,56 @@ $_chanson = new Chanson ($idChanson);
 $fichiersDuSongbook = $_chanson->fichiersChanson();
 
 // On choisit une des images du songbook
-$monImage = imageTableId("chanson", $idChanson);
+$monImage = imageTableId(CHANSON, $idChanson);
 
 $datePub = dateMysqlVersTexte($_chanson->getDatePub()); // datePub
 $utilisateur = chercheUtilisateur($_chanson->getIdUser())[1];
 $hits = $_chanson->getHits() + 1; // hits
 
-$contenuHtml .= "<div class='row'>";
+
+$contenuHtml .= DIV_CLASS_ROW;
 $contenuHtml .= "<section class='col-sm-8'>";
 
-$contenuHtml .= "<div class='row'>";
-$contenuHtml .= " <div class='col-sm-10'><h2>" . htmlentities($_chanson->getNom()) . "</h2></div>"; // Titre
+$contenuHtml .= DIV_CLASS_ROW;
+$contenuHtml .= " <div class='col-sm-10'><h2>" . htmlentities($_chanson->getNom()) . "</h2>" . FIN_DIV; // Titre
 $contenuHtml .= "<div class='col-sm-2'>";
 
 if ($_SESSION ['privilege'] > 1) {
     $contenuHtml .= Ancre("chanson_form.php?id=" . $idChanson, Image($cheminImages . $iconeEdit, 32, 32)); // Nom));
 }
-$contenuHtml .= "</div></div>";
+$contenuHtml .= "</div>" . FIN_DIV;
 
-$contenuHtml .= "<div class='row'>";
-$contenuHtml .= "<div class='col-sm-11'><h3> " . htmlentities($_chanson->getInterprete()) . " - " . $_chanson->getAnnee() . " </h3></div>\n";
-$contenuHtml .= "</div>";
-$contenuHtml .= "<div class='row'>";
+$contenuHtml .= DIV_CLASS_ROW;
+$contenuHtml .= "<div class='col-sm-11'><h3> " . htmlentities($_chanson->getInterprete()) . " - " . $_chanson->getAnnee() . " </h3>" . FIN_DIV . "\n";
+$contenuHtml .= FIN_DIV;
+$contenuHtml .= DIV_CLASS_ROW;
 $contenuHtml .= " <div class='col-sm-8'>Tonalité : " . $_chanson->getTonalite() . ", Tempo : " . $_chanson->getTempo();
 $contenuHtml .= ", mesure : " . $_chanson->getMesure() . ", pulsation : " . $_chanson->getPulsation() . " <br>\n";
-$contenuHtml .= " Publiée le  :$datePub, par $utilisateur, affichée $hits fois. <br>\n</div>\n";
+$contenuHtml .= " Publiée le  :$datePub, par $utilisateur, affichée $hits fois. <br>\n" . FIN_DIV . "\n";
 
 // Propose des recherches sur la chanson
 $contenuHtml .= "<div class='col-sm-4'><a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank'><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png' alt = 'recherche youtube' width='64'></a>\n";
 $rechercheWikipedia = "https://fr.wikipedia.org/w/index.php?search=" . urlencode(($_chanson->getNom() . " " . $_chanson->getInterprete()));
-$contenuHtml .= "<a href='$rechercheWikipedia' target='_blank'><img src='https://fr.wikipedia.org/static/images/project-logos/frwiki.png' alt='recherche wikipedia' width='64'></a><br>\n</div>\n";
-$contenuHtml .= "</div>";
-$contenuHtml .= "</section>";
+$contenuHtml .= "<a href='$rechercheWikipedia' target='_blank'><img src='https://fr.wikipedia.org/static/images/project-logos/frwiki.png' alt='recherche wikipedia' width='64'></a><br>\n" . FIN_DIV . "\n";
+$contenuHtml .= FIN_DIV;
+$contenuHtml .= FIN_SECTION;
 $contenuHtml .= "<section class='col-sm-4'>";
 
 if ("" != $monImage) {
     $contenuHtml .= Image("../data/chansons/" . $idChanson . "/" . $monImage, 200, "", "pochette", "img-thumbnail");
 }
 
-if ($_SESSION['privilege']>0)
-    $contenuHtml .=   UtilisateurNote::starBarUtilisateur( "chanson", $idChanson, 5, 25); // 5 stars, Media ID 201, 25px star image
-$contenuHtml .=   UtilisateurNote::starBar( "chanson", $idChanson, 5, 25); // 5 stars, Media ID 201, 25px star image
+if ($_SESSION['privilege'] > 0) {
+    $contenuHtml .= UtilisateurNote::starBarUtilisateur(CHANSON, $idChanson, 5, 25);
+} // 5 stars, Media ID 201, 25px star image
+$contenuHtml .= UtilisateurNote::starBar(CHANSON, $idChanson, 5, 25); // 5 stars, Media ID 201, 25px star image
 
-$contenuHtml .= "</section>";
-$contenuHtml .= "</div>";
+$contenuHtml .= FIN_SECTION;
+$contenuHtml .= FIN_DIV;
 
 augmenteHits($table, $idChanson);
 // Cherche un document et le renvoie s'il existe
-$result = chercheDocumentsTableId("chanson", $idChanson);
+$result = chercheDocumentsTableId(CHANSON, $idChanson);
 
 if ($result->num_rows > 0) {
     $contenuHtml .= "<h2> Documents attachés à cette chanson</h2>";
@@ -74,25 +80,24 @@ if ($result->num_rows > 0) {
     /** @noinspection PhpUndefinedMethodInspection */
     /** @noinspection PhpUndefinedMethodInspection */
     while ($ligne = $result->fetch_row()) {
-
         $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
         $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
         // $fichier = "../data/chansons/" . $idChanson . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
         $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
         $extension = substr(strrchr($ligne [1], '.'), 1);
         $icone = Image("../images/icones/" . $extension . ".png", 32, 32, "icone");
-        if (!file_exists("../images/icones/" . $extension . ".png"))
+        if (!file_exists("../images/icones/" . $extension . ".png")) {
             $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
-
+        }
         $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" . htmlentities($fichierSec) . "</a> <br>\n";
-        $contenuHtml .= "</div>";
+        $contenuHtml .= FIN_DIV;
     }
-    $contenuHtml .= " </section>\n";
+    $contenuHtml .= FIN_SECTION . "\n";
 
 /// Affichage des audios mp3 avec un outil de lecture audio
 
     $contenuHtml .= "<br><section class='row'>\n";
-    $result = chercheDocumentsTableId("chanson", $idChanson);
+    $result = chercheDocumentsTableId(CHANSON, $idChanson);
 
 // Pour chaque fichier audio
     while ($ligne = $result->fetch_row()) {
@@ -104,7 +109,7 @@ if ($result->num_rows > 0) {
             $baliseAudio = htmlentities($fichierSec) . "<br><audio controls='controls'>   <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
             Votre navigateur ne prend pas en charge l'élément <code>audio</code></audio>";
             $contenuHtml .= $baliseAudio . "\n";
-            $contenuHtml .= "</div>";
+            $contenuHtml .= FIN_DIV;
         }
     }
     $contenuHtml .= " </section>\n";
@@ -134,7 +139,7 @@ if ($songbooks->num_rows > 0) {
     }
     $contenuHtml .= "</section>";
 }
-$contenuHtml .= "</div><!-- /.starter-template -->\n
+$contenuHtml .= FIN_DIV . "<!-- /.starter-template -->\n
 </div><!-- /.container -->\n";
 $contenuHtml .= envoieFooter();
 echo $contenuHtml;

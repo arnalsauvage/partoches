@@ -83,7 +83,7 @@ $listeDocs = "";
 // Pour chaque document
 while ($ligneDoc = $lignes->fetch_row()) {
     // var_dump( $ligneDoc);
-    // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
+    // renvoie la ligne sélectionnée : id, contenuFiltrer, taille, date, version, nomTable, idTable, idUser
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     // echo "Chanson id : $id fichier court : $fichierCourt";
     $fichier = "../data/songbooks/$id/" . urlencode($fichierCourt);
@@ -157,10 +157,13 @@ if ($mode == "MAJ") {
 
     <form action="songbook_form.php" method="post" name="form2">
         <?php
-        echo selectDocument("nomTable", "chanson", "id", false);
+        // echo selectDocument("nomTable", "chanson", "id", false);
+        include "../php/documentCherche.php";
         ?>
         <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
         <input type="submit" value="Envoyer">
+
+
     </form>
     <button onclick='demandeUnPdf()'>Genère le songbook en pdf</button>
 

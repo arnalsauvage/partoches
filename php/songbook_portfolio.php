@@ -30,15 +30,15 @@ $table = "songbook";
 
     <?php
     // On se constitue une liste des titres de chansons
-    $titresChansons = chargeLibelles("chanson", "nom");
+    $titresChansons = chargeLibelles("chanson", "contenuFiltrer");
 
     // Chargement de la liste des songbooks
-    $listeSongbooks = chercheSongbooks("nom", "%", "date", false);
+    $listeSongbooks = chercheSongbooks("contenuFiltrer", "%", "date", false);
     $numligne = 0;
 
     // Boucle pour tous les songbooks
     while ($songbook = $listeSongbooks->fetch_row()) {
-    // Songbook : [0]id [1]nom [2]description [3]date [4]image [5]hits [6]idUser
+    // Songbook : [0]id [1]contenuFiltrer [2]description [3]date [4]image [5]hits [6]idUser
 
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$songbook[0]' AND document.nomTable = '$table' ORDER BY document.date ASC";
     $docsSongbook = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheDocumentsTableId #1 : " . $_SESSION ['mysql']->error);

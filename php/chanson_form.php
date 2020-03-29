@@ -1,27 +1,32 @@
 <?php
+const CHANSON = "chanson";
 include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("chanson.php");
 include_once("document.php");
 include_once("lib/formulaire.php");
-$table = "chanson";
+$table =  CHANSON;
 $sortie = "";
 
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
 if ($_SESSION ['privilege'] < 2) {
     $urlRedirection = $table . "_voir.php";
     if (isset ($_GET ['id']))
+    {
         $urlRedirection .= "?id=" . $_GET ['id'];
+    }
     redirection($urlRedirection);
 }
 
-// $id, $nom, $interprete, $annee, $idUser, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
+// $id, $contenuFiltrer, $interprete, $annee, $idUser, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
 $_chanson = new Chanson();
 
 // Chargement des donnees de la chanson si l'identifiant est fourni
 
 if (isset ($_POST ['id']))
+{
     $id = $_POST ['id'];
+}
 if (isset ($_GET ['id']) && $_GET ['id'] != "") {
     $id = $_GET ['id'];
     $_chanson->chercheChanson($id);
@@ -35,10 +40,12 @@ if (isset ($_GET ['id']) && $_GET ['id'] != "") {
 
 $sortie .= "
 <div class='col-lg-12 centrer'>";
-if ($mode == "MAJ")
+if ($mode == "MAJ"){
     $sortie .= "<H1> Mise à jour - " . $table . "</H1>";
-if ($mode == "INS")
+}
+if ($mode == "INS"){
     $sortie .= "<H1> Création - " . $table . "</H1>";
+}
 
 $sortie .= "<a href = 'chanson_voir.php?id=".$_chanson->getId()."'>voir la chanson</a>";
 // Création du formulaire
@@ -72,13 +79,15 @@ $sortie .= "
 <label class='inline col-sm-3'> Pulsation :</label>
     <select class= 'col-sm-7' NAME='fpulsation' >
     <option value='binaire'";
-if ($_chanson->getPulsation() == "binaire")
+if ($_chanson->getPulsation() == "binaire"){
     $sortie .= " selected";
+}
 $sortie .= ">binaire
     </option>
     <option value='ternaire' ";
-if ($_chanson->getPulsation() == "ternaire")
+if ($_chanson->getPulsation() == "ternaire"){
     $sortie .= " selected";
+}
 $sortie .= ">ternaire</option>
     </select>
 </div>
@@ -96,7 +105,7 @@ $sortie .= ">ternaire</option>
 </div>
 <div class = 'row'>
 <label class='inline col-sm-3'> Utilisateur :</label>"
-    . selectUtilisateur("nom", "%", "login", true, $_chanson->getIdUser()) . "
+    . selectUtilisateur("contenuFiltrer", "%", "login", true, $_chanson->getIdUser()) . "
 <INPUT TYPE=HIDDEN NAME='mode' VALUE='$mode'>
 <label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' >
 </div>
@@ -129,19 +138,21 @@ if ($mode == "MAJ") {
     <ul>
         <?php
         // Cherche un document et le renvoie s'il existe
-        $lignes = chercheDocumentsTableId("chanson", $id);
+        $lignes = chercheDocumentsTableId(CHANSON, $id);
         $listeDocs = "";
         // Pour chaque document
         while ($ligneDoc = $lignes->fetch_row()) {
             // var_dump( $ligneDoc);
             $idDoc = $ligneDoc [0];
-            // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
+            // renvoie la ligne sélectionnée : id, contenuFiltrer, taille, date, version, nomTable, idTable, idUser
             $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
             $fichier = "../data/chansons/$id/" . rawurlencode($fichierCourt);
             $extension = substr(strrchr($ligneDoc[1], '.'), 1);
             $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
             if (!file_exists("../images/icones/$extension.png"))
+            {
                 $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+            }
             $listeDocs .= "<li class='fichiers'> <div> <a href= '" . $fichier . "' target='_blank'> $icone </a> ";
             //    $listeDocs .= "Id chanson : $id  id doc : " . $ligneDoc[0] . "fichier court : $fichierCourt <br>";
             $listeDocs .= "<label class='doc'>" . htmlentities($fichierCourt) . "</label>";
@@ -167,13 +178,13 @@ if ($mode == "MAJ") {
     <h2> Corbeille des fichiers effacés</h2>
     <?php
     $fichiersEnBdd = [];
-    $resultat = chercheDocumentsTableId("chanson", "$id");
-    while (($fichierEnBdd = $resultat->fetch_row())) {
+    $resultat = chercheDocumentsTableId(CHANSON, "$id");
+    while ($fichierEnBdd = $resultat->fetch_row()) {
         array_push($fichiersEnBdd, $fichierEnBdd);
     }
 
-    $fichiersSurDisque = $_chanson->fichiersChanson(); // repertoire nom extension
-//    $maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')";
+    $fichiersSurDisque = $_chanson->fichiersChanson(); // repertoire contenuFiltrer extension
+//    $maRequete = "INSERT INTO document VALUES (NULL, '$contenuFiltrer', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')";
 
     $nbFichiersKO = 0;
     while (count($fichiersSurDisque) > 0) {
@@ -192,7 +203,7 @@ if ($mode == "MAJ") {
                 //echo "Fichier $fichierSurDisque[1] trouvé !!!!!!!!!!!!!!!!!!!<br>";
             }
         }
-        if ($fichierOk == false) {
+        if (! $fichierOk) {
             $nbFichiersKO++;
             echo "Fichier corbeille : " . $fichierSurDisque[1] . " non répertorié par la Bdd ";
             echo boutonSuppression("chanson_post.php?nomFic=" . urlencode("../data/chansons/" . $id . "/" . $fichierSurDisque[1]) . "&mode=SUPPRFIC&id=$id", $iconePoubelle, $cheminImages) . "<br>";
@@ -233,7 +244,9 @@ if ($mode == "MAJ") {
         }
     }
     if ($nbFichiersKO == 0)
+    {
         echo "La corbeille est vide pour cette chanson.\n";
+    }
 }
 echo "    </div> \n";
 echo "        	<script src='../js/chansonForm.js '></script>";
