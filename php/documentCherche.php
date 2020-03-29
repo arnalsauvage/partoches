@@ -9,7 +9,7 @@ $(document).ready(function(){
         donnees += "&triCroissant=" + $("#triCroissant").val();
         //alert("donnees :" + donnees);
         $.ajax({
-                url: '../php/documentChercheAjax.php',
+                url: 'documentChercheAjax.php',
                 type: 'POST', // Le type de la requête HTTP, ici devenu POST
                 data: donnees,
                 dataType: 'html'
@@ -17,9 +17,9 @@ $(document).ready(function(){
         });
 }) ;
 
-    $( document ).ajaxSuccess(function( event, xhr, settings ) {
+    $(document).ajaxSuccess(function( event, xhr, settings ) {
         if ( settings.url == "documentChercheAjax.php" ) {
-            $( "#storage" ).html( "Triggered ajaxSuccess handler. The Ajax response was: " + xhr.responseText );
+            $( "#storage" ).html( "Documents trouvés :  " + xhr.responseText );
             //alert (xhr.responseText);
         }
     });
