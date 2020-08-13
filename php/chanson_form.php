@@ -177,8 +177,10 @@ if ($mode == "MAJ") {
 		    <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
 		    <button name='renommer' style='display:none;'>renommer</button>
             <button style='display:none;'>x</button>";
+        if ($_SESSION ['privilege'] > 2) {
             $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
-            $listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
+        }
+            //$listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
             $listeDocs .= "</li>";
             $listeDocs .= "<button onclick=envoieFichierDansSongbook(".$ligneDoc[0].") >ajouter au songbook</button>";
         }
