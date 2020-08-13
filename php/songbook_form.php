@@ -1,4 +1,5 @@
 <?php /** @noinspection HtmlUnknownTarget */
+const ICONE = "icone";
 include_once("lib/utilssi.php");
 include_once("menu.php");
 include_once("songbook.php");
@@ -10,8 +11,9 @@ $sortie = "";
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
 if ($_SESSION ['privilege'] < 2) {
     $urlRedirection = $table . "_voir.php";
-    if (isset ($_GET ['id']))
+    if (isset ($_GET ['id'])) {
         $urlRedirection .= "?id=" . $_GET ['id'];
+    }
     redirection($urlRedirection);
 }
 
@@ -22,15 +24,16 @@ if (isset ($_POST ['id']) && (isset ($_POST ['documentJoint']))) {
     creeLienDocSongbook($_POST ['documentJoint'], $_POST ['id']);
     $id = $_POST ['id'];
     if ($_POST ['ajax']==11) {
-        echo("succes");
+        echo"succes";
         exit();
     }
 }
 
 // Chargement des donnees du songbook si l'identifiant est fourni
 if (isset ($_POST ['id']) || (isset ($_GET ['id']) && $_GET ['id'] != "")) {
-    if (isset ($_GET ['id']))
+    if (isset ($_GET ['id'])) {
         $id = $_GET ['id'];
+    }
     $donnee = chercheSongbook($id);
     $donnee [1] = htmlspecialchars($donnee [1]);
     $donnee [2] = htmlspecialchars($donnee [2]);
@@ -92,9 +95,10 @@ while ($ligneDoc = $lignes->fetch_row()) {
     // echo "Chanson id : $id fichier court : $fichierCourt";
     $fichier = "../data/songbooks/$id/" . urlencode($fichierCourt);
     $extension = substr(strrchr($ligneDoc[1], '.'), 1);
-    $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
-    if (!file_exists("../images/icones/$extension.png"))
-        $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+    $icone = Image("../images/icones/$extension.png", 32, 32, ICONE);
+    if (!file_exists("../images/icones/$extension.png")) {
+        $icone = Image("../images/icones/fichier.png", 32, 32, ICONE);
+    }
     $listeDocs .= "$icone <a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
     $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
     $listeDocs .= boutonSuppression("songbook_get.php" . "?idSongbook=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
@@ -143,9 +147,10 @@ if ($mode == "MAJ") {
         $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
         $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . urlencode($fichierCourt);
         $listeDocs .= "<li class='ui-state-default' data-index='$idDoc' data-position='$numero'>";
-        $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, "icone");
-        if (!file_exists("../images/icones/" . $fichier [2] . ".png"))
-            $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+        $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, ICONE);
+        if (!file_exists("../images/icones/" . $fichier [2] . ".png")) {
+            $icone = Image("../images/icones/fichier.png", 32, 32, ICONE);
+        }
         $listeDocs .= "<a href= '" . htmlentities($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
         $listeDocs .= boutonSuppression($songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
         $listeDocs .= "</li>\n";
