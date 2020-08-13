@@ -5,7 +5,7 @@ if (FALSE == isset($configMysql)) {
     $fichier = "../conf/params.ini";
 
     // On lit les données dans le fichier ini
-    $ini_objet = new ini ();
+    $ini_objet = new FichierIni ();
     $ini_objet->m_fichier($fichier);
 
     $monserveur = $ini_objet->m_valeur("monServeur", "mysql");

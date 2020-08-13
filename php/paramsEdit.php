@@ -13,7 +13,7 @@ if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] <= 2) {
     exit();
 }
 // On lit les données dans le fichier ini
-$ini_objet = new ini();
+$ini_objet = new FichierIni();
 
 $sortie .= ("Fichier params.ini<br>");
 $ini_objet->m_fichier($fichier);

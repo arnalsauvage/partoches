@@ -20,7 +20,7 @@ if (!isset ($FichierUtilsSi)) {
     $FichierUtilsSi = 1;
 
     // Inclusion des différentes librairies
-    require_once("class.ini.php");
+    require_once("class.fichierIni.php");
     require_once("compteur.php");
     require_once("configMysql.php");
     include_once "config-images.php";
