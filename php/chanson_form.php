@@ -34,7 +34,7 @@ if ($_SESSION ['privilege'] < 2) {
     redirection($urlRedirection);
 }
 
-// $id, $contenuFiltrer, $interprete, $annee, $idUser, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
+// $id, $nom, $interprete, $annee, $idUser, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
 $_chanson = new Chanson();
 
 // Chargement des donnees de la chanson si l'identifiant est fourni
@@ -122,7 +122,7 @@ $sortie .= "
 </div>
 <div class = 'row'>
 <label class='inline col-sm-3'> Utilisateur :</label>"
-    . selectUtilisateur("contenuFiltrer", "%", "login", true, $_chanson->getIdUser()) . "
+    . selectUtilisateur("nom", "%", "login", true, $_chanson->getIdUser()) . "
 <INPUT TYPE=HIDDEN NAME='mode' VALUE='$mode'>
 <label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' >
 </div>
@@ -161,7 +161,7 @@ if ($mode == "MAJ") {
         while ($ligneDoc = $lignes->fetch_row()) {
             // var_dump( $ligneDoc);
             $idDoc = $ligneDoc [0];
-            // renvoie la ligne sélectionnée : id, contenuFiltrer, taille, date, version, nomTable, idTable, idUser
+            // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
             $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
             $fichier = "../data/chansons/$id/" . rawurlencode($fichierCourt);
             $extension = substr(strrchr($ligneDoc[1], '.'), 1);
@@ -204,8 +204,8 @@ if ($mode == "MAJ") {
         array_push($fichiersEnBdd, $fichierEnBdd);
     }
 
-    $fichiersSurDisque = $_chanson->fichiersChanson(); // repertoire contenuFiltrer extension
-//    $maRequete = "INSERT INTO document VALUES (NULL, '$contenuFiltrer', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')";
+    $fichiersSurDisque = $_chanson->fichiersChanson(); // repertoire nom extension
+//    $maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')";
 
     $nbFichiersKO = 0;
     while (count($fichiersSurDisque) > 0) {

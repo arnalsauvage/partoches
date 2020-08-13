@@ -9,12 +9,13 @@ class ini
     var $valeur = "";
     var $fichier_ini = array();
 
-    // Cette méthode prend le contenuFiltrer d'un fichier en argument et le charge dans $fichier_ini
+    // Cette méthode prend le nom d'un fichier en argument et le charge dans $fichier_ini
     function m_fichier($arg)
     {
         $this->fichier = $arg;
         $this->fichier_ini = null;
         $this->fichier_ini = array();
+        $groupe_curseur = "general"; // Par défaut
         if (file_exists($arg) && $fichier_lecture = file($arg)) {
             foreach ($fichier_lecture as $ligne) // Parcourt chaque ligne du fichier
             {
@@ -182,7 +183,7 @@ class ini
         return $retour;
     }
 
-    // Si $fichier contient le contenuFiltrer d'un dossier, affiche le liste des fichiers ini que contient ce dossier
+    // Si $fichier contient le nom d'un dossier, affiche le liste des fichiers ini que contient ce dossier
     function print_dossier()
     {
         $retour = "";

@@ -13,7 +13,7 @@ $("button[name='renommer']").click(function () {
     id = $(this).parent().children("input").attr("id");
     //alert("id : " + id);
     $(this).parent().children("label").text(nouveauNom);
-    //alert("nouveau contenuFiltrer : " + nouveauNom);
+    //alert("nouveau nom : " + nouveauNom);
     $.ajax({
         url: "chanson_post.php",
         type: "POST",

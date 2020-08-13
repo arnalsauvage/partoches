@@ -78,7 +78,7 @@ function dateDuJourMysql()
 }
 
 // Chargement de la liste des libelles
-// ex : chargeLibelles($conn, "auteurs", "contenuFiltrer") donne la liste des noms dans un tab[id]=contenuFiltrer trié par contenuFiltrer
+// ex : chargeLibelles($conn, "auteurs", "nom") donne la liste des noms dans un tab[id]=nom trié par nom
 function chargeLibelles($table, $libelle)
 {
 

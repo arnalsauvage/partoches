@@ -5,7 +5,7 @@ include_once "lib/configMysql.php";
 // Fonctions de gestion des liens chanson playlist dans la table lienchansonplaylist
 
 // Cherche les lienChansonPlaylists correspondant à un critère
-function chercheLiensChansonPlaylist($critere, $valeur, $critereTri = 'contenuFiltrer', $bTriAscendant = true)
+function chercheLiensChansonPlaylist($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM lienchansonplaylist WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
     if ($bTriAscendant == false)
@@ -22,7 +22,7 @@ function chercheLienChansonPlaylist($id)
 {
     $maRequete = "SELECT * FROM lienchansonplaylist WHERE id = '$id'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchelienChansonPlaylist #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la lisgne sélectionnée : id, contenuFiltrer, interprète, année
+    // renvoie la lisgne sélectionnée : id, nom, interprète, année
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else
@@ -47,7 +47,7 @@ function chercheLienParIdPlaylistIdChanson($idPlaylist, $idChanson)
 {
     $maRequete = "SELECT * FROM lienchansonplaylist WHERE idChanson = '$idChanson' AND idPlaylist = '$idPlaylist'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheIdPlaylistIdChanson #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, contenuFiltrer, interprète, année
+    // renvoie la ligne sélectionnée : id, nom, interprète, année
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else
@@ -59,7 +59,7 @@ function chercheLienParIdPlaylistOrdre($idPlaylist, $ordre)
 {
     $maRequete = "SELECT * FROM lienchansonplaylist WHERE ordre = '$ordre' AND idPlaylist = '$idPlaylist'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienParIdPlaylistOrdre #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, contenuFiltrer, interprète, année
+    // renvoie la ligne sélectionnée : id, nom, interprète, année
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else

@@ -50,7 +50,7 @@ while ($ligne = $resultat->fetch_row()) {
 
         $fichiersDuSongbook .= TblCellule(entreBalise($ligne [1], "H2")); // Login
 
-        $fichiersDuSongbook .= TblCellule($ligne [3] . " " . $ligne [4]); // contenuFiltrer prenom
+        $fichiersDuSongbook .= TblCellule($ligne [3] . " " . $ligne [4]); // nom prenom
         $fichiersDuSongbook .= TblCellule(statut($ligne [11]));
         $fichiersDuSongbook .= TblCellule(dateMysqlVersTexte($ligne [9], 0));
         $fichiersDuSongbook .= TblCellule(" &nbsp &nbsp &nbsp &nbsp"); // un petit blanc

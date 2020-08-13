@@ -12,7 +12,7 @@ $cheminImagesplaylist = "../data/playlists/";
 // Fonctions de gestion du playlist
 
 // Cherche les playlists correspondant à un critère
-function cherchePlaylists($critere, $valeur, $critereTri = 'contenuFiltrer', $bTriAscendant = true)
+function cherchePlaylists($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM playlist WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
     if ($bTriAscendant == false)
@@ -29,7 +29,7 @@ function cherchePlaylist($id)
 {
     $maRequete = "SELECT * FROM playlist WHERE playlist.id = '$id'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheplaylist #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, contenuFiltrer, description, date , image, hits
+    // renvoie la ligne sélectionnée : id, nom, description, date , image, hits
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else
@@ -39,9 +39,9 @@ function cherchePlaylist($id)
 // Cherche une playlist et la renvoie si elle existe
 function cherchePlaylistParLeNom($nom)
 {
-    $maRequete = "SELECT * FROM playlist WHERE playlist.contenuFiltrer = '$nom'";
+    $maRequete = "SELECT * FROM playlist WHERE playlist.nom = '$nom'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchePlaylistParLeNom #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la lisgne sélectionnée : id, contenuFiltrer, description, date , image, hits
+    // renvoie la lisgne sélectionnée : id, nom, description, date , image, hits
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else
@@ -62,7 +62,7 @@ function modifiePlaylist($id, $nom, $description, $date, $image, $hits)
 {
     $date = convertitDateJJMMAAAA($date);
     $maRequete = "UPDATE  playlist
-	SET contenuFiltrer = '$nom', description = '$description', date = '$date' , image = '$image', hits = '$hits'
+	SET nom = '$nom', description = '$description', date = '$date' , image = '$image', hits = '$hits'
 	WHERE id='$id'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiePlaylist #1 : " . $_SESSION ['mysql']->error);
 }
@@ -91,14 +91,14 @@ function imagePlaylist($idplaylist)
 {
 
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$idplaylist' AND document.nomTable='playlist' ";
-    $maRequete .= " AND ( document.contenuFiltrer LIKE '%.png' OR document.contenuFiltrer LIKE '%.jpg')";
+    $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imagePlaylist #1 : " . $_SESSION ['mysql']->error);
     if (empty($result)) {
         return ("");
     }
 
     // Choisit une vignette au hasard parmi les images
-    // renvoie la ligne sélectionnée : id, contenuFiltrer, description, date , image, hits
+    // renvoie la ligne sélectionnée : id, nom, description, date , image, hits
     if (($ligne = $result->fetch_row())) {
         $nom = composeNomVersion($ligne[1], $ligne[4]);
         return ($nom);
@@ -119,7 +119,7 @@ function infosPlaylist($id)
 function fichiersPlaylist($id)
 {
     $enr = chercheplaylist($id);
-    $retour = []; // repertoire, contenuFiltrer, extension
+    $retour = []; // repertoire, nom, extension
     $repertoire = "../data/playlists/";
     if (is_dir($repertoire)) {
         foreach (new DirectoryIterator ($repertoire) as $fileInfo) {

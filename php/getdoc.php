@@ -78,7 +78,7 @@ if (!function_exists('mime_content_type')) {
 if (isset ($_GET ['doc'])) {
     $idDoc = $_GET ['doc'];
     $doc = chercheDocument($idDoc);
-    // renvoie la ligne sélectionnée : id, contenuFiltrer, taille, date, version, nomTable, idTable, idUser
+    // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
     $fichier = "../data/" . $doc [5] . "s/" . $doc [6] . "/" . composeNomVersion($doc [1], $doc [4]);
 //    header ( "Location: $fichier" );
 
@@ -98,7 +98,7 @@ if (isset ($_GET ['doc'])) {
     }
 //on indique le mime (type) du fichier
     header('Content-type: ' . mime_content_type($fichier));
-//on indique le contenuFiltrer du fichier:
+//on indique le nom du fichier:
     header('Content-Disposition: attachment; filename="' . composeNomVersion($doc [1], $doc [4]));
 //on envoie le fichier source
     readfile($fichier);

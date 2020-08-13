@@ -34,7 +34,7 @@ while ($ligne = $resultat->fetch_row()) {
             $affichage .= " checked ";
         $affichage .=">
         <label for='". $ligne[0] ."'>";
-        $affichage .= TblCellule($ligne [3] . " " . $ligne [4]); // contenuFiltrer prenom
+        $affichage .= TblCellule($ligne [3] . " " . $ligne [4]); // nom prenom
         $affichage .= "</label></div><br>\n";
 }
 $affichage .= " <input type=\"submit\" value=\"Envoyer\" /></form> <br>";
@@ -46,7 +46,7 @@ if (isset($_POST['utilisateur'])) {
         }
      */
 
-    $marequete = "select chanson.id , chanson.contenuFiltrer , SUM(noteUtilisateur.note) as score from chanson, noteUtilisateur
+    $marequete = "select chanson.id , chanson.nom , SUM(noteUtilisateur.note) as score from chanson, noteUtilisateur
             where chanson.id = noteUtilisateur.idObjet and noteUtilisateur.nomObjet='chanson'
             AND noteUtilisateur.idUtilisateur in ($listeUtilisateurs)
             GROUP BY chanson.id ORDER BY score DESC";

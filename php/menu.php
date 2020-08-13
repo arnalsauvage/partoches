@@ -3,7 +3,7 @@ include_once("lib/utilssi.php");
 include_once("utilisateur.php");
 
 // TODO : ajouter notion de liens : 
-// id contenuFiltrer, url, type (video, soundcloud, mp3, image)
+// id nom, url, type (video, soundcloud, mp3, image)
 // nomTable, idTable
 
 // Si l'utilisateur n'est pas logué
@@ -27,12 +27,12 @@ if (!isset ($_SESSION ['user'])) {
     }
 }
 
-if ($_SESSION['login'] == "ok"){
+if (isset($_SESSION['login'])&&($_SESSION['login'] == "ok")){
     $infoLogin = "<p class='ok'>Vous vous êtes bien connecté.e</p>";
     $_SESSION['login'] = "";
 }
 
-if ($_SESSION['login'] == "logout"){
+if (isset($_SESSION['login'])&&($_SESSION['login'] == "logout")){
     $infoLogin = "<p class='info'>Vous vous êtes bien déconnecté.e</p>";
     $_SESSION['login'] = "";
 }

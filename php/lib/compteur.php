@@ -11,7 +11,7 @@ if (!isset ($FichierCompteur)) {
         if ($DEBUG_COMPTEUR)
             echo " Requête lancée : $maRequete <BR>";
         $resultat = $_SESSION ['mysql']->query($maRequete) or die ("Problème ajouteHits #1 : " . $_SESSION ['mysql']->error);
-        // renvoie la lisgne sélectionnée : id, contenuFiltrer, taille, date, version, nomTable, idTable, idUser
+        // renvoie la lisgne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
         $resultat = $resultat->fetch_row();
         if ($resultat) {
             $nombreHits = $resultat[0];

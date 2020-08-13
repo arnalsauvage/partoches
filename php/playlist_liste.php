@@ -24,7 +24,7 @@ if (isset ($_GET ['tri'])) {
 }
 
 // Chargement de la liste des playlists
-$resultat = cherchePlaylists("contenuFiltrer", "%", $tri, $ordreAsc);
+$resultat = cherchePlaylists("nom", "%", $tri, $ordreAsc);
 $numligne = 0;
 
 // Affichage de la liste
@@ -40,7 +40,7 @@ TblCellule(Ancre("?tri=hits", "Hits")) . TblFinLigne();
 
 $fichiersDuPlaylist .= TblDebut(0);
 $fichiersDuPlaylist .= TblDebutLigne() . TblCellule("  Tri  ");
-$fichiersDuPlaylist .= titreColonne("Nom", "contenuFiltrer");
+$fichiersDuPlaylist .= titreColonne("Nom", "nom");
 $fichiersDuPlaylist .= titreColonne("Description", "description");
 $fichiersDuPlaylist .= titreColonne("Date", "date");
 $fichiersDuPlaylist .= titreColonne("Vues", "hits");
@@ -49,7 +49,7 @@ $fichiersDuPlaylist .= TblFinLigne();
 while ($ligne = $resultat->fetch_row()) {
     $numligne++;
     $fichiersDuPlaylist .= TblDebutLigne();
-    // Playlist : 	[0]id 	[1]contenuFiltrer 	[2]description 	[3]date  	[4]image 	[5]hits 	[6]idUser
+    // Playlist : 	[0]id 	[1]nom 	[2]description 	[3]date  	[4]image 	[5]hits 	[6]idUser
     if ($ligne [4])
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
         if ($_SESSION ['privilege'] >= 2)
