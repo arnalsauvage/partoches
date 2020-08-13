@@ -16,7 +16,7 @@ if (!isset ($_FILES [FICHIER_UPLOADE])) {
     return (0);
 }
 
-$autorisees = "pdf doc docx gif jpg png swf mp3 odt";
+$autorisees = "pdf doc docx gif jpg png swf mp3 odt svg crd txt";
 $repertoire = "../data/chansons/" . $_POST ['id'] . "/";
 if (!file_exists($repertoire)) {
     mkdir($repertoire, 0755);
