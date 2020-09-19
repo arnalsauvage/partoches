@@ -101,25 +101,13 @@ while ($ligneDoc = $lignes->fetch_row()) {
     }
     $listeDocs .= "$icone <a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
     $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
-    $listeDocs .= boutonSuppression("songbook_get.php" . "?idSongbook=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
+    $listeDocs .= boutonSuppression("songbook_get.php" . "?id=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
 }
 $sortie .= $listeDocs;
 
-// On récupère les fichiers du Songbook
-//$affichage = fichiersSongbook($id);
-//$lignes = chercheDocumentsTableId ( "chanson", $id );
-//
-//foreach ($affichage as $fichier) {
-//	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
-//	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
-//		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
-//	$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> \n";
-//	$sortie .= boutonSuppression ( "songbook_get.php?nomFic=" . urlencode($fichier [0] . $fichier [1]) . "&idDoc=$fichier[0]&mode=SUPPRFIC", $iconePoubelle, $cheminImages ) . "<br>\n";
-//	// echo "Fichier : $fichier[1]";
-//}
-
 echo $sortie;
 
+include('songbook_corbeille.php');
 if ($mode == "MAJ") {
     ?>
     <h2>Envoyer un fichier pour ce songbook sur le serveur</h2>

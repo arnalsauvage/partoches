@@ -346,7 +346,6 @@ class Chanson
             $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème modif dans creeModifieChanson #2 : " . $_SESSION [self::MYSQL]->error . " requete : " . $maRequete);
             return $this->_id;
         }
-        return 0;
     }
 
     // Cree une chanson et renvoie l'id de la chanson créée
@@ -390,7 +389,7 @@ class Chanson
         return $retour . "<BR>\n";
     }
 
-// Cette fonction renvoie la liste des fichiers dans le repertpore de la chanson ../data/chansons/#id/
+// Cette fonction renvoie la liste des fichiers dans le repertoire de la chanson ../data/chansons/#id/
     public function fichiersChanson()
     {
         $retour = array();// repertoire, nom, extension
