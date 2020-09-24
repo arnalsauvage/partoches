@@ -140,7 +140,7 @@ if ($mode == "MAJ") {
             $icone = Image("../images/icones/fichier.png", 32, 32, ICONE);
         }
         $listeDocs .= "<a href= '" . htmlentities($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
-        $listeDocs .= boutonSuppression($songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
+        $listeDocs .= boutonSuppression($songbookGet . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
         $listeDocs .= "</li>\n";
     }
     echo $listeDocs . "</ul>";
