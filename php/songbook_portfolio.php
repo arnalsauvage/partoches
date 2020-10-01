@@ -7,6 +7,7 @@ include_once("document.php");
 include_once("chanson.php");
 $table = "songbook";
 ?>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -20,8 +21,8 @@ $table = "songbook";
 <div class="navigation">
     <h1>les songbooks en ligne
 
-        <a href="chanson_liste.php" style="bottom: 45px; right: 24px; btn-floating btn-lg red">
-            <button type="button" class="btn blue-gradient btn-s btn-rounded">entrez !</button>
+        <a href="chanson_liste.php" style="bottom: 45px; right: 24px" class="btn btn-success">
+            Entrez !
         </a>
     </h1>
 </div>
@@ -70,7 +71,7 @@ $table = "songbook";
             } else {
                 // Sinon, on affiche un lien vers le doc + l'image
                 ?>
-						<a href="../data/songbooks/<?= $songbook[0] ?>/<?= $pdfSongbook ?>"
+						<a href="../data/songbooks/<?= urlencode($songbook[0]) ?>/<?= $pdfSongbook ?>"
 						   target="_blank"> <img
 								src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>"
 								alt="<?= $songbook[1] ?>"/></a>
@@ -87,12 +88,12 @@ $table = "songbook";
                 $ligneDoc = chercheDocument($ligne [1]);
                 $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
 
-                $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+                $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . urlencode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
                 $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, "icone");
                 if (!file_exists("../images/icones/" . $fichier [2] . ".png"))
                     $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
-                $titreCourt = limiteLongueur($titresChansons [$ligneDoc [6]], 18);
-                echo "<a href= '" . $fichier . "' target='_blank' title='" . $titresChansons [$ligneDoc [6]] . "'> " . $titreCourt . "</a> \n";
+                $titreCourt = htmlspecialchars(limiteLongueur($titresChansons [$ligneDoc [6]], 18), ENT_QUOTES);
+                echo "<a href= '" . $fichier . "' target='_blank' title='" . htmlspecialchars($titresChansons [$ligneDoc [6]], ENT_QUOTES) . "'> " . $titreCourt . "</a> \n";
                 //echo "<a href= 'getdoc.php?doc=" . $ligne [1] . "' target='_blank'> [t] </a> <br>\n";
 
                 echo "<a href= 'chanson_voir.php?id=" . $ligneDoc [6] . "' > $iconeMusique </a> <br>\n";
