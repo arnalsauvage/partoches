@@ -12,9 +12,15 @@ $table = "songbook";
 
 <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type">
-    <title>Songbooks ukulele en ligne</title>
+    <title>Songbooks ukulele en ligne : les partoches du club de ukulele top 5</title>
+    <meta name="description" content="sur partoches, les amis de top 5 partagent des partohes de ukulélé venues
+    d etop 5 ou d'ailleurs, pour le plaisir de chanter, en grattant son ukulélé.">
     <link rel="stylesheet" type="text/css" href="../css/styles.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120-precomposed.png"/>
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152-precomposed.png"/>
 </head>
 
 <body>
@@ -66,14 +72,14 @@ $table = "songbook";
                 ?>
                 
 					<img
-						src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>" alt="<?= $songbook[1] ?>"/>
+						src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>" loading="lazy"  alt="<?= $songbook[1] ?>"/>
              <?php
             } else {
                 // Sinon, on affiche un lien vers le doc + l'image
                 ?>
 						<a href="../data/songbooks/<?= myUrlEncode($songbook[0]) ?>/<?= $pdfSongbook ?>"
-						   target="_blank"> <img
-								src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>"
+						   target="_blank">
+						   <img src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>" loading="lazy"
 								alt="<?= $songbook[1] ?>"/></a>
 						<?php
             }
@@ -98,9 +104,6 @@ $table = "songbook";
 
                 echo "<a href= 'chanson_voir.php?id=" . $ligneDoc [6] . "' > $iconeMusique </a> <br>\n";
                 ?>
-                    <!--                <a href="http://www.rendevuke.com/eupelode/Quand-je-serai-K.O..pdf" target="_blank">Quand j’serai-->
-				<!--                    KO </a> <br/>-->
-
                     <?php
             }
             ?>
