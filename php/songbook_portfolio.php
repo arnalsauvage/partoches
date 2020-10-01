@@ -71,7 +71,7 @@ $table = "songbook";
             } else {
                 // Sinon, on affiche un lien vers le doc + l'image
                 ?>
-						<a href="../data/songbooks/<?= urlencode($songbook[0]) ?>/<?= $pdfSongbook ?>"
+						<a href="../data/songbooks/<?= myUrlEncode($songbook[0]) ?>/<?= $pdfSongbook ?>"
 						   target="_blank"> <img
 								src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>"
 								alt="<?= $songbook[1] ?>"/></a>
@@ -88,7 +88,7 @@ $table = "songbook";
                 $ligneDoc = chercheDocument($ligne [1]);
                 $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
 
-                $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . urlencode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
+                $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . myUrlEncode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
                 $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, "icone");
                 if (!file_exists("../images/icones/" . $fichier [2] . ".png"))
                     $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
