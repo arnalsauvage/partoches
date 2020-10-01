@@ -12,9 +12,18 @@ $table = "songbook";
 
 <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+
+    <!--    Indexation OpenGraph pourles réseaux sociaux-->
+    <meta property="og:title" content="Songbooks ukulele en ligne : les partoches du club de ukulele top 5"/>
+    <meta property="og:type" content="sur partoches, les amis de top 5 partagent des partoches de ukulélé venues
+    de top 5 ou d'ailleurs, pour le plaisir de chanter, en grattant son ukulélé."/>
+    <meta property="og:url" content="http://partoches.top5.re/"/>
+    <meta property="og:image" content="http://partoches.top5.re/apple-touch-icon-152x152-precomposed.png"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Songbooks ukulele en ligne : les partoches du club de ukulele top 5</title>
-    <meta name="description" content="sur partoches, les amis de top 5 partagent des partohes de ukulélé venues
-    d etop 5 ou d'ailleurs, pour le plaisir de chanter, en grattant son ukulélé.">
+    <meta name="description" content="sur partoches, les amis de top 5 partagent des partoohes de ukulélé venues
+    de top 5 ou d'ailleurs, pour le plaisir de chanter, en grattant son ukulélé.">
     <link rel="stylesheet" type="text/css" href="../css/styles.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
@@ -27,7 +36,7 @@ $table = "songbook";
 <div class="navigation">
     <h1>les songbooks en ligne
 
-        <a href="chanson_liste.php" style="bottom: 45px; right: 24px" class="btn btn-success">
+        <a href="chanson_liste.php" class="btn btn-success">
             Entrez !
         </a>
     </h1>
