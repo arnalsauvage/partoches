@@ -8,7 +8,7 @@ include_once("chanson.php");
 $table = "songbook";
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type">
