@@ -66,7 +66,7 @@ if (($_SESSION['privilege'] > 1))
 if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > 2))
     $contenu .= "<span class='icon-bar'></span>\n";
 $contenu .= "		</button>\n
-		<a class='navbar-brand' href='./songbook_portfolio.php'>Top 5 Partoches</a>\n
+		<a class='navbar-brand' href='./songbook-portfolio.php'>Top 5 Partoches</a>\n
 	</div> <!--/.navbar-header -->\n
     <div id='main-menu' class='collapse navbar-collapse'>\n
           <ul class='nav navbar-nav'>\n
