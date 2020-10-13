@@ -1,10 +1,10 @@
 <?php
-include_once("lib/utilssi.php");
+require_once("lib/utilssi.php");
 $pasDeMenu = true;
-include_once("menu.php");
-include_once("songbook.php");
-include_once("document.php");
-include_once("chanson.php");
+require_once("menu.php");
+require_once("songbook.php");
+require_once("document.php");
+require_once("chanson.php");
 $table = "songbook";
 ?>
 <!DOCTYPE html>

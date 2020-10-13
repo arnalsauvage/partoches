@@ -1,5 +1,5 @@
 <?php
-include_once "lib/utilssi.php";
+require_once "lib/utilssi.php";
 
 // Classe chiffrement, prise sur http://www.finalclap.com/tuto/php-cryptage-aes-chiffrement-85/
 class Chiffrement
@@ -172,7 +172,7 @@ function login_utilisateur($login, $mdp)
 
     if ($crypt == $donnee [2]) {
         $donnee [10] = $donnee [10] + 1;
-        echo "login ok";
+        // echo "login ok";
         modifieUtilisateur($donnee [0], $donnee [1], $mdp, $donnee [3], $donnee [4], $donnee [5], $donnee [6], $donnee [7], $donnee [8], $donnee [10], $donnee [11]);
         return $donnee;
     } else

@@ -1,6 +1,6 @@
 <?php
-include_once("lib/utilssi.php");
-include_once("utilisateur.php");
+require_once("lib/utilssi.php");
+require_once("utilisateur.php");
 
 // TODO : ajouter notion de liens : 
 // id nom, url, type (video, soundcloud, mp3, image)

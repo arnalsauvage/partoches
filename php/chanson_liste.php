@@ -6,12 +6,12 @@ const TRI = 'tri';
 const DATE_PUB = "datePub";
 const CHERCHE = 'cherche';
 const CENTRER = "centrer";
-include_once("lib/utilssi.php");
-include_once("menu.php");
-include_once("chanson.php");
-include_once("document.php");
-include_once("Pagination.php");
-include_once("UtilisateurNote.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once("chanson.php");
+require_once("document.php");
+require_once("Pagination.php");
+require_once("UtilisateurNote.php");
 
 $chansonForm = "chanson_form.php";
 $chansonPost = "chanson_post.php";
@@ -194,7 +194,7 @@ if ($_SESSION [PRIVILEGE] > 1) {
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 // Affichage de la recherche
-include_once("chanson-comp-cherche.php");
+require_once("chanson-comp-cherche.php");
 $contenuHtml .= $contenuHtmlCompCherche;
 $contenuHtml .= "
 </div>\n

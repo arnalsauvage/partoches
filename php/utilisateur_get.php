@@ -1,12 +1,12 @@
 <?php
-include_once("lib/utilssi.php");
-include_once("menu.php");
-include_once "utilisateur.php";
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once "utilisateur.php";
 
 $nomTable = "utilisateur";
 $utilisateurListe = "utilisateur_liste.php";
 
-// include_once ("params.php");
+// require_once ("params.php");
 $sortie = envoieHead("Menu", "../css/index.css");
 $table = "utilisateur";
 entreBalise("Utilisateurs", "H1");
