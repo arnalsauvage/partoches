@@ -57,6 +57,7 @@ $table = "songbook";
     // Songbook : [0]id [1]nom [2]description [3]date [4]image [5]hits [6]idUser
 
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$songbook[0]' AND document.nomTable = '$table' ORDER BY document.date ASC";
+
     $docsSongbook = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheDocumentsTableId #1 : " . $_SESSION ['mysql']->error);
 
     $pdfSongbook = "vide";
@@ -105,11 +106,11 @@ $table = "songbook";
 
                 $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . myUrlEncode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
                 $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, "icone");
-                if (!file_exists("../images/icones/" . $fichier [2] . ".png"))
+                if (!file_exists("../images/icones/" . $fichier [2] . ".png")) {
                     $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+                }
                 $titreCourt = htmlspecialchars(limiteLongueur($titresChansons [$ligneDoc [6]], 18), ENT_QUOTES);
                 echo "<a href= '" . $fichier . "' target='_blank' title='" . htmlspecialchars($titresChansons [$ligneDoc [6]], ENT_QUOTES) . "'> " . $titreCourt . "</a> \n";
-                //echo "<a href= 'getdoc.php?doc=" . $ligne [1] . "' target='_blank'> [t] </a> <br>\n";
 
                 echo "<a href= 'chanson_voir.php?id=" . $ligneDoc [6] . "' > $iconeMusique </a> <br>\n";
                 ?>

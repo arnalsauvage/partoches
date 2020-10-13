@@ -14,6 +14,13 @@ $cheminImagesSongbook = "../data/songbooks/";
 // Fonctions de gestion du songbook
 
 // Cherche les songbooks correspondant à un critère
+/**
+ * @param $critere
+ * @param $valeur
+ * @param string $critereTri
+ * @param bool $bTriAscendant
+ * @return mixed
+ */
 function chercheSongbooks($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM songbook WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
