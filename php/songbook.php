@@ -131,7 +131,7 @@ function creeModifieSongbook($id, $nom, $description, $date, $image, $hits)
 function imageSongbook($idSongbook)
 {
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
-    $maRequete .= " AND ( document.contenuFiltrer LIKE '%.png' OR document.contenuFiltrer LIKE '%.jpg')";
+    $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imageSongbook #1 : " . $_SESSION ['mysql']->error);
     if (empty($result)) {
         return ("");
