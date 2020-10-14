@@ -10,14 +10,14 @@ class Chiffrement
 
     public static function crypt($data)
     {
-        $data = Cryptor::Encrypt($data, $_key);
+        $data = Cryptor::Encrypt($data, self::$_key);
         return base64_encode($data);
     }
 
     public static function decrypt($data)
     {
         $data = base64_decode($data);
-        $data = Cryptor::Decrypt($encrypted, $_key);
+        $data = Cryptor::Decrypt($data, self::$_key);
         return ($data);
     }
 }
