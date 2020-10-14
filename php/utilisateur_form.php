@@ -1,12 +1,13 @@
 <?php
-include_once("lib/utilssi.php");
-include_once("menu.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once("Chiffrement.php");
 $mode = "";
 $table = "utilisateur";
 $sortie = "";
 
 // Chargement des donnees de l'utilisateur si l'identifiant est fourni
-if ((isset ($_GET ['id']) && $_GET ['id'] != "")) {
+if (isset ($_GET ['id']) && $_GET ['id'] != "") {
     $donnee = chercheUtilisateur($_GET ['id']);
     if (($_SESSION ['privilege'] > 2) || $_SESSION ['user'] == $donnee [1]) {
         $mode = "MAJ";
@@ -34,13 +35,20 @@ if ((isset ($_GET ['id']) && $_GET ['id'] != "")) {
     $donnee [11] = 0; // privilege
 }
 
-if ($mode == "MAJ")
+if ($mode == "MAJ"){
     $sortie .= "<H1> Mise à jour - " . $table . "</H1>";
-else if ($mode == "INS")
-    $sortie .= "<H1> Création - " . $table . "</H1>";
+}
 else
-    return;
-
+{
+    if ($mode == "INS")
+    {
+        $sortie .= "<H1> Création - " . $table . "</H1>";
+    }
+    else
+    {
+        return;
+    }
+}
 // Création du formulaire
 $f = new Formulaire ("POST", $table . "_get.php", $sortie);
 $f->champCache("id", $donnee [0]);
