@@ -16,8 +16,8 @@
  * enlev�e pour une utilisation par un composant javascript / Ajax
  *
  */
-include_once("lib/utilssi.php");
-include("lienChansonPlaylist.php");
+require_once("lib/utilssi.php");
+require("lienChansonPlaylist.php");
 
 // Un non-admin ne peut changer l'ordre
 if ($_SESSION ['privilege'] > 1) {

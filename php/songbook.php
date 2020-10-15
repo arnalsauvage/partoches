@@ -14,7 +14,14 @@ $cheminImagesSongbook = "../data/songbooks/";
 // Fonctions de gestion du songbook
 
 // Cherche les songbooks correspondant à un critère
-function chercheSongbooks($critere, $valeur, $critereTri = 'contenuFiltrer', $bTriAscendant = true)
+/**
+ * @param $critere
+ * @param $valeur
+ * @param string $critereTri
+ * @param bool $bTriAscendant
+ * @return mixed
+ */
+function chercheSongbooks($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM songbook WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
     if ($bTriAscendant == false)
@@ -31,7 +38,7 @@ function chercheSongbook($id)
 {
     $maRequete = "SELECT * FROM songbook WHERE songbook.id = '$id'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchesongbook #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, contenuFiltrer, description, date , image, hits
+    // renvoie la ligne sélectionnée : id, nom, description, date , image, hits
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else
@@ -41,9 +48,9 @@ function chercheSongbook($id)
 // Cherche un songbook et la renvoie si elle existe
 function chercheSongbookParLeNom($nom)
 {
-    $maRequete = "SELECT * FROM songbook WHERE songbook.contenuFiltrer = '$nom'";
+    $maRequete = "SELECT * FROM songbook WHERE songbook.nom = '$nom'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchesongbookParLeNom #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la lisgne sélectionnée : id, contenuFiltrer, description, date , image, hits
+    // renvoie la lisgne sélectionnée : id, nom, description, date , image, hits
     if (($ligne = $result->fetch_row()))
         return ($ligne);
     else
@@ -64,7 +71,7 @@ function modifiesSongbook($id, $nom, $description, $date, $image, $hits)
 {
     $date = convertitDateJJMMAAAA($date);
     $maRequete = "UPDATE  songbook
-	SET contenuFiltrer = '$nom', description = '$description', date = '$date' , image = '$image', hits = '$hits'
+	SET nom = '$nom', description = '$description', date = '$date' , image = '$image', hits = '$hits'
 	WHERE id='$id'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiesongbook #1 : " . $_SESSION ['mysql']->error);
 }
@@ -131,14 +138,14 @@ function creeModifieSongbook($id, $nom, $description, $date, $image, $hits)
 function imageSongbook($idSongbook)
 {
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
-    $maRequete .= " AND ( document.contenuFiltrer LIKE '%.png' OR document.contenuFiltrer LIKE '%.jpg')";
+    $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imageSongbook #1 : " . $_SESSION ['mysql']->error);
     if (empty($result)) {
         return ("");
     }
 
     // Choisit une vignette au hasard parmi les images
-    // renvoie la ligne sélectionnée : id, contenuFiltrer, description, date , image, hits
+    // renvoie la ligne sélectionnée : id, nom, description, date , image, hits
     if (($ligne = $result->fetch_row())) {
         $nom = composeNomVersion($ligne[1], $ligne[4]);
         return ($nom);
@@ -160,7 +167,7 @@ function infosSongbook($id)
 
 function fichiersSongbook($id)
 {
-    $retour = array(); // repertoire, contenuFiltrer, extension
+    $retour = array(); // repertoire, nom, extension
     $repertoire = "../data/songbooks/$id/";
     if (is_dir($repertoire)) {
         foreach (new DirectoryIterator ($repertoire) as $fileInfo) {
@@ -181,7 +188,7 @@ function CreeSongBookPdf($id)
     $listeIdChanson = [];
     $listeVersionsDoc = [];
 
-    $maRequete = "SELECT document.contenuFiltrer as NomFichier, chanson.contenuFiltrer as NomChanson, chanson.id as IdChanson, document.version as VersionDoc from document LEFT JOIN liendocsongbook ON liendocsongbook.idDocument = document.id LEFT JOIN chanson ON document.idTable = chanson.id
+    $maRequete = "SELECT document.nom as NomFichier, chanson.nom as NomChanson, chanson.id as IdChanson, document.version as VersionDoc from document LEFT JOIN liendocsongbook ON liendocsongbook.idDocument = document.id LEFT JOIN chanson ON document.idTable = chanson.id
 WHERE liendocsongbook.idSongbook =  '$id' ORDER BY liendocsongbook.ordre ASC";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème CreeSongBookPdf #1 : requete" . $_SESSION ['mysql']->error);
     if (empty($result)) {
