@@ -1,7 +1,8 @@
 <?php
 $a = session_id();
-if (empty ($a))
+if (empty ($a)) {
     session_start();
+}
 unset ($a);
 // function pc_process_dir ($nom_rep, $profondeur_max = 10, $profondeur = 0)
 // function affichePlayer($mp3="vide")
@@ -9,11 +10,6 @@ unset ($a);
 // function insereJavaScript ($source)
 // function listeImages ()
 // function boutonSuppression($lien,$iconePoubelle)
-
-// Ce code remplace la récupération automatique des variables post et GET en php4
-// TODO : sécurité - supprimer l'extraction automatique des get et posts
-//extract ( $_GET, EXTR_OVERWRITE );
-//extract ( $_POST, EXTR_OVERWRITE );
 
 if (!isset ($FichierUtilsSi)) {
     // Déclaration des variables globales
@@ -32,7 +28,6 @@ if (!isset ($FichierUtilsSi)) {
     require_once("vignette.php");
 
     if (!isset ($_SESSION ["privilege"])) {
-        // session_register("privilege");
         $_SESSION ["privilege"] = 0;
     }
 
@@ -90,11 +85,13 @@ if (!isset ($FichierUtilsSi)) {
                 $texte .= "<param name='movie' value='mp3/dewplayer.swf?son=mp3/$mp3' /> </object>";
                 $texte .= "</audio>";
                 return $texte;
-            } else
+            } else {
                 return (Ancre("mp3/" . $mp3, "ouvrir", -1, 1));
-        } else
+            }
+        } else {
             // echo "fichier $mp3 non trouvé !!";
             return "";
+        }
     }
 
     // Cette fonction écrit le $log dans le $fichier
@@ -105,13 +102,13 @@ if (!isset ($FichierUtilsSi)) {
         $fp = fopen("$fichier", "a");
         fputs($fp, "\n");
         fputs($fp, " 
-			<table border=0 cellspacing=0 cellpadding=0> 
+			<table  
 			<tr> 
-			<td valign=top><font size=1>$ip</font></td> <td valign=top width=10></td> 
-			<td valign=top><font size=1>$time</font></td><td valign=top></td> 
-			<td valign=top><font size=2>$log</font></td><td valign=top></td> 		
+			<td valign=top>< size=1>$ip</></td> <td valign=top width=10></td> 
+			<td valign=top><t size=1>$time</t></td><td valign=top></td> 
+			<td valign=top>< size=2>$log</></td><td valign=top></td> 		
 			</tr></table><br>");
-        // echo "TRUC !!! Fichier : $fichier <br>\n";
+        // echo "Fichier : $fichier <br>\n";
         fclose($fp);
     }
 
@@ -124,9 +121,8 @@ if (!isset ($FichierUtilsSi)) {
     function listeImages($subDir = "")
     {
         $d = dir("../images" . $subDir);
-        $compteur = 0;
         while (false !== ($entry = $d->read())) {
-            if (($entry != ".") and ($entry != "..")) {
+            if (($entry != ".") && ($entry != "..")) {
                 // echo "<option " . "value=$entry> echo $ligne[1]" . "</option>";
                 // echo "tableau[$compteur]=$entry <br>";
                 $tableau [$entry] = $entry;
@@ -140,7 +136,7 @@ if (!isset ($FichierUtilsSi)) {
     // Cette fonction retourne un bouton de suppression avec message de confirmation
     function boutonSuppression($lien, $iconePoubelle, $cheminImages)
     { // <img src="x.png" onclick="getattrs(this);">
-        return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer la fiche' onclick =\"confirmeSuppr('" . $lien . "','Voulez-vous vraiment supprimer cet élément ?');\" >";
+        return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer' onclick =\"confirmeSuppr('" . $lien . "','Voulez-vous vraiment supprimer cet élément ?');\" >";
     }
 
 }

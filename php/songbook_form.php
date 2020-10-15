@@ -1,10 +1,10 @@
 <?php /** @noinspection HtmlUnknownTarget */
 const ICONE = "icone";
-include_once("lib/utilssi.php");
-include_once("menu.php");
-include_once("songbook.php");
-include_once("document.php");
-include_once("lienDocSongbook.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once("songbook.php");
+require_once("document.php");
+require_once("lienDocSongbook.php");
 $table = "songbook";
 $sortie = "";
 
@@ -101,24 +101,13 @@ while ($ligneDoc = $lignes->fetch_row()) {
     }
     $listeDocs .= "$icone <a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
     $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
-    $listeDocs .= boutonSuppression("songbook_get.php" . "?idSongbook=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
+    $listeDocs .= boutonSuppression("songbook_get.php" . "?id=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
 }
 $sortie .= $listeDocs;
 
-// On récupère les fichiers du Songbook
-//$affichage = fichiersSongbook($id);
-//$lignes = chercheDocumentsTableId ( "chanson", $id );
-//
-//foreach ($affichage as $fichier) {
-//	$icone = Image ( "../images/icones/" . $fichier [2] . ".png", 32, 32, "icone" );
-//	if (! file_exists (  "../images/icones/" . $fichier [2] . ".png"))
-//		$icone = Image ( "../images/icones/fichier.png" , 32, 32, "icone" );
-//	$sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> \n";
-//	$sortie .= boutonSuppression ( "songbook_get.php?nomFic=" . urlencode($fichier [0] . $fichier [1]) . "&idDoc=$fichier[0]&mode=SUPPRFIC", $iconePoubelle, $cheminImages ) . "<br>\n";
-//	// echo "Fichier : $fichier[1]";
-//}
-
 echo $sortie;
+
+require('songbook_corbeille.php');
 
 if ($mode == "MAJ") {
     ?>
@@ -152,7 +141,7 @@ if ($mode == "MAJ") {
             $icone = Image("../images/icones/fichier.png", 32, 32, ICONE);
         }
         $listeDocs .= "<a href= '" . htmlentities($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
-        $listeDocs .= boutonSuppression($songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
+        $listeDocs .= boutonSuppression($songbookGet . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
         $listeDocs .= "</li>\n";
     }
     echo $listeDocs . "</ul>";
@@ -167,7 +156,7 @@ if ($mode == "MAJ") {
     <form action="songbook_form.php" method="post" name="form2">
         <?php
         // echo selectDocument("nomTable", "chanson", "id", false);
-        include "../php/documentCherche.php";
+        require "../php/documentCherche.php";
         ?>
         <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
         <input type="submit" value="Envoyer">

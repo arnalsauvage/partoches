@@ -5,8 +5,8 @@
  * Date: 07/12/2017
  * Time: 15:26
  */
-include_once("lib/utilssi.php");
-include("lienDocSongbook.php");
+require_once("lib/utilssi.php");
+require("lienDocSongbook.php");
 
 // Un non-admin ne peut changer l'ordre
 if ($_SESSION ['privilege'] > 1) {

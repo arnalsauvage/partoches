@@ -4,12 +4,12 @@ const CHANSON = "chanson";
 const DIV_CLASS_ROW = "<div class='row'>";
 const FIN_DIV = "</div>";
 const FIN_SECTION = "</section>";
-include_once("lib/utilssi.php");
-include_once("menu.php");
-include_once("chanson.php");
-include_once("document.php");
-include_once("songbook.php");
-include_once("UtilisateurNote.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once("chanson.php");
+require_once("document.php");
+require_once("songbook.php");
+require_once("UtilisateurNote.php");
 
 $table = CHANSON;
 $contenuHtml = "<div class='container'>
