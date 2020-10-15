@@ -108,6 +108,7 @@ $sortie .= $listeDocs;
 echo $sortie;
 
 require('songbook_corbeille.php');
+
 if ($mode == "MAJ") {
     ?>
     <h2>Envoyer un fichier pour ce songbook sur le serveur</h2>

@@ -1,34 +1,4 @@
 <?php
-require_once "lib/utilssi.php";
-
-// Classe chiffrement, prise sur http://www.finalclap.com/tuto/php-cryptage-aes-chiffrement-85/
-class Chiffrement
-{
-    private static $cipher = MCRYPT_RIJNDAEL_128; // Algorithme utilisé pour le cryptage des blocs
-    private static $key = 'Top5, Club Ukulele Fontenay-Sous-Bois'; // Clé de cryptage
-    private static $mode = 'cbc'; // Mode opératoire (traitement des blocs)
-
-    public static function crypt($data)
-    {
-        $keyHash = md5(self::$key);
-        $key = substr($keyHash, 0, mcrypt_get_key_size(self::$cipher, self::$mode));
-        $iv = substr($keyHash, 0, mcrypt_get_block_size(self::$cipher, self::$mode));
-
-        $data = mcrypt_encrypt(self::$cipher, $key, $data, self::$mode, $iv);
-        return base64_encode($data);
-    }
-
-    public static function decrypt($data)
-    {
-        $keyHash = md5(self::$key);
-        $key = substr($keyHash, 0, mcrypt_get_key_size(self::$cipher, self::$mode));
-        $iv = substr($keyHash, 0, mcrypt_get_block_size(self::$cipher, self::$mode));
-
-        $data = base64_decode($data);
-        $data = mcrypt_decrypt(self::$cipher, $key, $data, self::$mode, $iv);
-        return rtrim($data);
-    }
-}
 
 $nomtable = "utilisateur";
 
@@ -39,15 +9,18 @@ function chercheUtilisateurs($critere, $valeur, $critereTri = 'nom', $bTriAscend
 {
     global $nomtable;
     $maRequete = "SELECT * FROM " . $nomtable . " WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
-    if ($bTriAscendant == false)
+    if (!$bTriAscendant)
+    {
         $maRequete .= " DESC";
+    }
     else
+    {
         $maRequete .= " ASC";
+    }
     // echo "ma requete : " . $maRequete;
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheUtilisateurs #1 : " . $_SESSION ['mysql']->error);
     return $result;
 }
-
 
 // Cherche un utilisateur par son identifiant et le renvoie s'il existe
 function chercheUtilisateur($id)
@@ -55,12 +28,18 @@ function chercheUtilisateur($id)
     $maRequete = "SELECT * FROM utilisateur WHERE utilisateur.id = '$id'";
     $result = $_SESSION ['mysql']->query($maRequete);
     if (!$result)
+    {
         die ("Problème chercheutilisateur #1 : " . $_SESSION ['mysql']->error);
+    }
     // renvoie la lisgne sélectionnée : id, nom, taille, date
-    if (($ligne = $result->fetch_row()))
+    if ($ligne = $result->fetch_row())
+    {
         return ($ligne);
+    }
     else
+    {
         return (0);
+    }
 }
 
 // Cherche un utilisateur par le login et le renvoie s'il existe
@@ -69,13 +48,19 @@ function chercheUtilisateurParLeLogin($login)
     $maRequete = "SELECT * FROM utilisateur WHERE utilisateur.login = '$login'";
     $result = $_SESSION ['mysql']->query($maRequete);
     if (!$result)
+    {
         die ("Problème chercheutilisateurParLeNom #1 : " . $_SESSION ['mysql']->error);
+    }
     // renvoie la lisgne sélectionnée : id, nom, taille, date
     $ligne = $result->fetch_row();
     if ($ligne)
+    {
         return ($ligne);
+    }
     else
+    {
         return (0);
+    }
 }
 
 // Crée un utilisateur
@@ -97,7 +82,9 @@ function creeUtilisateur($login, $mdp, $prenom, $nom, $image, $site, $email, $si
     // echo "Ma requete : $maRequete<br>\n";
     $result = $_SESSION ['mysql']->query($maRequete);
     if (!$result)
+    {
         die ("Problème creeUtilisateur#1 : " . $_SESSION ['mysql']->error);
+    }
 }
 
 // Formate les chaînes pour enregistrement en base
@@ -125,7 +112,9 @@ function modifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site, $em
 	WHERE id='$id'";
     $result = $_SESSION ['mysql']->query($maRequete);
     if (!$result)
+    {
         die ("Problème modifieUtilisateur#1 : " . $_SESSION ['mysql']->error);
+    }
 }
 
 // Modifie en base le utilisateur
@@ -139,7 +128,9 @@ function modifieMdpUtilisateur($id, $mdp)
 	WHERE id='$id'";
     $result = $_SESSION ['mysql']->query($maRequete);
     if (!$result)
+    {
         die ("Problème modifieMdpUtilisateur#1 : " . $_SESSION ['mysql']->error);
+    }
 }
 
 
@@ -152,7 +143,9 @@ function supprimeUtilisateur($idUtilisateur)
 	WHERE id='$idUtilisateur'";
     $result = $_SESSION ['mysql']->query($maRequete);
     if (!$result)
+    {
         die ("Problème supprimeUtilisateur#1 : " . $_SESSION ['mysql']->error);
+    }
 }
 
 // Cette fonction modifie ou crée un utilisateur si besoin
@@ -227,7 +220,7 @@ function testUtilisateurs()
         die ("Problème testUtilisateurs #1 : pas d'utilisateurs trouvés ! - " . $_SESSION ['mysql']->error);
     // renvoie la lisgne sélectionnée : id, nom, taille, date
     while ($ligne = $result->fetch_row()) {
-        echo(infos($ligne[0]) . " Pass : " . Chiffrement::decrypt($ligne[2]) . "<br> \n\r");
+        echo infos($ligne[0]) . " Pass : " . Chiffrement::decrypt($ligne[2]) . "<br> \n\r";
     }
 }
 
@@ -258,7 +251,7 @@ function testeUtilisateur()
     creeUtilisateur("test", "kazoo", "Alain", "Minc", "test.png", "http://samere", "truc@bidule.com", "bla bla bla", "2");
     $id = chercheUtilisateurParLeLogin("test");
     $id = $id [0];
-    $enr = chercheUtilisateur($id);
+    chercheUtilisateur($id);
     echo infos($id);
     echo "Test de creeUtilisateur 2<br>\n";
     creeUtilisateur("test2", "kazoo2", "Alain", "Minc", "test.png", "http://samere", "truc@bidule.com", "bla bla bla", 2);
