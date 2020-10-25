@@ -159,7 +159,7 @@ function creeModifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site,
         creeUtilisateur($login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $privilege);
 }
 
-// Cette fonction tente de loguer un utilisateur avec le mot de passe mdp non
+// Cette fonction tente de loguer un utilisateur avec le mot de passe mdp
 function login_utilisateur($login, $mdp)
 {
     $donnee = chercheUtilisateurParLeLogin($login);
@@ -286,25 +286,4 @@ function testeUtilisateur()
     echo("Décryptage de chaine : " . $chaine . "<br> \n\r");
     echo("Resultat : " . Chiffrement::decrypt($chaine) . "<br> \n\r");
 
-}
-
-// testeUtilisateur ();
-// testUtilisateurs ();
-
-if (isset ($_GET ['majmdp']) && $_GET ['majmdp'] == "openssl") {
-    echo "Mise à jour des mots de passe...";
-    majMdpUtilisateur("admin", "kazoo");
-    majMdpUtilisateur("arnaud", "kazoo");
-    majMdpUtilisateur("xavier", "uku94120");
-    majMdpUtilisateur("jerome", "uku94120");
-    majMdpUtilisateur("invite", "invite");
-    majMdpUtilisateur("gauthier", "Mimolette123%");
-    majMdpUtilisateur("benedicte", "scottsboro");
-    majMdpUtilisateur("sylvie", "Spritz");
-    majMdpUtilisateur("marieange", "hautbashaut");
-    majMdpUtilisateur("bea", "ubass");
-    majMdpUtilisateur("annemarie", "LaVieEnRose");
-    majMdpUtilisateur("rene", "BzzBzzBzz");
-    majMdpUtilisateur("valerie", "LadyLikeYou");
-    echo "done...";
 }
