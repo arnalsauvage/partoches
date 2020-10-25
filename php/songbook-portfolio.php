@@ -1,5 +1,6 @@
 <?php
 require_once("lib/utilssi.php");
+require_once("Chiffrement.php");
 $pasDeMenu = true;
 require_once("menu.php");
 require_once("songbook.php");
