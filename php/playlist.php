@@ -1,7 +1,7 @@
 <?php
-include_once("lib/utilssi.php");
-include_once "lib/configMysql.php";
-//include_once ("lienDocplaylist.php");
+require_once("lib/utilssi.php");
+require_once "lib/configMysql.php";
+//require_once ("lienDocplaylist.php");
 
 $playlistForm = "playlist_form.php";
 $playlistGet = "playlist_get.php";
