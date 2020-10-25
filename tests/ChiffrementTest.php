@@ -1,5 +1,4 @@
 <?php
-// require_once 'PHPUnit/Autoload.php';
 
 use PHPUnit\Framework\TestCase;
 
@@ -10,29 +9,33 @@ class ChiffrementTest extends TestCase
         @session_start();
     }
 
-    public function testEncrypte()
+    public function testEncrypteDecrypte()
     {
-        // Avec 11 items et 5 items par page
-        $_chaine = "kazoo";
+        $_chaine = "DanielSchneiderman";
 
-        // Page en cours = 1
         $crypt = Chiffrement::crypt($_chaine);
 
         // Page en cours = 1
         $decrypt = Chiffrement::decrypt($crypt);
 
-        $this->assertEquals("kazoo", $decrypt);
+        $this->assertEquals($_chaine, $decrypt);
     }
 
-    public function testDecrypte()
+    public function testDecrypteInvite()
     {
-        // Avec 11 items et 5 items par page
-        $_chaine = "WURycGVqZ3lyUjRHbTVFdFh6UmpKQVNDcmtiQw==";
+        $_chaine = "VG9jQUovV3pjVWluQ09zTVcvZUI0Y3JFSzZlc0ZRPT0=";
 
-        // Page en cours = 1
         $decrypt = Chiffrement::decrypt($_chaine);
 
-        $this->assertEquals("kazoo", $decrypt);
+        $this->assertEquals("invite", $decrypt);
     }
 
+    public function testEncrypteInvite()
+    {
+        $_chaine = "invite";
+        $crypt = Chiffrement::crypt($_chaine);
+        echo $_chaine . " ==> " . $crypt . "\n";
+
+        $this->assertEquals("chaine", "chaine");
+    }
 }

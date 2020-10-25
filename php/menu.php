@@ -24,6 +24,11 @@ if (!isset ($_SESSION ['user'])) {
     }
     else {
         $infoLogin = "<p class='ko'> Compte invité défaillant...</p>";
+        $_SESSION ['id'] = 1;
+        $_SESSION ['user'] = "invite";
+        $_SESSION ['email'] = "test@test.mail";
+        $_SESSION ['image'] = "";
+        $_SESSION ['privilege'] = 0;
     }
 }
 
