@@ -1,6 +1,6 @@
 <?php
-include_once("lib/utilssi.php");
-include_once("utilisateur.php");
+require_once("lib/utilssi.php");
+require_once("utilisateur.php");
 
 $sortie = envoieHead("Partoches", "../css/index.css");
 $sortie .= "<body>";
@@ -25,7 +25,7 @@ if (isset ($_GET ['logoff'])) {
         // Récupère les données user / password depuis le formulaire
         $user = $_SESSION ['mysql']->real_escape_string($_POST ["user"]);
         $pass = $_POST ["pass"];
-        echo "user = $user , mot de passe = $pass";
+        // echo "user = $user , mot de passe = $pass";
 
         // Si oui, on crée une session avec user, id, email, image, privilege
         $donnee = login_utilisateur($user, $pass);

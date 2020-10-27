@@ -10,9 +10,9 @@ body {
 .navigation {
     background-color: rgba(255, 255, 255, 1);
     display: inline-block;
-    height: 60px;
+    /* height: 60px; */
     font-family: 'Roboto', sans-serif;
-    position: fixed;
+    /*position: fixed;*/
     left: 0;
     top: 0;
     z-index: 999;
@@ -30,7 +30,7 @@ h1 {
 }
 
 .navigation ul {
-    position: fixed;
+    /*position: fixed;*/
     left: 400px;
     top: 5px;
     vertical-align: middle;
@@ -45,7 +45,7 @@ h1 {
 
 /*  Corps de la page */
 
-.content-box {
+.contentcontent-box {
     background: rgba(255, 255, 255, 0.5);
     margin: 0 auto;
     position: relative;
@@ -60,7 +60,7 @@ h1 {
     background-color: #FFF;
     list-style: none;
     margin: 10px 10px 10px 10px;
-    width: 100%;
+    /*width: 100%;*/
     padding: 20px 40px;
     width: 400px;
     border-radius: 34px;

@@ -1,6 +1,6 @@
 <?php
-include_once("lib/utilssi.php");
-include_once("menu.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
 
 $utilisateurForm = "utilisateur_form.php";
 $utilisateurGet = "utilisateur_get.php";

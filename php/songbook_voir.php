@@ -1,10 +1,10 @@
 <?php
-include_once("lib/utilssi.php");
-include_once("menu.php");
-include_once("songbook.php");
-include_once("lienDocSongbook.php");
-include_once("document.php");
-include_once("utilisateur.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once("songbook.php");
+require_once("lienDocSongbook.php");
+require_once("document.php");
+require_once("utilisateur.php");
 $table = "songbook";
 $sortie = "";
 $monImage = "";
