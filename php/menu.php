@@ -1,6 +1,6 @@
 <?php
-include_once("lib/utilssi.php");
-include_once("utilisateur.php");
+require_once("lib/utilssi.php");
+require_once("utilisateur.php");
 
 // TODO : ajouter notion de liens : 
 // id nom, url, type (video, soundcloud, mp3, image)
@@ -71,7 +71,7 @@ if (($_SESSION['privilege'] > 1))
 if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > 2))
     $contenu .= "<span class='icon-bar'></span>\n";
 $contenu .= "		</button>\n
-		<a class='navbar-brand' href='./songbook_portfolio.php'>Top 5 Partoches</a>\n
+		<a class='navbar-brand' href='./songbook-portfolio.php'>Top 5 Partoches</a>\n
 	</div> <!--/.navbar-header -->\n
     <div id='main-menu' class='collapse navbar-collapse'>\n
           <ul class='nav navbar-nav'>\n
@@ -119,6 +119,3 @@ $contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut($_SESSION ['privil
 $contenu .= " </div> <!--/.container --></div><!--/.starter-template -->";
 if (!isset($pasDeMenu) || false == $pasDeMenu)
     echo $contenu . "\n\n";
-
-echo "
-";

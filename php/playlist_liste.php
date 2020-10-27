@@ -1,7 +1,7 @@
 <?php
-include_once("lib/utilssi.php");
-include_once("menu.php");
-include_once("playlist.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once("playlist.php");
 
 $table = "playlist";
 $fichiersDuPlaylist = "";

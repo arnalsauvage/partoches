@@ -4,12 +4,12 @@ const CHANSON = "chanson";
 const DIV_CLASS_ROW = "<div class='row'>";
 const FIN_DIV = "</div>";
 const FIN_SECTION = "</section>";
-include_once("lib/utilssi.php");
-include_once("menu.php");
-include_once("chanson.php");
-include_once("document.php");
-include_once("songbook.php");
-include_once("UtilisateurNote.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once("chanson.php");
+require_once("document.php");
+require_once("songbook.php");
+require_once("UtilisateurNote.php");
 
 $table = CHANSON;
 $contenuHtml = "<div class='container'>
@@ -104,7 +104,7 @@ if ($result->num_rows > 0) {
         $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
         $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
         $extension = substr(strrchr($ligne [1], '.'), 1);
-        if ($extension == "mp3") {
+        if (($extension == "mp3") || ($extension == "m4a")) {
             $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
             $baliseAudio = htmlentities($fichierSec) . "<br><audio controls='controls'>   <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
             Votre navigateur ne prend pas en charge l'élément <code>audio</code></audio>";

@@ -2,6 +2,7 @@
 require_once("lib/utilssi.php");
 require_once("menu.php");
 require_once("Chiffrement.php");
+
 $mode = "";
 $table = "utilisateur";
 $sortie = "";

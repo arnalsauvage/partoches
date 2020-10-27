@@ -1,9 +1,9 @@
 <?php
-include_once("lib/utilssi.php");
-include_once("menu.php");
-include_once("playlist.php");
-include_once("document.php");
-include_once("lienChansonPlaylist.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once("playlist.php");
+require_once("document.php");
+require_once("lienChansonPlaylist.php");
 $table = "playlist";
 $sortie = "";
 

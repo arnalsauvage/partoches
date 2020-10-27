@@ -3,6 +3,8 @@
 /data/
 /images/
 /logs/
+/tmp/
 /vignettes/
 /vendor/
 Dockerfile
+/vendor/

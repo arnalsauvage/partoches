@@ -1,10 +1,10 @@
 <?php /** @noinspection HtmlUnknownTarget */
 const ICONE = "icone";
-include_once("lib/utilssi.php");
-include_once("menu.php");
-include_once("songbook.php");
-include_once("document.php");
-include_once("lienDocSongbook.php");
+require_once("lib/utilssi.php");
+require_once("menu.php");
+require_once("songbook.php");
+require_once("document.php");
+require_once("lienDocSongbook.php");
 $table = "songbook";
 $sortie = "";
 
@@ -107,7 +107,8 @@ $sortie .= $listeDocs;
 
 echo $sortie;
 
-include('songbook_corbeille.php');
+require('songbook_corbeille.php');
+
 if ($mode == "MAJ") {
     ?>
     <h2>Envoyer un fichier pour ce songbook sur le serveur</h2>
@@ -140,7 +141,7 @@ if ($mode == "MAJ") {
             $icone = Image("../images/icones/fichier.png", 32, 32, ICONE);
         }
         $listeDocs .= "<a href= '" . htmlentities($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
-        $listeDocs .= boutonSuppression($songbookGet . "?idSongbook=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
+        $listeDocs .= boutonSuppression($songbookGet . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
         $listeDocs .= "</li>\n";
     }
     echo $listeDocs . "</ul>";
@@ -155,7 +156,7 @@ if ($mode == "MAJ") {
     <form action="songbook_form.php" method="post" name="form2">
         <?php
         // echo selectDocument("nomTable", "chanson", "id", false);
-        include "../php/documentCherche.php";
+        require "../php/documentCherche.php";
         ?>
         <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
         <input type="submit" value="Envoyer">
