@@ -1,18 +1,10 @@
-/data/
- .idea/.name
- .idea/French Ukulele Chords Kitchen.iml
- .idea/misc.xml
- .idea/modules.xml
- .idea/vcs.xml
- .idea/workspace.xml
- .settings
- .settings/org.eclipse.php.core.prefs
- .settings/org.eclipse.wst.common.project.facet.core.xml
-.idea/deployment.xml
 /.idea/
+/.settings/
+/data/
 /images/
 /logs/
 /tmp/
 /vignettes/
+/vendor/
 Dockerfile
 /vendor/

@@ -158,7 +158,7 @@ function creeModifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site,
 }
 
 // Cette fonction tente de loguer un utilisateur avec le mot de passe mdp
-  
+
 function login_utilisateur($login, $mdp)
 {
     $donnee = chercheUtilisateurParLeLogin($login);
@@ -284,5 +284,4 @@ function testeUtilisateur()
     $chaine = "YumgdDnP5Oomf2jI1Lmy/A==";
     echo("Décryptage de chaine : " . $chaine . "<br> \n\r");
     echo("Resultat : " . Chiffrement::decrypt($chaine) . "<br> \n\r");
-
 }

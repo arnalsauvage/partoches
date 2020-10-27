@@ -3,7 +3,6 @@ const FICHIER_UPLOADE = 'fichierUploade';
 require("lib/utilssi.php");
 require("document.php");
 
-// echo "Test renomme #élè phàù : " . renommeFichierChanson("#élè phàù");
 // On vérifie que l'utilisateur est connecté
 if (!isset ($_SESSION ['user'])) {
     echo "Vous devez vous authentifier !";
@@ -18,6 +17,7 @@ if (!isset ($_FILES [FICHIER_UPLOADE])) {
 
 // TODO : créer un paramètre d'application modifiable par l'admin
 $autorisees = "pdf doc docx gif jpg png swf mp3 odt svg crd txt m4a";
+
 $repertoire = "../data/chansons/" . $_POST ['id'] . "/";
 if (!file_exists($repertoire)) {
     mkdir($repertoire, 0755);

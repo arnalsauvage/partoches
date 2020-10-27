@@ -6,11 +6,11 @@ $sortie = envoieHead("Partoches", "../css/index.css");
 $sortie .= "<body>
     <h1>Top 5 Partoches - oubli de mot de passe (étape 1/4)</h1>
     <p> Vous pouvez demander un nouveau mot de passe ici :</p>
-	<FORM action='oubliMotDePasse.php' class='login' method='post'>
+	<form action='oubliMotDePasse.php' class='login' method='post'>
 		<label class='email' for='email'>Adresse mail :</label>
 			<input size='16' id='email' name='email' value='' placeholder='adresse@email.fr'>
 		<input type='submit' value='Ok'>
-	</FORM>
+	</form>
 
 ";
 
@@ -25,7 +25,6 @@ function envoieMailRecup()
 
     $sujet = "Oubli de mot de passe sur Partoches Top 5 - étape 2/4";
 
-    //	echo "user = $user , mot de passe = $pass";
     $contenu = "Bonjour, vous avez certainement demandé la régénération de votre mot de passe sur partoche.
         Voici un lien actif aujourd'hui pour le réinitialiser : 
         
@@ -38,15 +37,30 @@ function envoieMailRecup()
         Arnaud
         
         ";
-    mail($_POST['email'], $sujet, $contenu);
+
+    $resultat = chercheUtilisateurs('email', $_POST['email']);
+    $prenom = $resultat[3];
+    $nom = $resultat[4];
+
+    // Pour envoyer un mail HTML, l'en-tête Content-type doit être défini
+    $headers[] = 'MIME-Version: 1.0';
+    $headers[] = 'Content-type: text/html; charset=iso-8859-1';
+
+    // En-têtes additionnels
+    $headers[] = 'To: $prenom $nom<' . $_POST['email'] . '>';
+    $headers[] = 'From: Top 5 partoches <hello@top5.re>';
+
+    // Envoi
+    mail($_POST['email'], $sujet, $contenu, implode("\r\n", $headers));
     // echo "sujet : " . $sujet . "<br>";
     //  echo "Contenu : " . $contenu . "<br>";
 }
 
 if (isset ($_POST ['email'])) {
-    envoieMailRecup();
-    $reponse = "Un email de récupération de mot de passe vient de vous être adressé !";
+    $reponse = "<h1>Top 5 Partoches - oubli de mot de passe (étape 2/4) </h1>";
+    $reponse .= "Un email de récupération de mot de passe vient de vous être adressé !";
     echo $reponse;
+    envoieMailRecup();
     return;
 }
 
