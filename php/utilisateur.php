@@ -158,6 +158,7 @@ function creeModifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site,
 }
 
 // Cette fonction tente de loguer un utilisateur avec le mot de passe mdp
+  
 function login_utilisateur($login, $mdp)
 {
     $donnee = chercheUtilisateurParLeLogin($login);
