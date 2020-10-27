@@ -3,7 +3,6 @@ const FICHIER_UPLOADE = 'fichierUploade';
 require("lib/utilssi.php");
 require("document.php");
 
-// echo "Test renomme #élè phàù : " . renommeFichierChanson("#élè phàù");
 // On vérifie que l'utilisateur est connecté
 if (!isset ($_SESSION ['user'])) {
     echo "Vous devez vous authentifier !";
@@ -16,7 +15,7 @@ if (!isset ($_FILES [FICHIER_UPLOADE])) {
     return (0);
 }
 
-$autorisees = "pdf doc docx gif jpg png swf mp3 odt svg crd txt";
+$autorisees = "pdf doc docx gif jpg png swf mp3 m4a odt svg crd txt";
 $repertoire = "../data/chansons/" . $_POST ['id'] . "/";
 if (!file_exists($repertoire)) {
     mkdir($repertoire, 0755);
