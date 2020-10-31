@@ -4,6 +4,7 @@ include_once "lib/configMysql.php";
 include_once "document.php";
 
 // Fonctions de gestion de la chanson
+init_logger();
 
 class ChansonListe
 {

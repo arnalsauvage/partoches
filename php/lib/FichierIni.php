@@ -26,13 +26,13 @@ class FichierIni
                 if (preg_match("#^\[(.+)\]$#", $ligne_propre, $matches)) // Si la ligne est un groupe
                 {
                     $groupe_curseur = $matches [1];
-                    // echo 'groupe :' . $groupe_curseur;
+//                    echo 'groupe :' . $groupe_curseur;
                     $this->groupe = $groupe_curseur; // ajout sinon warning
                 } else {
                     if ($ligne_propre [0] != ';' && $tableau = explode("=", $ligne, 2)) // Sinon, c'est un item / valeur
                     {
                         $this->fichier_ini [$groupe_curseur] [trim($tableau [0])] = trim($tableau [1], "\n\r ");
-                        // echo ("Fichier [$groupe_curseur][$tableau[0]] =$tableau[1] ");
+//                        echo ("Fichier [$groupe_curseur][$tableau[0]] =$tableau[1] ");
                         $this->item = $tableau [0]; // ajout sinon warnings
                     }
                 }
@@ -40,13 +40,14 @@ class FichierIni
         }
 
         // Valeur courante = derniere valeur passée
-        // $this->valeur=$this->fichier_ini[$this->groupe][$this->item];
-        // print_r($this->fichier_ini);
-        /*
-         * echo ("groupe :".$this->groupe);
-         * echo("item :" . $this->item);
-         * echo $this->fichier_ini[$this->groupe][$this->item];
-         */
+        $this->valeur = $this->fichier_ini[$this->groupe][$this->item];
+
+        /*print_r($this->fichier_ini);
+
+          echo ("groupe :".$this->groupe);
+          echo("item :" . $this->item);
+          echo $this->fichier_ini[$this->groupe][$this->item];*/
+
     }
 
     // Sélectionner un groupe dans le fichier ini

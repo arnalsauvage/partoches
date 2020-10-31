@@ -14,5 +14,3 @@ $contenuHtmlCompCherche = "
 <label class='inline'> </label><INPUT TYPE='submit' NAME='chercher' VALUE=' chercher ' >
 <br>
 </FORM>";
-
-// echo $contenuHtmlCompCherche;

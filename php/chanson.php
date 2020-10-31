@@ -1,7 +1,8 @@
 <?php
-include_once("lib/utilssi.php");
-include_once "lib/configMysql.php";
-include_once "document.php";
+require_once "lib/utilssi.php";
+require_once "lib/configMysql.php";
+require_once "document.php";
+
 
 // Fonctions de gestion de la chanson
 
@@ -20,10 +21,13 @@ class Chanson
     private $_datePub; // date de publication de la chanson en chaine de caractères JJ/MM/AAAA
     private $_hits; // compteur de visites de la chanson, corresponds aux affichages de la page chanson
     private $_tonalite;
+    static $_logger;
 
     // Fonction conseillée pour gérer plusieurs constructeurs
     function __construct()
     {
+        Chanson::$_logger = init_logger();
+
         $a = func_get_args();
         $i = func_num_args();
         if (method_exists($this, $f = '__construct' . $i)) {
@@ -286,7 +290,7 @@ class Chanson
         $maRequete = "SELECT * FROM chanson WHERE chanson.id = '$id'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
         // renvoie la ligne sélectionnée : id, nom, interprète, année
-        if (($ligne = $result->fetch_row())) {
+        if ($ligne = $result->fetch_row()) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
         } else {
@@ -316,7 +320,7 @@ class Chanson
         $maRequete = "SELECT * FROM chanson WHERE chanson.nom = '$nom'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChansonParLeNom #1 : " . $_SESSION ['mysql']->error);
         // renvoie la ligne sélectionnée : id, nom, taille, date
-        if (($ligne = $result->fetch_row())) {
+        if ($ligne = $result->fetch_row()) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
         } else {
@@ -342,7 +346,9 @@ class Chanson
             $maRequete = "UPDATE  chanson SET nom = '$this->_nom', interprete = '$this->_interprete', annee = '$this->_annee',
             idUser = $this->_idUser, tempo = '$this->_tempo', mesure='$this->_mesure', pulsation='$this->_pulsation', 
             hits='$this->_hits', tonalite='$this->_tonalite', datePub='$this->_datePub' WHERE id='$this->_id'";
-            // echo $maRequete;
+            Chanson::$_logger = init_logger();
+            Chanson::$_logger->info("Modification d'une chanson $this->_nom - $this->_interprete");
+            Chanson::$_logger->debug($maRequete);
             $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème modif dans creeModifieChanson #2 : " . $_SESSION [self::MYSQL]->error . " requete : " . $maRequete);
             return $this->_id;
         }
@@ -358,7 +364,9 @@ class Chanson
         $maRequete = "INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
 	        VALUES (NULL, '$this->_nom', '$this->_interprete', '$this->_annee', '$this->_idUser', '$this->_tempo', '$this->_mesure', 
 	        '$this->_pulsation', '$this->_datePub' ,  '$this->_hits', '$this->_tonalite')";
-        // echo $maRequete;
+        Chanson::$_logger = init_logger();
+        Chanson::$_logger->debug($maRequete);
+        Chanson::$_logger->info("Création d'une chanson $this->_nom - $this->_interprete");
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème creeChansonBDD#1 : " . $_SESSION [self::MYSQL]->error);
         // On renseigne l'id de l'objet avec l'id créé en BDD
         $this->setId($_SESSION [self::MYSQL]->insert_id);
@@ -371,7 +379,9 @@ class Chanson
         // On supprime les enregistrements dans chanson
         $maRequete = "DELETE FROM chanson WHERE id='" . $this->getId() . "'";
         $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème #1 dans supprimeChanson : " . $_SESSION [self::MYSQL]->error);
-
+        Chanson::$_logger = init_logger();
+        Chanson::$_logger->debug($maRequete);
+        Chanson::$_logger->info("Suppression d'une chanson $this->_nom - $this->_interprete");
         // On supprime ensuite tous les documents de la chanson
         $result = chercheDocumentsTableId("chanson", $this->getId());
         while ($ligne = $result->fetch_row()) {
@@ -437,7 +447,8 @@ class Chanson
         } else {
             $maRequete .= " ASC";
         }
-        // echo "ma requête : " . $maRequete;
+        Chanson::$_logger = init_logger();
+        Chanson::$_logger->debug($maRequete);
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION [self::MYSQL]->error);
         $tableau = [];
         while ($idChanson = $result->fetch_row()) {
@@ -459,9 +470,10 @@ class Chanson
         $maRequete = "SELECT DISTINCT songbook.id, songbook.nom from songbook, liendocsongbook , document ,
         chanson WHERE liendocsongbook.idDocument = document.id AND document.nomTable='chanson' 
         AND document.idTable = chanson.id AND chanson.id = " . $this->_id . "  AND songbook.id = liendocsongbook.idSongbook";
-        //echo "ma requête : " . $maRequete;
+        Chanson::$_logger = init_logger();
+        Chanson::$_logger->debug($maRequete);
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheSongbooksDocuments #1 : " . $_SESSION [self::MYSQL]->error);
-        //var_dump($result);
+        Chanson::$_logger->warning(var_dump($result));
         return $result;
     }
 }
@@ -477,7 +489,8 @@ function chercheChansons($critere, $valeur, $critereTri = 'nom', $bTriAscendant 
     } else {
         $maRequete .= " ASC";
     }
-    // echo "ma requête : " . $maRequete;
+    Chanson::$_logger = init_logger();
+    Chanson::$_logger->debug($maRequete);
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #3 : " . $_SESSION ['mysql']->error);
     return $result;
 }

@@ -1,8 +1,13 @@
 <?php
+require_once '../vendor/autoload.php';
 $a = session_id();
 if (empty ($a)) {
     session_start();
 }
+
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+
 unset ($a);
 // function pc_process_dir ($nom_rep, $profondeur_max = 10, $profondeur = 0)
 // function affichePlayer($mp3="vide")
@@ -15,8 +20,9 @@ if (!isset ($FichierUtilsSi)) {
     // Déclaration des variables globales
     $FichierUtilsSi = 1;
 
+
     // Inclusion des différentes librairies
-    require_once("class.fichierIni.php");
+    require_once("FichierIni.php");
     require_once("compteur.php");
     require_once("configMysql.php");
     include_once "config-images.php";
@@ -96,6 +102,7 @@ if (!isset ($FichierUtilsSi)) {
     }
 
     // Cette fonction écrit le $log dans le $fichier
+    // TODO    ancien fichier de log à supprimer
     function ecritFichierLog($fichier, $log)
     {
         $time = date("l, j F Y [h:i a]");
@@ -140,4 +147,26 @@ if (!isset ($FichierUtilsSi)) {
         return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer' onclick =\"confirmeSuppr('" . $lien . "','Voulez-vous vraiment supprimer cet élément ?');\" >";
     }
 
+    /**
+     * @return Logger
+     */
+    function init_logger()
+    {
+        $logger = new Logger('monLoggerA');
+        $dateHeureMinute = date('Y-m-d') . '.log';
+        // Niveaux de log dans
+        switch ($GLOBALS['niveauDeLog']) {
+            case "debug" :
+                $GLOBALS['niveauDeLog'] = Logger::DEBUG;
+            case "info" :
+                $GLOBALS['niveauDeLog'] = Logger::INFO;
+            case "warning" :
+                $GLOBALS['niveauDeLog'] = Logger::WARNING;
+            case "error" :
+                $GLOBALS['niveauDeLog'] = Logger::ERROR;
+        }
+        $logger->pushHandler(new StreamHandler('../../logs/' . $dateHeureMinute, $GLOBALS['niveauDeLog']));
+        echo "log dans le fichier " . '../../logs/' . $dateHeureMinute;
+        return $logger;
+    }
 }

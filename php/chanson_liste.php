@@ -194,7 +194,7 @@ if ($_SESSION [PRIVILEGE] > 1) {
 // //////////////////////////////////////////////////////////////////////ADMIN
 
 // Affichage de la recherche
-require_once("chanson-comp-cherche.php");
+require_once("chanson-v-comp-cherche.php");
 $contenuHtml .= $contenuHtmlCompCherche;
 $contenuHtml .= "
 </div>\n
