@@ -1,15 +1,12 @@
 <?php
 // require_once 'PHPUnit/Autoload.php';
+session_start();
+require_once "../php/lib/utilssi.php";
 
 use PHPUnit\Framework\TestCase;
 
 class ChansonTest extends TestCase
 {
-    function setUp()
-    {
-        @session_start();
-    }
-
     public function testConstructeur()
     {
         $_chanson = new Chanson("Lila Louis 987", "Olive", 1998, 1, 120, "4/4", "binaire", 0, "Bm");

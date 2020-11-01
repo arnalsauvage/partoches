@@ -2,15 +2,14 @@
 
 use PHPUnit\Framework\TestCase;
 
-include_once("../php/lib/utilssi.php");
-include_once ("../php/UtilisateurNote.php");
+require_once("../php/lib/utilssi.php");
+require_once("../php/UtilisateurNote.php");
 
 class UtilisateurNoteTest extends TestCase
 {
     function setUp()
     {
         @session_start();
-
     }
 
     public function testSetIdObjetNote()

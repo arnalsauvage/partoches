@@ -1,5 +1,5 @@
 <?php
-require ('lib/Cryptor.php');
+require_once('Cryptor.php');
 
 use ioncube\phpOpensslCryptor\Cryptor;
 
