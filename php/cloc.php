@@ -28,7 +28,7 @@
 /**
  *** int counter(string $dir)
  ***
- ***        @param $dir: chemin du dossier � parcourir
+ ***        @param $dir : chemin du dossier à parcourir
  **/
 function counter($dir)
 {
@@ -54,8 +54,8 @@ function counter($dir)
     return $nbLines;
 }
 
-// dossier � parcourir
-// '.' signifie que je parcours le dossier o� se trouve mon script
+// dossier à parcourir
+// '.' signifie que je parcours le dossier où se trouve mon script
 $dir = ".";
 
 $nb = counter($dir);
