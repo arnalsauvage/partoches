@@ -154,19 +154,24 @@ if (!isset ($FichierUtilsSi)) {
     {
         $logger = new Logger('monLoggerA');
         $dateHeureMinute = date('Y-m-d') . '.log';
+        // echo "niveau de log :" .$GLOBALS['niveauDeLog'];
         // Niveaux de log dans
         switch ($GLOBALS['niveauDeLog']) {
             case "debug" :
                 $GLOBALS['niveauDeLog'] = Logger::DEBUG;
+                break;
             case "info" :
                 $GLOBALS['niveauDeLog'] = Logger::INFO;
+                break;
             case "warning" :
                 $GLOBALS['niveauDeLog'] = Logger::WARNING;
+                break;
             case "error" :
                 $GLOBALS['niveauDeLog'] = Logger::ERROR;
+                break;
         }
-        $logger->pushHandler(new StreamHandler('../../logs/' . $dateHeureMinute, $GLOBALS['niveauDeLog']));
-        echo "log dans le fichier " . '../../logs/' . $dateHeureMinute;
+        $logger->pushHandler(new StreamHandler('../logs/' . $dateHeureMinute, $GLOBALS['niveauDeLog']));
+        // echo "logs à partir du niveau" . $GLOBALS['niveauDeLog']." dans le fichier " . '../../logs/' . $dateHeureMinute;
         return $logger;
     }
 }

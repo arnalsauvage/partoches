@@ -39,15 +39,6 @@ class FichierIni
             }
         }
 
-        // Valeur courante = derniere valeur passée
-        $this->valeur = $this->fichier_ini[$this->groupe][$this->item];
-
-        /*print_r($this->fichier_ini);
-
-          echo ("groupe :".$this->groupe);
-          echo("item :" . $this->item);
-          echo $this->fichier_ini[$this->groupe][$this->item];*/
-
     }
 
     // Sélectionner un groupe dans le fichier ini

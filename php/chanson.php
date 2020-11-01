@@ -449,6 +449,7 @@ class Chanson
         }
         Chanson::$_logger = init_logger();
         Chanson::$_logger->debug($maRequete);
+        // echo "debug : " . $maRequete;
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION [self::MYSQL]->error);
         $tableau = [];
         while ($idChanson = $result->fetch_row()) {
