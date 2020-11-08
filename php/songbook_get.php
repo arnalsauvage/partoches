@@ -18,6 +18,10 @@ if (isset($_POST ['mode'])) {
     $mode = $_POST ['mode'];
 } elseif (isset($_GET ['mode'])) {
     $mode = $_GET ['mode'];
+    if (len($mode) > 12) {
+        echo "Erreur n#1 dans songbook_get.php";
+        return;
+    }
 }
 
 // On récupère l'identifiant du songbook passé par POST ou GET

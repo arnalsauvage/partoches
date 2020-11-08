@@ -9,23 +9,30 @@ $table = "songbook";
 $sortie = "";
 $monImage = "";
 
+if (isset($_GET ['id']) && is_numeric($_GET ['id'])) {
+    $idSongbook = $_GET ['id'];
+} else {
+    echo "erreur #1 dans playlis_voir.php";
+    return;
+}
+
 // On augmente le compteur de vues du songbook
-augmenteHits($table, $_GET ['id']);
+augmenteHits($table, $idSongbook);
 
 // On choisit une des images du songbook
-$monImage = imageTableId("songbook", $_GET ['id']);
+$monImage = imageTableId("songbook", $idSongbook);
 
 // On charge le tableau des utilisateurs
 $tabUsers = portraitDesUtilisateurs();
 
-$donnee = chercheSongbook($_GET ['id']);
+$donnee = chercheSongbook($idSongbook);
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
 
 if ($_SESSION ['privilege'] > 1)
-    $sortie .= Ancre($songbookForm . "?id=" . $_GET ['id'], Image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
+    $sortie .= Ancre($songbookForm . "?id=" . $idSongbook, Image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
 
 if ("" != $monImage) {
-    $repertoire = "../data/songbooks/" . $_GET ['id'] . "/";
+    $repertoire = "../data/songbooks/" . $idSongbook . "/";
     $sortie .= Image($repertoire . $monImage, 200, "", "pochette");
 }
 
@@ -34,7 +41,7 @@ $sortie .= $donnee [2] . "-" . $donnee [3] . "-" . $donnee [5] . " hit(s)<br>\n"
 $sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
 
 // On récupère les fichiers du Songbook
-$fichiersDuSongbook = fichiersSongbook($_GET ['id']);
+$fichiersDuSongbook = fichiersSongbook($idSongbook);
 
 foreach ($fichiersDuSongbook as $fichier) {
     $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, "icone");
@@ -46,7 +53,7 @@ foreach ($fichiersDuSongbook as $fichier) {
 
 $sortie .= "<h2>Liste des documents dans ce songbook</h2>";
 
-$lignes = chercheLiensDocSongbook('idSongbook', $_GET ['id'], "ordre", true);
+$lignes = chercheLiensDocSongbook('idSongbook', $idSongbook, "ordre", true);
 $listeDocs = "";
 while ($ligne = $lignes->fetch_row()) {
     $ligneDoc = chercheDocument($ligne [1]);
