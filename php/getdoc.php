@@ -75,7 +75,7 @@ if (!function_exists('mime_content_type')) {
     }
 }
 
-if (isset ($_GET ['doc'])) {
+if ((isset ($_GET ['doc'])) && (is_numeric($_GET ['doc']))) {
     $idDoc = $_GET ['doc'];
     $doc = chercheDocument($idDoc);
     // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser

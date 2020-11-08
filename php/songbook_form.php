@@ -11,14 +11,16 @@ $sortie = "";
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
 if ($_SESSION ['privilege'] < 2) {
     $urlRedirection = $table . "_voir.php";
-    if (isset ($_GET ['id'])) {
+    if ((isset ($_GET ['id']) && (is_numeric($_GET ['doc'])))) {
         $urlRedirection .= "?id=" . $_GET ['id'];
+        redirection($urlRedirection);
+    } else {
+        echo "Erreur n°1 dans Songbook_form.php, merci de contacter notre numéro vert.";
     }
-    redirection($urlRedirection);
 }
 
 // Traitement de l'ajout de document
-if (isset ($_POST ['id']) && (isset ($_POST ['documentJoint']))) {
+if (isset ($_POST ['id']) && is_numeric($_POST ['id']) && (isset ($_POST ['documentJoint']))) {
     $id = $_POST ['id'];
     ordonneLiensSongbook($id);
     creeLienDocSongbook($_POST ['documentJoint'], $_POST ['id']);
@@ -30,7 +32,7 @@ if (isset ($_POST ['id']) && (isset ($_POST ['documentJoint']))) {
 }
 
 // Chargement des donnees du songbook si l'identifiant est fourni
-if (isset ($_POST ['id']) || (isset ($_GET ['id']) && $_GET ['id'] != "")) {
+if (isset ($_POST ['id']) || (isset ($_GET ['id']) && (is_numeric($_GET ['id'])))) {
     if (isset ($_GET ['id'])) {
         $id = $_GET ['id'];
     }

@@ -1,12 +1,8 @@
 <?php
-require_once '../vendor/autoload.php';
 $a = session_id();
 if (empty ($a)) {
     session_start();
 }
-
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 
 unset ($a);
 // function pc_process_dir ($nom_rep, $profondeur_max = 10, $profondeur = 0)
@@ -20,7 +16,6 @@ if (!isset ($FichierUtilsSi)) {
     // Déclaration des variables globales
     $FichierUtilsSi = 1;
 
-
     // Inclusion des différentes librairies
     require_once("FichierIni.php");
     require_once("compteur.php");
@@ -33,7 +28,6 @@ if (!isset ($FichierUtilsSi)) {
     include_once("table.php");
     require_once("vignette.php");
     require_once("Chiffrement.php");
-
     if (!isset ($_SESSION ["privilege"])) {
         $_SESSION ["privilege"] = 0;
     }
@@ -150,23 +144,31 @@ if (!isset ($FichierUtilsSi)) {
     /**
      * @return Logger
      */
-    function init_logger()
-    {
-        $logger = new Logger('monLoggerA');
-        $dateHeureMinute = date('Y-m-d') . '.log';
-        // Niveaux de log dans
-        switch ($GLOBALS['niveauDeLog']) {
-            case "debug" :
-                $GLOBALS['niveauDeLog'] = Logger::DEBUG;
-            case "info" :
-                $GLOBALS['niveauDeLog'] = Logger::INFO;
-            case "warning" :
-                $GLOBALS['niveauDeLog'] = Logger::WARNING;
-            case "error" :
-                $GLOBALS['niveauDeLog'] = Logger::ERROR;
+    /*
+        function init_logger()
+        {
+
+            $logger = new Logger('monLoggerA');
+            $dateHeureMinute = date('Y-m-d') . '.log';
+            // echo "niveau de log :" .$GLOBALS['niveauDeLog'];
+            // Niveaux de log dans
+            switch ($GLOBALS['niveauDeLog']) {
+                case "debug" :
+                    $GLOBALS['niveauDeLog'] = Logger::DEBUG;
+                    break;
+                case "info" :
+                    $GLOBALS['niveauDeLog'] = Logger::INFO;
+                    break;
+                case "warning" :
+                    $GLOBALS['niveauDeLog'] = Logger::WARNING;
+                    break;
+                case "error" :
+                    $GLOBALS['niveauDeLog'] = Logger::ERROR;
+                    break;
+            }
+            $logger->pushHandler(new StreamHandler('../logs/' . $dateHeureMinute, $GLOBALS['niveauDeLog']));
+            // echo "logs à partir du niveau" . $GLOBALS['niveauDeLog']." dans le fichier " . '../../logs/' . $dateHeureMinute;
+            return $logger;
         }
-        $logger->pushHandler(new StreamHandler('../../logs/' . $dateHeureMinute, $GLOBALS['niveauDeLog']));
-        echo "log dans le fichier " . '../../logs/' . $dateHeureMinute;
-        return $logger;
-    }
+    */
 }

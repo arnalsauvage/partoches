@@ -26,7 +26,7 @@ $contenuHtml .= entreBalise("Chansons", "H1");
 
 // Gestion du paramètre de tri
 // On prend en compte une demande de tri ascendant
-if (isset ($_GET [TRI])) {
+if (isset ($_GET [TRI]) && isset ($_GET [TRI])) {
     $_SESSION[TRI] = $_GET [TRI];
     $_SESSION[ORDRE_ASC] = true;
     // echo "session tri = get tro = " . $_SESSION['tri'] = $_GET ['tri'];
@@ -84,7 +84,7 @@ $numligne = 0;
 
 // Gestion de la pagination
 $pagination = new Pagination ($nbreChansons, $nombreChansonsParPage);
-if (isset ($_GET['page'])) {
+if (isset ($_GET['page']) && is_numeric($_GET['page'])) {
     $page = $_GET['page'];
 } else {
     $page = 1;
@@ -137,7 +137,7 @@ foreach ($resultat as $ligne) {
 
     $_chanson->chercheChanson($ligne);
     $_id = $_chanson->getId();
-    if ((isset ($_GET ['nonVote'])) && ($maNote->chercheNoteUtilisateur($_SESSION['id'], CHANSON, $_id) == 1)) {
+    if ((isset ($_GET ['nonVote'])) && is_numeric($_GET ['nonVote']) && ($maNote->chercheNoteUtilisateur($_SESSION['id'], CHANSON, $_id) == 1)) {
         echo "session id: " . $_SESSION['id'];
         $nbreChansons--;
         continue;

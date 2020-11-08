@@ -12,13 +12,13 @@ if ($_SESSION [PRIVILEGE] <= 1) {
 $nomTable = "chanson";
 $_chanson = new Chanson();
 
-if (isset ($_GET ['id'])) {
+if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
     $id = $_GET ['id'];
     $mode = $_GET ['mode'];
     //echo "On est en get <br> " ;
 }
 
-if (isset ($_POST ['id'])) {
+if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     //echo "On est en post !!!  \n\n\n ";
     $id = $_POST ['id'];
     $fnom = $_POST ['fnom'];
@@ -27,7 +27,7 @@ if (isset ($_POST ['id'])) {
     $ftempo = $_POST ['ftempo'];
     $fmesure = $_POST ['fmesure'];
     $fpulsation = $_POST ['fpulsation'];
-    if (isset($_POST ['fhits'])) {
+    if (isset($_POST ['fhits']) && is_numeric($_POST ['fhits'])) {
         $fhits = $_POST ['fhits'];
     }
     $ftonalite = $_POST ['ftonalite'];

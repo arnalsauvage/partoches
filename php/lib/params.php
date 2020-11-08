@@ -10,5 +10,5 @@ $_SESSION ['emailAdmin'] = $ini_objet->m_valeur("EmailAdmin", "general");
 $_SESSION ['loginParam'] = $ini_objet->m_valeur("loginParam", "general");
 // Niveau de log : on écrit à partir de DEBUG / INFO / WARNING / ERROR
 $niveauDeLog = $ini_objet->m_valeur("niveauDeLog", "general");
-echo "Niveau de log : " . $niveauDeLog;
+// echo "Niveau de log : " . $niveauDeLog;
 

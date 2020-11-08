@@ -16,6 +16,11 @@ $contenuHtml = "<div class='container'>
   <div class='starter-template'> \n";
 $monImage = "";
 
+if (!is_numeric($_GET['id'])) {
+    echo "Erreur #1 dans chanson_voir.php";
+    return;
+}
+
 $idChanson = $_GET['id'];
 $_chanson = new Chanson ($idChanson);
 $fichiersDuSongbook = $_chanson->fichiersChanson();
