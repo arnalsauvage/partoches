@@ -10,7 +10,7 @@ $fichiersDuPlaylist .= TblDebut(0);
 $cheminPlaylist = ".data/playlists/";
 
 // Gestion du paramètre de tri
-if (isset ($_GET ['tri'])) {
+if (isset ($_GET ['tri']) && is_numeric($_GET ['tri'])) {
     $tri = $_GET ['tri'];
     $ordreAsc = true;
 } else {

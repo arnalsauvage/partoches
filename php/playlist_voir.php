@@ -9,11 +9,18 @@ $table = "playlist";
 $sortie = "";
 $monImage = "";
 
+if (isset($_GET ['id']) && is_numeric($_GET ['id'])) {
+    $idPlaylist = $_GET ['id'];
+} else {
+    echo "erreur #1 dans playlis_voir.php";
+    return;
+}
+
 // On augmente le compteur de vues du playlist
-augmenteHits($table, $_GET ['id']);
+augmenteHits($table, $idPlaylist);
 
 // On récupère les fichiers du Playlist
-$fichiersDuPlaylist = fichiersPlaylist($_GET ['id']);
+$fichiersDuPlaylist = fichiersPlaylist($idPlaylist);
 
 //On cherche une image pour illustrer la playlist parmi les images dispos
 foreach ($fichiersDuPlaylist as $fichier) {
@@ -25,11 +32,11 @@ foreach ($fichiersDuPlaylist as $fichier) {
 // On charge le tableau des utilisateurs
 $tabUsers = portraitDesUtilisateurs();
 
-$donnee = chercheplaylist($_GET ['id']);
+$donnee = chercheplaylist($idPlaylist);
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
 
 if ($_SESSION ['privilege'] > 1)
-    $sortie .= Ancre($playlistForm . "?id=" . $_GET ['id'], Image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
+    $sortie .= Ancre($playlistForm . "?id=" . $idPlaylist, Image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
 
 if ("" != $monImage) {
     $sortie .= Image($monImage [0] . $monImage [1], 200, "", "pochette");
@@ -47,7 +54,7 @@ $sortie .= "<h2>Liste des documents dans cette playlist</h2>";
 
 // TODO : afficher une vignette de chaque chanson relative au document
 
-$lignes = chercheLiensChansonPlaylist('idPlaylist', $_GET ['id'], "ordre", true);
+$lignes = chercheLiensChansonPlaylist('idPlaylist', $idPlaylist, "ordre", true);
 $listeDocs = "";
 while ($ligne = $lignes->fetch_row()) {
     $ligneDoc = chercheDocument($ligne [1]);

@@ -22,11 +22,11 @@ if (($mode == "MAJ") || ($mode == "INS")) {
     }
 }
 
-if (isset ($_GET ['id'])) {
+if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
     $id = $_GET ['id'];
 }
 
-if (isset ($_POST ['id'])) {
+if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     $id = $_POST ['id'];
 }
 

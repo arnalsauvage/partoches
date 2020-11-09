@@ -27,7 +27,7 @@ function comboAjoutSongbook($listeSongbooks)
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
 if ($_SESSION ['privilege'] < 2) {
     $urlRedirection = $table . "_voir.php";
-    if (isset ($_GET ['id']))
+    if (isset ($_GET ['id']) && is_numeric($_GET ['id']))
     {
         $urlRedirection .= "?id=" . $_GET ['id'];
     }
@@ -43,7 +43,7 @@ if (isset ($_POST ['id']))
 {
     $id = $_POST ['id'];
 }
-if (isset ($_GET ['id']) && $_GET ['id'] != "") {
+if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
     $id = $_GET ['id'];
     $_chanson->chercheChanson($id);
     $mode = "MAJ";

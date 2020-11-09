@@ -6,14 +6,14 @@
  * Time: 15:26
  * Ce script permet de changer l'ordre des morceaux dans une playlist
  *
- * param�tre en entr�e, par GET :
+ * paramètre en entrée, par GET :
  * idPlaylist : identifiant de la playlist
  * dir : "down" (augemnter l'ordre) "pit" (dernier de la liste)
  *          "up" (baisser l'ordre) "top" (premier de la liste)
- * ordre : n� de la chanson vis�e
+ * ordre : n° de la chanson visée
  *
- * Pour le moment, on redirige vers le formulaire, mais cette instruction pourra �tre
- * enlev�e pour une utilisation par un composant javascript / Ajax
+ * Pour le moment, on redirige vers le formulaire, mais cette instruction pourra être
+ * enlevée pour une utilisation par un composant javascript / Ajax
  *
  */
 require_once("lib/utilssi.php");
@@ -21,7 +21,7 @@ require("lienChansonPlaylist.php");
 
 // Un non-admin ne peut changer l'ordre
 if ($_SESSION ['privilege'] > 1) {
-    if ($_GET['idPlaylist'] > 0) {
+    if (is_numeric($_GET['idPlaylist'] > 0)) {
         if ($_GET['dir'] == "down") {
             echo "remonteTitre " . $_GET['ordre'] + 1 . "  1";
             remonteTitre($_GET['idPlaylist'], $_GET['ordre'] + 1, 1);

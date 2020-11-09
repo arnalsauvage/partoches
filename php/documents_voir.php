@@ -37,7 +37,7 @@ $lignes = chercheDocuments("nomTable", CHANSON, $_SESSION[DOC_TRI], $_SESSION[DO
 
 // Gestion de la pagination
 $pagination = new Pagination ($lignes->num_rows, $nombreDocumentsParPage);
-if (isset ($_GET['page'])) {
+if (isset ($_GET['page']) && is_numeric($_GET['page'])) {
     $_SESSION[DOC_PAGE] = $_GET['page'];
 } else
     if (!isset ($_SESSION[DOC_PAGE])) {
