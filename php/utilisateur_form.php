@@ -1,12 +1,10 @@
 <?php
 require_once("lib/utilssi.php");
 require_once("menu.php");
-require_once("lib/Chiffrement.php");
 
 $mode = "";
 $table = "utilisateur";
 $sortie = "";
-
 // Chargement des donnees de l'utilisateur si l'identifiant est fourni
 if (isset ($_GET ['id']) && $_GET ['id'] != "") {
     $donnee = chercheUtilisateur($_GET ['id']);

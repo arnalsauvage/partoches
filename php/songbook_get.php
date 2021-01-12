@@ -18,7 +18,7 @@ if (isset($_POST ['mode'])) {
     $mode = $_POST ['mode'];
 } elseif (isset($_GET ['mode'])) {
     $mode = $_GET ['mode'];
-    if (len($mode) > 12) {
+    if (strlen($mode) > 12) {
         echo "Erreur n#1 dans songbook_get.php";
         return;
     }

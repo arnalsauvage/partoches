@@ -45,7 +45,7 @@ if (!isset ($ClasseFormulaire)) {
         private function champSELECT($pNom, $pListe, $pDefaut, $pTaille = 1)
         {
             $s = "<SELECT NAME='$pNom' SIZE='$pTaille'>\n";
-            while (list ($val, $libelle) = each($pListe)) {
+            foreach ($pListe as $val => $libelle) {
                 if ($val != $pDefaut)
                     $s .= "<OPTION VALUE='$val'>" . $libelle . "</OPTION>\n";
                 else
@@ -59,7 +59,7 @@ if (!isset ($ClasseFormulaire)) {
         {
             global $cheminVignettes;
             $s = "<SELECT NAME='$pNom' id='listeImage' SIZE='$pTaille' onchange='changeListeImage(this.form)'>\n";
-            while (list ($val, $libelle) = each($pListe)) {
+            foreach ($pListe as $val => $libelle) {
                 if ($val != $pDefaut)
                     $s .= "<OPTION VALUE='$val'>" . $libelle . "</OPTION>\n";
                 else
@@ -77,7 +77,7 @@ if (!isset ($ClasseFormulaire)) {
             $libelles = "";
             $champs = "";
             // Toujours afficher dans une table
-            while (list ($val, $libelle) = each($pListe)) {
+            foreach ($pListe as $val => $libelle) {
                 $libelles .= "<TD><B>$libelle</B></TD>";
                 if ($val == $pDefaut)
                     $checked = "CHECKED";
