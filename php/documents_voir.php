@@ -14,7 +14,11 @@ $sortie = "";
 $monImage = "";
 
 $nombreDocumentsParPage = 50;
-
+if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] < 1) {
+    // Affichage du formulaire de login
+    echo "pas de contenu...";
+    exit();
+}
 $sortie .= "<h2>Documents publiés pour des chansons</h2> \n"; // Titre
 
 // Gestion du paramètre de tri

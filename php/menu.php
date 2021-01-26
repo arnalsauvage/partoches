@@ -77,12 +77,12 @@ $contenu .= "		</button>\n
           <ul class='nav navbar-nav'>\n
 			<li class='divider' role='separator'></li>\n
 			<li><a href='../php/songbook_liste.php'>Songbooks</a></li>\n
-            <li><a href='../php/chanson_liste.php'>Chansons</a></li>\n
-            <li><a href='../php/documents_voir.php'>Documents</a></li>\n";
+            <li><a href='../php/chanson_liste.php'>Chansons</a></li>\n";
 //            <li><a href='../php/playlist_liste.php'>Playlists</a></li>\n";
 // Le lien utilisateur est limité aux admin et login parametrage
 if (($_SESSION['privilege'] > 1))
-    $contenu .= "<li ><a href='../php/utilisateur_liste.php'>Utilisateurs</a></li>\n";
+    $contenu .= "<li ><a href='../php/utilisateur_liste.php'>Utilisateurs</a></li>\n
+            <li><a href='../php/documents_voir.php'>Documents</a></li>\n";
 // Le lien paramétrage est limité aux admin et login parametrage
 if (($_SESSION['user'] == $_SESSION['loginParam'])
     || ($_SESSION['privilege'] > 2))

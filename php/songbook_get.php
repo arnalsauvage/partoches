@@ -114,7 +114,6 @@ function menageNomVersion($nomFic)
     $nom = substr($nomFic, 0, strlen($nomFic) - 4);
     $nomextension = substr($nomFic, -3);
 
-
     $fin = substr($nom, -3);
     if (substr($fin, 0, 2) == "-v") {
         echo "fin = $fin <br>";
