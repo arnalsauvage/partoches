@@ -3,22 +3,10 @@ if (!isset ($ModuleTable)) {
     $ModuleTable = 1;
 
     // Module de production de tableaux HTML
-    function TblDebut($bordure = '1', // La bordure
-                      $largeur = -1, $espCell = '2', // CELLSPACING
-                      $remplCell = '4', // CELLPADDING
-                      $classe = -1)
+    function TblDebut()
     {
-        $retour = "";
-        $optionClasse = "";
-        $optionLargeur = "";
-        if ($classe != -1)
-            $optionClasse = " CLASS='$classe' ";
-        if ($largeur != -1)
-            $optionLargeur = " WIDTH='$largeur' ";
-
-        $retour .= "<table " . $optionLargeur . $optionClasse . ">\n";
-        return $retour;
-    }
+        return "<table>\n";
+       }
 
     function TblFin()
     {

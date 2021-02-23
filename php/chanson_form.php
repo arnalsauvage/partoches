@@ -17,9 +17,9 @@ function comboAjoutSongbook($listeSongbooks)
     $monCombo = " <br>   <label class='inline col-sm-4'> * Ajouter au songbook :</label> 
     <select name= 'idSongbook' >";
     foreach ( $listeSongbooks as $songbook)
-        {
-            $monCombo .= " <option value='".$songbook[0]."'>".$songbook[1]."</option>";
-        }
+    {
+        $monCombo .= " <option value='".$songbook[0]."'>".$songbook[1]."</option>";
+    }
     $monCombo .= "   </select>";
     return($monCombo);
 }
@@ -128,7 +128,11 @@ $sortie .= "
 </div>
 </FORM>
 ";
+$urlCherche = "chanson_chercher.php?chanson=". urlencode($_chanson->getNom())."&artiste=".urlencode($_chanson->getInterprete());
+$urlCherche .= "&idChanson=$id";
 
+$sortie .= "<br> Nouvelle fonctionnalité !!! Enregistrer la chanson avec titre et interprête, puis cliquez ici pour remplir automatiquement via une base de données !!!";
+$sortie .= "<br> <a href='" . $urlCherche."'>Chercher année, tempo, mesure, tonalité et image depuis getsongbpm !</a><br>";
 if ($_chanson->getNom()) {
 
     $sortie .= "Pour chercher la chanson sur youtube : <a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom()) . "' target='_blank'>ici</a><br>\n";
@@ -177,9 +181,9 @@ if ($mode == "MAJ") {
 		    <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
 		    <button name='renommer' style='display:none;'>renommer</button>
             <button style='display:none;'>x</button>";
-        if ($_SESSION ['privilege'] > 2) {
-            $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
-        }
+            if ($_SESSION ['privilege'] > 2) {
+                $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
+            }
             //$listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
             $listeDocs .= "</li>";
             $listeDocs .= "<button onclick=envoieFichierDansSongbook(".$ligneDoc[0].") >ajouter au songbook</button>";
@@ -276,35 +280,35 @@ echo "        	<script src='../js/chansonForm.js '></script>";
 
 ?>
 
-            <script>
-                function envoieFichierDansSongbook(idFichier) {
-                    // Récupérer l'id du songbook dans la combo
-                    var idSongbook = $("select[name='idSongbook'] option:selected").val() ;
-                    // alert('idSongbook = ' + idSongbook);
-                    // Appel Ajax
-                    $.ajax({
-                        type: "POST",
-                    url: "songbook_form.php",
-                    data: "id="+idSongbook+"&documentJoint="+idFichier+"&ajax=11",
-                    datatype: 'html', // type de la donnée à recevoir
-                        success: function (code_html, statut) { // success est toujours en place, bien sûr !
-                        if (code_html.search("succes") > -1)
+    <script>
+        function envoieFichierDansSongbook(idFichier) {
+            // Récupérer l'id du songbook dans la combo
+            var idSongbook = $("select[name='idSongbook'] option:selected").val() ;
+            // alert('idSongbook = ' + idSongbook);
+            // Appel Ajax
+            $.ajax({
+                type: "POST",
+                url: "songbook_form.php",
+                data: "id="+idSongbook+"&documentJoint="+idFichier+"&ajax=11",
+                datatype: 'html', // type de la donnée à recevoir
+                success: function (code_html, statut) { // success est toujours en place, bien sûr !
+                    if (code_html.search("succes") > -1)
                         toastr.success("Le document a été ajouté au songbook ! <br> Le fichier a été raccroché au songbook <br> Vous pouvez raffraîchir la page pour le voir.");
                     else {
-                            toastr.warning("Erreur dans l'opération...<br>Le document n'a pas pu être raccroché... :-(");
-                            $("#div1").html(code_html);
-                        }
-                    },
-                    error: function (resultat, statut, erreur) {
-                        $("#div1").html(resultat);
+                        toastr.warning("Erreur dans l'opération...<br>Le document n'a pas pu être raccroché... :-(");
+                        $("#div1").html(code_html);
                     }
-
-                });
-                    // Retour ok : toast vert
-
-                    // Retour ko : toast rouge
+                },
+                error: function (resultat, statut, erreur) {
+                    $("#div1").html(resultat);
                 }
-            </script>
+
+            });
+            // Retour ok : toast vert
+
+            // Retour ko : toast rouge
+        }
+    </script>
 <?php
 echo envoieFooter();
 

@@ -94,7 +94,6 @@ while ($ligneDoc = $lignes->fetch_row()) {
         continue;
     }
 
-
     $sortie .= "<tr> \n";
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);

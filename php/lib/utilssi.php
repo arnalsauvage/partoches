@@ -25,7 +25,7 @@ if (!isset ($FichierUtilsSi)) {
     require_once("html.php");
     require_once("mysql.php");
     include_once("params.php");
-    include_once("table.php");
+    include_once("tableHtml.php");
     require_once("vignette.php");
     require_once("Chiffrement.php");
     if (!isset ($_SESSION ["privilege"])) {

@@ -1,6 +1,7 @@
 <?php
 const PRIVILEGE = 'privilege';
 const NOM_FIC = 'nomFic';
+$nomTable = "chanson";
 require_once("lib/utilssi.php");
 require_once("document.php");
 require_once("chanson.php");
@@ -11,6 +12,42 @@ if ($_SESSION [PRIVILEGE] <= 1) {
 
 $nomTable = "chanson";
 $_chanson = new Chanson();
+
+function telechargeImageFromUrl($monUrl, $nomFichier, $id)
+{
+    $repertoire = "../data/chansons/$id/";
+    $file = file_get_contents($monUrl);
+    $cheminFichier = "vide";
+
+    $isImageJpg = (bin2hex($file[0]) == 'ff' && bin2hex($file[1]) == 'd8');
+    if ($isImageJpg){
+        $nomFichier .= ".jpg";
+        $cheminFichier = $repertoire . $nomFichier;
+    }
+
+    $isImagePng = (bin2hex($file[0]) == '89' && $file[1] == 'P' && $file[2] == 'N' && $file[3] == 'G');
+    if ($isImagePng){
+        $nomFichier .= ".png";
+        $cheminFichier = $repertoire . $nomFichier;
+    }
+
+    if ($cheminFichier <> "vide")
+    {
+        // On  enregistre le fichier sur disque
+        file_put_contents ($cheminFichier, $file);
+        // On met à jour en base de données
+        $size = filesize($cheminFichier);
+        $version = creeModifieDocument($nomFichier, $size, "chanson", $id);
+        // Il faut renommer le doc en lui accolant son numéro de version
+        rename($repertoire . $nomFichier, $repertoire . composeNomVersion($nomFichier, $version));
+    }
+/*
+    echo "téléchargement de $monUrl<br>";
+    echo " contenu : $file <br>";
+    echo "vers fichier : $cheminFichier";
+    exit();
+*/
+}
 
 if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
     $id = $_GET ['id'];
@@ -37,8 +74,6 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     }
     $fdate = $_POST['fdate'];
 }
-//else
-//    echo "On est PAS enPOST!!!";
 
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
 if ($mode == "MAJ") {
@@ -53,6 +88,28 @@ if ($mode == "MAJ") {
     }
     $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
     $_chanson->creeModifieChansonBDD();
+}
+
+// On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
+if ($mode == "MAJ_SONGBPM") {
+        // On doit recharger les hits, le user et la date pour qu'ils ne soient remis à zéro
+        $_chanson->chercheChanson($id);
+        $fhits = $_chanson->getHits();
+        $fidUser = $_chanson->getIdUser();
+        $fdate = $_chanson->getDatePub();
+        $fnom = $_chanson->getNom();
+        $finterprete = $_chanson->getInterprete();
+        $fpulsation = $_chanson->getPulsation();
+    $fannee = $_GET ['annee'];
+    $ftempo = $_GET ['tempo'];
+    $fmesure = $_GET ['mesure'];
+    $ftonalite = $_GET ['tonalite'];
+    $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
+    $_chanson->creeModifieChansonBDD();
+    $fimage = $_GET ['image'];
+    echo "télécharge fichier" . $fnom . "-" . $finterprete . " depuis url " .$fimage;
+    telechargeImageFromUrl($fimage, $fnom . "-" . $finterprete , $id);
+
 }
 
 // Gestion de la demande de suppression
