@@ -36,7 +36,7 @@ function counter($dir)
 
     $nbLines = 0;
 
-    while (($file = readdir($handle)) != false) {
+    while (($file = readdir($handle)) ) {
         if ($file != "." && $file != "..") {
             if (!is_dir($dir . "/" . $file)) {
                 if (preg_match("#\.(php|html|txt)$#", $file)) {

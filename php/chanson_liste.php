@@ -26,7 +26,7 @@ $contenuHtml .= entreBalise("Chansons", "H1");
 
 // Gestion du paramètre de tri
 // On prend en compte une demande de tri ascendant
-if (isset ($_GET [TRI]) && isset ($_GET [TRI])) {
+if (isset ($_GET [TRI]) ) {
     $_SESSION[TRI] = $_GET [TRI];
     $_SESSION[ORDRE_ASC] = true;
     // echo "session tri = get tro = " . $_SESSION['tri'] = $_GET ['tri'];
@@ -99,7 +99,7 @@ if ($_SESSION [PRIVILEGE] > 1) {
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 
-$contenuHtml .= TblDebut(0);
+$contenuHtml .= TblDebut();
 $contenuHtml .= TblEnteteDebut() . TblDebutLigne();
 $contenuHtml .= TblEntete("  -  ");
 $contenuHtml .= TblEntete("  Pochette  ");
@@ -195,7 +195,7 @@ if ($_SESSION [PRIVILEGE] > 1) {
 
 // Affichage de la recherche
 require_once("chanson-v-comp-cherche.php");
-$contenuHtml .= $contenuHtmlCompCherche;
+$contenuHtml .= $contenuHtml;
 $contenuHtml .= "
 </div>\n
 </div><!-- /.container -->\n";

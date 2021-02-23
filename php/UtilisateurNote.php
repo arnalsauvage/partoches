@@ -6,6 +6,8 @@ include_once("lib/utilssi.php");
 
 class UtilisateurNote
 {
+    const PX_CCC = 'px,#ccc ';
+    const DIV = "</div>";
     private  $_id; // id ds BDD
     private $_note; // note de 1 à 5
     private $_idUtilisateur; // identifiant de l'utilisateur
@@ -38,7 +40,7 @@ class UtilisateurNote
 
         $starBar = '<div id="'.$mediaId.'">';
         $starBar .= '<div class="star_bar" style="width:'.$nbrPixelsInDiv.'px; height:'.$largeurEtoiles.'px; background: 
-    linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX.'px,#ccc '.$numEnlightedPX.'px,#ccc '.$nbrPixelsInDiv.'px);" rel=\''.$getJSON.'\'>';
+    linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX. self::PX_CCC .$numEnlightedPX. self::PX_CCC .$nbrPixelsInDiv.'px);" rel=\''.$getJSON.'\'>';
         // Une boucle pour créer le nombre d'étoiles demandées
         for ($i=1; $i<=$nombreEtoiles; $i++) {
             $starBar .= '<div title="'.$i.'/'.$nombreEtoiles.'" id="'.$i.'" class="star"';
@@ -51,7 +53,7 @@ class UtilisateurNote
             ';
             $starBar .= '></div>';
         }
-        $starBar .= '</div>';
+        $starBar .= self::DIV;
         $starBar .= '<div class="resultMedia'.$mediaId.'" style="font-size: small; color: grey">'; // We show the rate score and number of rates
         if ($maNote->getNote() == 0)
             $starBar .= 'Pas (encore) de vote';
@@ -59,9 +61,9 @@ class UtilisateurNote
 
             $starBar .= 'Note : ' . $maNote->getNote() ;
         }
-        $starBar .= '</div>';
+        $starBar .= self::DIV;
         $starBar .= '<div class="box'.$mediaId.'"></div>';
-        $starBar .= '</div>';
+        $starBar .= self::DIV;
         return $starBar;
     }
 
@@ -82,21 +84,21 @@ class UtilisateurNote
 
         $starBar = '<div id="'.$mediaId.'">';
         $starBar .= '<div class="star_bar" style="width:'.$nbrPixelsInDiv.'px; height:'.$largeurEtoiles.'px; background: 
-    linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX.'px,#ccc '.$numEnlightedPX.'px,#ccc '.$nbrPixelsInDiv.'px);" rel=\''.$getJSON.'\'>';
+    linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX. self::PX_CCC .$numEnlightedPX. self::PX_CCC .$nbrPixelsInDiv.'px);" rel=\''.$getJSON.'\'>';
         // Une boucle pour créer le nombre d'étoiles demandées
         for ($i=1; $i<=$nombreEtoiles; $i++) {
             $starBar .= '<div title="'.$i.'/'.$nombreEtoiles.'" id="'.$i.'" class="star"';
             $starBar .= '></div>';
         }
-        $starBar .= '</div>';
+        $starBar .= self::DIV;
         $starBar .= '<div class="resultMedia'.$mediaId.'" style="font-size: small; color: grey">'; // We show the rate score and number of rates
         if ($result['nbrRate'] == 0)
             $starBar .= 'Pas (encore) de vote';
         else
             $starBar .=  $result['average'] . '/' . $nombreEtoiles . ' (' . $result['nbrRate'] . ' votes)';
-        $starBar .= '</div>';
+        $starBar .= self::DIV;
         $starBar .= '<div class="box'.$mediaId.'"></div>';
-        $starBar .= '</div>';
+        $starBar .= self::DIV;
         return $starBar;
     }
 
@@ -115,7 +117,7 @@ class UtilisateurNote
         $maRequete = "SELECT * FROM noteUtilisateur WHERE idUtilisateur = '$idUtilisateur' AND idObjet = '$idObjet' AND nomObjet = '$nomObjet'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheNoteUtilisateur #1 : " . $_SESSION ['mysql']->error);
         // renvoie la ligne sélectionnée : id, idUtilisateur, nomObjet, idObjet, note
-        if (($ligne = $result->fetch_row())) {
+        if ($ligne = $result->fetch_row()) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
         } else
