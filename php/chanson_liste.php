@@ -195,7 +195,7 @@ if ($_SESSION [PRIVILEGE] > 1) {
 
 // Affichage de la recherche
 require_once("chanson-v-comp-cherche.php");
-$contenuHtml .= $contenuHtml;
+
 $contenuHtml .= "
 </div>\n
 </div><!-- /.container -->\n";

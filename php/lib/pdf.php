@@ -7,7 +7,6 @@ const ARIAL = 'Arial';
 require_once('fpdf/fpdf.php');
 require_once('fpdi/autoload.php');
 require_once('fpdi/Fpdi.php');
-
 use setasign\Fpdi\Fpdi;
 
 class SongBookPDF extends FPDI
@@ -78,15 +77,24 @@ function testePdf()
     echo "Fichier <a href='compile.pdf'>compile.pdf</a> généré à partir de Germaine et La Jument de Michao";
 }
 
-function pdfCreeSongbook($idSongBook, $intitule, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
+function pdfCreeSongbook($idSongBook, $version, $intitule, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
 {
     $pdf = new SongBookPDF();
 
     // On fait une couverture avec l'image
     $pdf->AddPage();
-    // TODO : ici on pourrait déterminer le ratio de l'image pour ne pas avoir d'image trop étirée
-    $pdf->Image(DATA_SONGBOOKS . $idSongBook . "/" . $imageCouverture, 5, 5, 200, 287);
 
+    $version++;
+    $dateDuJour = date("d/m/Y");
+    // Position at 1.5 cm from bottom
+    $pdf->Image(DATA_SONGBOOKS . $idSongBook . "/" . $imageCouverture, 5, 5, 190, 250);
+    $pdf->SetY(260);
+    $pdf->SetFont(ARIAL, 'B', 10);
+    $pdf->SetTextColor(50, 50, 50);
+    $pdf->Cell(0, 12, $intitule . " - v" . $version . " du " . $dateDuJour, 0, 0, "C");
+    // TODO : ici on pourrait déterminer le ratio de l'image pour ne pas avoir d'image trop étirée
+    // Page number
+//    $this->Cell(0, 10, 'Page ' . $this->PageNo(), 0, 0, 'C');
     // On crée un sommaire
     $pdf->AddPage();
     // Logo

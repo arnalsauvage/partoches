@@ -153,7 +153,7 @@ function imageSongbook($idSongbook)
         return ("");
 }
 
-// Cette fonction renvoie une chaine de description de la songbook
+// Cette fonction renvoie une chaine de description du songbook
 function infosSongbook($id)
 {
     $enr = chercheSongbook($id);
@@ -205,8 +205,13 @@ WHERE liendocsongbook.idSongbook =  '$id' ORDER BY liendocsongbook.ordre ASC";
     }
     $imageSongBook = imageSongBook($id);
     $ligneSongbook = chercheSongbook($id);
-
-    pdfCreeSongbook($id, $ligneSongbook[1], $imageSongBook, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
+    $nom_songbookgenere = make_alias("songbook_".$ligneSongbook[1]) .'.pdf';
+    // echo '$nom de document cherche pour la version : ' . $nom_songbookgenere;
+    $document = chercheDocumentNomTableId($nom_songbookgenere, "songbook", $id);
+    // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
+    $version = $document[4];
+    pdfCreeSongbook($id, $version, $ligneSongbook[1], $imageSongBook, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
+//     function pdfCreeSongbook($idSongBook, $version, $intitule, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
 }
 
 // Renvoie la liste des songbooks en base
