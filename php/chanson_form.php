@@ -167,7 +167,7 @@ if ($mode == "MAJ") {
             $idDoc = $ligneDoc [0];
             // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
             $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-            $fichier = "../data/chansons/$id/" . rawurlencode($fichierCourt);
+            $fichier = "../" . $_DOSSIER_CHANSONS . "$id/" . rawurlencode($fichierCourt);
             $extension = substr(strrchr($ligneDoc[1], '.'), 1);
             $icone = Image("../images/icones/$extension.png", 32, 32, "icone");
             if (!file_exists("../images/icones/$extension.png"))
@@ -210,7 +210,7 @@ if ($mode == "MAJ") {
         array_push($fichiersEnBdd, $fichierEnBdd);
     }
 
-    $fichiersSurDisque = $_chanson->fichiersChanson(); // repertoire nom extension
+    $fichiersSurDisque = $_chanson->fichiersChanson($_DOSSIER_CHANSONS); // repertoire nom extension
 //    $maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')";
 
     $nbFichiersKO = 0;
@@ -233,7 +233,7 @@ if ($mode == "MAJ") {
         if (! $fichierOk) {
             $nbFichiersKO++;
             echo "Fichier corbeille : " . $fichierSurDisque[1] . " non répertorié par la Bdd ";
-            echo boutonSuppression("chanson_post.php?nomFic=" . urlencode("../data/chansons/" . $id . "/" . $fichierSurDisque[1]) . "&mode=SUPPRFIC&id=$id", $iconePoubelle, $cheminImages) . "<br>";
+            echo boutonSuppression("chanson_post.php?nomFic=" . urlencode("../".$_DOSSIER_CHANSONS . $id . "/" . $fichierSurDisque[1] . "&mode=SUPPRFIC&id=$id", $iconePoubelle, $cheminImages) . "<br>$numeroElement=;";
             $numeroElement = count($fichiersSurDisque) + 1;
             ?>
             <button onclick='restaureDocument<?php echo $numeroElement; ?>()'>Restaurer le document dans la chanson

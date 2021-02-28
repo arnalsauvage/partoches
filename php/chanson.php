@@ -399,11 +399,11 @@ class Chanson
         return $retour . "<BR>\n";
     }
 
-// Cette fonction renvoie la liste des fichiers dans le repertoire de la chanson ../data/chansons/#id/
-    public function fichiersChanson()
+// Cette fonction renvoie la liste des fichiers dans le repertoire de la chanson ../".$_DOSSIER_CHANSONS/id/
+    public function fichiersChanson($dossier)
     {
         $retour = array();// repertoire, nom, extension
-        $repertoire = "../data/chansons/$this->_id/";
+        $repertoire = "../" . $dossier . $this->_id;
         if (is_dir($repertoire)) {
             foreach (new DirectoryIterator ($repertoire) as $fileInfo) {
                 if ($fileInfo->isDot() || strpos($fileInfo->getFilename(), ".") == 0) {

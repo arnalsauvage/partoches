@@ -125,8 +125,7 @@ if ($mode == "MAJ") {
 
     <h2>Liste des documents dans ce songbook</h2>
     <p>Voici la liste des documents rattachés au songbook :grilles, partoches, partitions...</p>
-    <p>Il est possible de changer l'ordre des documents via les chevrons (déplacement d'un cran) ou les fléches (début
-        ou fin de la liste)</p>
+    <p>Il est possible de changer l'ordre des documents en déplaçant les titres dans la liste à la souris (drag'n drop)</p>
     <?php
     $lignes = chercheLiensDocSongbook('idSongbook', $id, "ordre", true);
     $listeDocs = "<ul id='sortable'>";
@@ -136,7 +135,7 @@ if ($mode == "MAJ") {
         $ligneDoc = chercheDocument($ligne [1]);
         $idDoc = $ligneDoc[0];
         $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-        $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . urlencode($fichierCourt);
+        $fichier = "../".$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . urlencode($fichierCourt);
         $listeDocs .= "<li class='ui-state-default' data-index='$idDoc' data-position='$numero'>";
         $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, ICONE);
         if (!file_exists("../images/icones/" . $fichier [2] . ".png")) {

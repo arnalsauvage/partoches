@@ -18,7 +18,7 @@ if (!isset ($_FILES [FICHIER_UPLOADE])) {
 // TODO : créer un paramètre d'application modifiable par l'admin
 $autorisees = "pdf doc docx gif jpg png swf mp3 odt svg crd txt m4a";
 
-$repertoire = "../data/chansons/" . $_POST ['id'] . "/";
+$repertoire = "../".$_DOSSIER_CHANSONS . $_POST ['id'] . "/";
 if (!file_exists($repertoire)) {
     mkdir($repertoire, 0755);
     // echo " -=> Création du repertoire $repertoire réussi<br>";

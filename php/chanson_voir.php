@@ -23,7 +23,7 @@ if (!is_numeric($_GET['id'])) {
 
 $idChanson = $_GET['id'];
 $_chanson = new Chanson ($idChanson);
-$fichiersDuSongbook = $_chanson->fichiersChanson();
+$fichiersDuSongbook = $_chanson->fichiersChanson($_DOSSIER_CHANSONS);
 
 // On choisit une des images du songbook
 $monImage = imageTableId(CHANSON, $idChanson);
@@ -62,7 +62,7 @@ $contenuHtml .= FIN_SECTION;
 $contenuHtml .= "<section class='col-sm-4'>";
 
 if ("" != $monImage) {
-    $contenuHtml .= Image("../data/chansons/" . $idChanson . "/" . $monImage, 200, "", "pochette", "img-thumbnail");
+    $contenuHtml .= Image("../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $monImage, 200, "", "pochette", "img-thumbnail");
 }
 
 if ($_SESSION['privilege'] > 0) {
@@ -87,7 +87,7 @@ if ($result->num_rows > 0) {
     while ($ligne = $result->fetch_row()) {
         $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
         $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
-        // $fichier = "../data/chansons/" . $idChanson . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
+        // $fichier = "../".$_DOSSIER_CHANSONS" . $idChanson . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
         $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
         $extension = substr(strrchr($ligne [1], '.'), 1);
         $icone = Image("../images/icones/" . $extension . ".png", 32, 32, "icone");

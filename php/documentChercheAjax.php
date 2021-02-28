@@ -63,7 +63,7 @@ $nombreItems = 0;
 $nombreItemsMax = 10;
 while (($ligneDoc = $listeDocs->fetch_row()) && ($nombreItems<$nombreItemsMax)) {
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+    $fichier = "../".$_DOSSIER_CHANSONS" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
     //echo "extension " . $extension . " et filtre : " . $nom . " - " ;
     if ($typeDocument != $extension) {

@@ -12,3 +12,6 @@ $_SESSION ['loginParam'] = $ini_objet->m_valeur("loginParam", "general");
 $niveauDeLog = $ini_objet->m_valeur("niveauDeLog", "general");
 // echo "Niveau de log : " . $niveauDeLog;
 
+$_DOSSIER_DATA = "data/";
+$_DOSSIER_CHANSONS = $_DOSSIER_DATA . "chansons/";
+$_DOSSIER_SONGBOOKS = $_DOSSIER_DATA . "songbooks/";

@@ -15,7 +15,7 @@ $_chanson = new Chanson();
 
 function telechargeImageFromUrl($monUrl, $nomFichier, $id)
 {
-    $repertoire = "../data/chansons/$id/";
+    $repertoire = "../" . $_DOSSIER_CHANSONS . $id . "/";
     $file = file_get_contents($monUrl);
     $cheminFichier = "vide";
 
@@ -128,6 +128,11 @@ if ($mode == "INS") {
     }
     $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
     $id = $_chanson->creeChansonBDD();
+    $repertoire = "../".$_DOSSIER_CHANSONS . $id . "/";
+    if (!file_exists($repertoire)) {
+        mkdir($repertoire, 0755);
+        // echo " -=> Création du repertoire $repertoire réussi<br>";
+    }
 }
 
 // Gestion de la demande de suppression de document dans la chanson
@@ -157,7 +162,7 @@ if ($mode == "SUPPRFIC" && $_SESSION [PRIVILEGE] > 1) {
 
 if ($mode == "RESTAUREDOC") {
 
-    $repertoire = "../data/chansons/" . $_POST ['id'] . "/";
+    $repertoire = "../".$_DOSSIER_CHANSONS . $_POST ['id'] . "/";
     $size = filesize($repertoire . $_POST [NOM_FIC]);
     $version = creeModifieDocument($_POST [NOM_FIC], $size, "chanson", $id);
     // Il faut renommer le doc en lui accolant son numéro de version

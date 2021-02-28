@@ -104,7 +104,7 @@ $table = "songbook";
                 $ligneDoc = chercheDocument($ligne [1]);
                 $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
 
-                $fichier = "../data/chansons/" . $ligneDoc [6] . "/" . myUrlEncode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
+                $fichier = "../".$_DOSSIER_CHANSONS" . $ligneDoc [6] . "/" . myUrlEncode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
                 $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, "icone");
                 if (!file_exists("../images/icones/" . $fichier [2] . ".png")) {
                     $icone = Image("../images/icones/fichier.png", 32, 32, "icone");

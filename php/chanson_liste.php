@@ -122,7 +122,7 @@ if ($_SESSION [PRIVILEGE] > 1) {
 $contenuHtml .= TblFinLigne() . TblEnteteFin();
 $contenuHtml .= TblCorpsDebut();
 
-$cheminImagesChanson = "../data/chansons/";
+$cheminImagesChanson = "../".$_DOSSIER_CHANSONS";
 $_chanson = new Chanson();
 $maNote = new UtilisateurNote(0, 1, 1, 1);
 
