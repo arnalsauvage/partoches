@@ -6,6 +6,7 @@ require_once("songbook.php");
 require_once("document.php");
 require_once("chanson.php");
 $table = "songbook";
+global $_DOSSIER_CHANSONS;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -78,22 +79,20 @@ $table = "songbook";
 
             <?php
             // Si on n'a pas de pdf pour le songbook, on affiche juste l'image
+            $largeur_max = 200;
+            $hauteur_max = "";
+            $baliseImage = afficheVignette($imageSongBook, "../data/songbooks/$songbook[0]/" , "../data/songbooks/vignettes/");
             if ($pdfSongbook == "vide") {
-                ?>
-                
-					<img
-						src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>" loading="lazy"  alt="<?= $songbook[1] ?>"/>
-             <?php
+                echo $baliseImage;
             } else {
                 // Sinon, on affiche un lien vers le doc + l'image
                 ?>
-						<a href="../data/songbooks/<?= myUrlEncode($songbook[0]) ?>/<?= $pdfSongbook ?>"
-						   target="_blank">
-						   <img src="../data/songbooks/<?= $songbook[0] ?>/<?= $imageSongBook ?>" loading="lazy"
-								alt="<?= $songbook[1] ?>"/></a>
-						<?php
+						<a href="../data/songbooks/<?= myUrlEncode($songbook[0]) ?>/<?= $pdfSongbook ?>" target="_blank">
+			<?php
+                echo $baliseImage;
             }
             ?>
+            </a>
             </div>
 			<div class="titres">
                 <?php
@@ -104,7 +103,7 @@ $table = "songbook";
                 $ligneDoc = chercheDocument($ligne [1]);
                 $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
 
-                $fichier = "../".$_DOSSIER_CHANSONS" . $ligneDoc [6] . "/" . myUrlEncode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
+                $fichier = "../" . $_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . myUrlEncode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
                 $icone = Image("../images/icones/" . $fichier [2] . ".png", 32, 32, "icone");
                 if (!file_exists("../images/icones/" . $fichier [2] . ".png")) {
                     $icone = Image("../images/icones/fichier.png", 32, 32, "icone");

@@ -8,6 +8,9 @@ require_once("songbook.php");
 require_once("lib/formulaire.php");
 $table =  CHANSON;
 $sortie = "";
+global $iconePoubelle;
+global $cheminImages;
+global $_DOSSIER_CHANSONS;
 
 $listeSongbooks =[];
 $listeSongbooks = listeSongbooks();
@@ -230,10 +233,12 @@ if ($mode == "MAJ") {
                 //echo "Fichier $fichierSurDisque[1] trouvé !!!!!!!!!!!!!!!!!!!<br>";
             }
         }
+        $numeroElement = 1;
         if (! $fichierOk) {
             $nbFichiersKO++;
             echo "Fichier corbeille : " . $fichierSurDisque[1] . " non répertorié par la Bdd ";
-            echo boutonSuppression("chanson_post.php?nomFic=" . urlencode("../".$_DOSSIER_CHANSONS . $id . "/" . $fichierSurDisque[1] . "&mode=SUPPRFIC&id=$id", $iconePoubelle, $cheminImages) . "<br>$numeroElement=;";
+            $urlFichier = "chanson_post.php?nomFic=" . urlencode("../".$_DOSSIER_CHANSONS . $id . "/" . $fichierSurDisque[1] . "&mode=SUPPRFIC&id=$id");
+            echo boutonSuppression($urlFichier, $iconePoubelle, $cheminImages) . "<br>$numeroElement";
             $numeroElement = count($fichiersSurDisque) + 1;
             ?>
             <button onclick='restaureDocument<?php echo $numeroElement; ?>()'>Restaurer le document dans la chanson

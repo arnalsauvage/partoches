@@ -19,6 +19,11 @@ $chansonVoir = "chanson_voir.php";
 $table = CHANSON;
 $nombreChansonsParPage = 20;
 
+global $cheminImages;
+global $iconeEdit;
+global $iconePoubelle;
+global $contenuHtmlCompCherche;
+
 $contenuHtml = "<div class='container'> \n
   <div class='starter-template'> \n";
 
@@ -122,7 +127,9 @@ if ($_SESSION [PRIVILEGE] > 1) {
 $contenuHtml .= TblFinLigne() . TblEnteteFin();
 $contenuHtml .= TblCorpsDebut();
 
-$cheminImagesChanson = "../".$_DOSSIER_CHANSONS";
+global $_DOSSIER_CHANSONS;
+
+$cheminImagesChanson = "../".$_DOSSIER_CHANSONS;
 $_chanson = new Chanson();
 $maNote = new UtilisateurNote(0, 1, 1, 1);
 

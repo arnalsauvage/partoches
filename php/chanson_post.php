@@ -10,12 +10,14 @@ if ($_SESSION [PRIVILEGE] <= 1) {
     redirection($nomTable . "_liste.php");
 }
 
+global $_DOSSIER_CHANSONS;
+
 $nomTable = "chanson";
 $_chanson = new Chanson();
 
-function telechargeImageFromUrl($monUrl, $nomFichier, $id)
+function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest)
 {
-    $repertoire = "../" . $_DOSSIER_CHANSONS . $id . "/";
+    $repertoire = "../" . $dossierDest . $id . "/";
     $file = file_get_contents($monUrl);
     $cheminFichier = "vide";
 
@@ -108,7 +110,7 @@ if ($mode == "MAJ_SONGBPM") {
     $_chanson->creeModifieChansonBDD();
     $fimage = $_GET ['image'];
     echo "télécharge fichier" . $fnom . "-" . $finterprete . " depuis url " .$fimage;
-    telechargeImageFromUrl($fimage, $fnom . "-" . $finterprete , $id);
+    telechargeImageFromUrl($fimage, $fnom . "-" . $finterprete , $id, $_DOSSIER_CHANSONS);
 
 }
 
@@ -128,10 +130,10 @@ if ($mode == "INS") {
     }
     $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
     $id = $_chanson->creeChansonBDD();
-    $repertoire = "../".$_DOSSIER_CHANSONS . $id . "/";
+    $repertoire = "../". $_DOSSIER_CHANSONS . $id . "/";
     if (!file_exists($repertoire)) {
         mkdir($repertoire, 0755);
-        // echo " -=> Création du repertoire $repertoire réussi<br>";
+        echo " -=> Création du repertoire $repertoire réussi<br>";
     }
 }
 

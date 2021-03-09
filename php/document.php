@@ -3,7 +3,7 @@ include_once("lib/utilssi.php");
 include_once "lib/configMysql.php";
 include_once("lienDocSongbook.php");
 
-// Fonctions de gestion de la document
+// Fonctions de gestion de document
 
 // TODO : faire une fonction de contrôle des documents sur disque :
 // Documents sur disque non vus en BDD & documents BDD non vus sur disque
