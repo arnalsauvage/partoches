@@ -6,18 +6,18 @@
 // function supprime_fichier_BD($nomFichier,$connexion)
 // function actualise_fichier_BD($nomFichier,$connexion)
 const LOGS_FICHIERLOG_HTM = "../logs/fichierlog.htm";
-function afficheVignette($image, $cheminImages, $cheminVignettes)
+function afficheVignette($image, $cheminImages, $cheminVignettes, $alt='vignette')
 {
-    global $largeur_max;
-    global $hauteur_max;
+    global $largeur_max_vignette;
+    global $hauteur_max_vignette;
 
     // Si la vignette n'existe pas
     if (!file_exists($cheminVignettes . $image)) {
         // On crée une vignette
-        creation_vignette($image, $largeur_max, $hauteur_max, $cheminImages, $cheminVignettes, "");
+        creation_vignette($image, $largeur_max_vignette, $hauteur_max_vignette, $cheminImages, $cheminVignettes);
     }
         // On retourne le code de la vignette
-    return ("<img class = 'vignette' loading='lazy' SRC='$cheminVignettes$image'>");
+    return ("<img class = 'vignette' loading='lazy' alt='$alt' src='$cheminVignettes$image'>");
 }
 
 /**
@@ -41,8 +41,8 @@ function afficheVignette($image, $cheminImages, $cheminVignettes)
 /* CREATION DE VIGNETTE */
 /* ------------------------------------- */
 /* $image: Nom de l'image originale */
-/* $largeur_max : largeur max de la vignette */
-/* $hauteur_max : hauteur max de la vignette */
+/* $largeur : largeur max de la vignette */
+/* $hauteur : hauteur max de la vignette */
 /* $source: Chemin relatif du répertoire de l'image originale */
 /* $destination: Chemin relatif du répertoire de l'image réduite */
 /* $prefixe : Prefixe de la vignette */
@@ -51,16 +51,16 @@ function afficheVignette($image, $cheminImages, $cheminVignettes)
  */
 function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $destination = "", $prefixe = "")
 {
-    global $cheminVignettes, $largeur_max, $hauteur_max, $cheminImages;
+    global $cheminVignettes, $largeur_max_vignette, $hauteur_max_vignette, $cheminImages;
 
     if ($destination == "") {
         $destination = $cheminVignettes;
     }
     if ($largeur == "") {
-        $largeur = $largeur_max;
+        $largeur = $largeur_max_vignette;
     }
     if ($hauteur == "") {
-        $hauteur = $hauteur_max;
+        $hauteur = $hauteur_max_vignette;
     }
     if ($source == "") {
         $source = $cheminImages;
@@ -118,15 +118,15 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
             }
 
             // on verifie que l'image source ne soit pas plus petite que l'image de destination
-            if ($hauteur_max=="") {
-                $ratio = $largeur_src / $largeur_max;
+            if ($hauteur_max_vignette=="") {
+                $ratio = $largeur_src / $largeur_max_vignette;
                 $hauteur = round ( $hauteur_src / $ratio);
-                $largeur = $largeur_max;
+                $largeur = $largeur_max_vignette;
             }
-            if ($largeur_max=="") {
-                $ratio = $hauteur_src / $hauteur_max;
+            if ($largeur_max_vignette=="") {
+                $ratio = $hauteur_src / $hauteur_max_vignette;
                 $largeur = round( $largeur_src/$ratio);
-                $hauteur = $hauteur_max;
+                $hauteur = $hauteur_max_vignette;
             }
             $image_dest = imagecreatetruecolor($largeur, $hauteur);
             imagecopyresized($image_dest, $image_src, 0, 0, 0, 0, $largeur, $hauteur, $largeur_src, $hauteur_src);

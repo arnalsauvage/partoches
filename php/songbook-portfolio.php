@@ -81,7 +81,7 @@ global $_DOSSIER_CHANSONS;
             // Si on n'a pas de pdf pour le songbook, on affiche juste l'image
             $largeur_max = 200;
             $hauteur_max = "";
-            $baliseImage = afficheVignette($imageSongBook, "../data/songbooks/$songbook[0]/" , "../data/songbooks/vignettes/");
+            $baliseImage = afficheVignette($imageSongBook, "../data/songbooks/$songbook[0]/" , "../data/songbooks/vignettes/", "vignette songbook");
             if ($pdfSongbook == "vide") {
                 echo $baliseImage;
             } else {
@@ -96,7 +96,7 @@ global $_DOSSIER_CHANSONS;
             </div>
 			<div class="titres">
                 <?php
-            $lignes = chercheLiensDocSongbook('idSongbook', $songbook [0], "ordre", true);
+            $lignes = chercheLiensDocSongbook('idSongbook', $songbook [0], "ordre");
             $listeDocs = "";
             $iconeMusique = "<span class='glyphicon glyphicon-music'></span>";
             while ($ligne = $lignes->fetch_row()) {

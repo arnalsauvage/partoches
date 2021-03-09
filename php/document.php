@@ -1,4 +1,5 @@
 <?php
+define("DOSSIER_DATA" ,"../data/");
 include_once("lib/utilssi.php");
 include_once "lib/configMysql.php";
 include_once("lienDocSongbook.php");
@@ -14,10 +15,7 @@ include_once("lienDocSongbook.php");
 function chercheDocuments($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM document WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
-    if ($bTriAscendant == false)
-        $maRequete .= " DESC";
-    else
-        $maRequete .= " ASC";
+    $maRequete = !$bTriAscendant ? $maRequete . " DESC" : $maRequete . " ASC";
     // echo "ma requete : " . $maRequete;
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #1 : " . $_SESSION ['mysql']->error);
     return $result;
@@ -27,12 +25,14 @@ function chercheDocuments($critere, $valeur, $critereTri = 'nom', $bTriAscendant
 function chercheDocument($id)
 {
     $maRequete = "SELECT * FROM document WHERE document.id = '$id'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #1 : " . $_SESSION ['mysql']->error);
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #2 : " . $_SESSION ['mysql']->error);
     // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-    if (($ligne = $result->fetch_row()))
+    if ($ligne = $result->fetch_row()) {
         return ($ligne);
-    else
+    }
+    else {
         return (0);
+    }
 }
 
 // Cherche un document et le renvoie s'il existe
@@ -41,17 +41,19 @@ function chercheDocumentNomTableId($nom, $table, $id)
     $maRequete = "SELECT * FROM document WHERE document.nom = '$nom' AND document.idTable = '$id' AND document.nomTable = '$table'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #1 : " . $_SESSION ['mysql']->error);
     // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-    if (($ligne = $result->fetch_row()))
+    if (($ligne = $result->fetch_row())) {
         return ($ligne);
-    else
+    }
+    else {
         return (0);
+    }
 }
 
 // Cherche les documents d'une entree d'une table et les renvoie s'ils existent
 function chercheDocumentsTableId($table, $id)
 {
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$id' AND document.nomTable = '$table' ORDER BY document.id ASC";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheDocumentsTableId #1 : " . $_SESSION ['mysql']->error);
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheDocumentsTableId #3 : " . $_SESSION ['mysql']->error);
     return ($result);
 }
 
@@ -76,12 +78,13 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable)
     $version = 1;
 
     $resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
-    if ($resultat != NULL)
+    if ($resultat != NULL) {
         return false;
+    }
     $idUser = $_SESSION ['id'];
     $maRequete = "INSERT INTO document VALUES (NULL, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creedocument#1 : " . $_SESSION ['mysql']->error);
-    return true;
+    return $result;
 }
 
 // Modifie en base le document
@@ -99,15 +102,17 @@ function modifieDocument($nom, $tailleKo, $nomTable, $idTable)
     $idUser = $_SESSION ['id'];
 
     $resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
-    if ($resultat == NULL)
+    if ($resultat == NULL) {
         return false;
-    else
+    }
+    else {
         $version = $resultat [4] + 1;
+    }
 
     $maRequete = "UPDATE  document
 	SET tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser'
 	WHERE nom = '$nom' AND nomTable = '$nomTable' and idTable = '$idTable'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiedocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
+    $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiedocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
 
     return $version;
 }
@@ -117,29 +122,31 @@ function renommeDocument($id, $nouveauNom)
 {
     $document = chercheDocument($id);
     //id, nom, taille, date, version, nomTable, idTable, idUser
-    $tailleko = $document[2];
     $nomTable = $document[5];
     $idTable = $document[6];
     $idUser = $document[7];
 
     // regarder s'il existe un fichier avec le nouveau nom
-    $fichier = "../data/" . $nomTable . "s/" . $idTable . "/" . $nouveauNom;
+    $fichier = DOSSIER_DATA . $nomTable . "s/" . $idTable . "/" . $nouveauNom;
     if (file_exists($fichier))
         // s'il existe, renvoyer -2
+    {
         return -2;
+    }
 
-    $ancienNomFic = "../data/" . $nomTable . "s/" . $idTable . "/" . composeNomVersion($document[1], $document[4]);
-    $nouveauNomFic = "../data/" . $nomTable . "s/" . $idTable . "/" . composeNomVersion($nouveauNom, $document[4]);
+    $ancienNomFic = DOSSIER_DATA . $nomTable . "s/" . $idTable . "/" . composeNomVersion($document[1], $document[4]);
+    $nouveauNomFic = DOSSIER_DATA . $nomTable . "s/" . $idTable . "/" . composeNomVersion($nouveauNom, $document[4]);
     // renommer le fichier
     $resultRename = rename($ancienNomFic, $nouveauNomFic);
-    if ($resultRename == false)
+    if (!$resultRename) {
         return -3;
+    }
 
     // mettre a jour base de données
     $maRequete = "UPDATE  document
 	SET nom = '$nouveauNom', idUser = '$idUser'
 	WHERE id = '$id'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème renommeDocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
+    $_SESSION ['mysql']->query($maRequete) or die ("Problème renommeDocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
 
     // renvoyer vrai
     return 1;
@@ -151,7 +158,7 @@ function supprimeDocument($id)
     // On supprime les enregistrements dans la table document
     $maRequete = "DELETE FROM document
 	WHERE id='$id'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimedocument : " . $_SESSION ['mysql']->error);
+    $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimedocument : " . $_SESSION ['mysql']->error);
     // On supprime également toutes les entrées Songbook lui correspondant
     supprimeliensDocSongbookDuDocument($id);
 }
@@ -160,10 +167,12 @@ function supprimeDocument($id)
 function creeModifieDocument($nom, $tailleKo, $nomTable, $idTable)
 {
     $resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
-    if ($resultat == NULL)
+    if ($resultat == NULL) {
         return creeDocument($nom, $tailleKo, $nomTable, $idTable);
-    else
+    }
+    else {
         return modifieDocument($nom, $tailleKo, $nomTable, $idTable);
+    }
 }
 
 // Prépare un combo en html avec les documents correspondant à un critère et triés selon un critereTri
@@ -174,8 +183,9 @@ function selectDocument($critere, $valeur, $critereTri = 'nom', $bTriAscendant =
     // Ajouter des options
     $lignes = chercheDocuments($critere, $valeur, $critereTri, $bTriAscendant);
     while ($ligne = $lignes->fetch_row()) {
-        if (strstr($ligne[1], "pdf"))
+        if (strstr($ligne[1], "pdf")) {
             $retour .= "<option  value = '" . $ligne [0] . "'> " . htmlEntities($ligne [1] . " " . $ligne[3], ENT_HTML5) . "</option>\n";
+        }
     }
     $retour .= "</select>\n";
     return $retour;
@@ -188,7 +198,7 @@ function lienUrlAffichageDocument($idDoc)
     if ($ligne != 0) {
         // Le fichier est stocke dans le répertoire data/NOMTABLEs/IDTABLE
         // ex: nom table = chanson, dossier = data/chansons/123/
-        $url = "../data/" . $ligne [5] . "s/" . $ligne [6] . "/" . composeNomVersion($ligne [1], $ligne [4]);
+        $url = DOSSIER_DATA . $ligne [5] . "s/" . $ligne [6] . "/" . composeNomVersion($ligne [1], $ligne [4]);
     } else {
         $url = "";
     }
@@ -217,8 +227,9 @@ function infosDocument($nom)
         // id_journee id_joueur poste statut
         $retour = "id : " . $enr [0] . " nom : " . $enr [1] . " taille(ko) : " . $enr [2] . " Date : " . $enr [3];
         $retour .= " Version : " . $enr [4] . "nomTable : " . $enr [5] . " idTable : " . $enr [6] . " hits : " . $enr [8];
-    } else
+    } else {
         $retour = "$nom pas trouvé...";
+    }
     return $retour . "<BR>\n";
 }
 
@@ -258,16 +269,17 @@ function imageTableId($table, $id)
     }
     $tableImages = array();
     // renvoie la ligne sélectionnée : id, nom, taille, date , version, nomtable, idTable, idUser, hits
-    while (($ligne = $result->fetch_row()))
+    while ($ligne = $result->fetch_row()) {
         array_push($tableImages, $ligne);
-    if (count($tableImages) == 0)
-        return ("");
-    else {
-        srand();
-        $imageChoisie = rand(0, count($tableImages) - 1);
-        $ligne = $tableImages [$imageChoisie];
-        return (composeNomVersion($ligne [1], $ligne [4]));
     }
+    if (empty($tableImages)) {
+        return ("");
+    }
+    srand();
+    $imageChoisie = rand(0, count($tableImages) - 1);
+    $ligne = $tableImages [$imageChoisie];
+    return (composeNomVersion($ligne [1], $ligne [4]));
+
 }
 
 // testeDocument ();

@@ -19,6 +19,6 @@ $tailleicones = 64;
 
 // Pour les vignettes
 $cheminVignettes = "../vignettes/";
-$largeur_max = 128;
-$hauteur_max = 100;  
+$largeur_max_vignette = 128;
+$hauteur_max_vignette = 100;
 
