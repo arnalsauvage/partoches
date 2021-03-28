@@ -172,7 +172,7 @@ function testeCreeSongBook()
     $listeIdChanson = [154];
     $listeVersionsDoc = [4];
 
-    pdfCreeSongbook(45, "Songbook test", "AuBonheurDesDames-v1.jpg", $listeNomsChanson, $listeNomsFichiers, $listeIdChanson , $listeVersionsDoc);
+    pdfCreeSongbook(45, "2","Songbook test", "AuBonheurDesDames-v1.jpg", $listeNomsChanson, $listeNomsFichiers, $listeIdChanson , $listeVersionsDoc);
 }
 
 //testePdf();
