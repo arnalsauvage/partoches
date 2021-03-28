@@ -9,6 +9,8 @@ require_once('fpdi/autoload.php');
 require_once('fpdi/Fpdi.php');
 use setasign\Fpdi\Fpdi;
 
+const DOSSIER_CHANSONS = "data/chansons/";
+
 class SongBookPDF extends FPDI
 {
 
@@ -127,7 +129,7 @@ function pdfCreeSongbook($idSongBook, $version, $intitule, $imageCouverture, $li
         $nomFichier = composeNomVersion($nomFichier, $versionDoc);
         //echo ("Tentative d'ajout du fichier : ".$nomFichier . "\n<br>");
         try {
-            ajouteFichier($pdf, "../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $nomFichier);
+            ajouteFichier($pdf, "../" . DOSSIER_CHANSONS . $idChanson . "/" . $nomFichier);
         } catch (Exception $e) {
             echo "Le fichier $nomFichier n'a pas été traité. <br> Exception reçue : ", $e->getMessage(), "\n<br>";
         }

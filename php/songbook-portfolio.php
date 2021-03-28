@@ -26,7 +26,7 @@ global $_DOSSIER_CHANSONS;
     <meta name="description" content="sur partoches, les amis de top 5 partagent des partoohes de ukulélé venues
     de top 5 ou d'ailleurs, pour le plaisir de chanter, en grattant son ukulélé.">
     <link rel="stylesheet" type="text/css" href="../css/styles.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
     <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120-precomposed.png"/>
@@ -79,8 +79,8 @@ global $_DOSSIER_CHANSONS;
 
             <?php
             // Si on n'a pas de pdf pour le songbook, on affiche juste l'image
-            $largeur_max = 200;
-            $hauteur_max = "";
+            $largeur_max_vignette = 200;
+            $hauteur_max_vignette = "";
             $baliseImage = afficheVignette($imageSongBook, "../data/songbooks/$songbook[0]/" , "../data/songbooks/vignettes/", "vignette songbook");
             if ($pdfSongbook == "vide") {
                 echo $baliseImage;

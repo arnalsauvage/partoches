@@ -420,28 +420,46 @@ class Chanson
     }
 
 // Cherche les chansons sur le titre ou l'interprete, renvoie le tableau des identifiants
-    public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true)
+    public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true, $champFiltre ="", $valfiltre="")
     {
         $critere = $_SESSION [self::MYSQL]->real_escape_string($critere);
 
+        $maRequete = "SELECT id FROM chanson";
+        $_bool_where_defini = false;
         if ($critere!= "" && $critere!="%") {
-            $maRequete = "SELECT id FROM chanson WHERE nom  LIKE '$critere' OR interprete LIKE '$critere' ORDER BY $critereTri";
+            $maRequete .= " WHERE ( nom LIKE '$critere' OR interprete LIKE '$critere' )";
+            $_bool_where_defini = true;
         }
-        else {
-            $maRequete = "SELECT id FROM chanson ORDER BY $critereTri";
-            if ($critere=="votes"|| $critereTri =="votes"){
-                if ($_SESSION['privilege']==0){
-                    $maRequete = "SELECT chanson.id  FROM chanson 
-                    RIGHT JOIN noteUtilisateur on noteUtilisateur.idObjet = chanson.id 
-                    WHERE noteUtilisateur.nomObjet = 'chanson' OR noteUtilisateur.nomObjet = NULL
-                    GROUP BY chanson.id ORDER BY COALESCE(AVG(noteUtilisateur.note),0) ";
-                } else{
-                    $maRequete = "SELECT  noteUtilisateur.idObjet FROM noteUtilisateur 
-                    WHERE noteUtilisateur.nomObjet = 'chanson' AND noteUtilisateur.idUtilisateur = '" . $_SESSION['id'] ."'
-                    ORDER BY noteUtilisateur.note";
-                }
+
+        if ($champFiltre <> "" && $valfiltre <>"") {
+            if (!$_bool_where_defini) {
+                $maRequete .= " WHERE ";
+            }
+            else {
+                $maRequete .= " AND ";
+            }
+            if ($champFiltre == "contributeur") {
+                $maRequete .= " iduser =  " . $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
+
+            }
+            if ($champFiltre == 'tempo' || $champFiltre == 'mesure' || $champFiltre == 'tonalite' || $champFiltre == 'pulsation' || $champFiltre == 'annee'|| $champFiltre == 'interprete') {
+                $maRequete .= $champFiltre . " =  '" . $_SESSION[self::MYSQL]->real_escape_string($valfiltre) . "'";
             }
         }
+        $maRequete .= " ORDER BY $critereTri";
+        if ($critereTri =="votes"){
+            if ($_SESSION['privilege']==0){
+                $maRequete = "SELECT chanson.id  FROM chanson 
+                RIGHT JOIN noteUtilisateur on noteUtilisateur.idObjet = chanson.id 
+                WHERE noteUtilisateur.nomObjet = 'chanson' OR noteUtilisateur.nomObjet = NULL
+                GROUP BY chanson.id ORDER BY COALESCE(AVG(noteUtilisateur.note),0) ";
+            } else{
+                $maRequete = "SELECT  noteUtilisateur.idObjet FROM noteUtilisateur 
+                WHERE noteUtilisateur.nomObjet = 'chanson' AND noteUtilisateur.idUtilisateur = '" . $_SESSION['id'] ."'
+                ORDER BY noteUtilisateur.note";
+            }
+        }
+
         if (! $bTriAscendant) {
             $maRequete .= " DESC";
         } else {
@@ -450,7 +468,7 @@ class Chanson
         // Chanson::$_logger = init_logger();
         // Chanson::$_logger->debug($maRequete);
         // echo "debug : " . $maRequete;
-        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION [self::MYSQL]->error);
+        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChanson #2 : " . $_SESSION [self::MYSQL]->error . "Requete : $maRequete");
         $tableau = [];
         while ($idChanson = $result->fetch_row()) {
             array_push($tableau, $idChanson[0]);
