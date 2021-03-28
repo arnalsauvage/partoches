@@ -13,6 +13,8 @@ $table = "songbook";
 $sortie = "";
 $monImage = "";
 
+global $_DOSSIER_CHANSONS;
+
 $nombreDocumentsParPage = 50;
 if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] < 1) {
     // Affichage du formulaire de login
@@ -96,7 +98,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
 
     $sortie .= "<tr> \n";
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    $fichier = "../".$_DOSSIER_CHANSONS" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+    $fichier = "../". $_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
     //echo "extension " . $extension . " et filtre : " . $contenuFiltrer . " - " ;
 
@@ -120,7 +122,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
         $precedenteVignette = $vignetteChanson;
         $vignettePublicateur = Image("../images" . $tabUsers [$ligneDoc [7]] [1], 48, 48, $tabUsers [$ligneDoc [7]] [0]);
         $sortie .= "<td> $vignettePublicateur </td>\n";
-        $vignetteChanson = Image("../".$_DOSSIER_CHANSONS" . $ligneDoc [6] . "/" . imageTableId(CHANSON, $ligneDoc [6]), 128, 128, CHANSON);
+        $vignetteChanson = Image("../".$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . imageTableId(CHANSON, $ligneDoc [6]), 128, 128, CHANSON);
         if ($precedenteVignette != $vignetteChanson) {
             $sortie .= "<td> $vignetteChanson </td>\n";
         } else {
