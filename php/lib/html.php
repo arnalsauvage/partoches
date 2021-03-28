@@ -201,4 +201,10 @@ if (!isset ($FichierHtml)) {
         return str_replace($replacements, $entities, $string);
     }
 
+    function simplifieNomFichier($nomOriginal){
+        $_nomSimplifie = strtr($nomOriginal,"ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ","aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn") ;
+        $_nomSimplifie = str_replace("'","", $_nomSimplifie);
+        $_nomSimplifie = str_replace(" ","", $_nomSimplifie);
+        return $_nomSimplifie;
+    }
 }

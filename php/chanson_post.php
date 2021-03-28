@@ -20,6 +20,7 @@ function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest)
     $repertoire = "../" . $dossierDest . $id . "/";
     $file = file_get_contents($monUrl);
     $cheminFichier = "vide";
+    $nomFichier = simplifieNomFichier($nomFichier);
 
     $isImageJpg = (bin2hex($file[0]) == 'ff' && bin2hex($file[1]) == 'd8');
     if ($isImageJpg){

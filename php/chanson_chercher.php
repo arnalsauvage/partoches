@@ -44,6 +44,7 @@ if (strlen($retour)>32) {
             echo "&mesure=".urlencode($enr->time_sig)."&tonalite=" . urlencode($enr->key_of) . "&annee= ". urlencode($album->year);
             echo "&image=".urlencode($album->img);
             echo "&mode=MAJ_SONGBPM'>enregistrer ces données</a>";
+            //echo simplifieNomFichier("S'assoir.jpg");
         $numero++;
         }
     }

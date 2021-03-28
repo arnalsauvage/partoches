@@ -39,7 +39,7 @@ function chercheDocument($id)
 function chercheDocumentNomTableId($nom, $table, $id)
 {
     $maRequete = "SELECT * FROM document WHERE document.nom = '$nom' AND document.idTable = '$id' AND document.nomTable = '$table'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #1 : " . $_SESSION ['mysql']->error);
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #3 : " . $_SESSION ['mysql']->error);
     // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
     if (($ligne = $result->fetch_row())) {
         return ($ligne);
