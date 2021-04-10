@@ -27,8 +27,9 @@ class Pagination
      */
     public function setPageEnCours($pageEnCours)
     {
-        if ($pageEnCours >= 1 && $pageEnCours <= $this->_nombreDePages)
+        if ($pageEnCours >= 1 && $pageEnCours <= $this->_nombreDePages) {
             $this->_pageEnCours = $pageEnCours;
+        }
     }
 
 
@@ -50,34 +51,39 @@ class Pagination
 
     public function barrePagination()
     {
+        $_monUrlSansParamPage = $this->retirerParametreUrl("page");
+        // echo "url sans page : " . $_monUrlSansParamPage;
         $chaine = "<div class = nav> Pages :  ";
-        if ($this->getPageEnCours() > 1)
-            $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=1", "<< ");
-        else
-            $chaine .= " &lt;&lt; ";
-        $pagePrecedente = $this->getPageEnCours() - 1;
-        if ($pagePrecedente == 0)
-            $pagePrecedente = 1;
-        if ($this->getPageEnCours() > 1)
-            $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=$pagePrecedente", " préc. ");
-        else
-            $chaine.= " préc. ";
-        for ($compteur = 1; $compteur <= ($this->getNombreDePages()); $compteur++) {
-            if ($compteur > 1)
-                $chaine .= " - ";
-            if ($compteur == $this->getPageEnCours())
-                $chaine .= $compteur;
-            else
-                $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=" . $compteur, $compteur);
-        }
-        $pageSuivante = $this->getPageEnCours() + 1;
-        if ($pageSuivante > $this->getNombreDePages())
-            $pageSuivante = $this->getNombreDePages();
-        if ($this->getPageEnCours() < $this->getNombreDePages()) {
-            $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=$pageSuivante", " suiv. ");
-            $chaine .= Ancre($_SERVER['PHP_SELF'] . "?page=" . $this->getNombreDePages(), " >>");
+        if ($this->getPageEnCours() > 1) {
+            $chaine .= Ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=1"), "<< ");
         }
         else {
+            $chaine .= " &lt;&lt; ";
+        }
+        $pagePrecedente = $this->getPageEnCours() - 1;
+        if ($pagePrecedente == 0) {
+            $pagePrecedente = 1;
+        }
+        $chaine = $this->getPageEnCours() > 1 ? $chaine . Ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$pagePrecedente"), " préc. ") : $chaine . " préc. ";
+        for ($compteur = 1; $compteur <= ($this->getNombreDePages()); $compteur++) {
+            if ($compteur > 1) {
+                $chaine .= " - ";
+            }
+            if ($compteur == $this->getPageEnCours()) {
+                $chaine .= $compteur;
+            }
+            else {
+                $chaine .= Ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=" . $compteur), $compteur);
+            }
+        }
+        $pageSuivante = $this->getPageEnCours() + 1;
+        if ($pageSuivante > $this->getNombreDePages()) {
+            $pageSuivante = $this->getNombreDePages();
+        }
+        if ($this->getPageEnCours() < $this->getNombreDePages()) {
+            $chaine .= Ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$pageSuivante"), " suiv. ");
+            $chaine .= Ancre($this->urlAjouteParam($_monUrlSansParamPage,  "page=".$this->getNombreDePages()), " >>");
+        } else {
             $chaine .= " suiv. >>";
         }
         $chaine .= "</div>";
@@ -110,8 +116,9 @@ class Pagination
 
     private function limitePageEnCours()
     {
-        if ($this->_pageEnCours > $this->getNombreDePages())
+        if ($this->_pageEnCours > $this->getNombreDePages()) {
             $this->_pageEnCours = $this->getNombreDePages();
+        }
     }
 
     //// GETTERS /////////////////////
@@ -145,10 +152,12 @@ class Pagination
      */
     public function getItemFin()
     {
-        if ($this->getPageEnCours() < $this->getNombreDePages())
+        if ($this->getPageEnCours() < $this->getNombreDePages()) {
             return (($this->_pageEnCours) * $this->_nombreItemsParPage);
-        else
+        }
+        else {
             return $this->getNombreItemsTotal();
+        }
     }
 
     /**
@@ -167,4 +176,33 @@ class Pagination
         return $this->_pageEnCours;
     }
 
+    // ex on est dans la page http://mapage.pgp?id=12&tri=asc
+    // on appelle retirerParametreUrl ("id")
+    // on récupère http://mapage.pgp?tri=asc
+    private function retirerParametreUrl($_paramAretirer)
+    {
+        $_monUrl = $_SERVER['REQUEST_URI'] ;
+        // echo "mon url : " . $_monUrl;
+        $parsed = parse_url($_monUrl);
+        $query = $parsed['query'];
+
+        parse_str($query, $params);
+
+        unset($params[$_paramAretirer]);
+        $nouvelleUrl = $_SERVER['PHP_SELF']."?".http_build_query($params);
+        return($nouvelleUrl);
+    }
+
+// TODO doublon dans chansonliste !
+    private function urlAjouteParam($url, $_leparam){
+
+        if (!strstr($url,"?")){
+            $url .= "?";
+        }
+        else {
+            $url .= "&";
+        }
+        $url.= $_leparam;
+        return $url;
+    }
 }
