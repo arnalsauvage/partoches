@@ -112,7 +112,6 @@ if ($mode == "MAJ_SONGBPM") {
     $fimage = $_GET ['image'];
     echo "télécharge fichier" . $fnom . "-" . $finterprete . " depuis url " .$fimage;
     telechargeImageFromUrl($fimage, $fnom . "-" . $finterprete , $id, $_DOSSIER_CHANSONS);
-
 }
 
 // Gestion de la demande de suppression

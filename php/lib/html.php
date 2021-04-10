@@ -6,12 +6,15 @@ if (!isset ($FichierHtml)) {
     function Ancre($url, $libelle, $classe = -1, $nouvellefenetre = -1)
     {
         $optionClasse = "";
-        if ($nouvellefenetre == -1)
+        if ($nouvellefenetre == -1) {
             $nouvellefenetre = "";
-        else
+        }
+        else {
             $nouvellefenetre = 'target="_blank"';
-        if ($classe != -1)
+        }
+        if ($classe != -1) {
             $optionClasse = " class='$classe'";
+        }
         return "<a href='$url'" . "$nouvellefenetre $optionClasse>$libelle</A>";
     }
 
@@ -27,10 +30,12 @@ if (!isset ($FichierHtml)) {
     {
         $attrLargeur = "";
         $attrHauteur = "";
-        if (($largeur != -1) && ($largeur <> "100%"))
+        if (($largeur != -1) && ($largeur <> "100%")) {
             $attrLargeur = " width = '$largeur' ";
-        if (($hauteur != -1) && ($hauteur <> "100%"))
+        }
+        if (($hauteur != -1) && ($hauteur <> "100%")) {
             $attrHauteur = " height = '$hauteur' ";
+        }
         return "<img src='$urlImage' " . $attrLargeur . $attrHauteur . "  alt='$alt' class ='$class'>\n";
     }
 
@@ -46,8 +51,9 @@ if (!isset ($FichierHtml)) {
         while ($ligne = $liste->fetch_row()) {
             $choix++;
             $champSelect .= "<option ";
-            if ($numero == $choix)
+            if ($numero == $choix) {
                 $champSelect .= "selected ";
+            }
             $champSelect .= "value=$choix>";
             $champSelect .= $ligne[1] . "</option>";
         }
@@ -70,10 +76,12 @@ if (!isset ($FichierHtml)) {
     // pas m?me un espace ou  un retour de ligne
     function redirection($url)
     {
-        if (headers_sent())
+        if (headers_sent()) {
             print('<meta http-equiv="refresh" content="0;URL=' . $url . '">');
-        else
+        }
+        else {
             header("Location: $url");
+        }
         exit;
     }
 
@@ -93,7 +101,7 @@ if (!isset ($FichierHtml)) {
     function ajouteLiens($texte)
     {
         // On place d'abord le texte en tableaux où l'on sépare le texte pur du texte formaté html
-        // parcours la chaine caractère par acaractère
+        // parcours la chaine caractère par caractère
         // Quand la balise < est rencontrée, on augmente le niveau : il peut y a voir des < imbriqués
         // L'indice indique l'élément du tableau dans lequel le bout sera rangé
 
@@ -130,22 +138,34 @@ if (!isset ($FichierHtml)) {
         $indice_max = $indice;
         $indice = 0;
         for ($indice = 0; $indice <= $indice_max; $indice++) {
-            if (isset($debug_fonc))
-                echo "tableau[$indice] : $tableau[$indice]\n";
-
-            if (strstr($tableau[$indice], "<") == FALSE) {
-                $chaine = $tableau[$indice];
-                $tableau[$indice] = lienCliquable($tableau[$indice]);
-                //$tableau[$indice]  = preg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
-                //    "<a href=\"\\0\">\\0</a>", $tableau[$indice]);
-                if (isset($debug_fonc))
-                    echo "<br>chaine  remplacée : $chaine <br>\n";
-                if (isset($debug_fonc))
-                    echo "<br>chaine  de remplacement : $tableau[$indice] <br>\n";
-            }
+            list($chaine, $tableau) = transformerAdressesEnLiens( $indice, $tableau);
         }
         $chaine = implode($tableau);
         return $chaine;
+    }
+
+    /**
+     * @param $debug_fonc
+     * @param int $indice
+     * @param array $tableau
+     * @return array
+     */
+    function transformerAdressesEnLiens( int $indice, array $tableau, $debug_fonc=false): array
+    {
+        if ($debug_fonc)
+            echo "tableau[$indice] : $tableau[$indice]\n";
+
+        if (strstr($tableau[$indice], "<") == FALSE) {
+            $chaine = $tableau[$indice];
+            $tableau[$indice] = lienCliquable($tableau[$indice]);
+            //$tableau[$indice]  = preg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
+            //    "<a href=\"\\0\">\\0</a>", $tableau[$indice]);
+            if ($debug_fonc)
+                echo "<br>chaine  remplacée : $chaine <br>\n";
+            if ($debug_fonc)
+                echo "<br>chaine  de remplacement : $tableau[$indice] <br>\n";
+        }
+        return array($chaine, $tableau);
     }
 
     // Fin de la function ajouteLiens($texte)
@@ -202,9 +222,22 @@ if (!isset ($FichierHtml)) {
     }
 
     function simplifieNomFichier($nomOriginal){
-        $_nomSimplifie = strtr($nomOriginal,"ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ","aaaaaaaaaaaaooooooooooooeeeeeeeecciiiiiiiiuuuuuuuuynn") ;
+
+        $table = array(
+            'Š'=>'S', 'š'=>'s', 'Đ'=>'Dj', 'đ'=>'dj', 'Ž'=>'Z', 'ž'=>'z', 'Č'=>'C', 'č'=>'c', 'Ć'=>'C', 'ć'=>'c',
+            'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
+            'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O',
+            'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss',
+            'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e',
+            'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o',
+            'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b',
+            'ÿ'=>'y', 'Ŕ'=>'R', 'ŕ'=>'r',
+        );
+
+        $_nomSimplifie = strtr($nomOriginal,$table) ;
+        $_nomSimplifie = str_replace("#","diese", $_nomSimplifie);
         $_nomSimplifie = str_replace("'","", $_nomSimplifie);
-        $_nomSimplifie = str_replace(" ","", $_nomSimplifie);
+        $_nomSimplifie = str_replace(" ","-", $_nomSimplifie);
         return $_nomSimplifie;
     }
 }

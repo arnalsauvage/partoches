@@ -7,7 +7,7 @@ require_once("../php/UtilisateurNote.php");
 
 class UtilisateurNoteTest extends TestCase
 {
-    function setUp()
+    function setUp():void
     {
         @session_start();
     }
@@ -37,5 +37,4 @@ class UtilisateurNoteTest extends TestCase
         $_utilisateurNote->supprimeNoteUtilisateur();
         $this->assertEquals(0,$_utilisateurNote->chercheNoteUtilisateur(12,"chanson", 3));
     }
-
 }

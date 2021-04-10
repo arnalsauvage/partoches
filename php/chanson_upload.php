@@ -3,6 +3,8 @@ const FICHIER_UPLOADE = 'fichierUploade';
 require("lib/utilssi.php");
 require("document.php");
 
+global $_DOSSIER_CHANSONS;
+
 // On vérifie que l'utilisateur est connecté
 if (!isset ($_SESSION ['user'])) {
     echo "Vous devez vous authentifier !";
@@ -16,7 +18,7 @@ if (!isset ($_FILES [FICHIER_UPLOADE])) {
 }
 
 // TODO : créer un paramètre d'application modifiable par l'admin
-$autorisees = "pdf doc docx gif jpg png swf mp3 odt svg crd txt m4a";
+$autorisees = "pdf doc docx gif jpg png swf mp3 odt ppt pptx svg crd txt m4a";
 
 $repertoire = "../".$_DOSSIER_CHANSONS . $_POST ['id'] . "/";
 if (!file_exists($repertoire)) {
@@ -53,7 +55,7 @@ if (!strstr($autorisees, $ext)) {
 }
 
 // On met le contenuFiltrer au propre pour éviter les pb de caractères accentués
-$name_file = renommeFichierChanson($path); // on crée un contenuFiltrer compatible url
+$name_file = simplifieNomFichier($path); // on crée un contenuFiltrer compatible url
 //$name_file = urlencode($name_file);
 
 // On enregistre notre contenuFiltrer de fichier en BDD, on récupère un n°de version
@@ -81,27 +83,3 @@ header('Location: ./chanson_form.php?id=' . $_POST ['id']);
 // echo "Ceci est un espace privé, merci de le respecter.<BR>";
 // echo " Votre adresse IP ($REMOTE_ADDR) a �t� transmise par mail au webmaster du site, tout abus pourra faie l'objet d'une plainte.<BR>";
 // echo "Texte mail : $texte";
-
-function renommeFichierChanson($nomFichier)
-{
-    $nomFichier = str_replace(
-        array(
-            'à', 'â', 'ä', 'á', 'ã', 'å',
-            'î', 'ï', 'ì', 'í',
-            'ô', 'ö', 'ò', 'ó', 'õ', 'ø',
-            'ù', 'û', 'ü', 'ú',
-            'é', 'è', 'ê', 'ë',
-            'ç', 'ÿ', 'ñ', '#'
-        ),
-        array(
-            'a', 'a', 'a', 'a', 'a', 'a',
-            'i', 'i', 'i', 'i',
-            'o', 'o', 'o', 'o', 'o', 'o',
-            'u', 'u', 'u', 'u',
-            'e', 'e', 'e', 'e',
-            'c', 'y', 'n', "Diese"
-        ),
-        $nomFichier
-    );
-    return $nomFichier;
-}
