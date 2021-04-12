@@ -1,10 +1,17 @@
 <?php
 const PRIVILEGE = 'privilege';
 const NOM_FIC = 'nomFic';
+const RESTAUREDOC = "RESTAUREDOC";
+const RENDOC = "RENDOC";
+const SUPPRFIC = "SUPPRFIC";
+const SUPPR = "SUPPR";
 $nomTable = "chanson";
 require_once("lib/utilssi.php");
 require_once("document.php");
 require_once("chanson.php");
+
+// ecritFichierLog("ajaxlog.htm", "entrée dans chanson_post");
+
 
 if ($_SESSION [PRIVILEGE] <= 1) {
     redirection($nomTable . "_liste.php");
@@ -58,6 +65,11 @@ if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
     //echo "On est en get <br> " ;
 }
 
+// Appel ajax RENDOC
+if (isset ($_POST ['idDoc']) && is_numeric($_POST ['idDoc'])) {
+    $mode = $_POST ['mode'];
+}
+
 if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     //echo "On est en post !!!  \n\n\n ";
     $id = $_POST ['id'];
@@ -77,6 +89,10 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     }
     $fdate = $_POST['fdate'];
 }
+
+$chaine = "Mode  : " . $mode;
+//ecritFichierLog("ajaxlog.htm", $chaine);
+
 
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
 if ($mode == "MAJ") {
@@ -115,7 +131,7 @@ if ($mode == "MAJ_SONGBPM") {
 }
 
 // Gestion de la demande de suppression
-if ($id && $mode == "SUPPR" && $_SESSION [PRIVILEGE] > 1) {
+if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > 1) {
     $_chanson = new Chanson($id);
     $_chanson->supprimeChanson();
     redirection($nomTable . "_liste.php");
@@ -144,8 +160,9 @@ if ($mode == "SUPPRDOC" && $_SESSION [PRIVILEGE] > 1) {
 }
 
 // Gestion de la demande de renommage de document dans la chanson
-if ($mode == "RENDOC" && $_SESSION [PRIVILEGE] > 1) {
-    //echo "Appel avec idDoc = " . $_POST ['idDoc'] . " nomDoc = " . $_POST ['nomDoc'];
+if ($mode == RENDOC && $_SESSION [PRIVILEGE] > 1) {
+//    $log =  "Appel avec idDoc = " . $_POST ['idDoc'] . " nomDoc = " . $_POST ['nomDoc'];
+//    ecritFichierLog("ajaxlog.htm", $log);
     $retour = renommeDocument($_POST ['idDoc'], $_POST ['nomDoc']);
     if ($retour == 1) {
         echo "Tout s'est bien passé";
@@ -157,21 +174,21 @@ if ($mode == "RENDOC" && $_SESSION [PRIVILEGE] > 1) {
 }
 
 // Gestion de la demande de suppression de fichier dans la chanson
-if ($mode == "SUPPRFIC" && $_SESSION [PRIVILEGE] > 1) {
+if ($mode == SUPPRFIC  && $_SESSION [PRIVILEGE] > 1) {
     // echo "Appel avec mode = $mode, id = $id, nomFic = " . $_GET ['nomFic'];
     unlink($_GET[NOM_FIC]);
 }
 
-if ($mode == "RESTAUREDOC") {
+if ($mode == RESTAUREDOC) {
 
     $repertoire = "../".$_DOSSIER_CHANSONS . $_POST ['id'] . "/";
     $size = filesize($repertoire . $_POST [NOM_FIC]);
-    $version = creeModifieDocument($_POST [NOM_FIC], $size, "chanson", $id);
+    $version = creeModifieDocument($_POST [NOM_FIC], $size, $nomTable, $id);
     // Il faut renommer le doc en lui accolant son numéro de version
     rename($repertoire . $_POST [NOM_FIC], $repertoire . composeNomVersion($_POST [NOM_FIC], $version));
 }
 
 // On fait une redirection dans tous les cas, sauf la demande de restauration d'un fichier - appel ajax
-if ($mode != "RESTAUREDOC" && $mode != "RENDOC") {
+if ($mode != RESTAUREDOC && $mode !=  RENDOC ) {
     redirection($nomTable . "_form.php?id=$id");
 }

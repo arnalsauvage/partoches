@@ -68,7 +68,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
 
     if (!file_exists($source . $image)) {
         $log = "vignette.php : function creation_vignette : Le fichier source $source$image n'a pas été trouvé.";
-        ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
+        // ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
         // echo $log;
         return false;
     }
@@ -132,10 +132,10 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
             imagecopyresized($image_dest, $image_src, 0, 0, 0, 0, $largeur, $hauteur, $largeur_src, $hauteur_src);
 
             $log = "vignette.php Image : $image, largeur : " . round($largeur_src * $ratio) . ", $hauteur : " . round($hauteur_src * $ratio) . ", source : $source, destination : $destination";
-            ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
+            // ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
             if (!imagejpeg($image_dest, $destination . $prefixe . $image)) {
                 $log = "la création de la vignette a echoué pour l'image $destination$prefixe$image";
-                ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
+                // ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
                 return false;
             }
         } // fin du size

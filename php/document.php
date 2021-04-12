@@ -126,11 +126,24 @@ function renommeDocument($id, $nouveauNom)
     $idTable = $document[6];
     $idUser = $document[7];
 
+    // Si le nouveau nom contient le "-vx" indiquant le numéro de version, on le nettoie
+    $extension = strrchr( $nouveauNom,".");
+    $nouveauNomSansExtension = str_replace("$extension","", $nouveauNom);
+    // On récupere le numéro de version du doc
+    $maRequete = "SELECT version FROM document
+	WHERE id = '$id'";
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème renommeDocument #2 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
+    $ligne = $result->fetch_row();
+    $numVersion = $ligne[0];
+    $nouveauNomSansVersionNiExtension =     str_replace("-v$numVersion","", $nouveauNomSansExtension);
+    $nouveauNom = $nouveauNomSansVersionNiExtension . $extension;
+
     // regarder s'il existe un fichier avec le nouveau nom
-    $fichier = DOSSIER_DATA . $nomTable . "s/" . $idTable . "/" . $nouveauNom;
+    $fichier = DOSSIER_DATA . $nomTable . "s/" . $idTable . "/" . composeNomVersion($nouveauNom, $numVersion);;
     if (file_exists($fichier))
         // s'il existe, renvoyer -2
     {
+        //ecritFichierLog("ajaxlog.htm", "le fichier existe déja");
         return -2;
     }
 

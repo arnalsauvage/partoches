@@ -13,11 +13,11 @@ $("button[name='renommer']").click(function () {
     id = $(this).parent().children("input").attr("id");
     //alert("id : " + id);
     $(this).parent().children("label").text(nouveauNom);
-    //alert("nouveau nom : " + nouveauNom);
+    alert("nouveau nom : " + encodeURI(nouveauNom) + " --- idDoc : " + id );
     $.ajax({
         url: "chanson_post.php",
         type: "POST",
-        data: {mode: "RENDOC", idDoc: id , id: "nonprecise", nomDoc : encodeURI(nouveauNom)},
+        data: {mode: "RENDOC", idDoc: id , nomDoc : encodeURI(nouveauNom)},
         contentType: 'application/x-www-form-urlencoded',
         datatype: 'json', // type de la donnée à recevoir
         success: function (code_html, statut) { // success est toujours en place, bien sûr !
