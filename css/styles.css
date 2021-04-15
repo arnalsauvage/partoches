@@ -56,6 +56,27 @@ h1 {
     flex-wrap: wrap;
 }
 
+.info-cookies {
+    background: rgba(255, 155, 155, 0.75);
+    margin: 0 auto;
+    width: 80%;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    font-size: 10px;
+    z-index:  2;
+    position: absolute;
+    top: 50px;
+    left: 720px;
+    width: 400px;
+    height: 55px;
+    color: black;
+    font-size: 11px;
+    padding-left: 15px;
+    border: 5px;
+    border-radius :22px;
+}
+
 .songbook {
     background-color: #FFF;
     list-style: none;

@@ -40,9 +40,16 @@ global $_DOSSIER_CHANSONS;
         <a href="chanson_liste.php" class="btn btn-success">
             Entrez !
         </a>
+
     </h1>
 </div>
 
+<div class="info-cookies">
+    <p>
+        Ce site ne contient qu'un seul cookie pour vous donner les droits qui vous reviennent.
+        En poursuivant votre navigation, vous acceptez ce cookie et offrez votre coeur et votre âme au ukulélé !
+    </p>
+</div>
 <div class="content-box">
 
     <?php
