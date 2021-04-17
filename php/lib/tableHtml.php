@@ -65,9 +65,20 @@ if (!isset ($ModuleTable)) {
     {
         $optionClasse = "";
         if ($classe != -1)
-            $optionClasse = " CLASS='$classe'";
+            $optionClasse = " CLASS='$classe' ";
 
-        return "<td ROWSPAN='$nbLig' COLSPAN='$nbCol' " . $optionClasse . ">$contenu</td>\n";
+        $rowSpan = " ";
+        if ($nbLig <> 1)
+        {
+            $rowSpan = " rowspan='$nbLig' ";
+        }
+
+        $colSpan = " ";
+        if ($nbCol <> 1)
+        {
+            $colSpan = " rowspan='$nbCol' ";
+        }
+        return "<td " . $rowSpan . $colSpan. $optionClasse . ">$contenu</td>\n";
     }
 
     function TblCorpsFin()

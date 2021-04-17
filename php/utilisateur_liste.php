@@ -2,21 +2,20 @@
 require_once("lib/utilssi.php");
 require_once("menu.php");
 
-$utilisateurForm = "utilisateur_form.php";
-$utilisateurGet = "utilisateur_get.php";
-$utilisateurVoir = "utilisateur_voir.php";
 global $largeur_max_vignette;
 global $iconeAttention;
 global $cheminImages;
 global $iconePoubelle;
 global $iconeCreer;
 global $cheminVignettes;
-$largeur_max_vignette = 64;
 
+$utilisateurForm = "utilisateur_form.php";
+$utilisateurGet = "utilisateur_get.php";
+$utilisateurVoir = "utilisateur_voir.php";
+$largeur_max_vignette = 64;
 $table = "utilisateur";
 $fichiersDuSongbook = "";
 $fichiersDuSongbook .= entreBalise("Utilisateurs", "H1");
-$fichiersDuSongbook .= TblDebut();
 
 // Chargement de la liste des utilisateurs
 $marequete = "select * from $table ORDER BY dateDernierLogin DESC";
@@ -39,6 +38,8 @@ if ($_SESSION ['privilege'] > 1){
     $fichiersDuSongbook .= "<a href='utilisateurBand_form.php'>Morceaux pour un band</a>";
 }
     $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
+
+$fichiersDuSongbook .= TblDebut();
 
 while ($ligne = $resultat->fetch_row()) {
     $numligne++;
@@ -65,7 +66,7 @@ while ($ligne = $resultat->fetch_row()) {
         $fichiersDuSongbook .= TblCellule($ligne [3] . " " . $ligne [4]); // nom prenom
         $fichiersDuSongbook .= TblCellule(statut($ligne [11]));
         $fichiersDuSongbook .= TblCellule(dateMysqlVersTexte($ligne [9]));
-        $fichiersDuSongbook .= TblCellule(" &nbsp &nbsp &nbsp &nbsp"); // un petit blanc
+        $fichiersDuSongbook .= TblCellule(" &nbsp; &nbsp; &nbsp; "); // un petit blanc
         $fichiersDuSongbook .= TblCellule(" " . $ligne [10] . " logins"); // nbreLogins
 
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
