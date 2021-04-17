@@ -3,69 +3,57 @@ if (!isset ($ModuleTable)) {
     $ModuleTable = 1;
 
     // Module de production de tableaux HTML
-    function TblDebut()
+    function TblDebut(): string
     {
         return "<table>\n";
        }
 
-    function TblFin()
+    function TblFin(): string
     {
         return "</table>\n";
     }
 
-    function TblEnteteDebut()
+    function TblEnteteDebut(): string
     {
         return "<thead>";
     }
 
-    function TblEntete($contenu, $nbLig = 1, $nbCol = 1)
+    function TblEntete($contenu, $nbLig = 1, $nbCol = 1): string
     {
         return "<th ROWSPAN='$nbLig' COLSPAN='$nbCol'>$contenu</th>\n";
     }
 
-    function TblEnteteFin()
+    function TblEnteteFin(): string
     {
         return "</thead>\n";
     }
 
 
-    function TblCorpsDebut()
+    function TblCorpsDebut(): string
     {
         return "<tbody>";
     }
 
-    function TblDebutLigne($classe = -1)
+    function TblDebutLigne($classe = -1): string
     {
         $optionClasse = "";
-        if ($classe != -1)
+        if ($classe != -1) {
             $optionClasse = " CLASS='$classe'";
+        }
         return "<tr" . $optionClasse . ">\n";
     }
 
-    function TblFinLigne()
+    function TblFinLigne(): string
     {
         return "</tr>\n";
     }
 
-
-    function TblDebutCellule($classe = -1)
+    function TblCellule($contenu, $nbLig = 1, $nbCol = 1, $classe = -1): string
     {
         $optionClasse = "";
-        if ($classe != -1)
-            $optionClasse = " CLASS='$classe'";
-        return "<td" . $optionClasse . ">\n";
-    }
-
-    function TblFinCellule()
-    {
-        return "</td>\n";
-    }
-
-    function TblCellule($contenu, $nbLig = 1, $nbCol = 1, $classe = -1)
-    {
-        $optionClasse = "";
-        if ($classe != -1)
+        if ($classe != -1) {
             $optionClasse = " CLASS='$classe' ";
+        }
 
         $rowSpan = " ";
         if ($nbLig <> 1)
@@ -81,7 +69,7 @@ if (!isset ($ModuleTable)) {
         return "<td " . $rowSpan . $colSpan. $optionClasse . ">$contenu</td>\n";
     }
 
-    function TblCorpsFin()
+    function TblCorpsFin(): string
     {
         return "</tbody>";
     }
