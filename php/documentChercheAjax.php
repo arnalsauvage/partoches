@@ -101,7 +101,7 @@ while (($ligneDoc = $listeDocs->fetch_row()) && ($nombreItems<$nombreItemsMax)) 
     $sortie .= "<td> " . "<a href= '" . $fichier . "' target='_blank'> " . $fichierCourt . "</a> \n";
     $sortie .= "<td>" . intval($ligneDoc [2] / 1024) . " ko  </td>";
     $sortie .= "<td>" . " - " . dateMysqlVersTexte($ligneDoc [3]) . " </td>";
-    $sortie .= "<td> &nbsp - " . $ligneDoc [8] . " vues </td></tr>\n";
+    $sortie .= "<td> &nbsp; - " . $ligneDoc [8] . " vues </td></tr>\n";
 }
 $sortie .= "</table>";
 echo $sortie;

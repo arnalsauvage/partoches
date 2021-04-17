@@ -1,4 +1,7 @@
 <?php
+
+use JetBrains\PhpStorm\Pure;
+
 const DOC_TRI = 'docTri';
 const DOC_ORDRE_ASC = 'docOrdreAsc';
 const CHANSON = "chanson";
@@ -120,25 +123,26 @@ while ($ligneDoc = $lignes->fetch_row()) {
         $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
     }
         $precedenteVignette = $vignetteChanson;
-        $vignettePublicateur = Image("../images" . $tabUsers [$ligneDoc [7]] [1], 48, 48, $tabUsers [$ligneDoc [7]] [0]);
+        $vignettePublicateur = Image("../images" . urlencode($tabUsers [$ligneDoc [7]] [1]), 48, 48, $tabUsers [$ligneDoc [7]] [0]);
         $sortie .= "<td> $vignettePublicateur </td>\n";
-        $vignetteChanson = Image("../".$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . imageTableId(CHANSON, $ligneDoc [6]), 128, 128, CHANSON);
+        $vignetteChanson = Image("../".$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . rawurlencode(imageTableId(CHANSON, $ligneDoc [6])), 128, 128, CHANSON);
         if ($precedenteVignette != $vignetteChanson) {
             $sortie .= "<td> $vignetteChanson </td>\n";
         } else {
             $sortie .= "<td>  </td>\n ";
         }
-        $sortie .= "<td> " . Ancre("getdoc.php?doc=" . $ligneDoc [0], $icone, "", true) . "<a href= '" . $fichier . "' target='_blank'> " . $fichierCourt . "</a> \n";
+        $sortie .= "<td> " . Ancre("getdoc.php?doc=" . $ligneDoc [0], $icone, "", true) . "<a href= '" . urlencode($fichier) . "' target='_blank'> " . $fichierCourt . "</a> \n";
         $sortie .= "<td>" . intval($ligneDoc [2] / 1024) . " ko  </td>";
         $sortie .= "<td>" . " -  publié le " . dateMysqlVersTexte($ligneDoc [3]) . " </td>";
-        $sortie .= "<td> &nbsp - " . $ligneDoc [8] . " vues </td></tr>\n";
+        $sortie .= "<td> &nbsp; - " . $ligneDoc [8] . " vues </td></tr>\n";
 }
 $sortie .= "</table>";
 $sortie .= $pagination->barrePagination() . "   ";
 $sortie .= envoieFooter();
 echo $sortie;
 
-function titreColonne($libelle, $nomRubrique)
+#[Pure] function titreColonne($libelle, $nomRubrique): string
 {
-    return TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
+    return TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> </span>")
+        . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'></span> "));
 }
