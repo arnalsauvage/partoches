@@ -1,11 +1,9 @@
 <?php
 
-use JetBrains\PhpStorm\Pure;
-
 include_once("menu.php");
 include_once("songbook.php");
 include_once("document.php");
-include_once("/lib/utilssi.php");
+include_once("lib/utilssi.php");
 
 global $cheminImages;
 global $iconePoubelle;
@@ -98,7 +96,7 @@ if ($_SESSION ['privilege'] >= 2) {
 $fichiersDuSongbook .= envoieFooter();
 echo $fichiersDuSongbook;
 
-#[Pure] function titreColonne($libelle, $nomRubrique): string
+function titreColonne($libelle, $nomRubrique): string
 {
     return TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> </span>")
         . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'></span> "));

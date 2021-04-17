@@ -1,7 +1,5 @@
 <?php
 
-use JetBrains\PhpStorm\Pure;
-
 const DOC_TRI = 'docTri';
 const DOC_ORDRE_ASC = 'docOrdreAsc';
 const CHANSON = "chanson";
@@ -27,19 +25,18 @@ if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] < 1) {
 $sortie .= "<h2>Documents publiés pour des chansons</h2> \n"; // Titre
 
 // Gestion du paramètre de tri
+if (!isset($_SESSION[DOC_TRI])) {
+    $_SESSION[DOC_TRI] = "date";
+    $_SESSION[DOC_ORDRE_ASC] = false;
+}
 if (isset ($_POST ['tri'])) {
-    $_SESSION[DOC_TRI] = $_GET ['tri'];
+    $_SESSION[DOC_TRI] = $_POST ['tri'];
     $_SESSION[DOC_ORDRE_ASC] = true;
-} else {
-    if (isset ($_GET ['triDesc'])) {
-        $_SESSION[DOC_TRI] = $_GET ['triDesc'];
-        $_SESSION[DOC_ORDRE_ASC] = false;
-    } else {
-        if (!isset($_SESSION[DOC_TRI])) {
-            $_SESSION[DOC_TRI] = "date";
-            $_SESSION[DOC_ORDRE_ASC] = false;
-        }
-    }
+}
+
+if (isset ($_GET ['triDesc'])) {
+    $_SESSION[DOC_TRI] = $_GET ['triDesc'];
+    $_SESSION[DOC_ORDRE_ASC] = false;
 }
 
 $lignes = chercheDocuments("nomTable", CHANSON, $_SESSION[DOC_TRI], $_SESSION[DOC_ORDRE_ASC]);
@@ -141,7 +138,7 @@ $sortie .= $pagination->barrePagination() . "   ";
 $sortie .= envoieFooter();
 echo $sortie;
 
-#[Pure] function titreColonne($libelle, $nomRubrique): string
+function titreColonne($libelle, $nomRubrique): string
 {
     return TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> </span>")
         . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'></span> "));
