@@ -123,7 +123,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
         $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
     }
         $precedenteVignette = $vignetteChanson;
-        $vignettePublicateur = Image("../images" . urlencode($tabUsers [$ligneDoc [7]] [1]), 48, 48, $tabUsers [$ligneDoc [7]] [0]);
+        $vignettePublicateur = Image("../images/utilisateur/" . urlencode($tabUsers [$ligneDoc [7]] [1]), 48, 48, $tabUsers [$ligneDoc [7]] [0]);
         $sortie .= "<td> $vignettePublicateur </td>\n";
         $vignetteChanson = Image("../".$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . rawurlencode(imageTableId(CHANSON, $ligneDoc [6])), 128, 128, CHANSON);
         if ($precedenteVignette != $vignetteChanson) {
