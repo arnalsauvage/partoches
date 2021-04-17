@@ -7,6 +7,12 @@ require_once("utilisateur.php");
 // nomTable, idTable
 
 // Si l'utilisateur n'est pas logué
+if (!isset ($_SESSION ['largeur-fenetre'])) {
+    // On définit une largeur de fenetre, utile pour décider quel niveau de détail sera affiché
+    $_SESSION ['largeur-fenetre'] = 800;
+}
+
+// Si l'utilisateur n'est pas logué
 if (!isset ($_SESSION ['user'])) {
     // version précédente : on présente un formulaire de login
     //header('Location: ./login.php');
@@ -16,6 +22,7 @@ if (!isset ($_SESSION ['user'])) {
     // Si oui, on crée une session avec user, idclub, nomClub
     $donnee = login_utilisateur("invite", "invite");
     if ($donnee) {
+        // TODO : 5 lignes dupliquées d elogin.php
         $_SESSION ['id'] = $donnee [0];
         $_SESSION ['user'] = $donnee [1];
         $_SESSION ['email'] = $donnee [7];
@@ -42,14 +49,23 @@ if (isset($_SESSION['login'])&&($_SESSION['login'] == "logout")){
     $_SESSION['login'] = "";
 }
 
-if ($_SESSION['login'] == "ko"){
+if (isset($_SESSION['login'])&&($_SESSION['login'] == "ko")){
     $infoLogin = "<p class='ko'> erreur de login/mot de passe...</p>";
     $_SESSION['login'] = "";
 }
 
 $contenu = envoieHead("Top 5 Partoches", "../css/index.css");
 $contenu .= "<body>";
-
+$contenu .= "<script> if (window.innerWidth != ". $_SESSION['largeur-fenetre'] . ") {
+    var donnees = 'largeur_fenetre=' + window.innerWidth;
+        $.ajax({
+                url: './lib/ajaxappli.php',
+                type: 'POST', // Le type de la requête HTTP, ici devenu POST
+                data: donnees,
+                dataType: 'html'
+            });
+}
+</script>";
 // Affichage du menu
 
 $contenu .= "

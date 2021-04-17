@@ -179,22 +179,31 @@ class Pagination
     // ex on est dans la page http://mapage.pgp?id=12&tri=asc
     // on appelle retirerParametreUrl ("id")
     // on récupère http://mapage.pgp?tri=asc
-    private function retirerParametreUrl($_paramAretirer)
+    public function retirerParametreUrl($_paramAretirer)
     {
         $_monUrl = $_SERVER['REQUEST_URI'] ;
-        // echo "mon url : " . $_monUrl;
+        // echo "mon url : " . $_monUrl . "\n";
         $parsed = parse_url($_monUrl);
-        $query = $parsed['query'];
-
+        // echo "parsed : ";
+        // var_dump($parsed);
+        // On récupère la query (ex id=12&tri=ASC)
+        if (isset($parsed['query'])) {
+            $query = $parsed['query'];
+        }
+        else
+        {
+            $query = "";
+        }
+        // On la parse en un tableau de parametres
         parse_str($query, $params);
-
+        // On supprime le parametre à retirer
         unset($params[$_paramAretirer]);
+        // On reconstruit la nouvelle url
         $nouvelleUrl = $_SERVER['PHP_SELF']."?".http_build_query($params);
         return($nouvelleUrl);
     }
 
-// TODO doublon dans chansonliste !
-    private function urlAjouteParam($url, $_leparam){
+    public function urlAjouteParam($url, $_leparam){
 
         if (!strstr($url,"?")){
             $url .= "?";

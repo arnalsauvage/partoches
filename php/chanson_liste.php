@@ -33,9 +33,14 @@ $contenuHtml = "<div class='container'> \n
 $contenuHtml .= entreBalise("Chansons", "H1");
 
 if (isset($_GET['filtre'])){
-    $contenuHtml .= "filtre présent : " . $_GET['filtre'] . " = " . $_GET['valFiltre'];
-    $contenuHtml .= Ancre($_SERVER['PHP_SELF'],"effacer le filtre");
+    $contenuHtml .= "<p class='filtres'> filtre présent : " . $_GET['filtre'] . " = " . $_GET['valFiltre'];
+    $contenuHtml .= " " . Ancre($_SERVER['PHP_SELF'],"effacer le filtre") . "</p>";
 }
+
+if (isset($_GET['raz-recherche'])){
+    $_SESSION[CHERCHE] = "";
+}
+
 
 // Gestion du paramètre de tri
 // On prend en compte une demande de tri ascendant
@@ -118,7 +123,11 @@ if (isset ($_GET['page']) && is_numeric($_GET['page'])) {
 $pagination->setPageEnCours($page);
 
 // Affichage de la liste
+$largeur_ecran  = $_SESSION['largeur-fenetre'];
 
+// $contenuHtml .= "Largeur d'écran : " . $largeur_ecran;
+// >1200 on affiche tout
+// >740 on retire tempo mesure pulsation tonalité
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION [PRIVILEGE] > 1) {
     $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'></span> Ajouter une chanson</a>\n";
@@ -131,15 +140,24 @@ $contenuHtml .= TblEntete("  -  ");
 $contenuHtml .= TblEntete("  Pochette  ");
 $contenuHtml .= titreColonne("Nom", "nom");
 $contenuHtml .= titreColonne("Interprète", "interprete");
-$contenuHtml .= titreColonne("  Votes  ", "votes");
-$contenuHtml .= titreColonne("Année", "annee");
-$contenuHtml .= titreColonne("Tempo", "tempo");
-$contenuHtml .= titreColonne("Mesure", "mesure");
-$contenuHtml .= titreColonne("Pulsation", "pulsation");
-$contenuHtml .= titreColonne("Tonalité", "tonalite");
-$contenuHtml .= titreColonne("Date pub.", DATE_PUB);
-$contenuHtml .= titreColonne("Publié par", "idUser");
-$contenuHtml .= titreColonne("Vues", "hits");
+if ($largeur_ecran > 700) {
+    $contenuHtml .= titreColonne("  Votes  ", "votes");
+    $contenuHtml .= titreColonne("Année", "annee");
+}
+if ($largeur_ecran >1200) {
+    $contenuHtml .= titreColonne("Tempo", "tempo");
+    $contenuHtml .= titreColonne("Mesure", "mesure");
+    $contenuHtml .= titreColonne("Pulsation", "pulsation");
+    $contenuHtml .= titreColonne("Tonalité", "tonalite");
+}
+if ($largeur_ecran > 700) {
+    $contenuHtml .= titreColonne("Date pub.", DATE_PUB);
+    $contenuHtml .= titreColonne("Publié par", "idUser");
+}
+if ($largeur_ecran >1200) {
+
+    $contenuHtml .= titreColonne("Vues", "hits");
+}
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
 if ($_SESSION [PRIVILEGE] > 1) {
     $contenuHtml .= TblCellule(" ");
@@ -184,24 +202,32 @@ foreach ($resultat as $ligne) {
     $imagePochette = Image(($cheminImagesChanson . $_id . "/" . rawurlencode(imageTableId(CHANSON, $_id))), 48, 48, "couverture");
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", $imagePochette));
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"))); // Nom
-    $contenuHtml .= TblCellule(Ancre(pageAjouteParam( FILTRE ."=interprete&" .  VAL_FILTRE . "=" .$_chanson->getInterprete()),limiteLongueur($_chanson->getInterprete(),21))); // interprete
-    if ($_SESSION [PRIVILEGE] > 0) {
-        $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
-    } else {
-        $contenuHtml .= TblCellule(UtilisateurNote::starBar(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
+    $url = $_SERVER['REQUEST_URI'];
+    $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=interprete&" .  VAL_FILTRE . "=" .$_chanson->getInterprete()),limiteLongueur($_chanson->getInterprete(),21))); // interprete
+    if ($largeur_ecran >700) {
+        if ($_SESSION [PRIVILEGE] > 0) {
+            $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
+        } else {
+            $contenuHtml .= TblCellule(UtilisateurNote::starBar(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
+        }
+    }
+    if ($largeur_ecran >700) {
+        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=annee&" .  VAL_FILTRE . "=" .$_chanson->getAnnee()), $_chanson->getAnnee()),1, 1, CENTRER); // annee
     }
 
-    $contenuHtml .= TblCellule(Ancre(pageAjouteParam( FILTRE ."=annee&" .  VAL_FILTRE . "=" .$_chanson->getAnnee()), $_chanson->getAnnee()),1, 1, CENTRER); // annee
-    $contenuHtml .= TblCellule(Ancre(pageAjouteParam( FILTRE ."=tempo&" .  VAL_FILTRE . "=" .$_chanson->getTempo()), $_chanson->getTempo()), 1, 1, "alignerAdroite"); // tempo
-    $contenuHtml .= TblCellule(Ancre(pageAjouteParam( FILTRE ."=mesure&" .  VAL_FILTRE . "=" .$_chanson->getMesure()), $_chanson->getMesure()), 1, 1, CENTRER); // mesure
-    $contenuHtml .= TblCellule(Ancre(pageAjouteParam( FILTRE ."=pulsation&" .  VAL_FILTRE . "=" .$_chanson->getPulsation()), $_chanson->getPulsation()), 1, 1, CENTRER); // pulsation
-    $contenuHtml .= TblCellule(Ancre(pageAjouteParam( FILTRE ."=tonalite&" .  VAL_FILTRE . "=" .$_chanson->getTonalite()), $_chanson->getTonalite()), 1, 1, CENTRER); // tonalité
-    $contenuHtml .= TblCellule(dateMysqlVersTexte($_chanson->getDatePub())); // Date Pub
-    $nomAuteur = chercheUtilisateur($_chanson->getIdUser());
-    $nomAuteur = $nomAuteur[3];
-    $contenuHtml .= TblCellule(Ancre(pageAjouteParam( FILTRE ."=contributeur&" .  VAL_FILTRE . "=" . $_chanson->getIdUser()), $nomAuteur), 1, CENTRER); // auteur
-    $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite"); // hits
-
+    if ($largeur_ecran >1200) {
+        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=tempo&" .  VAL_FILTRE . "=" .$_chanson->getTempo()), $_chanson->getTempo()), 1, 1, "alignerAdroite"); // tempo
+        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=mesure&" .  VAL_FILTRE . "=" .$_chanson->getMesure()), $_chanson->getMesure()), 1, 1, CENTRER); // mesure
+        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=pulsation&" .  VAL_FILTRE . "=" .$_chanson->getPulsation()), $_chanson->getPulsation()), 1, 1, CENTRER); // pulsation
+        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=tonalite&" .  VAL_FILTRE . "=" .$_chanson->getTonalite()), $_chanson->getTonalite()), 1, 1, CENTRER); // tonalité
+    }
+    if ($largeur_ecran >700) {
+        $contenuHtml .= TblCellule(dateMysqlVersTexte($_chanson->getDatePub())); // Date Pub
+        $nomAuteur = chercheUtilisateur($_chanson->getIdUser());
+        $nomAuteur = $nomAuteur[3];
+        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url,FILTRE . "=contributeur&" . VAL_FILTRE . "=" . $_chanson->getIdUser()), $nomAuteur), 1, CENTRER); // auteur
+        $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite"); // hits
+    }
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
     if ($_SESSION [PRIVILEGE] > 1) {
         $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages));
@@ -236,16 +262,4 @@ function titreColonne($libelle, $nomRubrique)
     $lienCroissant = Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> </span>");
     $lienDecroissant = Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> </span>");
     return TblEntete($lienCroissant . "  $libelle " . $lienDecroissant);
-}
-
-function pageAjouteParam($_leparam){
-    $url = $_SERVER['REQUEST_URI'];
-    if (!strstr($url,"?")){
-        $url .= "?";
-    }
-    else {
-        $url .= "&";
-    }
-    $url.= $_leparam;
-    return $url;
 }

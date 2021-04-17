@@ -1,6 +1,7 @@
 <?php
 // require_once 'PHPUnit/Autoload.php';
-
+require_once("../php/lib/utilssi.php");
+require_once("../php/Pagination.php");
 use PHPUnit\Framework\TestCase;
 
 class PaginationTest extends TestCase
@@ -113,4 +114,17 @@ class PaginationTest extends TestCase
         $this->assertEquals(1, $_partoche->getNombreDePages());
 
     }
+
+public function testRetirerParametreUrl()
+{
+    // Attention le contexte local est à prendre en compte : cette fonction étant normalement amenée à traviller sur une url
+    $_partoche = new Pagination (11, 5);
+    $_SERVER['REQUEST_URI'] = "C:/Users/medin/PhpstormProjects/partoches/vendor/phpunit/phpunit/mapage.php?tri=asc&id=12";
+    $this->assertEquals("C:/Users/medin/PhpstormProjects/partoches/vendor/phpunit/phpunit/phpunit?tri=asc", $_partoche->retirerParametreUrl("id"));
+
+    $_SERVER['REQUEST_URI'] = "C:/Users/medin/PhpstormProjects/partoches/vendor/phpunit/phpunit/mapage.php?tri=asc&id=12";
+    $this->assertEquals("C:/Users/medin/PhpstormProjects/partoches/vendor/phpunit/phpunit/phpunit?id=12", $_partoche->retirerParametreUrl("tri"));
+
+
+}
 }

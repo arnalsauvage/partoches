@@ -42,10 +42,22 @@ label.login {
 	width: 120px;
 }
 
+.inline {
+	display: inline;
+}
+
 label.inline {
 	display: inline;
-	margin-right: 50px;
+	margin-right: 5px;
 }
+
+.labelTitreInterprete {
+	width: 120px;
+}
+.rechercheChanson {
+	width: 320px;
+}
+
 
 input, textarea, select, option {
 	background-color: #FFF3F3;
@@ -198,4 +210,20 @@ span.selected {
 .info {
     font-size: medium;
     color: #115599;
+}
+
+.filtres {
+	background: rgba(255, 155, 155, 0.75);
+	margin: 0 auto;
+	width: 80%;
+	display: flex;
+	justify-content: space-around;
+	flex-wrap: wrap;
+	font-size: 12px;
+	width: 300px;
+	color: black;
+	font-size: 11px;
+	padding-left: 15px;
+	border: 5px;
+	border-radius :22px;
 }
