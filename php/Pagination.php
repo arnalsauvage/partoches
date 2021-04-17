@@ -212,6 +212,6 @@ class Pagination
             $url .= "&";
         }
         $url.= $_leparam;
-        return $url;
+        return ($url);
     }
 }

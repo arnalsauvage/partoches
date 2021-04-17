@@ -160,7 +160,8 @@ if ($largeur_ecran >1200) {
 }
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
 if ($_SESSION [PRIVILEGE] > 1) {
-    $contenuHtml .= TblCellule(" ");
+    $contenuHtml .= titreColonne("", "");
+
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 $contenuHtml .= TblFinLigne() . TblEnteteFin();
@@ -203,7 +204,7 @@ foreach ($resultat as $ligne) {
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", $imagePochette));
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"))); // Nom
     $url = $_SERVER['REQUEST_URI'];
-    $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=interprete&" .  VAL_FILTRE . "=" .$_chanson->getInterprete()),limiteLongueur($_chanson->getInterprete(),21))); // interprete
+    $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=interprete&" .  VAL_FILTRE . "=" .urlencode($_chanson->getInterprete())),limiteLongueur($_chanson->getInterprete(),21))); // interprete
     if ($largeur_ecran >700) {
         if ($_SESSION [PRIVILEGE] > 0) {
             $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
@@ -225,7 +226,7 @@ foreach ($resultat as $ligne) {
         $contenuHtml .= TblCellule(dateMysqlVersTexte($_chanson->getDatePub())); // Date Pub
         $nomAuteur = chercheUtilisateur($_chanson->getIdUser());
         $nomAuteur = $nomAuteur[3];
-        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url,FILTRE . "=contributeur&" . VAL_FILTRE . "=" . $_chanson->getIdUser()), $nomAuteur), 1, CENTRER); // auteur
+        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url,FILTRE . "=contributeur&" . VAL_FILTRE . "=" . $_chanson->getIdUser()), $nomAuteur), 1, 1,CENTRER); // auteur
         $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite"); // hits
     }
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
