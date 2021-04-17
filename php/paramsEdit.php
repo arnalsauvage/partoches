@@ -3,7 +3,7 @@ include_once "lib/utilssi.php";
 include_once("menu.php");
 $fichier = "../conf/params.ini";
 $sortie = "";
-$sortie .= "<table align='center'><tr><td>";
+$sortie .= "<table><tr><td>";
 
 // Si l'utilisateur n'est pas logué
 if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] <= 2) {
@@ -45,11 +45,11 @@ if ($bModif) {
 $ini_objet->print_fichier();
 
 $sortie .= "
-<form action='paramsEdit.php' method='post' ENCTYPE='x-www-form-urlencoded'>
+<form action='paramsEdit.php' method='post' ENCTYPE='application/x-www-form-urlencoded'>
 <fieldset>
  <legend> Attributs modifiables : </legend>
 <br> <label for='emailAdmin'>Email de l'admin : </label>
-<input value='" . $ini_objet->m_valeur("EmailAdmin", "general") . "' name='EmailAdmin' id='EmailAdmin' type='email'>
+<input value='" . $ini_objet->m_valeur("EmailAdmin", "general") . "' name='EmailAdmin' id='emailAdmin' type='email'>
 <br><label for='urlSite'>Url du site : </label>
 <input value='" . $ini_objet->m_valeur("urlSite", "general") . "' name='urlSite' id='urlSite' type='text' >
 <br><label for='loginParam'>login de paramétrage  : </label>
