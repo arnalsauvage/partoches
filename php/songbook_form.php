@@ -1,17 +1,23 @@
-<?php /** @noinspection HtmlUnknownTarget */
-const ICONE = "icone";
+<?php
 require_once("lib/utilssi.php");
 require_once("menu.php");
 require_once("songbook.php");
 require_once("document.php");
 require_once("lienDocSongbook.php");
+
+global $iconePoubelle;
+global $_DOSSIER_CHANSONS;
+global $cheminImages;
+global $songbookGet;
+
+const ICONE = "icone";
 $table = "songbook";
 $sortie = "";
 
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
 if ($_SESSION ['privilege'] < 2) {
     $urlRedirection = $table . "_voir.php";
-    if ((isset ($_GET ['id']) && (is_numeric($_GET ['doc'])))) {
+    if (isset ($_GET ['id']) && (is_numeric($_GET ['doc']))) {
         $urlRedirection .= "?id=" . $_GET ['id'];
         redirection($urlRedirection);
     } else {
@@ -40,8 +46,6 @@ if (isset ($_POST ['id']) || (isset ($_GET ['id']) && (is_numeric($_GET ['id']))
     $donnee [1] = htmlspecialchars($donnee [1]);
     $donnee [2] = htmlspecialchars($donnee [2]);
     $donnee [3] = dateMysqlVersTexte($donnee [3]);
-//	$donnee [4] = $donnee [4];
-//	$donnee [5] = $donnee [5];
     $mode = "MAJ";
     ordonneLiensSongbook($id);
 } else {
@@ -87,26 +91,28 @@ $sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
 $sortie .= "<p>Les fichiers à rattacher ici seront relatifs au songbook lui-même : illustration de couverture, pdf contenant toutes les chansons...</p>";
 
 // Cherche un document et le renvoie s'il existe
-$lignes = chercheDocumentsTableId("songbook", $id);
-$listeDocs = "";
-// Pour chaque document
-while ($ligneDoc = $lignes->fetch_row()) {
-    // var_dump( $ligneDoc);
-    // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-    $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    // echo "Chanson id : $id fichier court : $fichierCourt";
-    $fichier = "../data/songbooks/$id/" . urlencode($fichierCourt);
-    $extension = substr(strrchr($ligneDoc[1], '.'), 1);
-    $icone = Image("../images/icones/$extension.png", 32, 32, ICONE);
-    if (!file_exists("../images/icones/$extension.png")) {
-        $icone = Image("../images/icones/fichier.png", 32, 32, ICONE);
-    }
-    $listeDocs .= "$icone <a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
-    $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
-    $listeDocs .= boutonSuppression("songbook_get.php" . "?id=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
-}
-$sortie .= $listeDocs;
 
+if ($mode=="MAJ") {
+    $lignes = chercheDocumentsTableId("songbook", $id);
+    $listeDocs = "";
+    // Pour chaque document
+    while ($ligneDoc = $lignes->fetch_row()) {
+        // var_dump( $ligneDoc);
+        // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
+        $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+        // echo "Chanson id : $id fichier court : $fichierCourt";
+        $fichier = "../data/songbooks/$id/" . urlencode($fichierCourt);
+        $extension = substr(strrchr($ligneDoc[1], '.'), 1);
+        $icone = Image("../images/icones/$extension.png", 32, 32, ICONE);
+        if (!file_exists("../images/icones/$extension.png")) {
+            $icone = Image("../images/icones/fichier.png", 32, 32, ICONE);
+        }
+        $listeDocs .= "$icone <a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
+        $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
+        $listeDocs .= boutonSuppression("songbook_get.php" . "?id=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
+    }
+    $sortie .= $listeDocs;
+}
 echo $sortie;
 
 require('songbook_corbeille.php');
@@ -127,7 +133,7 @@ if ($mode == "MAJ") {
     <p>Voici la liste des documents rattachés au songbook :grilles, partoches, partitions...</p>
     <p>Il est possible de changer l'ordre des documents en déplaçant les titres dans la liste à la souris (drag'n drop)</p>
     <?php
-    $lignes = chercheLiensDocSongbook('idSongbook', $id, "ordre", true);
+    $lignes = chercheLiensDocSongbook('idSongbook', $id, "ordre" );
     $listeDocs = "<ul id='sortable'>";
     $numero = 0;
     while ($ligne = $lignes->fetch_row()) {
@@ -161,14 +167,12 @@ if ($mode == "MAJ") {
         ?>
         <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
         <input type="submit" value="Envoyer">
-
-
     </form>
-    <button onclick='demandeUnPdf()'>Genère le songbook en pdf</button>
+    <button onclick='genereUnPdf()'>Genère le songbook en pdf</button>
 
     <div id="div1"></div>
     <script>
-        function demandeUnPdf() {
+        function genereUnPdf() {
             $.ajax({
                 type: "POST",
                 url: "songbook_get.php",
@@ -202,10 +206,10 @@ if ($mode == "MAJ") {
             $('#sortable').sortable({
                 axis: 'y',
                 update: function(index) {
-                    var positions = [];
+                    let positions = [];
                     $(this).children().each(function( index)
                     {
-                        console.log($(this).attr('data-index'));
+                        // console.log('déplacement du ' + $(this).attr('data-index'));
                         positions.push([$(this).attr('data-index'),$(this).attr('data-position')]);
                     });
                     $.ajax({

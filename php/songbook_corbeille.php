@@ -1,5 +1,6 @@
 <h2> Corbeille des fichiers effacés</h2>
 <?php
+global $table, $id, $iconePoubelle, $cheminImages;
 $debug = true;
 //echo "<br> En bdd : <br>;";
 $fichiersEnBdd = [];
@@ -8,9 +9,7 @@ while ($fichierEnBdd = $resultat->fetch_row()) {
     array_push($fichiersEnBdd, $fichierEnBdd);
     // echo "fichier en bdd :" ;
     //print_r($fichierEnBdd);
-
 }
-
 $fichiersSurDisque = fichiersSongbook($id); // repertoire nom extension
 
 $nbFichiersKO = 0;
@@ -29,7 +28,6 @@ while (count($fichiersSurDisque) > 0) {
             $fichierOk = true;
             //echo "Fichier $fichierSurDisque[1] trouvé !!!!!!!!!!!!!!!!!!!<br>";
         }
-
     }
     if (!$fichierOk) {
         $nbFichiersKO++;
@@ -60,22 +58,17 @@ while (count($fichiersSurDisque) > 0) {
                     error: function (resultat, statut, erreur) {
                         $("#div<?php echo $numeroElement;?>").html(resultat);
                     }
-
                 });
             }
-
             function formSuccess() {
                 $("#msgSubmit").removeClass("hidden");
             }
         </script>
-
         <?php
     }
 }
 if ($nbFichiersKO == 0) {
     echo "La corbeille est vide pour ce songbook.\n";
 }
-
-echo "    </div> \n";
 echo "        	<script src='../js/chansonForm.js '></script>";
 ?>
