@@ -122,6 +122,12 @@ if (isset ($_GET['page']) && is_numeric($_GET['page'])) {
 }
 $pagination->setPageEnCours($page);
 
+
+// Affichage de la recherche
+require_once("chanson-v-comp-cherche.php");
+$contenuHtml .= $contenuHtmlCompCherche;
+
+
 // Affichage de la liste
 $largeur_ecran  = $_SESSION['largeur-fenetre'];
 
@@ -249,9 +255,7 @@ if ($_SESSION [PRIVILEGE] > 1) {
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 
-// Affichage de la recherche
-require_once("chanson-v-comp-cherche.php");
-$contenuHtml .= $contenuHtmlCompCherche;
+
 $contenuHtml .= "
 </div>\n
 </div><!-- /.container -->\n";

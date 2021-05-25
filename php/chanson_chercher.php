@@ -23,7 +23,7 @@ if (isset ($_GET ['chanson']) ) {
 if (isset ($_GET ['artiste']) ) {
     $urlRecherche = str_replace("ARTISTE", urlEncode($_GET ['artiste']), $urlRecherche);
 }
-// echo ("url appelée : " . $urlRecherche);
+echo ("url appelée : " . $urlRecherche);
 $retour = file_get_contents($urlRecherche);
 
 $tableau = json_decode($retour);
