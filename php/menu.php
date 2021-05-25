@@ -99,7 +99,8 @@ $contenu .= "		</button>\n
 if (($_SESSION['privilege'] > 1))
     $contenu .= "<li ><a href='../php/utilisateur_liste.php'>Utilisateurs</a></li>\n
             <li><a href='../php/documents_voir.php'>Documents</a></li>\n";
-    $contenu .= "<li><a href='../html/diagrammes/pageDiagrammes.htm' target='_blank'>Outils</a></li>";
+    $contenu .= "<li><a href='../html/diagrammes/pageDiagrammes.htm' target='_blank'><img height='32' src='../images/icones/diagramme.png'>Outils</a></li>
+<li></li>";
 // Le lien paramétrage est limité aux admin et login parametrage
 if (($_SESSION['user'] == $_SESSION['loginParam'])
     || ($_SESSION['privilege'] > 2))

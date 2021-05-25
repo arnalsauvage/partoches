@@ -1,4 +1,5 @@
 <?php
+const BR_REQUETE = "<br>Requete : ";
 define("DOSSIER_DATA" ,"../data/");
 include_once("lib/utilssi.php");
 include_once "lib/configMysql.php";
@@ -41,7 +42,7 @@ function chercheDocumentNomTableId($nom, $table, $id)
     $maRequete = "SELECT * FROM document WHERE document.nom = '$nom' AND document.idTable = '$id' AND document.nomTable = '$table'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #3 : " . $_SESSION ['mysql']->error);
     // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-    if (($ligne = $result->fetch_row())) {
+    if ($ligne = $result->fetch_row()) {
         return ($ligne);
     }
     else {
@@ -112,7 +113,7 @@ function modifieDocument($nom, $tailleKo, $nomTable, $idTable)
     $maRequete = "UPDATE  document
 	SET tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser'
 	WHERE nom = '$nom' AND nomTable = '$nomTable' and idTable = '$idTable'";
-    $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiedocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
+    $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiedocument #1 : " . $_SESSION ['mysql']->error . BR_REQUETE . $maRequete);
 
     return $version;
 }
@@ -132,7 +133,7 @@ function renommeDocument($id, $nouveauNom)
     // On récupere le numéro de version du doc
     $maRequete = "SELECT version FROM document
 	WHERE id = '$id'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème renommeDocument #2 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème renommeDocument #2 : " . $_SESSION ['mysql']->error . BR_REQUETE . $maRequete);
     $ligne = $result->fetch_row();
     $numVersion = $ligne[0];
     $nouveauNomSansVersionNiExtension =     str_replace("-v$numVersion","", $nouveauNomSansExtension);
@@ -159,7 +160,7 @@ function renommeDocument($id, $nouveauNom)
     $maRequete = "UPDATE  document
 	SET nom = '$nouveauNom', idUser = '$idUser'
 	WHERE id = '$id'";
-    $_SESSION ['mysql']->query($maRequete) or die ("Problème renommeDocument #1 : " . $_SESSION ['mysql']->error . "<br>Requete : " . $maRequete);
+    $_SESSION ['mysql']->query($maRequete) or die ("Problème renommeDocument #1 : " . $_SESSION ['mysql']->error . BR_REQUETE . $maRequete);
 
     // renvoyer vrai
     return 1;

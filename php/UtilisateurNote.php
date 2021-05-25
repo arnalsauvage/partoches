@@ -55,8 +55,9 @@ class UtilisateurNote
         }
         $starBar .= self::DIV;
         $starBar .= '<div class="resultMedia'.$mediaId.'" style="font-size: small; color: grey">'; // We show the rate score and number of rates
-        if ($maNote->getNote() == 0)
+        if ($maNote->getNote() == 0) {
             $starBar .= 'Pas (encore) de vote';
+        }
         else {
 
             $starBar .= 'Note : ' . $maNote->getNote() ;
@@ -92,10 +93,12 @@ class UtilisateurNote
         }
         $starBar .= self::DIV;
         $starBar .= '<div class="resultMedia'.$mediaId.'" style="font-size: small; color: grey">'; // We show the rate score and number of rates
-        if ($result['nbrRate'] == 0)
+        if ($result['nbrRate'] == 0) {
             $starBar .= 'Pas (encore) de vote';
-        else
-            $starBar .=  $result['average'] . '/' . $nombreEtoiles . ' (' . $result['nbrRate'] . ' votes)';
+        }
+        else {
+            $starBar .= $result['average'] . '/' . $nombreEtoiles . ' (' . $result['nbrRate'] . ' votes)';
+        }
         $starBar .= self::DIV;
         $starBar .= '<div class="box'.$mediaId.'"></div>';
         $starBar .= self::DIV;
@@ -120,8 +123,9 @@ class UtilisateurNote
         if ($ligne = $result->fetch_row()) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
-        } else
+        } else {
             return (0);
+        }
     }
 
     // Passe une ligne résultat mysql dans un objet
