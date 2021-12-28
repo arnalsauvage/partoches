@@ -95,10 +95,10 @@ while ($ligneDoc = $lignes->fetch_row()) {
     if (($numligne < $pagination->getItemDebut()) || $numligne > $pagination->getItemFin()) {
         continue;
     }
-
+// document : idAuto, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')
     $sortie .= "<tr> \n";
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    $fichier = "../". $_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+    $urlFichier = $_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . urlencode($fichierCourt);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
     //echo "extension " . $extension . " et filtre : " . $contenuFiltrer . " - " ;
 
@@ -128,7 +128,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
         } else {
             $sortie .= "<td>  </td>\n ";
         }
-        $sortie .= "<td> " . Ancre("getdoc.php?doc=" . $ligneDoc [0], $icone, "", true) . "<a href= '" . urlencode($fichier) . "' target='_blank'> " . $fichierCourt . "</a> \n";
+        $sortie .= "<td> " . Ancre("getdoc.php?doc=" . $ligneDoc [0], $icone, "", true) . "<a href= '" . $urlFichier . "' target='_blank'> " . $fichierCourt . "</a> \n";
         $sortie .= "<td>" . intval($ligneDoc [2] / 1024) . " ko  </td>";
         $sortie .= "<td>" . " -  publié le " . dateMysqlVersTexte($ligneDoc [3]) . " </td>";
         $sortie .= "<td> &nbsp; - " . $ligneDoc [8] . " vues </td></tr>\n";
