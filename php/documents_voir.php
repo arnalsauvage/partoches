@@ -98,7 +98,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
 // document : idAuto, '$nom', '$tailleKo', '$date', '$version', '$nomTable', '$idTable', '$idUser', '0')
     $sortie .= "<tr> \n";
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    $urlFichier = $_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . urlencode($fichierCourt);
+    $urlFichier = "../".$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . urlencode($fichierCourt);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
     //echo "extension " . $extension . " et filtre : " . $contenuFiltrer . " - " ;
 
