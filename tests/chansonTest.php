@@ -1,11 +1,12 @@
 <?php
+use PHPUnit\Framework\TestCase;
 // require_once 'PHPUnit/Autoload.php';
 session_start();
 require_once "../php/lib/utilssi.php";
+require_once "../php/chanson.php";
 
-use PHPUnit\Framework\TestCase;
 
-class ChansonTest extends TestCase
+class chansonTest extends TestCase
 {
     const LILA_LOUIS_987 = "Lila Louis 987";
     const OLIVE = "Olive";

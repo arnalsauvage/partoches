@@ -1,10 +1,11 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
+require_once("../php/lib/utilssi.php");
 
 class ChiffrementTest extends TestCase
 {
-    function setUp()
+    function setUp() :void
     {
         @session_start();
     }
@@ -33,9 +34,11 @@ class ChiffrementTest extends TestCase
     public function testEncrypteInvite()
     {
         $_chaine = "invite";
-        $crypt = Chiffrement::crypt($_chaine);
-        echo $_chaine . " ==> " . $crypt . "\n";
+        $_chaine_chiffree_attendue = "YXFUaU9SdkkvMHZlVFgzRjlRTmZEdjV6Rk9Pd093PT0=";
+        $chaine_chiffree = Chiffrement::crypt($_chaine);
+        echo $_chaine . " ==> " . $chaine_chiffree . "\n";
+        $chaine_dechiffree = Chiffrement::decrypt($chaine_chiffree);
 
-        $this->assertEquals("chaine", "chaine");
+        $this->assertEquals($_chaine , $chaine_dechiffree);
     }
 }
