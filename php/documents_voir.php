@@ -124,7 +124,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
         $sortie .= "<td> $vignettePublicateur </td>\n";
         $vignetteChanson = Image("../".$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . rawurlencode(imageTableId(CHANSON, $ligneDoc [6])), 128, 128, CHANSON);
         if ($precedenteVignette != $vignetteChanson) {
-            $sortie .= "<td> $vignetteChanson </td>\n";
+            $sortie .= "<td><a href='chanson_voir.php?id=".$ligneDoc[6]. "'> $vignetteChanson </a> </td>\n";
         } else {
             $sortie .= "<td>  </td>\n ";
         }
