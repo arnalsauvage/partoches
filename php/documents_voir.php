@@ -39,7 +39,20 @@ if (isset ($_GET ['triDesc'])) {
     $_SESSION[DOC_ORDRE_ASC] = false;
 }
 
-$lignes = chercheDocuments("nomTable", CHANSON, $_SESSION[DOC_TRI], $_SESSION[DOC_ORDRE_ASC]);
+
+if (isset ($_POST['filtre'])) {
+    $contenuFiltrer = $_POST['filtre'];
+    $contenuFiltrer = htmlspecialchars($contenuFiltrer, ENT_QUOTES);
+    //echo "filtre :" . $contenuFiltrer;
+} else {
+    $contenuFiltrer = "";
+}
+if ($contenuFiltrer =="") {
+    $lignes = chercheDocuments("nomTable", CHANSON, $_SESSION[DOC_TRI], $_SESSION[DOC_ORDRE_ASC]);
+}
+else {
+    $lignes = chercheDocuments("nom","%".addslashes($contenuFiltrer)."%", $_SESSION[DOC_TRI], $_SESSION[DOC_ORDRE_ASC]);
+}
 
 // Gestion de la pagination
 $pagination = new Pagination ($lignes->num_rows, $nombreDocumentsParPage);
@@ -53,14 +66,6 @@ $pagination->setPageEnCours($_SESSION[DOC_PAGE]);
 
 // On charge le tableau des utilisateurs
 $tabUsers = portraitDesUtilisateurs();
-
-if (isset ($_POST['filtre'])) {
-    $contenuFiltrer = $_POST['filtre'];
-    $contenuFiltrer = htmlspecialchars($contenuFiltrer, ENT_QUOTES);
-    //echo "filtre :" . $contenuFiltrer;
-} else {
-    $contenuFiltrer = "";
-}
 
 $sortie .= "
 <form  METHOD='POST' ACTION='documents_voir.php' NAME='formfiltre'>
