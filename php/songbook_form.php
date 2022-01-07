@@ -60,7 +60,8 @@ if (isset ($_POST ['id']) || (isset ($_GET ['id']) && (is_numeric($_GET ['id']))
 
 if ($mode == "MAJ") {
     $sortie .= "<H1> Mise à jour - " . $table . "</H1>";
-    $sortie .= " <p> Vous êtes sur le point de modifier un Songbook !</p>";
+    $sortie .= " <p> Vous êtes sur le point de modifier un Songbook !</p>
+                <a href='songbook_voir.php?id=$id'> voir le songbook</a>";
 }
 if ($mode == "INS") {
     $sortie .= "<H1> Création - " . $table . "</H1>";

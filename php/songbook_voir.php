@@ -67,6 +67,7 @@ $listeDocs = "";
 while ($ligne = $lignes->fetch_row()) {
     $ligneDoc = chercheDocument($ligne [1]);
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+    $lienChanson = "./chanson_voir.php?id=" . $ligneDoc [6];
     $fichier = "../".$_DOSSIER_CHANSONS. "/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
     $icone = Image(IMAGES_ICONES . $extension . ".png", 32, 32, "icone");
@@ -75,7 +76,8 @@ while ($ligne = $lignes->fetch_row()) {
         $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
     }
     $vignetteChanson = Image("../".$_DOSSIER_CHANSONS. "/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
-    $vignettePublicateur = Image("../images" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
+    $vignetteChanson = Ancre($lienChanson,$vignetteChanson);
+    $vignettePublicateur = Image("../vignettes/" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
     $sortie .= $vignettePublicateur . $vignetteChanson . $icone;
     $sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a>";
     $sortie .= " (" . intval($ligneDoc[2] / 1024) . " ko)<br>\n";
