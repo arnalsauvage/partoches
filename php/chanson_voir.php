@@ -4,6 +4,9 @@ const CHANSON = "chanson";
 const DIV_CLASS_ROW = "<div class='row'>";
 const FIN_DIV = "</div>";
 const FIN_SECTION = "</section>";
+global $_DOSSIER_CHANSONS;
+global $iconeEdit;
+global $cheminImages;
 require_once("lib/utilssi.php");
 require_once("menu.php");
 require_once("chanson.php");
@@ -117,7 +120,37 @@ if ($result->num_rows > 0) {
             $contenuHtml .= FIN_DIV;
         }
     }
-    $contenuHtml .= " </section>\n";
+    $contenuHtml .= FIN_SECTION . " \n";
+}
+
+//Voir les liens associés à cette chanson
+//  id	table	idtable	url	type	description
+$liens = $_chanson->chercheLiensChanson();
+
+// Voir les songbooks associés à cette chanson
+
+if ($liens->num_rows > 0) {
+    $contenuHtml .= "<h2> Liens associés à cette chanson</h2>";
+    $contenuHtml .= "<br><section class='row'>";
+
+    while ($lien = $liens->fetch_row()) {
+        $url = $lien[3];
+        $type = $lien[4];
+        $description = $lien[5];
+        $contenuHtml .= "
+
+<div class=\"col-xs-4 col-sm-3 col-md-2 centrer\">
+    <h3> 
+        <a href = '$url' target='_blank'>
+            $type
+        </a>
+    </h3>
+<p>  $description</p>
+</div>
+
+";
+    }
+    $contenuHtml .= FIN_SECTION;
 }
 
 $songbooks = $_chanson->chercheSongbooksDocuments();

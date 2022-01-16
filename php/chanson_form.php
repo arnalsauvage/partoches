@@ -5,6 +5,7 @@ require_once("menu.php");
 require_once("chanson.php");
 require_once("document.php");
 require_once("songbook.php");
+require_once ('lienurl.php');
 require_once("lib/formulaire.php");
 $table =  CHANSON;
 $sortie = "";
@@ -263,15 +264,12 @@ if ($mode == "MAJ") {
                         error: function (resultat, statut, erreur) {
                             $("#div<?php echo $numeroElement;?>").html(resultat);
                         }
-
                     });
                 }
-
                 function formSuccess() {
                     $("#msgSubmit").removeClass("hidden");
                 }
             </script>
-
             <?php
         }
     }
@@ -280,11 +278,73 @@ if ($mode == "MAJ") {
         echo "La corbeille est vide pour cette chanson.\n";
     }
 }
-echo "    </div> \n";
-echo "        	<script src='../js/chansonForm.js '></script>";
+    echo "<h2>Liste des liens de cette chanson</h2>";
+    echo "<ul>";
 
+echo "<li>
+                <input size='255' id='lienType0' name='type' value='' placeholder='video ou article'>
+                <input size='255' id='lienDescription0' name='description' value='' placeholder='description'>
+                <input size='255' id='lienUrl0' name='url' value='' placeholder='http://youtu.be/3456' >
+                <button name='createLien' onclick=\"updateLienurl('NEW',0,'chanson', $id) \">créer</button>
+              ";
+echo "</li><br>";
+
+    // Cherche un lienurl et le renvoie s'il existe
+    $lignes = chercheLiensUrlsTableId(CHANSON, $id);
+    $listeLiensUrl = "";
+    // Pour chaque lien
+    while ($ligneLien = $lignes->fetch_row()) {
+        // var_dump( $ligneLien);
+        $idLien = $ligneLien [0];
+        // renvoie la ligne sélectionnée : //  id	nomtable	idtable	url	type	description
+        $url = $ligneLien[3] ;
+        $type = $ligneLien[4];
+        $description = $ligneLien[5];
+        $nomtable = "chanson";
+        $idtable = $id;
+
+        echo "<li>
+                <input size='255' id='lienType$idLien' name='type' value='" . htmlentities($type) . "' placeholder='video ou article'>
+                <input size='255' id='lienDescription$idLien' name='description' value='" . htmlentities($description) . "' placeholder='description'>
+                <input size='255' id='lienUrl$idLien' name='url' value='" . htmlentities($url) . "' placeholder='http://youtu.be/3456' >
+                <button name='updateLien$idLien' onclick=\"updateLienurl('UPDATE',$idLien,'chanson', $id) \">modifier</button>
+                <button name='deleteLien$idLien' onclick=\"updateLienurl('DEL',$idLien,'chanson', $id) \">supprimer</button>
+              ";
+        echo "</li><br>";
+    }
 ?>
-
+    <script>
+        function updateLienurl(mode,id, nomtable, idtable) {
+            url = document.getElementById("lienUrl"+id).value;
+            type = document.getElementById("lienType"+id).value;
+            description = document.getElementById("lienDescription"+id).value;
+            $.ajax({
+                type: "POST",
+                url: "lienurlPost.php",
+                data: "mode="+mode+"&id="+id+"&url="+url+"&type="+type+"&description="+description+"&nomtable="+nomtable+"&idtable="+idtable,
+                datatype: 'html', // type de la donnée à recevoir
+                success: function (code_html, statut) { // success est toujours en place, bien sûr !
+                    if (code_html.search("n'a pas été traité.") === -1)
+                        toastr.success("Le lien a été modifié ! <br> Le lien de la chanson a été modifié <br> Vous pouvez raffraîchir la page pour le voir.");
+                    else {
+                        toastr.warning("Erreur dans l'opération...<br>Le lien n'a pas pu être modifié...");
+                        $("#div1").html(code_html);
+                    }
+                },
+                error: function (resultat, statut, erreur) {
+                    $("#div<?php echo $numeroElement;?>").html(resultat);
+                }
+            });
+        }
+        function formSuccess() {
+            $("#msgSubmit").removeClass("hidden");
+        }
+    </script>
+<?php
+    echo "</ul>";
+    echo "    </div> \n";
+    echo "        	<script src='../js/chansonForm.js '></script>";
+?>
     <script>
         function envoieFichierDansSongbook(idFichier) {
             // Récupérer l'id du songbook dans la combo
@@ -307,14 +367,11 @@ echo "        	<script src='../js/chansonForm.js '></script>";
                 error: function (resultat, statut, erreur) {
                     $("#div1").html(resultat);
                 }
-
             });
             // Retour ok : toast vert
-
             // Retour ko : toast rouge
         }
     </script>
 <?php
 echo envoieFooter();
-
 ?>

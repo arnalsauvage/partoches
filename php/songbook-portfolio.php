@@ -37,7 +37,7 @@ global $_DOSSIER_CHANSONS;
 <div class="navigation">
     <h1>les songbooks en ligne
 
-        <a href="chanson_liste.php" class="btn btn-success">
+        <a href="chanson_liste.php" class="btn btn-success" style="font-weight: bold">
             Entrez !
         </a>
 
@@ -45,10 +45,10 @@ global $_DOSSIER_CHANSONS;
 </div>
 
 <div class="info-cookies">
-    <p>
-        Ce site ne contient qu'un seul cookie pour vous donner les droits qui vous reviennent.
+    <span>
+        Ce site contient un cookie avec une seule donnée pour vous identifer comme visiteur ou contributeur.
         En poursuivant votre navigation, vous acceptez ce cookie et offrez votre coeur et votre âme au ukulélé !
-    </p>
+    </span>
 </div>
 <div class="content-box">
 
@@ -88,7 +88,7 @@ global $_DOSSIER_CHANSONS;
             // Si on n'a pas de pdf pour le songbook, on affiche juste l'image
             $largeur_max_vignette = 200;
             $hauteur_max_vignette = "";
-            $baliseImage = afficheVignette($imageSongBook, "../data/songbooks/$songbook[0]/" , "../data/songbooks/vignettes/", "vignette songbook");
+            $baliseImage = afficheVignette($imageSongBook, "../data/songbooks/$songbook[0]/" , "../data/songbooks/vignettes/", "vignette du songbook " . $songbook [1]);
             if ($pdfSongbook == "vide") {
                 echo $baliseImage;
             } else {
@@ -118,7 +118,7 @@ global $_DOSSIER_CHANSONS;
                 $titreCourt = htmlspecialchars(limiteLongueur($titresChansons [$ligneDoc [6]], 18), ENT_QUOTES);
                 echo "<a href= '" . $fichier . "' target='_blank' title='" . htmlspecialchars($titresChansons [$ligneDoc [6]], ENT_QUOTES) . "'> " . $titreCourt . "</a> \n";
 
-                echo "<a href= 'chanson_voir.php?id=" . $ligneDoc [6] . "' > $iconeMusique </a> <br>\n";
+                echo "<a aria-label='ouvrir la chanson '" . htmlspecialchars($titresChansons [$ligneDoc [6]]) . " href= 'chanson_voir.php?id=" . $ligneDoc [6] . "' > $iconeMusique </a> <br>\n";
                 ?>
                     <?php
             }
