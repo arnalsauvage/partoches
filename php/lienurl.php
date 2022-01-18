@@ -15,18 +15,18 @@ include_once "lib/configMysql.php";
 // Cherche les Lienurls correspondant à un critère
 function chercheLienurls($critere, $valeur, $critereTri = 'type', $bTriAscendant = true)
 {
-    $maRequete = "SELECT * FROM Lienurl WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
+    $maRequete = "SELECT * FROM lienurl WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
     $maRequete = !$bTriAscendant ? $maRequete . " DESC" : $maRequete . " ASC";
     // echo "ma requete : " . $maRequete;
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienurl #1 : " . $_SESSION ['mysql']->error);
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienurls #1 : " . $_SESSION ['mysql']->error);
     return $result;
 }
 
 // Cherche un Lienurl et le renvoie s'il existe
-function chercheLienurl($id)
+function chercheLienurlId($id)
 {
-    $maRequete = "SELECT * FROM Lienurl WHERE Lienurl.id = '$id'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienurl #2 : " . $_SESSION ['mysql']->error);
+    $maRequete = "SELECT * FROM lienurl WHERE lienurl.id = '$id'";
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienurlId #1 : " . $_SESSION ['mysql']->error);
     // renvoie la ligne sélectionnée :id	nomtable	idtable	url	type	description
     if ($ligne = $result->fetch_row()) {
         return ($ligne);
@@ -50,7 +50,7 @@ function chercheLienurlUrlTableId($url, $table, $id)
     }
 }
 
-// Cherche les documents d'une entree d'une table et les renvoie s'ils existent
+// Cherche les documents d'une entrée d'une table et les renvoie s'ils existent
 function chercheLiensUrlsTableId($table, $id)
 {
     $maRequete = "SELECT * FROM lienurl WHERE lienurl.idtable = '$id' AND lienurl.nomtable = '$table' ORDER BY lienurl.id ASC";
@@ -68,7 +68,7 @@ function creeLienurl($url, $type, $description, $nomTable, $idTable)
         return false;
     }
     $idUser = $_SESSION ['id'];
-    $maRequete = "INSERT INTO Lienurl VALUES (NULL,  '$nomTable', '$idTable', '$url', '$type', '$description')";
+    $maRequete = "INSERT INTO lienurl VALUES (NULL,  '$nomTable', '$idTable', '$url', '$type', '$description')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creeLienurl#1 : " . $_SESSION ['mysql']->error);
     return $result;
 }
@@ -83,14 +83,11 @@ function creeLienurl($url, $type, $description, $nomTable, $idTable)
  */
 function modifieLienurl($id, $url, $type, $description, $nomTable, $idTable)
 {
-    $date = date("d/m/y");
-    $date = convertitDateJJMMAAAA($date);
-    $idUser = $_SESSION ['id'];
     $resultat = chercheLienurlId($id);
     if ($resultat == NULL) {
         return false;
     }
-    $maRequete = "UPDATE  Lienurl
+    $maRequete = "UPDATE  lienurl
 	SET type = '$type', url = '$url', description = '$description', nomtable = '$nomTable', idtable = '$idTable'
 	WHERE id = '$id' ";
     $_SESSION ['mysql']->query($maRequete) or die ("Problème modifieLienurl #1 : " . $_SESSION ['mysql']->error . BR_REQUETE . $maRequete);
@@ -100,7 +97,7 @@ function modifieLienurl($id, $url, $type, $description, $nomTable, $idTable)
 function supprimeLienurl($id)
 {
     // On supprime les enregistrements dans la table Lienurl
-    $maRequete = "DELETE FROM Lienurl
+    $maRequete = "DELETE FROM lienurl
 	WHERE id='$id'";
     $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimeLienurl : " . $_SESSION ['mysql']->error);
 }

@@ -22,8 +22,9 @@ if ($_SESSION ['privilege'] > 2) {
         creeLienurl($url,$type,$description,$nomtable,$idtable);
     }
     // Modification
-    if (($_POST['mode'] == "UPDATE") && (is_numeric($id > 0))) {
-            modifieLienurl($id, $url, $type, $description, $nomtable, $idtable);
+    if (($_POST['mode'] == "UPDATE") && (is_numeric($id ))) {
+        //echo "Update";
+        modifieLienurl($id, $url, $type, $description, $nomtable, $idtable);
     }
 }
 //header('Location: ./chanson_form.php?id=' . $_POST['idTable']);

@@ -138,17 +138,30 @@ if ($liens->num_rows > 0) {
         $type = $lien[4];
         $description = $lien[5];
         $contenuHtml .= "
+        <div class=\"col-xs-4 col-sm-3 col-md-2 centrer\">
+            <h3> 
+                <a href = '$url' target='_blank'>
+                    $type
+                </a>
+            </h3>
+        <p>  $description</p>
+        </div>";
 
-<div class=\"col-xs-4 col-sm-3 col-md-2 centrer\">
-    <h3> 
-        <a href = '$url' target='_blank'>
-            $type
-        </a>
-    </h3>
-<p>  $description</p>
-</div>
+        $search  = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'à', 'á', 'â', 'ã', 'ä', 'å', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ò', 'ó', 'ô', 'õ', 'ö', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ');
+        $replace = array('A', 'A', 'A', 'A', 'A', 'A', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 'a', 'a', 'a', 'a', 'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y');
+        $type_sans_accent = str_replace($search, $replace, $type);
+        if (strtolower ($type_sans_accent) =="video"){
+            $urlEmbedded = str_replace( ".com/" , ".com/embed/" , $url);
+            $urlEmbedded = str_replace( ".be/" , ".be/embed/" , $urlEmbedded);
+            $urlEmbedded = str_replace( "watch?v=" , "" , $urlEmbedded);
+            $contenuHtml .= "
+        <div class=\"col-xs-4 col-sm-3 col-md-2 centrer\">
+        
+            <iframe width='280' height='200' src='$urlEmbedded' title='YouTube video player' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowfullscreen></iframe>
+        </div >
+        ";
+        }
 
-";
     }
     $contenuHtml .= FIN_SECTION;
 }
@@ -166,14 +179,14 @@ if ($songbooks->num_rows > 0) {
         $image = imageSongbook($id);
         $contenuHtml .= "
 
-<div class=\"col-xs-4 col-sm-3 col-md-2 centrer\">
-<a href = 'songbook_voir.php?id=$id'>
-<img src = '../data/songbooks/$id/$image' height='128' alt = 'couverture songbook'>
-<p>  $nom</p>
-</a>
-</div>
+        <div class=\"col-xs-4 col-sm-3 col-md-2 centrer\">
+        <a href = 'songbook_voir.php?id=$id'>
+        <img src = '../data/songbooks/$id/$image' height='128' alt = 'couverture songbook'>
+        <p>  $nom</p>
+        </a>
+        </div>
+        ";
 
-";
     }
     $contenuHtml .= "</section>";
 }
