@@ -51,16 +51,16 @@ if (!isset ($FichierUtilsSi)) {
                 }
                 if (is_dir("$nom_rep/$f")) {
                     array_push($sous_repertoires, "$nom_rep/$f");
-                    // echo $f . "<BR>";
+                    // pour debug : echo $f . "<BR>";
                 } else {
                     array_push($fichiers, "$nom_rep/$f");
-                    // echo $f . "<BR>";
+                    // pour debug : echo $f . "<BR>";
                 }
             }
             $d->close();
             foreach ($sous_repertoires as $sous_repertoire) {
                 $fichiers = array_merge($fichiers, pc_process_dir($sous_repertoire, $profondeur_max, $profondeur + 1));
-                // echo "$sous_repertoire <BR>";
+                // pour debug : echo "$sous_repertoire <BR>";
             }
         }
         return $fichiers;
@@ -90,7 +90,7 @@ if (!isset ($FichierUtilsSi)) {
                 return (Ancre("mp3/" . $mp3, "ouvrir", -1, 1));
             }
         } else {
-            // echo "fichier $mp3 non trouvé !!";
+            // pour debug : echo "fichier $mp3 non trouvé !!";
             return "";
         }
     }
@@ -110,7 +110,7 @@ if (!isset ($FichierUtilsSi)) {
 			<td valign=top><t size=1>$time</t></td><td valign=top></td> 
 			<td valign=top>< size=2>$log</></td><td valign=top></td> 		
 			</tr></table><br>");
-        // echo "Fichier : $fichier <br>\n";
+        // pour debug : echo "Fichier : $fichier <br>\n";
         fclose($fp);
     }
 
@@ -125,8 +125,8 @@ if (!isset ($FichierUtilsSi)) {
         $d = dir("../images" . $subDir);
         while (false !== ($entry = $d->read())) {
             if (($entry != ".") && ($entry != "..")) {
-                // echo "<option " . "value=$entry> echo $ligne[1]" . "</option>";
-                // echo "tableau[$compteur]=$entry <br>";
+                // pour debug : echo "<option " . "value=$entry> echo $ligne[1]" . "</option>";
+                // pour debug : echo "tableau[$compteur]=$entry <br>";
                 $tableau [$entry] = $entry;
             }
         }

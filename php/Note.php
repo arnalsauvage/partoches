@@ -2,13 +2,7 @@
 include_once("lib/utilssi.php");
 include_once ("UtilisateurNote.php");
 
-//$_utilisateurNote = new UtilisateurNote ( 5, 12, "chanson", 1);
-//$id = $_utilisateurNote->creeNoteUtilisateurBDD();
-//$_utilisateurNote = new UtilisateurNote ( 3, 1, "chanson", 1);
-//$id = $_utilisateurNote->creeNoteUtilisateurBDD();
-
 echo envoieHead("Partoches", "../css/index.css") . PHP_EOL;
-// phpinfo();
 
 // Display 4 star bar system for 4 different IDs
 echo UtilisateurNote::starBar( "chanson", 5, 10, 25); // 5 stars, Media ID 201, 25px star image

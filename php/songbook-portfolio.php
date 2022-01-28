@@ -76,7 +76,7 @@ global $_DOSSIER_CHANSONS;
     while ($docSongbook = $docsSongbook->fetch_row()) {
         if (strstr(strtolower($docSongbook [1]), "pdf")) {
             $pdfSongbook = composeNomVersion($docSongbook [1], $docSongbook [4]);
-            // echo "fichier trouvé : " . $pdfSongbook ." ";
+            // pour debug : echo "fichier trouvé : " . $pdfSongbook ." ";
         }
     }
     $imageSongBook = imageSongbook($songbook [0]);

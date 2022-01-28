@@ -93,7 +93,7 @@ if (!isset ($FichierHtml)) {
     // Cette fonction remplace une adresse url dans un texte par un lien cliquable
     function lienCliquable($texte)
     {
-        $texte = preg_replace('@((https?://)?([-\w]+\.[-\w\.]+)+\w(:\d+)?(/([-\w/_\.]*(\?\S+)?)?)*)@', '<a href="$1" target="blank">$1</a>', $texte);
+        $texte = preg_replace('/https?:\/\/[\w\-\.!~#?&=+\*\'"(),\/]+/','<a href="$0">$0</a>', $texte);
 
         //because you want the url to be an external link the href needs to start with 'http://'
         //simply replace any occurance of 'href="www.' into 'href="http://www."
@@ -134,9 +134,9 @@ if (!isset ($FichierHtml)) {
                     $indice++;
                     $tableau[$indice] = "";
                 }
-            } else
-                // on copie le caractère dans le tableau[indice]
+            } else {// on copie le caractère dans le tableau[indice]
                 $tableau[$indice] .= $texte[$i];
+            }
         }
         // Pour chaque élément du tableau non HTML, on applique une expression régulière
         // transformant les adresses en liens
@@ -157,18 +157,19 @@ if (!isset ($FichierHtml)) {
      */
     function transformerAdressesEnLiens( int $indice, array $tableau, $debug_fonc=false): array
     {
-        if ($debug_fonc)
+        if ($debug_fonc) {
             echo "tableau[$indice] : $tableau[$indice]\n";
+        }
 
         if (strstr($tableau[$indice], "<") == FALSE) {
             $chaine = $tableau[$indice];
             $tableau[$indice] = lienCliquable($tableau[$indice]);
-            //$tableau[$indice]  = preg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]",
-            //    "<a href=\"\\0\">\\0</a>", $tableau[$indice]);
-            if ($debug_fonc)
+            if ($debug_fonc) {
                 echo "<br>chaine  remplacée : $chaine <br>\n";
-            if ($debug_fonc)
+            }
+            if ($debug_fonc) {
                 echo "<br>chaine  de remplacement : $tableau[$indice] <br>\n";
+            }
         }
         return array($chaine, $tableau);
     }

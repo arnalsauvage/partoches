@@ -80,71 +80,60 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
     }
     // On verifie que l'extention du fichier est bien une image jpg,jpeg ou gif
     $ext = strtolower(strrchr($image, '.'));
-    if ($ext == ".jpg" || $ext == ".jpeg" || $ext == ".gif" || $ext == ".png") {
-        $size = getimagesize($source . $image);
-        $largeur_src = $size [0];
-        $hauteur_src = $size [1];
+    if ($ext != ".jpg" && $ext != ".jpeg" && $ext != ".gif" && $ext != ".png") {
+        return false;
+    }
+    $size = getimagesize($source . $image);
+    $largeur_src = $size [0];
+    $hauteur_src = $size [1];
 
-        // 2ieme verification -> on verifie que le type du fichier est un jpg,jpeg,gif ou bmp
-        // rappel
-        // retourne un tableau de 4 éléments.
-        // L'index 0 contient la largeur.
-        // L'index 1 contient la longueur.
-        // L'index 2 contient le type de l'image :
-        // 1 = GIF ,
-        // 2 = JPG ,
-        // 3 = PNG ,
-        // 4 = SWF ,
-        // 5 = PSD ,
-        // 6 = BMP ,
-        // 7 = TIFF (Ordre des octets Intel),
-        // 8 = TIFF (Ordre des octets Motorola),
-        // 9 = JPC ,
-        // 10 = JP2 ,
-        // 11 = JPX ,
-        // 12 = JB2 ,
-        // 13 = SWC ,
-        // 14 = IFF .
-        // Ces valeurs correspondent aux constantes IMAGETYPE qui ont �t� ajout�es en PHP 4.3
+    // 2ieme verification -> on verifie que le type du fichier est un jpg,jpeg,gif ou bmp
+    // rappel
+    // retourne un tableau de 4 éléments.
+    // L'index 0 contient la largeur.
+    // L'index 1 contient la longueur.
+    // L'index 2 contient le type de l'image :
+    // 1 = GIF ,
+    // 2 = JPG ,
+    // 3 = PNG ,
 
-        // $size[2] -> type de l'image : 1 = GIF , 2 = JPG,JPEG
-        if ($size [2] == 1 || $size [2] != 2 || $size [2] != 3 || $size [2] != 6) {
-            if ($size [2] == 1) {
-                // format gif
-                $image_src = imagecreatefromgif($source . $image);
-            }
-            if ($size [2] == 2) {
-                // format jpg ou jpeg
-                $image_src = imagecreatefromjpeg($source . $image);
-                // echo 'image : $source / $image';
-            }
-            if ($size [2] == 3) {
-                // format png
-                $image_src = imagecreatefrompng($source . $image);
-            }
+    switch ($size[2])
+    {
+        case 1: // format gif
+            $image_src = imagecreatefromgif($source . $image);
+            break;
+        case 2: // format jpg ou jpeg
+            $image_src = imagecreatefromjpeg($source . $image);
+            break;
+        case 3: // format png
+            $image_src = imagecreatefrompng($source . $image);
+            break;
+        default :
+            return 0;
+    }
 
-            // on verifie que l'image source ne soit pas plus petite que l'image de destination
-            if ($hauteur_max_vignette=="") {
-                $ratio = $largeur_src / $largeur_max_vignette;
-                $hauteur = round ( $hauteur_src / $ratio);
-                $largeur = $largeur_max_vignette;
-            }
-            if ($largeur_max_vignette=="") {
-                $ratio = $hauteur_src / $hauteur_max_vignette;
-                $largeur = round( $largeur_src/$ratio);
-                $hauteur = $hauteur_max_vignette;
-            }
-            $image_dest = imagecreatetruecolor($largeur, $hauteur);
-            imagecopyresized($image_dest, $image_src, 0, 0, 0, 0, $largeur, $hauteur, $largeur_src, $hauteur_src);
+    // on verifie que l'image source ne soit pas plus petite que l'image de destination
+    if ($hauteur_max_vignette=="") {
+        $ratio = $largeur_src / $largeur_max_vignette;
+        $hauteur = round ( $hauteur_src / $ratio);
+        $largeur = $largeur_max_vignette;
+    }
 
-            $log = "vignette.php Image : $image, largeur : " . round($largeur_src * $ratio) . ", $hauteur : " . round($hauteur_src * $ratio) . ", source : $source, destination : $destination";
-            // ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
-            if (!imagejpeg($image_dest, $destination . $prefixe . $image)) {
-                $log = "la création de la vignette a echoué pour l'image $destination$prefixe$image";
-                // ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
-                return false;
-            }
-        } // fin du size
-    } // fin de l'extension
+    if ($largeur_max_vignette=="") {
+        $ratio = $hauteur_src / $hauteur_max_vignette;
+        $largeur = round( $largeur_src/$ratio);
+        $hauteur = $hauteur_max_vignette;
+    }
+
+    $image_dest = imagecreatetruecolor($largeur, $hauteur);
+    imagecopyresized($image_dest, $image_src, 0, 0, 0, 0, $largeur, $hauteur, $largeur_src, $hauteur_src);
+
+    $log = "vignette.php Image : $image, largeur : " . round($largeur_src * $ratio) . ", $hauteur : " . round($hauteur_src * $ratio) . ", source : $source, destination : $destination";
+    // ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
+    if (!imagejpeg($image_dest, $destination . $prefixe . $image)) {
+        $log = "la création de la vignette a echoué pour l'image $destination$prefixe$image";
+        // ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
+        return false;
+    }
     return true;
 }

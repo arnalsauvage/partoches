@@ -1,8 +1,6 @@
 <?php
-//namespace Partoches;
 include_once("lib/utilssi.php");
 // Objet de gestion des notes utilisateur
-
 
 class UtilisateurNote
 {
@@ -151,7 +149,6 @@ class UtilisateurNote
         } else {
             $maRequete = "UPDATE noteUtilisateur SET note = '$this->_note'
              WHERE nomObjet = '$this->_nomObjet' AND  idObjet = '$this->_idObjet' AND idUtilisateur = '$this->_idUtilisateur'";
-            // echo $maRequete;
             $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modif dans creeModifieNoteUtilisateurBDD #1 : " . $_SESSION ['mysql']->error . " requete : " . $maRequete);
             return ($this->_id);
         }
@@ -167,7 +164,6 @@ class UtilisateurNote
 	         '$this->_nomObjet',
 	          '$this->_idObjet', 
 	          '$this->_note')";
-        // echo $maRequete;
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creeNoteUtilisateurBDD#1 : " . $_SESSION ['mysql']->error);
         // On renseigne l'id de l'objet avec l'id créé en BDD
         $this->setId($_SESSION ['mysql']->insert_id);
@@ -183,7 +179,6 @@ class UtilisateurNote
             $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimeNoteUtilisateur : " . $_SESSION ['mysql']->error);
         }
     }
-
 
     //// GETTERS et SETTERS /////////////////////
 
