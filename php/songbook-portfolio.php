@@ -35,13 +35,16 @@ global $_DOSSIER_CHANSONS;
 
 <body>
 <div class="navigation">
-    <h1>les songbooks en ligne
+    <header>
 
+    <h1>les songbooks en ligne
+    <nav>
         <a href="chanson_liste.php" class="btn btn-success" style="font-weight: bold">
             Entrez !
         </a>
-
+    </nav>
     </h1>
+    </header>
 </div>
 
 <div class="info-cookies">

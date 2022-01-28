@@ -35,4 +35,12 @@ class htmlTest extends TestCase
         $_utilisateurNote->supprimeNoteUtilisateur();
         $this->assertEquals(0, $_utilisateurNote->chercheNoteUtilisateur(12, "chanson", 3));
     }
+
+    public function testeEchappeGuillemetsSimples()
+    {
+        $_titre_original = "Concert d'automne";
+        $_titre_modifie = "Concert d&#39;automne";
+
+        $this->assertEquals($_titre_modifie, echappeGuillemetSimple( $_titre_original));
+    }
 }

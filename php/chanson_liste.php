@@ -159,14 +159,12 @@ if ($largeur_ecran >1200) {
 if ($largeur_ecran > 700) {
     $contenuHtml .= titreColonne("Date pub.", DATE_PUB);
     $contenuHtml .= titreColonne("Publié par", "idUser");
-}
-if ($largeur_ecran >1200) {
 
     $contenuHtml .= titreColonne("Vues", "hits");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
 if ($_SESSION [PRIVILEGE] > 1) {
-    $contenuHtml .= titreColonne("", "");
+    $contenuHtml .= tblEntete("action", "");
 
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
@@ -199,7 +197,9 @@ foreach ($resultat as $ligne) {
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
     if ($_SESSION [PRIVILEGE] > 1)
     {
-        $contenuHtml .= TblCellule(Ancre("$chansonForm?id=" . $_id, Image($cheminImages . $iconeEdit, 32, 32)));
+        $_image = Image($cheminImages . $iconeEdit, 32, 32);
+        $_ancre = Ancre("$chansonForm?id=" . $_id, $_image,-1, -1, "modifier la chanson" );
+        $contenuHtml .= TblCellule($_ancre);
     }
     else
     {
@@ -208,7 +208,7 @@ foreach ($resultat as $ligne) {
     // TODO Supprimer les parametres filtres existant dans l'url pour les liens avec filtre !
     $imagePochette = Image(($cheminImagesChanson . $_id . "/" . rawurlencode(imageTableId(CHANSON, $_id))), 48, 48, "couverture");
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", $imagePochette));
-    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"))); // Nom
+    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"), -1 ,-1,$_chanson->getNom())); // Nom
     $url = $_SERVER['REQUEST_URI'];
     $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=interprete&" .  VAL_FILTRE . "=" .urlencode($_chanson->getInterprete())),limiteLongueur($_chanson->getInterprete(),21))); // interprete
     if ($largeur_ecran >700) {
@@ -264,7 +264,11 @@ echo $contenuHtml;
 
 function titreColonne($libelle, $nomRubrique)
 {
-    $lienCroissant = Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> </span>");
-    $lienDecroissant = Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> </span>");
+    $lienCroissant = "<button onclick=\"window.location.href='?tri=$nomRubrique'\" title='tri croissant par $nomRubrique'>
+                        <span class='glyphicon glyphicon-chevron-up'> </span>
+                        </button>";
+    $lienDecroissant = "<button onclick=\"window.location.href='?triDesc=$nomRubrique'\" title='tri décroissant par $nomRubrique'>
+                        <span class='glyphicon glyphicon-chevron-down'> </span>
+                        </button>";
     return TblEntete($lienCroissant . "  $libelle " . $lienDecroissant);
 }

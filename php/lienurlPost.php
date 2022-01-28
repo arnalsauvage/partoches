@@ -2,7 +2,7 @@
 require_once("lib/utilssi.php");
 require("lienurl.php");
 // Un non-admin non editeur ne peut modifier les liens
-if ($_SESSION ['privilege'] > 2) {
+if ($_SESSION ['privilege'] > 1) {
     // Suppression
     if ($_POST['mode'] == "DEL") {
         supprimeLienurl($_POST['id']);

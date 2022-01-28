@@ -16,8 +16,14 @@ function afficheVignette($image, $cheminImages, $cheminVignettes, $alt='vignette
         // On crée une vignette
         creation_vignette($image, $largeur_max_vignette, $hauteur_max_vignette, $cheminImages, $cheminVignettes);
     }
-        // On retourne le code de la vignette
+    // On retourne le code de la vignette
+    $alt = echappeGuillemetSimple($alt);
     return ("<img class = 'vignette' loading='lazy' alt='$alt' src='$cheminVignettes$image'>");
+}
+
+function echappeGuillemetSimple($chaine)
+{
+    return str_replace("'", "&#39;", $chaine);
 }
 
 /**

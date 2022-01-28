@@ -10,9 +10,9 @@ global $pagination;
 global $url;
 $contenuHtmlCompCherche = "
 <FORM  METHOD='POST' ACTION='chanson_liste.php' NAME='Form'>
-<label class='labelTitreInterprete' >Titre ou interprète:</label>
-<INPUT TYPE='TEXT' NAME='cherche' class='rechercheChanson' VALUE='$nom' SIZE='100' MAXLENGTH='128' placeholder=\"recherche chanson par titre ou nom de l'interprete\">
-<a class='inline'
+<label class='labelTitreInterprete' for='rechercheChanson'>Titre ou interprète:</label>
+<INPUT id='rechercheChanson' TYPE='TEXT' NAME='cherche' class='rechercheChanson' VALUE='$nom' SIZE='100' MAXLENGTH='128' placeholder=\"recherche chanson par titre ou nom de l'interprete\">
+<a class='inline' title='effacer le critère de recherche'
 
  href='" . $pagination->urlAjouteParam($url,"raz-recherche") . "'> 
 <svg xmlns='http://www.w3.org/2000/svg' 
@@ -21,6 +21,6 @@ $contenuHtmlCompCherche = "
 </svg>
 </a>
 <br>
-<label class='inline'> </label><INPUT TYPE='submit' NAME='chercher' VALUE=' chercher ' >
+<input type='submit' title='chercher' name='chercher' value=' chercher ' >
 <br>
 </FORM>";

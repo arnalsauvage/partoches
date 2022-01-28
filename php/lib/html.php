@@ -3,9 +3,10 @@ if (!isset ($FichierHtml)) {
     $FichierHtml = 1;
     // Fonction retournant le code HTML pour un lien hypertexte____________
 
-    function Ancre($url, $libelle, $classe = -1, $nouvellefenetre = -1)
+    function Ancre($url, $libelle, $classe = -1, $nouvellefenetre = -1, $titre=-1)
     {
         $optionClasse = "";
+        $optionTitre = "";
         if ($nouvellefenetre == -1) {
             $nouvellefenetre = "";
         }
@@ -15,7 +16,11 @@ if (!isset ($FichierHtml)) {
         if ($classe != -1) {
             $optionClasse = " class='$classe'";
         }
-        return "<a href='$url'" . "$nouvellefenetre $optionClasse>$libelle</A>";
+        if ($titre != -1) {
+            $titre = htmlspecialchars($titre);
+            $optionTitre = " title=\"$titre\"";
+        }
+        return "<a href='$url'" . "$nouvellefenetre $optionClasse $optionTitre>$libelle</A>";
     }
 
     // Fin de la fonction Ancre____________________________________________
@@ -26,7 +31,7 @@ if (!isset ($FichierHtml)) {
     }
 
     // Fonction retournant le code HTML pour une image ____________________
-    function Image($urlImage, $largeur = -1, $hauteur = -1, $alt = "image deco", $class = "")
+    function Image($urlImage, $largeur = -1, $hauteur = -1, $alt = "image décorative", $class = "")
     {
         $attrLargeur = "";
         $attrHauteur = "";
@@ -36,7 +41,7 @@ if (!isset ($FichierHtml)) {
         if (($hauteur != -1) && ($hauteur <> "100%")) {
             $attrHauteur = " height = '$hauteur' ";
         }
-        return "<img src='".$urlImage."' " . $attrLargeur . $attrHauteur . "  title='$alt' alt='$alt' class ='$class'>\n";
+        return "<img src='".$urlImage."' " . $attrLargeur . $attrHauteur . " alt='$alt' class ='$class'>\n";
     }
 
     // Fin de la fonction Image____________________________________________

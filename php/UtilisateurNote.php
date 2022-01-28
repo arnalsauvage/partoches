@@ -40,7 +40,8 @@ class UtilisateurNote
 
         $starBar = '<div id="'.$mediaId.'">';
         $starBar .= '<div class="star_bar" style="width:'.$nbrPixelsInDiv.'px; height:'.$largeurEtoiles.'px; background: 
-    linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX. self::PX_CCC .$numEnlightedPX. self::PX_CCC .$nbrPixelsInDiv.'px);" rel=\''.$getJSON.'\'>';
+    linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX. self::PX_CCC .$numEnlightedPX. self::PX_CCC .$nbrPixelsInDiv.'px);" >';
+//    linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX. self::PX_CCC .$numEnlightedPX. self::PX_CCC .$nbrPixelsInDiv.'px);" rel=\''.$getJSON.'\'>';
         // Une boucle pour créer le nombre d'étoiles demandées
         for ($i=1; $i<=$nombreEtoiles; $i++) {
             $starBar .= '<div title="'.$i.'/'.$nombreEtoiles.'" id="'.$i.'" class="star"';

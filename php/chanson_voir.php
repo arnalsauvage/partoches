@@ -151,11 +151,16 @@ if ($liens->num_rows > 0) {
         $replace = array('A', 'A', 'A', 'A', 'A', 'A', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 'a', 'a', 'a', 'a', 'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y');
         $type_sans_accent = str_replace($search, $replace, $type);
         if (strtolower ($type_sans_accent) =="video"){
+            // On vire les paramètres
+            $url = explode ("&", $url);
+            $url = $url[0];
+            // On remplace youtu.be par youtube.com
+            $url = str_replace( ".be/" , "be.com/" , $url);
+            // On ajoute, si manquant, le mot clé embed
             $urlEmbedded = str_replace( ".com/" , ".com/embed/" , $url);
-            $urlEmbedded = str_replace( ".be/" , ".be/embed/" , $urlEmbedded);
             $urlEmbedded = str_replace( "watch?v=" , "" , $urlEmbedded);
             $contenuHtml .= "
-        <div class=\"col-xs-4 col-sm-3 col-md-2 centrer\">
+        <div class=\"col-xs-8 col-sm-6 col-md-4 centrer\">
         
             <iframe width='280' height='200' src='$urlEmbedded' title='YouTube video player' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowfullscreen></iframe>
         </div >
