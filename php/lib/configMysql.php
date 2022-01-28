@@ -33,7 +33,7 @@ if (FALSE == isset($configMysql)) {
 
 function convertitDateJJMMAAAA($date)
 {
-    // On convertit la date au format mysql
+    // On convertit la date au format mysql : "JJ/MM/AAAA" devient "AAAA-MM-JJ"
 // 		echo "Ancienne date : $date ";
     $date = explode('/', $date);
     $new_date = $date[2] . '-' . $date[1] . '-' . $date[0];

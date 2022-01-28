@@ -35,7 +35,7 @@ $tabUsers = portraitDesUtilisateurs();
 $donnee = chercheSongbook($idSongbook);
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
 
-if ($_SESSION ['privilege'] > 1) {
+if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     $sortie .= Ancre($songbookForm . "?id=" . $idSongbook, Image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
 }
 

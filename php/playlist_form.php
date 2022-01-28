@@ -10,7 +10,7 @@ $sortie = "";
 // Cette page est dupliquée depuis songbook_form...
 
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
-if ($_SESSION ['privilege'] < 2) {
+if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_EDITEUR"] ) {
     $urlRedirection = $table . "_voir.php";
     if (isset ($_GET ['id']) && is_numeric($_GET['id']))
         $urlRedirection .= "?id=" . $_GET ['id'];
@@ -66,7 +66,7 @@ $f->champCache("mode", $mode);
 $f->champValider(" Valider ", "valider");
 $sortie .= $f->fin();
 
-if ($_SESSION ['privilege'] < 3) {
+if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
     // On verrouille les champs hits, date publication
     $sortie = str_replace("NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie);
     $sortie = str_replace("NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie);

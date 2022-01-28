@@ -38,7 +38,7 @@ $numligne = 0;
 // Affichage de la liste
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
-if ($_SESSION ['privilege'] >= 2) {
+if ($_SESSION ['privilege'] >=$GLOBALS["PRIVILEGE_EDITEUR"]) {
     $fichiersDuSongbook .= "<BR>" . Ancre("$songbookForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau songbook");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
@@ -60,7 +60,7 @@ while ($ligne = $resultat->fetch_row()) {
     if ($ligne [4])
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
     {
-        if ($_SESSION ['privilege'] >= 2) {
+        if ($_SESSION ['privilege'] >=$GLOBALS["PRIVILEGE_EDITEUR"]) {
             $fichiersDuSongbook .= TblCellule(Ancre($songbookForm . "?id=$ligne[0]", Image(($cheminImagesSongbook . $ligne[0] . "/" . urlencode(imageTableId("songbook", $ligne[0]))), 32, 32, "couverture")));
         } // image
         else {
@@ -78,7 +78,7 @@ while ($ligne = $resultat->fetch_row()) {
     $fichiersDuSongbook .= TblCellule("  -  " . $ligne [5] . " hit(s)"); // hits
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-    if ($_SESSION ['privilege'] >= 2) {
+    if ($_SESSION ['privilege'] >=$GLOBALS["PRIVILEGE_EDITEUR"]) {
         $fichiersDuSongbook .= TblCellule(boutonSuppression($songbookGet . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
         $fichiersDuSongbook .= TblCellule(Ancre($songbookGet . "?DUP=$ligne[0]", "dupliquer"));
         // //////////////////////////////////////////////////////////////////////ADMIN
@@ -89,7 +89,7 @@ while ($ligne = $resultat->fetch_row()) {
 $fichiersDuSongbook .= TblFin();
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
-if ($_SESSION ['privilege'] >= 2) {
+if ($_SESSION ['privilege'] >=$GLOBALS["PRIVILEGE_EDITEUR"]) {
     $fichiersDuSongbook .= "<BR>" . Ancre("?page=$songbookForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel songbook");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN

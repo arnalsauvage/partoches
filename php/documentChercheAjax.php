@@ -9,8 +9,9 @@ global $_DOSSIER_CHANSONS;
 $table =  "documents";
 $sortie = "";
 
-// Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on ne répond pas
-if ($_SESSION ['privilege'] < 2) {
+// Si l'utilisateur n'est pas au moins EDITEUR, on ne répond pas
+if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_EDITEUR"])
+{
     return(0);
 }
 

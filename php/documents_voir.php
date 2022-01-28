@@ -17,7 +17,7 @@ $monImage = "";
 global $_DOSSIER_CHANSONS;
 
 $nombreDocumentsParPage = 50;
-if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] < 1) {
+if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_MEMBRE"]) {
     // Affichage du formulaire de login
     echo "pas de contenu...";
     exit();

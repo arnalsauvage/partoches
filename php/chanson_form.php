@@ -29,7 +29,7 @@ function comboAjoutSongbook($listeSongbooks)
 }
 
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
-if ($_SESSION ['privilege'] < 2) {
+if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_EDITEUR"]) {
     $urlRedirection = $table . "_voir.php";
     if (isset ($_GET ['id']) && is_numeric($_GET ['id']))
     {
@@ -149,7 +149,7 @@ if ($_chanson->getNom()) {
     $sortie .= "Pour chercher la chanson sur <a href='$rechercheWikipedia' target='_blank'>wikipedia</a><br>\n";
 }
 
-if ($_SESSION ['privilege'] < 3) {
+if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
     // On verrouille les champs hits, date publication, et utilisateur
     $sortie = str_replace("NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie);
     $sortie = str_replace("NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie);
@@ -185,7 +185,7 @@ if ($mode == "MAJ") {
 		    <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
 		    <button name='renommer' style='display:none;'>renommer</button>
             <button style='display:none;'>x</button>";
-            if ($_SESSION ['privilege'] > 2) {
+            if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
                 $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
             }
             //$listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];

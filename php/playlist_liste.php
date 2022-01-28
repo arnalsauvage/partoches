@@ -30,7 +30,7 @@ $numligne = 0;
 // Affichage de la liste
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
-if ($_SESSION ['privilege'] >= 2)
+if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"])
     $fichiersDuPlaylist .= "<BR>" . Ancre("$playlistForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel playlist");
 // //////////////////////////////////////////////////////////////////////ADMIN
 
@@ -52,7 +52,7 @@ while ($ligne = $resultat->fetch_row()) {
     // Playlist : 	[0]id 	[1]nom 	[2]description 	[3]date  	[4]image 	[5]hits 	[6]idUser
     if ($ligne [4])
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-        if ($_SESSION ['privilege'] >= 2)
+        if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"])
             $fichiersDuPlaylist .= TblCellule(Ancre($playlistForm . "?id=$ligne[0]", "modifier"));
         else
             $fichiersDuPlaylist .= TblCellule(Image(($cheminPlaylist . $ligne[0] . "/" . $ligne [4]), 32, 32)); // image
@@ -66,7 +66,7 @@ while ($ligne = $resultat->fetch_row()) {
     $fichiersDuPlaylist .= TblCellule("  -  " . $ligne [5] . " hit(s)"); // hits
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-    if ($_SESSION ['privilege'] >= 2) {
+    if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"]) {
         $fichiersDuPlaylist .= TblCellule(boutonSuppression($playlistGet . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
         // //////////////////////////////////////////////////////////////////////ADMIN
 
@@ -77,7 +77,7 @@ $fichiersDuPlaylist .= TblFin();
 
 $fichiersDuPlaylist .= Image($iconeAttention, "100%", 1, 1);
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
-if ($_SESSION ['privilege'] >= 2)
+if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"])
     $fichiersDuPlaylist .= "<BR>" . Ancre("?page=$playlistForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer une nouvelle playlist");
 // //////////////////////////////////////////////////////////////////////ADMIN
 $fichiersDuPlaylist .= envoieFooter();

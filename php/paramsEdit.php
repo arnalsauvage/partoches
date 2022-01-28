@@ -6,7 +6,7 @@ $sortie = "";
 $sortie .= "<table><tr><td>";
 
 // Si l'utilisateur n'est pas logué
-if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] <= 2) {
+if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
     // Affichage du formulaire de login
     $sortie .= $sortie;
     include "../html/menuLogin.html";

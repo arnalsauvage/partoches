@@ -43,7 +43,7 @@ $contenuHtml .= DIV_CLASS_ROW;
 $contenuHtml .= " <div class='col-sm-10'><h2>" . htmlentities($_chanson->getNom()) . "</h2>" . FIN_DIV; // Titre
 $contenuHtml .= "<div class='col-sm-2'>";
 
-if ($_SESSION ['privilege'] > 1) {
+if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     $contenuHtml .= Ancre("chanson_form.php?id=" . $idChanson, Image($cheminImages . $iconeEdit, 32, 32)); // Nom));
 }
 $contenuHtml .= "</div>" . FIN_DIV;
@@ -68,7 +68,7 @@ if ("" != $monImage) {
     $contenuHtml .= Image("../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $monImage, 200, "", "pochette", "img-thumbnail");
 }
 
-if ($_SESSION['privilege'] > 0) {
+if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
     $contenuHtml .= UtilisateurNote::starBarUtilisateur(CHANSON, $idChanson, 5, 25);
 } // 5 stars, Media ID 201, 25px star image
 $contenuHtml .= UtilisateurNote::starBar(CHANSON, $idChanson, 5, 25); // 5 stars, Media ID 201, 25px star image

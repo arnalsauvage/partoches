@@ -8,7 +8,7 @@ include_once "songbook.php";
 include_once "utilisateur.php";
 
 
-if ($_SESSION ['privilege'] > 2) {
+if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
     testeChanson();
     testeDocument();
     testeSongbook();

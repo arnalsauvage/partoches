@@ -8,7 +8,7 @@ $sortie = "";
 // Chargement des donnees de l'utilisateur si l'identifiant est fourni
 if (isset ($_GET ['id']) && $_GET ['id'] != "") {
     $donnee = chercheUtilisateur($_GET ['id']);
-    if (($_SESSION ['privilege'] > 2) || $_SESSION ['user'] == $donnee [1]) {
+    if (($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) || $_SESSION ['user'] == $donnee [1]) {
         $mode = "MAJ";
         $donnee [2] = Chiffrement::decrypt($donnee [2]);
         $donnee [1] = htmlspecialchars($donnee [1]);
@@ -18,7 +18,7 @@ if (isset ($_GET ['id']) && $_GET ['id'] != "") {
         $donnee [7] = htmlspecialchars($donnee [7]);
         $donnee [8] = htmlspecialchars($donnee [8]);
     }
-} else if ($_SESSION ['privilege'] > 2) {
+} else if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
     $mode = "INS";
     $donnee [0] = 0; // id
     $donnee [1] = ""; // login
@@ -85,14 +85,14 @@ $sortie .= "<h2>Envoyer une image sur le serveur</h2>
 	</form>";
 
 // Si l'utilisateur n'est pas Admin
-if ($_SESSION ['privilege'] < 3) {
+if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
     // On désactive les champs dateDernierLogin, nbreLogins et privilege pour les non admins
     $sortie = str_replace("NAME='fdateDernierLogin'", "NAME='fdateDernierLogin' disabled='disabled' ", $sortie);
     $sortie = str_replace("NAME='fnbreLogins'", "NAME='fnbreLogins' disabled='disabled' ", $sortie);
     $sortie = str_replace("NAME='fprivilege'", "NAME='fprivilege' disabled='disabled' ", $sortie);
 }
 
-if ($_SESSION ['privilege'] > 2)
+if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"])
     $help = "(". $donnee [2] .")";
 $sortie .= "<img src='../vignettes/upload.png' title=' ".$donnee [2]."'>";
 

@@ -9,7 +9,7 @@ require_once("lib/utilssi.php");
 require("lienDocSongbook.php");
 
 // Un non-admin ne peut changer l'ordre
-if ($_SESSION ['privilege'] > 1) {
+if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     if (is_numeric($_GET['idSongbook'] > 0)) {
         if ($_GET['dir'] == "down") {
             remonteTitre($_GET['idSongbook'], $_GET['ordre'] + 1, 1);

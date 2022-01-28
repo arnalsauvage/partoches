@@ -80,11 +80,11 @@ $contenu .= "
 			<span class='icon-bar'></span>\n
 			<span class='icon-bar'></span>\n";
 // Le lien paramétrage est limité aux admin et login parametrage
-if (($_SESSION['privilege'] > 1))
+if (($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]))
     $contenu .= "<span class='icon-bar'></span>";
 
 // Le lien paramétrage est limité aux admin et login parametrage
-if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > 2))
+if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]))
     $contenu .= "<span class='icon-bar'></span>\n";
 $contenu .= "		</button>\n
 		<a class='navbar-brand' href='./songbook-portfolio.php'>Top 5 Partoches</a>\n
@@ -96,14 +96,14 @@ $contenu .= "		</button>\n
             <li><a href='../php/chanson_liste.php'>Chansons</a></li>\n";
 //            <li><a href='../php/playlist_liste.php'>Playlists</a></li>\n";
 // Le lien utilisateur est limité aux admin et login parametrage
-if (($_SESSION['privilege'] > 1))
+if (($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]))
     $contenu .= "<li ><a href='../php/utilisateur_liste.php'>Utilisateurs</a></li>\n
             <li><a href='../php/documents_voir.php'>Documents</a></li>\n";
     $contenu .= "<li><a href='../html/diagrammes/pageDiagrammes.htm' target='_blank'><img height='32' alt='' src='../images/icones/diagramme.png'>Outils</a></li>
 <li></li>";
 // Le lien paramétrage est limité aux admin et login parametrage
 if (($_SESSION['user'] == $_SESSION['loginParam'])
-    || ($_SESSION['privilege'] > 2))
+    || ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]))
     $contenu .= "<li><a href='../php/paramsEdit.php'>parametrage</a></li>\n";
 
 $contenu .= "

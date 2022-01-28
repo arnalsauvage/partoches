@@ -102,7 +102,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->_id;
     }
@@ -110,7 +110,7 @@ class Chanson
     /**
      * @param mixed $id
      */
-    public function setId($id)
+    public function setId(int $id)
     {
         $this->_id = $id;
     }
@@ -118,7 +118,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getNom()
+    public function getNom() : string
     {
         return $this->_nom;
     }
@@ -126,7 +126,7 @@ class Chanson
     /**
      * @param mixed $nom
      */
-    public function setNom($nom)
+    public function setNom(string $nom)
     {
         $this->_nom = $nom;
     }
@@ -134,7 +134,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getInterprete()
+    public function getInterprete() : string
     {
         return $this->_interprete;
     }
@@ -142,7 +142,7 @@ class Chanson
     /**
      * @param mixed $interprete
      */
-    public function setInterprete($interprete)
+    public function setInterprete(string $interprete)
     {
         $this->_interprete = $interprete;
     }
@@ -150,7 +150,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getAnnee()
+    public function getAnnee(): int
     {
         return $this->_annee;
     }
@@ -158,7 +158,7 @@ class Chanson
     /**
      * @param mixed $annee
      */
-    public function setAnnee($annee)
+    public function setAnnee(int $annee)
     {
         if ($annee > 0) {
             $this->_annee = $annee;
@@ -168,7 +168,7 @@ class Chanson
     /**
      * @return int
      */
-    public function getIdUser()
+    public function getIdUser(): int
     {
         return $this->_idUser;
     }
@@ -176,7 +176,7 @@ class Chanson
     /**
      * @param int $idUser
      */
-    public function setIdUser($idUser)
+    public function setIdUser(int $idUser)
     {
         $this->_idUser = $idUser;
     }
@@ -184,7 +184,7 @@ class Chanson
     /**
      * @return int
      */
-    public function getTempo()
+    public function getTempo(): int
     {
         return $this->_tempo;
     }
@@ -192,7 +192,7 @@ class Chanson
     /**
      * @param int $tempo
      */
-    public function setTempo($tempo)
+    public function setTempo(int $tempo)
     {
         if ($tempo > 0) {
             $this->_tempo = $tempo;
@@ -202,7 +202,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getMesure()
+    public function getMesure(): string
     {
         return $this->_mesure;
     }
@@ -210,7 +210,7 @@ class Chanson
     /**
      * @param mixed $mesure
      */
-    public function setMesure($mesure)
+    public function setMesure(string $mesure)
     {
         $this->_mesure = $mesure;
     }
@@ -218,7 +218,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getPulsation()
+    public function getPulsation(): string
     {
         return $this->_pulsation;
     }
@@ -226,7 +226,7 @@ class Chanson
     /**
      * @param mixed $pulsation
      */
-    public function setPulsation($pulsation)
+    public function setPulsation(string $pulsation)
     {
         if (($pulsation >= 0) && ($pulsation < 300)) {
             $this->_pulsation = $pulsation;
@@ -236,7 +236,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getDatePub()
+    public function getDatePub() : string
     {
         return $this->_datePub;
     }
@@ -244,7 +244,7 @@ class Chanson
     /**
      * @param mixed $datePub
      */
-    public function setDatePub($datePub)
+    public function setDatePub(string $datePub)
     {
         $this->_datePub = $datePub;
     }
@@ -252,7 +252,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getHits()
+    public function getHits() : int
     {
         return $this->_hits;
     }
@@ -260,7 +260,7 @@ class Chanson
     /**
      * @param mixed $hits
      */
-    public function setHits($hits)
+    public function setHits(int $hits)
     {
         if ($hits >= 0) {
             $this->_hits = $hits;
@@ -270,7 +270,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getTonalite()
+    public function getTonalite() : string
     {
         return $this->_tonalite;
     }
@@ -278,7 +278,7 @@ class Chanson
     /**
      * @param mixed $tonalite
      */
-    public function setTonalite($tonalite)
+    public function setTonalite(string $tonalite)
     {
         $this->_tonalite = $tonalite;
     } // Indique la tonalité de la chanson ex : "Am" , "C#m"
@@ -287,7 +287,9 @@ class Chanson
     // Cherche une chanson et la renvoie si elle existe
     public function chercheChanson($id)
     {
-        $maRequete = "SELECT * FROM chanson WHERE chanson.id = '$id'";
+        $maRequete = sprintf("SELECT * FROM chanson WHERE chanson.id = '%s'",
+            $id);
+        // pour debug : echo "requete : $maRequete";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
         // renvoie la ligne sélectionnée : id, nom, interprète, année
         if ($ligne = $result->fetch_row()) {
@@ -317,7 +319,7 @@ class Chanson
     // Cherche un chanson, la charge et renvoie vrai si elle existe
     public function chercheChansonParLeNom($nom)
     {
-        $maRequete = "SELECT * FROM chanson WHERE chanson.nom = '$nom'";
+        $maRequete = sprintf("SELECT * FROM chanson WHERE chanson.nom = '%s'", $nom);
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChansonParLeNom #1 : " . $_SESSION ['mysql']->error);
         // renvoie la ligne sélectionnée : id, nom, taille, date
         if ($ligne = $result->fetch_row()) {
@@ -343,13 +345,24 @@ class Chanson
             $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
             $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
             $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
-            $maRequete = "UPDATE  chanson SET nom = '$this->_nom', interprete = '$this->_interprete', annee = '$this->_annee',
-            idUser = $this->_idUser, tempo = '$this->_tempo', mesure='$this->_mesure', pulsation='$this->_pulsation', 
-            hits='$this->_hits', tonalite='$this->_tonalite', datePub='$this->_datePub' WHERE id='$this->_id'";
+            $maRequete = sprintf("UPDATE  chanson SET nom = '%s', interprete = '%s', annee = '%s',
+            idUser = %s, tempo = '%s', mesure='%s', pulsation='%s', 
+            hits='%s', tonalite='%s', datePub='%s' WHERE id='%s'",
+                $this->_nom,
+                $this->_interprete,
+                $this->_annee,
+                $this->_idUser,
+                $this->_tempo,
+                $this->_mesure,
+                $this->_pulsation,
+                $this->_hits,
+                $this->_tonalite,
+                $this->_datePub,
+                $this->_id);
             // Chanson::$_logger = init_logger();
             // Chanson::$_logger->info("Modification d'une chanson $this->_nom - $this->_interprete");
             // Chanson::$_logger->debug($maRequete);
-            $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème modif dans creeModifieChanson #2 : " . $_SESSION [self::MYSQL]->error . " requete : " . $maRequete);
+            $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème modif dans creeModifieChanson #1 : " . $_SESSION [self::MYSQL]->error . " requete : " . $maRequete);
             return $this->_id;
         }
     }
@@ -361,9 +374,19 @@ class Chanson
         $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
         $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
         $this->_datePub = convertitDateJJMMAAAA(date(self::D_M_Y));
-        $maRequete = "INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
-	        VALUES (NULL, '$this->_nom', '$this->_interprete', '$this->_annee', '$this->_idUser', '$this->_tempo', '$this->_mesure', 
-	        '$this->_pulsation', '$this->_datePub' ,  '$this->_hits', '$this->_tonalite')";
+        $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
+	        VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', 
+	        '%s', '%s' ,  '%s', '%s')",
+            $this->_nom,
+            $this->_interprete,
+            $this->_annee,
+            $this->_idUser,
+            $this->_tempo,
+            $this->_mesure,
+            $this->_pulsation,
+            $this->_datePub,
+            $this->_hits,
+            $this->_tonalite);
         // Chanson::$_logger = init_logger();
         // Chanson::$_logger->debug($maRequete);
         // Chanson::$_logger->info("Création d'une chanson $this->_nom - $this->_interprete");
@@ -447,7 +470,7 @@ class Chanson
         }
         $maRequete .= " ORDER BY $critereTri";
         if ($critereTri == "votes") {
-            if ($_SESSION['privilege'] == 0) {
+            if ($_SESSION['privilege'] == $GLOBALS["PRIVILEGE_INVITE"]) {
                 $maRequete = "SELECT chanson.id  FROM chanson 
                 RIGHT JOIN noteUtilisateur on noteUtilisateur.idObjet = chanson.id 
                 WHERE noteUtilisateur.nomObjet = 'chanson' OR noteUtilisateur.nomObjet = NULL
@@ -500,7 +523,8 @@ class Chanson
 
     public function chercheLiensChanson()
     {
-        $maRequete = "SELECT * from lienurl WHERE lienurl.nomtable = 'chanson' AND lienurl.idtable = " . $this->_id;
+        $maRequete = sprintf("SELECT * from lienurl WHERE lienurl.nomtable = 'chanson' AND lienurl.idtable = %s",
+            $this->_id);
         // Chanson::$_logger = init_logger();
         // Chanson::$_logger->debug($maRequete);
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheLiensChanson #1 : " . $_SESSION [self::MYSQL]->error);

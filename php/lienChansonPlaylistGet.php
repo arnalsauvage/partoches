@@ -20,7 +20,7 @@ require_once("lib/utilssi.php");
 require("lienChansonPlaylist.php");
 
 // Un non-admin ne peut changer l'ordre
-if ($_SESSION ['privilege'] > 1) {
+if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     if (is_numeric($_GET['idPlaylist'] > 0)) {
         if ($_GET['dir'] == "down") {
             echo "remonteTitre " . $_GET['ordre'] + 1 . "  1";

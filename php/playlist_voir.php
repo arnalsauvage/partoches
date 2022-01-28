@@ -8,6 +8,8 @@ require_once("utilisateur.php");
 $table = "playlist";
 $sortie = "";
 $monImage = "";
+global $_DOSSIER_CHANSONS;
+
 
 if (isset($_GET ['id']) && is_numeric($_GET ['id'])) {
     $idPlaylist = $_GET ['id'];
@@ -35,8 +37,11 @@ $tabUsers = portraitDesUtilisateurs();
 $donnee = chercheplaylist($idPlaylist);
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
 
-if ($_SESSION ['privilege'] > 1)
+if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
+    global $playlistForm ;
+    global $cheminImages, $iconeEdit;
     $sortie .= Ancre($playlistForm . "?id=" . $idPlaylist, Image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
+}
 
 if ("" != $monImage) {
     $sortie .= Image($monImage [0] . $monImage [1], 200, "", "pochette");
@@ -59,13 +64,13 @@ $listeDocs = "";
 while ($ligne = $lignes->fetch_row()) {
     $ligneDoc = chercheDocument($ligne [1]);
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    $fichier = "../".$_DOSSIER_CHANSONS" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+    $fichier = "../".$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
     $icone = Image("../images/icones/" . $extension . ".png", 32, 32, "icone");
 
     if (!file_exists("../images/icones/" . $extension . ".png"))
         $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
-    $vignetteChanson = Image("../".$_DOSSIER_CHANSONS" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
+    $vignetteChanson = Image("../".$_DOSSIER_CHANSONS . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson$vignettePublicateur =;");
     $vignettePublicateur = Image("../images" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
     $sortie .= $vignettePublicateur . $vignetteChanson . $icone;
     $sortie .= "<a href= 'getdoc.php?doc=" . $ligneDoc [0] . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";

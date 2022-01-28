@@ -5,7 +5,7 @@ include_once "UtilisateurNote.php";
 // On gère le cas d'un appel POST
 if($_POST) {
     // Seuls les utilisateurs enregistrés sont autorisés à voter
-    if ($_SESSION ['privilege'] > 0) {
+    if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
 
         $mediaId = $_POST['mediaId'];
         $mediaNom = $_POST['mediaName'];

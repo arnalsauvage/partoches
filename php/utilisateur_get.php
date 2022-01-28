@@ -16,7 +16,7 @@ $mode = $_POST ['mode'];
 
 $fimage = "/utilisateur/" . $_POST ['fimage'];
 // Un non-admin ne peut changer ses privilèges
-if ($_SESSION ['privilege'] < 3) {
+if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
     $fprivilege = $_SESSION ['privilege'];
     // ne peut changer son nombre de connexions, il faut donc charger la valeur, elle n'est pas passée par le formulaire
     $fnbreLogins = chercheUtilisateur($_SESSION ['id']);
@@ -37,7 +37,7 @@ if ($mode == "MAJ") {
 
 // Gestion de la demande de suppression
 if ($_POST ['$id'] && $mode == "SUPPR") {
-    if ($_SESSION ['privilege'] > 2) {
+    if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
         supprimeUtilisateur($_POST ['id']);
     }
 }

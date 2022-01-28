@@ -4,7 +4,7 @@ require_once("menu.php");
 require_once("playlist.php");
 $nomTable = "playlist";
 
-if ($_SESSION ['privilege'] <= 1)
+if ($_SESSION ['privilege'] <= $GLOBALS["PRIVILEGE_MEMBRE"])
     redirection($nomTable . "_liste.php");
 
 // On gère 3 cas : création d'une playlist, modif, suppression
@@ -16,7 +16,7 @@ if (($mode == "MAJ") || ($mode == "INS")) {
     $description = $_SESSION ['mysql']->real_escape_string($_POST ['fdescription']);
     $fimage = $_POST ['fimage'];
     // Seul admin peut modifier hits et date
-    if ($_SESSION ['privilege'] > 2) {
+    if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
         $fdate = $_POST ['fdate'];
         $fhits = $_POST ['fhits'];
     }
@@ -31,7 +31,7 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
 }
 
 if ($mode == "MAJ") {
-    if ($_SESSION ['privilege'] < 3) {
+    if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
         // On doit recharger les hits et la date pour qu'ils ne soient remis à zéro
         $playlist = chercheplaylist($id);
         $fhits = $playlist[5];
