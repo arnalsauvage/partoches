@@ -6,7 +6,7 @@ if (FALSE == isset($configMysql)) {
 
     // On lit les données dans le fichier ini
     $ini_objet = new FichierIni ();
-    $ini_objet->m_fichier($fichier);
+    $ini_objet->m_load_fichier($fichier);
 
     $monserveur = $ini_objet->m_valeur("monServeur", "mysql");
     $mabase = $ini_objet->m_valeur("maBase", "mysql");

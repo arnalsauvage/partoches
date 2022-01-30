@@ -12,7 +12,7 @@ $sortie = "";
 // On lit les données dans le fichier ini
 $fichier = "../conf/params.ini";
 $ini_objet = new FichierIni ();
-$ini_objet->m_fichier($fichier);
+$ini_objet->m_load_fichier($fichier);
 $cle = $ini_objet->m_valeur("cleGetSongBpm", "general");
 
 $urlRecherche = "https://api.getsongbpm.com/search/?api_key=CLE&type=both&lookup=song:CHANSONartist:ARTISTE";
