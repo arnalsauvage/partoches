@@ -13,7 +13,7 @@ $("button[name='renommer']").click(function () {
     id = $(this).parent().children("input").attr("id");
     //alert("id : " + id);
     $(this).parent().children("label").text(nouveauNom);
-    alert("nouveau nom : " + encodeURI(nouveauNom) + " --- idDoc : " + id );
+    alert("nouveau nom : " + encodeURI(nouveauNom) + " \n idDoc : " + id );
     $.ajax({
         url: "chanson_post.php",
         type: "POST",
@@ -30,12 +30,12 @@ $("button[name='renommer']").click(function () {
             }
         },
         error: function (resultat, statut, erreur) {
-            $("#div1").html(resultat);
+            $("#erreurAjax").html(resultat);
         }
     });
 //  toastr.success("Le fichier a été renommé ! <br> Un nouveau pdf a été rajouté aux fichiers du songbook. <br> Vous pouvez raffraîchir la page pour le voir.");
-
 });
+
 // Clic sur un des boutons referme la saisie
 $("button").click(function () {
     //						toastr.warning("Erreur dans la génération du pdf... un des pdf à assembler n'est pas pris en compte par nos outils .<br>Message d'erreur en bas de la page.");

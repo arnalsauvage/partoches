@@ -30,7 +30,7 @@ $numligne = 0;
 // Affichage de la liste
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
-if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"])
+if ($_SESSION ['privilege'] >= $GLOBALS["PRIVILEGE_EDITEUR"])
     $fichiersDuPlaylist .= "<BR>" . Ancre("$playlistForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel playlist");
 // //////////////////////////////////////////////////////////////////////ADMIN
 

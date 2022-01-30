@@ -135,7 +135,7 @@ $largeur_ecran  = $_SESSION['largeur-fenetre'];
 // >1200 on affiche tout
 // >740 on retire tempo mesure pulsation tonalité
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
-if ($_SESSION [PRIVILEGE] > 1) {
+if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
     $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'></span> Ajouter une chanson</a>\n";
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
@@ -163,7 +163,7 @@ if ($largeur_ecran > 700) {
     $contenuHtml .= titreColonne("Vues", "hits");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-if ($_SESSION [PRIVILEGE] > 1) {
+if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
     $contenuHtml .= tblEntete("action", "");
 
 }
@@ -195,7 +195,7 @@ foreach ($resultat as $ligne) {
     }
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-    if ($_SESSION [PRIVILEGE] > 1)
+    if (($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) )
     {
         $_image = Image($cheminImages . $iconeEdit, 32, 32);
         $_ancre = Ancre("$chansonForm?id=" . $_id, $_image,-1, -1, "modifier la chanson" );
@@ -212,7 +212,7 @@ foreach ($resultat as $ligne) {
     $url = $_SERVER['REQUEST_URI'];
     $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=interprete&" .  VAL_FILTRE . "=" .urlencode($_chanson->getInterprete())),limiteLongueur($_chanson->getInterprete(),21))); // interprete
     if ($largeur_ecran >700) {
-        if ($_SESSION [PRIVILEGE] > 0) {
+        if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
             $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
         } else {
             $contenuHtml .= TblCellule(UtilisateurNote::starBar(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
@@ -236,7 +236,7 @@ foreach ($resultat as $ligne) {
         $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite"); // hits
     }
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-    if ($_SESSION [PRIVILEGE] > 1) {
+    if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
         $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages));
         // //////////////////////////////////////////////////////////////////////ADMIN
     }
@@ -250,7 +250,7 @@ if ($nbreChansons == 0) {
     $contenuHtml .= "Pas de résultat ... <BR><a href='?razFiltres' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Supprimer les filtres et tris</a>\n";
 }
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
-if ($_SESSION [PRIVILEGE] > 1) {
+if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
     $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Ajouter une chanson</a>\n";
 }
 // //////////////////////////////////////////////////////////////////////ADMIN

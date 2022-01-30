@@ -13,7 +13,7 @@ require_once("chanson.php");
 // ecritFichierLog("ajaxlog.htm", "entrée dans chanson_post");
 
 
-if ($_SESSION [PRIVILEGE] <= 1) {
+if ($_SESSION [PRIVILEGE] <= $GLOBALS["PRIVILEGE_INVITE"]) {
     redirection($nomTable . "_liste.php");
 }
 
@@ -131,7 +131,7 @@ if ($mode == "MAJ_SONGBPM") {
 }
 
 // Gestion de la demande de suppression
-if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > 1) {
+if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
     $_chanson = new Chanson($id);
     $_chanson->supprimeChanson();
     redirection($nomTable . "_liste.php");

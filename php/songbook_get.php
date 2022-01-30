@@ -10,7 +10,7 @@ include_once("lienDocSongbook.php");
 $nomTable = "songbook";
 
 // Les modifs sont reservées aux utilisateurs authentifiés et habilités
-if ($_SESSION [PRIVILEGE] <= 1) {
+if ($_SESSION [PRIVILEGE] <= $GLOBALS["PRIVILEGE_INVITE"]) {
     redirection($nomTable . "_liste.php");
 }
 // On gère 6 cas : création d'une songbook, modif, suppression, ou suppression d'un docJoint, duplication songbook, liste songbooks
@@ -41,7 +41,7 @@ if (($mode == "MAJ") || ($mode == "INS")) {
     $fimage = $_POST ['fimage'];
 
     // Seul admin peut modifier hits et date
-    if ($_SESSION [PRIVILEGE] > 2) {
+    if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
         $fdate = $_POST ['fdate'];
         $fhits = $_POST ['fhits'];
     }

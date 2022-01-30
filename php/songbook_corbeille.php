@@ -1,10 +1,10 @@
 <h2> Corbeille des fichiers effacés</h2>
 <?php
-global $table, $id, $iconePoubelle, $cheminImages;
+global $_table, $id, $iconePoubelle, $cheminImages;
 $debug = true;
 //echo "<br> En bdd : <br>;";
 $fichiersEnBdd = [];
-$resultat = chercheDocumentsTableId($table, $id);
+$resultat = chercheDocumentsTableId($_table, $id);
 while ($fichierEnBdd = $resultat->fetch_row()) {
     array_push($fichiersEnBdd, $fichierEnBdd);
     // echo "fichier en bdd :" ;
