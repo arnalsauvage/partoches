@@ -3,7 +3,7 @@ $fichier = "../conf/params.ini";
 
 // On lit les données dans le fichier ini
 $ini_objet = new FichierIni ();
-$ini_objet->m_fichier($fichier);
+$ini_objet->m_load_fichier($fichier);
 
 $_SESSION ['urlSite'] = $ini_objet->m_valeur("urlSite", "general");
 $_SESSION ['emailAdmin'] = $ini_objet->m_valeur("EmailAdmin", "general");

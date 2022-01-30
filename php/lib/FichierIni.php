@@ -6,18 +6,14 @@ class FichierIni
     const SUPPRIM_EACUTE = ") supprim&eacute;.";
     const B_BR = "</b><br />";
     const SPAN_BR = "</span><br />";
-    var $fichier = "";
-    var $groupe = "";
-    var $item = "";
-    var $valeur = "";
-    var $fichier_ini = array();
+    var string $fichier = "";
+    var array $tableauDesValeursDansItemsDansGroupe = array();
 
     // Cette méthode prend le nom d'un fichier en argument et le charge dans $fichier_ini
-    function m_fichier($arg)
+    function m_load_fichier($arg)
     {
         $this->fichier = $arg;
-        $this->fichier_ini = null;
-        $this->fichier_ini = array();
+        $this->tableauDesValeursDansItemsDansGroupe = array();
         $groupe_curseur = "general"; // Par défaut
         if (file_exists($arg) && $fichier_lecture = file($arg)) {
             foreach ($fichier_lecture as $ligne) // Parcourt chaque ligne du fichier
@@ -31,83 +27,55 @@ class FichierIni
                 } else {
                     if ($ligne_propre [0] != ';' && $tableau = explode("=", $ligne, 2)) // Sinon, c'est un item / valeur
                     {
-                        $this->fichier_ini [$groupe_curseur] [trim($tableau [0])] = trim($tableau [1], "\n\r ");
+                        $this->tableauDesValeursDansItemsDansGroupe [$groupe_curseur] [trim($tableau [0])] = trim($tableau [1], "\n\r ");
 //                        echo ("Fichier [$groupe_curseur][$tableau[0]] =$tableau[1] ");
                         $this->item = $tableau [0]; // ajout sinon warnings
                     }
                 }
             }
         }
-
-    }
-
-    // Sélectionner un groupe dans le fichier ini
-    function m_groupe($arg)
-    {
-        $this->groupe = $arg;
-        return true;
-    }
-
-    // Selectionner un item
-    function m_item($arg)
-    {
-        $this->item = $arg;
-        return true;
     }
 
     // Changer une valeur (valeur sélectionnée, ou préciser item, groupe, fichier)
-    function m_put($arg, $arg_i = false, $arg_g = false, $arg_f = false)
+    function m_put(string $arg_valeur, string $arg_item, string $arg_groupe )
     {
-        if ($arg_f !== false) {
-            $this->m_fichier($arg_f);
-        }
-        if ($arg_g !== false) {
-            $this->m_groupe($arg_g);
-        }
-        if ($arg_i !== false) {
-            $this->m_item($arg_i);
-        }
-        $this->fichier_ini [$this->groupe] [$this->item] = $arg;
-        $this->valeur = $arg;
-        echo $this->fichier . " ==> [" . $this->groupe . "] " . $this->item . "=" . $this->valeur . "<br>";
-        return $this->fichier . " ==> [" . $this->groupe . "] " . $this->item . "=" . $this->valeur;
+        $this->tableauDesValeursDansItemsDansGroupe [$arg_groupe] [$arg_item] = $arg_valeur;
+        // Pour debug echo $this->fichier . " ==> [" . $arg_groupe . "] " . $arg_item . "=" . $arg_valeur . "<br>";
+        return $this->fichier . " ==> [" . $arg_groupe . "] " . $arg_item . "=" .$arg_valeur;
     }
 
     // Sans paramètres : nb elements / Nb groupes / nb items (tableau)
-    // Parqmetre : nb d'items du groupe en paramètre
+    // Parametre : nb d'items du groupe en paramètre
     function m_count($arg_gr = false)
     {
         if ($arg_gr === false) {
             return array(
-                1 => $gr_cou = count($this->fichier_ini),
-                0 => $itgr_cou = count($this->fichier_ini, COUNT_RECURSIVE),
+                1 => $gr_cou = count($this->tableauDesValeursDansItemsDansGroupe),
+                0 => $itgr_cou = count($this->tableauDesValeursDansItemsDansGroupe, COUNT_RECURSIVE),
                 2 => $itgr_cou - $gr_cou
             );
         } else {
-            return count($this->fichier_ini [$arg_gr]);
+            return count($this->tableauDesValeursDansItemsDansGroupe [$arg_gr]);
         }
     }
 
     // Renvoie les items d'un groupe passé en paramètre
-    function array_groupe($arg_gr = false)
+    function m_array_get_items_groupe($arg_gr)
     {
-        if ($arg_gr === false) {
-            $arg_gr = $this->groupe;
-        }
-        return $this->fichier_ini [$arg_gr];
+        return $this->tableauDesValeursDansItemsDansGroupe [$arg_gr];
     }
 
     // Enregistre l'objet dans le fichier ini
     function save()
     {
         $fichier_save = "";
-        foreach ($this->fichier_ini as $keyGroupe => $groupe_n) // Pour chaque groupe
+        foreach ($this->tableauDesValeursDansItemsDansGroupe as $keyGroupe => $groupe_n) // Pour chaque groupe
         {
             $fichier_save .= "[" . $keyGroupe . "]\r\n";
             foreach ($groupe_n as $keyCle => $item_n) // Pour chaque valeur
             {
                 $fichier_save .= "" . $keyCle . " = " . $item_n . "\r\n";
-                echo "sauvegarde[$keyGroupe]: $keyCle = $item_n<br>";
+                // pour debug echo "sauvegarde[$keyGroupe]: $keyCle = $item_n<br>";
             }
         }
         // $fichier_save=substr($fichier_save, 1);
@@ -129,61 +97,30 @@ class FichierIni
     }
 
     // Réinitialise toutes les variables de l'objet
-    function clear()
+    private function m_clear()
     {
         $this->fichier = "";
-        $this->groupe = "";
-        $this->item = "";
-        $this->valeur = "";
-        $this->fichier_ini = null;
-        $this->fichier_ini = array();
+        $this->tableauDesValeursDansItemsDansGroupe = array();
     }
 
     // Supprime le fichier
-    function s_fichier()
+    function m_delete_fichier()
     {
         $return = $this->fichier;
         if (file_exists($this->fichier)) {
             unlink($this->fichier);
         }
         $this->fichier = "";
-        $this->valeur = "";
         return "fichier(" . $return . self::SUPPRIM_EACUTE;
     }
 
-    // Supprime le groupe selectionné
-    function s_groupe()
-    {
-        $return = $this->groupe;
-        if (isset ($this->fichier_ini [$this->groupe])) {
-            unset ($this->fichier_ini [$this->groupe]);
-        }
-        $this->groupe = "";
-        $this->valeur = "";
-        return "groupe(" . $return . self::SUPPRIM_EACUTE;
-    }
-
     // Supprime l'item sélectionné
-    function s_item()
+    function s_item($_argItem, $arg_groupe)
     {
         $return = $this->item;
-        if (isset ($this->fichier_ini [$this->groupe] [$this->item])) {
-            unset ($this->fichier_ini [$this->groupe] [$this->item]);
+        if (isset ($this->tableauDesValeursDansItemsDansGroupe [$arg_groupe] [$_argItem])) {
+            unset ($this->tableauDesValeursDansItemsDansGroupe [$arg_groupe] [$_argItem]);
         }
-        $this->item = "";
-        $this->valeur = "";
-        return "item(" . $return . self::SUPPRIM_EACUTE;
-    }
-
-    // Imprime les coordonnées du curseur et la valeur courante
-    function print_curseur()
-    {
-        $retour = "";
-        $retour .= "Fichier : <b>" . $this->fichier . self::B_BR;
-        $retour .= "Groupe : <b>" . $this->groupe . self::B_BR;
-        $retour .= "Item : <b>" . $this->item . self::B_BR;
-        $retour .= "Valeur : <b>" . $this->valeur . self::B_BR;
-        return $retour;
     }
 
     // Si $fichier contient le nom d'un dossier, affiche le liste des fichiers ini que contient ce dossier
@@ -207,43 +144,39 @@ class FichierIni
         }
     }
 */
-    // Affiche le contenu du fichier ini
-    function print_fichier()
+    // Renvoie une chaîne html pour afficher le contenu du fichier ini
+    function print_fichier() : string
     {
-        $echo = "Fichier : $this->fichier <br>";
-        $groupeIni = false;
+        $chaineHtml = "Fichier : $this->fichier <br>";
+
         if (file_exists($this->fichier) && is_file($this->fichier) && $fichier_lecture = file($this->fichier)) {
             // Pour chaque ligne
             foreach ($fichier_lecture as $ligne) {
                 $ligne = preg_replace("#\s$#", "", $ligne);
-                if (preg_match("#^\[.+\]\s?$#", $ligne)) {
-                    $groupeIni = false;
-                }
+
                 // variable pour le reset dans le elseif
                 $var = explode("=", $ligne);
                 // Titre de rubrique en bleu
-                if (preg_match("#^\[" . preg_quote($this->groupe, "#") . "\]$#", $ligne)) {
-                    $echo .= "<span style='background-color:aqua;'>" . htmlspecialchars($ligne) . self::SPAN_BR;
-                    $groupeIni = true;
+                if (preg_match("/^\[[a-zA-Z]*\]$/", $ligne)) {
+                    $chaineHtml .= "<span style='background-color:aqua;'>" . htmlspecialchars($ligne) . self::SPAN_BR;
+
                 } // première ligne en jaune
-                elseif ($groupeIni && $this->item == reset($var)) {
-                    $echo .= "<span style='background-color:yellow;'>" . htmlspecialchars($ligne) . self::SPAN_BR;
-                } else {
-                    $echo .= htmlspecialchars($ligne) . "<br />";
+
+                else {
+                    $chaineHtml .= htmlspecialchars($ligne) . "<br />";
                 }
             }
-            echo $echo;
+            return $chaineHtml;
         } else {
-            echo "Le fichier " . $this->fichier . " n'existe pas ou est incompatible";
+            return "Le fichier " . $this->fichier . " n'existe pas ou est incompatible";
         }
         // $this->valeur=$this->fichier_ini[$this->groupe][$this->item];
-        return true;
     }
 
     // Prend deux paramètres : l'item, le groupe, et renvoie la valeur
     function m_valeur($arg_item, $arg_groupe)
     {
         // echo "Cherche item : " . $arg_item . " dans groupe : " . $arg_groupe . "\n";
-        return $this->fichier_ini [$arg_groupe] [$arg_item];
+        return $this->tableauDesValeursDansItemsDansGroupe [$arg_groupe] [$arg_item];
     }
 }
