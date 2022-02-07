@@ -300,6 +300,7 @@ class Chanson
         }
     }
 
+
     // Charge une ligne mysql vers un objet
     private function mysqlRowVersObjet($ligne)
     {

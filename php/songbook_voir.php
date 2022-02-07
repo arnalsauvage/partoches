@@ -6,6 +6,7 @@ require_once("songbook.php");
 require_once("lienDocSongbook.php");
 require_once("document.php");
 require_once("utilisateur.php");
+require_once ("chansonListe.php");
 
 global $songbookForm;
 global $cheminImages;
@@ -31,6 +32,10 @@ $monImage = imageTableId("songbook", $idSongbook);
 
 // On charge le tableau des utilisateurs
 $tabUsers = portraitDesUtilisateurs();
+
+// On charge la liste des chansons
+$listeChansons = new ChansonListe();
+$listeChansons->chargeListeChansons();
 
 $donnee = chercheSongbook($idSongbook);
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
@@ -80,7 +85,13 @@ while ($ligne = $lignes->fetch_row()) {
     $vignettePublicateur = Image("../vignettes/" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
     $sortie .= $vignettePublicateur . $vignetteChanson . $icone;
     $sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a>";
-    $sortie .= " (" . intval($ligneDoc[2] / 1024) . " ko)<br>\n";
+    $sortie .= " (" . intval($ligneDoc[2] / 1024) . " ko)";
+    // echo "chanson " . $ligneDoc[6];
+    $maChanson = $listeChansons->recupereChanson($ligneDoc[6]);
+    if ($maChanson != null) {
+        $sortie .= " - " . $maChanson->getNom() . " - " . $maChanson->getTonalite() . " - " . $maChanson->getAnnee() . " - " . $maChanson->getTempo() . " bpm";
+    }
+    $sortie .= " <br>\n";
 }
 
 $sortie .= envoieFooter();

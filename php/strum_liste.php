@@ -15,6 +15,12 @@ $_table = "strum";
 $_renduHtml = "";
 $_renduHtml .= entreBalise("Strums", "H1");
 
+$_renduHtml .= "Pour écouter le strum, copie le et colle le dans la fenêtre de la Boîte à Strum ! <a href='../html/boiteAstrum/index.html'>lien</a>
+<iframe src='../html/boiteAstrum/index.html'    title='Inline Frame Example'
+    width='800'
+    height='600'></iframe>
+";
+
 // Chargement de la liste des strums
 $marequete = "select * from $_table ORDER BY 'dateDernierLogin' DESC";
 $_listeDesStrums = $_SESSION ['mysql']->query($marequete);
@@ -33,7 +39,7 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
 
 while ($_strumParcouru = $_listeDesStrums->fetch_row()) {
     $_numLigneParcourue++;
-        $_renduHtml .= entreBalise($_strumParcouru [3], "H2"); // Login
+        $_renduHtml .= entreBalise(str_replace(" ", "-",$_strumParcouru [3]), "H2"); // Login
 
         if (($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) ) {
             $_image = Image($cheminImages . $iconeEdit, 32, 32);
@@ -41,7 +47,7 @@ while ($_strumParcouru = $_listeDesStrums->fetch_row()) {
             $_renduHtml .= TblCellule($_ancre);
         }
 
-        $_renduHtml .= $_strumParcouru [1] . " / " . $_strumParcouru [2]; // unité longueur
+        $_renduHtml .= $_strumParcouru [2] . " / " . $_strumParcouru [1]; //  longueur / unité
         $_renduHtml .= " - "  . $_strumParcouru [4]; // description
 
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer

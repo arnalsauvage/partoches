@@ -9,10 +9,18 @@ global $iconeEdit;
 global $cheminImages;
 require_once("lib/utilssi.php");
 require_once("menu.php");
+require_once ("strum.php");
 require_once("chanson.php");
 require_once("document.php");
 require_once("songbook.php");
+require_once ("lienStrumChanson.php");
 require_once("UtilisateurNote.php");
+
+$_strumForm = "strum_form.php";
+$_strumPost = "strum_post.php";
+$_lienStrumChansonPost = "lienStrumChanson_post.php";
+global $iconePoubelle;
+
 
 $table = CHANSON;
 $contenuHtml = "<div class='container'>
@@ -123,6 +131,8 @@ if ($result->num_rows > 0) {
     $contenuHtml .= FIN_SECTION . " \n";
 }
 
+    $contenuHtml .= afficheStrums($idChanson);
+
 //Voir les liens associés à cette chanson
 //  id	table	idtable	url	type	description
 $liens = $_chanson->chercheLiensChanson();
@@ -168,6 +178,7 @@ if ($liens->num_rows > 0) {
         }
 
     }
+
     $contenuHtml .= FIN_SECTION;
 }
 
@@ -195,6 +206,33 @@ if ($songbooks->num_rows > 0) {
     }
     $contenuHtml .= "</section>";
 }
+/**
+ * @param int|string $idChanson
+ * @param string $contenuHtml
+ * @return string
+ */
+function afficheStrums(int $idChanson): string
+{
+    $contenuHtml = "";
+// Affiche les strums de la chanson
+    $_listeDesLiensStrums = chercheLiensStrumChanson("idChanson", $idChanson);
+    if ($_listeDesLiensStrums) {
+        $titre = "Strum";;
+        if ($_listeDesLiensStrums->num_rows > 1) {
+            $titre .= "s";
+        }
+        $contenuHtml .= "<h2>$titre</h2>";
+        $monStrum = new Strum();
+        while ($lienStrum = $_listeDesLiensStrums->fetch_row()) {
+            $monStrum->chercheStrumParChaine($lienStrum[1]);
+            $contenuHtml .= entreBalise(str_replace(" ", "-", $monStrum->getStrum()), "H3"); // Login
+            $contenuHtml .= $monStrum->getLongueur() . " / " . $monStrum->getUnite(); //  longueur / unité
+            $contenuHtml .= " - " . $monStrum->getDescription(); // description
+        }
+    }
+    return $contenuHtml;
+}
+
 $contenuHtml .= FIN_DIV . "<!-- /.starter-template -->\n
 </div><!-- /.container -->\n";
 $contenuHtml .= envoieFooter();

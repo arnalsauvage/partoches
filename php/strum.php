@@ -185,7 +185,7 @@ class Strum
     // Cherche un strum, la charge et renvoie vrai si elle existe
     public function chercheStrumParChaine($chaine)
     {
-        $maRequete = sprintf("SELECT * FROM strum WHERE strum = '%s'", $chaine);
+        $maRequete = sprintf("SELECT * FROM strum WHERE BINARY strum = '%s'", $chaine);
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchestrumParChaine #1 : " . $_SESSION ['mysql']->error);
         // renvoie la ligne sélectionnée : id,  unite longueur strum description
         if ($ligne = $result->fetch_row()) {
@@ -277,6 +277,22 @@ class Strum
         return $retour . "<BR>\n";
     }
 
+    public static function chargeStrumsBdd()
+    {
+        $maRequete = sprintf("SELECT * FROM strum ");
+        // pour debug : echo "requete : $maRequete";
+        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chargeStrumsBdd #1 : " . $_SESSION ['mysql']->error);
+        $listeStrum = [];
+
+
+        // renvoie la ligne sélectionnée : id,  unite longueur strum description
+        while ($ligne = $result->fetch_row()) {
+            $strum = new Strum();
+            $strum->mysqlRowVersObjet($ligne);
+            array_push($listeStrum, $strum);
+        }
+        return $listeStrum;
+    }
 
 // Cherche la présence d'une strum dans des songbooks
 //idSongbook	nomSongBook

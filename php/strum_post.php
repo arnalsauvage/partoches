@@ -14,11 +14,11 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
         return;
     }
 
-    $id = $_SESSION ['mysql']->real_escape_string($_POST['id']);
-    $strum = $_SESSION ['mysql']->real_escape_string($_POST['strum']);
-    $description = $_SESSION ['mysql']->real_escape_string($_POST['description']);
-    $unite = intval($_SESSION ['mysql']->real_escape_string($_POST['unite']));
-    $longueur = intval($_SESSION ['mysql']->real_escape_string($_POST['longueur']));
+    $id = $_POST['id'];
+    $strum = $_POST['strum'];
+    $description = $_POST['description'];
+    $unite = intval($_POST['unite']);
+    $longueur = intval($_POST['longueur']);
 
     // Creation
     if ($_POST['mode'] == "NEW")

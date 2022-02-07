@@ -6,8 +6,8 @@ class FichierIni
     const SUPPRIM_EACUTE = ") supprim&eacute;.";
     const B_BR = "</b><br />";
     const SPAN_BR = "</span><br />";
-    var string $fichier = "";
-    var array $tableauDesValeursDansItemsDansGroupe = array();
+    var $fichier = "";
+    var $tableauDesValeursDansItemsDansGroupe = array();
 
     // Cette méthode prend le nom d'un fichier en argument et le charge dans $fichier_ini
     function m_load_fichier($arg)

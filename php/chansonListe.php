@@ -2,9 +2,10 @@
 include_once("lib/utilssi.php");
 include_once "lib/configMysql.php";
 include_once "document.php";
+include_once 'chanson.php';
 
 // Fonctions de gestion de la chanson
-init_logger();
+//init_logger();
 
 class ChansonListe
 {
@@ -40,20 +41,6 @@ class ChansonListe
      * @param $_hits
      * @param $_tonalite
      */
-    public function __construct9($_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
-    {
-        $this->setId(0);
-        $this->setNom($_nom);
-        $this->setInterprete($_interprete);
-        $this->setAnnee($_annee);
-        $this->setIdUser($_idUser);
-        $this->setTempo($_tempo);
-        $this->setMesure($_mesure);
-        $this->setPulsation($_pulsation);
-        $this->setDatePub(date("d/m/Y"));
-        $this->setHits($_hits);
-        $this->setTonalite($_tonalite);
-    }
 
 
     /// Getters et Setters
@@ -63,10 +50,11 @@ class ChansonListe
         return (count($this->_tabChanson));
     }
 
-
     public function ajouteChanson($uneChanson)
     {
-        $this->_tabChanson[$this->getNbChansons] = $uneChanson;
+        // echo "on ajoute la chanson ";
+        // var_dump($uneChanson);
+        $this->_tabChanson[$this->getNbChansons()] = $uneChanson;
     }
 
     public function retireChanson($numero)
@@ -74,11 +62,36 @@ class ChansonListe
         unset($this->_tabChanson[$numero]);
     }
 
+    public function getChanson($rang)
+    {
+        $maChanson = $this->_tabChanson[$rang];
+        return $maChanson;
+    }
+
+    public function recupereChanson ( $_idChanson)
+    {
+        $nbChansons = $this->getNbChansons();
+        $parcours = 0;
+        $_idChanson = intval($_idChanson);
+
+        while ($parcours < $nbChansons)
+        {
+            $maChanson = new Chanson();
+            $maChanson = $this->_tabChanson[$parcours];
+            if (intval($maChanson->getId()) == $_idChanson)
+            {
+                return $maChanson;
+            }
+            // echo "id $parcours : " . intval($maChanson->getId() ) ;
+//            var_dump($maChanson);
+            $parcours++;
+        }
+        echo "Chanson $_idChanson non trouvée dans chansonListe.php parmi une liste de $nbChansons  !";
+    }
 
     public function filtreChansons ( $critere, $valeur)
     {
         $nbChansons = $this->getNbChansons();
-
         $parcours = 0;
 
         while ($parcours < $nbChansons)
@@ -91,24 +104,22 @@ class ChansonListe
                 $nbChansons--;
             }
             $parcours++;
-
         }
-
     }
 
     public function chargeListeChansons ()
     {
         // Lancer la requete
-        // pour toutes les chansons
-        // Ajouter la chansson dans la liste
+        // pour récupérer les id de toutes les chansons
+        // Ajouter la chanson dans la liste
         $resultat = Chanson::chercheChansons( ""  );
-        $_chanson = new Chanson();
 
         /** @noinspection PhpUndefinedMethodInspection */
-        foreach ($resultat as $ligne) {
-            $_chanson->chercheChanson($ligne);
+        foreach ($resultat as $idChanson) {
+            $_chanson = new Chanson();
+            // echo " idchanson : $idChanson";
+            $_chanson->chercheChanson(intval($idChanson));
             $this->ajouteChanson($_chanson);
         }
     }
-
 }
