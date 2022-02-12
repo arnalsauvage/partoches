@@ -17,13 +17,14 @@ class chansonListeTest extends TestCase
       // On charge la liste des chansons
       $listeChansons = new ChansonListe();
       $listeChansons->chargeListeChansons();
-var_dump($listeChansons);
+      // var_dump($listeChansons);
       $_chanson = $listeChansons->getNbChansons();
       echo $_chanson;
 
       $_chanson = $listeChansons->getChanson(111);
       var_dump($_chanson);
       echo "chanson id : " . $_chanson->getid();
+      $this->assertEquals(388, $_chanson->getid());
   }
 
     public function testEnregistreBDD()

@@ -71,7 +71,7 @@ class Strum
     public function __construct1($_id)
     {
         $this->__construct0();
-        $this->chercheStrum($_id);
+        $this->chercheStrumParId($_id);
     }
 
     /// Getters et Setters
@@ -157,8 +157,8 @@ class Strum
     }
 
 
-    // Cherche une strum et la renvoie si elle existe
-    public function chercheStrum($id)
+    // Cherche un strum et le renvoie si il existe
+    public function chercheStrumParId($id)
     {
         $maRequete = sprintf("SELECT * FROM strum WHERE id = '%s'", $id);
         // pour debug : echo "requete : $maRequete";
@@ -172,6 +172,38 @@ class Strum
         }
     }
 
+    // Renvoie l'unité en français : noire, croche, double croche
+    public function renvoieUniteEnFrancais(){
+        $unite = "" . $this->getUnite();
+        switch ($this->getUnite())
+        {
+            case 4 : $unite = "noires";
+            break;
+            case 8 : $unite = "croches";
+            break;
+            case 16 : $unite = "double-croches";
+            break;
+        }
+        return $unite;
+    }
+
+    // Cherche les chansons qui utilisent un strum
+    static public function chansonsDuStrum($chaineStrum)
+    {
+        $chaineRetour = " - strum utilisé dans ";
+        $titresChansons = chargeLibelles("chanson", "nom");
+        $maRequete = sprintf("SELECT * FROM lienstrumchanson WHERE strum = '%s'", $chaineStrum);
+        // pour debug : echo "requete : $maRequete";
+        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chansonsDuStrum #1 : " . $_SESSION ['mysql']->error);
+        // renvoie la ligne sélectionnée : id,  unite longueur strum description
+        while ($ligne = $result->fetch_row()) {
+            //$this->mysqlRowVersObjet($ligne);
+            $_idChanson = $ligne[2];
+            $chaineRetour .= " - " . $titresChansons[$_idChanson];
+        }
+        return $chaineRetour;
+    }
+
     // Charge une ligne mysql vers un objet
     private function mysqlRowVersObjet($ligne)
     {
@@ -182,7 +214,7 @@ class Strum
         $this->_description = $ligne[4];
     }
 
-    // Cherche un strum, la charge et renvoie vrai si elle existe
+    // Cherche un strum, le charge dans l'instance courante de l'objet et renvoie vrai si il existe
     public function chercheStrumParChaine($chaine)
     {
         $maRequete = sprintf("SELECT * FROM strum WHERE BINARY strum = '%s'", $chaine);
@@ -194,6 +226,13 @@ class Strum
         } else {
             return (0);
         }
+    }
+
+    private function nettoieValeursEscapeStrings(){
+        $this->_strum = $_SESSION ['mysql']->real_escape_string($this->_strum);
+        $this->_description = $_SESSION ['mysql']->real_escape_string($this->_description);
+        $this->_unite = $_SESSION ['mysql']->real_escape_string($this->_unite);
+        $this->_longueur = $_SESSION ['mysql']->real_escape_string($this->_longueur);
     }
 
     // Créée un strum en BDD
@@ -208,10 +247,8 @@ class Strum
             $this->setId($_SESSION ['mysql']->insert_id);
             return ($this->getId());
         } else {
-            $this->_strum = $_SESSION ['mysql']->real_escape_string($this->_strum);
-            $this->_description = $_SESSION ['mysql']->real_escape_string($this->_description);
-            $this->_unite = $_SESSION ['mysql']->real_escape_string($this->_unite);
-            $this->_longueur = $_SESSION ['mysql']->real_escape_string($this->_longueur);
+            // Modif dans la table strum
+            $this->nettoieValeursEscapeStrings();
             $maRequete = sprintf("UPDATE  strum SET strum = '%s', description = '%s', unite = '%s',
             longueur = %s WHERE strum.id = %s",
                 $this->_strum,
@@ -222,7 +259,16 @@ class Strum
             // strum::$_logger = init_logger();
             // strum::$_logger->info("Modification d'un strum $this->_unite - $this->_longueur");
             // strum::$_logger->debug($maRequete);
-            $_SESSION ['mysql']->query($maRequete) or die ("Problème modif dans creeModifiestrum #1 : " . $_SESSION ['mysql']->error . " requete : " . $maRequete);
+            $_SESSION ['mysql']->query($maRequete) or die ("Problème modif dans creeModifiestrum #1 (strum) : " . $_SESSION ['mysql']->error . " requete : " . $maRequete);
+
+            // Modif dans la table lienstrumchanson
+            $maRequete = sprintf("UPDATE  lienstrumchanson SET strum = '%s' WHERE lienstrumchanson.strum = '%s'",
+                $this->_strum, $this->_strum);
+            // strum::$_logger = init_logger();
+            // strum::$_logger->info("Modification d'un strum $this->_unite - $this->_longueur");
+            // strum::$_logger->debug($maRequete);
+            $_SESSION ['mysql']->query($maRequete) or die ("Problème modif dans creeModifiestrum #2 (lienstrumchanson): " . $_SESSION ['mysql']->error . " requete : " . $maRequete);
+
             return $this->_id;
         }
     }
@@ -230,10 +276,7 @@ class Strum
     // Cree une strum et renvoie l'id de la strum créée
     public function creestrumBDD()
     {
-        $this->_strum = $_SESSION ['mysql']->real_escape_string($this->_strum);
-        $this->_description = $_SESSION ['mysql']->real_escape_string($this->_description);
-        $this->_unite = $_SESSION ['mysql']->real_escape_string($this->_unite);
-        $this->_longueur = $_SESSION ['mysql']->real_escape_string($this->_longueur);
+        $this->nettoieValeursEscapeStrings();
         $maRequete = sprintf("INSERT INTO strum (id, strum, description, unite, longueur)
 	        VALUES (NULL, '%s', '%s', '%s', '%s')",
             $this->_strum,
@@ -243,30 +286,27 @@ class Strum
         // strum::$_logger = init_logger();
         // strum::$_logger->debug($maRequete);
         // strum::$_logger->info("Création d'une strum $this->_unite - $this->_longueur");
-        echo $maRequete;
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creestrumBDD#1 : " . $_SESSION ['mysql']->error);
         // On renseigne l'id de l'objet avec l'id créé en BDD
         $this->setId($_SESSION ['mysql']->insert_id);
         return ($this->getId());
     }
 
-    // Supprime un strum si elle existe
+    // Supprime un strum si il existe en BDD
     public function supprimestrumBDD()
     {
         // On supprime les enregistrements dans strum
         $maRequete = "DELETE FROM strum WHERE id='" . $this->getId() . "'";
-        $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimestrum : " . $_SESSION ['mysql']->error);
+        $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimestrum (strum): " . $_SESSION ['mysql']->error);
+
         // strum::$_logger = init_logger();
         // strum::$_logger->debug($maRequete);
         // strum::$_logger->info("Suppression d'une strum $this->_unite - $this->_longueur");
+
         // On supprime ensuite tous les liens entre un strum et une chanson
-        /* TODO
-        $result = chercheDocumentsTableId("strum", $this->getId());
-        while ($ligne = $result->fetch_row()) {
-            $id = $ligne [0];
-            supprimeDocument($id);
-        }
-        */
+        $maRequete = "DELETE FROM lienstrumchanson WHERE strum = '" . $this->getStrum() . "'";
+        $_SESSION ['mysql']->query($maRequete) or die ("Problème #2 dans supprimestrum (lienstrumchanson): " . $_SESSION ['mysql']->error);
+
     }
 
 // Renvoie une chaine de description de la strum
@@ -277,13 +317,13 @@ class Strum
         return $retour . "<BR>\n";
     }
 
+    // Crée une liste des strums de la bdd
     public static function chargeStrumsBdd()
     {
         $maRequete = sprintf("SELECT * FROM strum ");
         // pour debug : echo "requete : $maRequete";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chargeStrumsBdd #1 : " . $_SESSION ['mysql']->error);
         $listeStrum = [];
-
 
         // renvoie la ligne sélectionnée : id,  unite longueur strum description
         while ($ligne = $result->fetch_row()) {
@@ -293,27 +333,6 @@ class Strum
         }
         return $listeStrum;
     }
-
-// Cherche la présence d'une strum dans des songbooks
-//idSongbook	nomSongBook
-//24            Madelon 2017
-//28        	Les Face A
-//32        	Vergers de l îlot
-//33        	Fête de Printemps
-//33         	Fête de Printemps
-
-    public function chercheSongbooksDocuments()
-    {
-        $maRequete = "SELECT DISTINCT songbook.id, songbook.nom from songbook, liendocsongbook , document ,
-        strum WHERE liendocsongbook.idDocument = document.id AND document.nomTable='strum' 
-        AND document.idTable = strum.id AND strum.id = " . $this->_id . "  AND songbook.id = liendocsongbook.idSongbook";
-        // strum::$_logger = init_logger();
-        // strum::$_logger->debug($maRequete);
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheSongbooksDocuments #1 : " . $_SESSION ['mysql']->error);
-        // strum::$_logger->warning(var_dump($result));
-        return $result;
-    }
-
 
 // Cherche les liens associés à ce strum
 

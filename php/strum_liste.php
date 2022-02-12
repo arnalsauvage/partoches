@@ -1,6 +1,7 @@
 <?php
 require_once("lib/utilssi.php");
 require_once("menu.php");
+require_once ("strum.php");
 
 global $iconeAttention;
 global $cheminImages;
@@ -22,7 +23,11 @@ $_renduHtml .= "Pour écouter le strum, copie le et colle le dans la fenêtre de
 ";
 
 // Chargement de la liste des strums
-$marequete = "select * from $_table ORDER BY 'dateDernierLogin' DESC";
+    $marequete = "SELECT strum.id, lienstrumchanson.strum as lestrum , strum.longueur , strum.unite, strum.description  , count(lienstrumchanson.strum) as compte
+FROM  strum 
+left join lienstrumchanson on binary lienstrumchanson.strum  = strum.strum 
+group by lestrum
+order by compte desc;";
 $_listeDesStrums = $_SESSION ['mysql']->query($marequete);
 if (!$_listeDesStrums) {
     die ("Problème strumsListe #1 : " . $_SESSION ['mysql']->error);
@@ -37,18 +42,34 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 
+$_monStrum = new Strum();
+
 while ($_strumParcouru = $_listeDesStrums->fetch_row()) {
     $_numLigneParcourue++;
-        $_renduHtml .= entreBalise(str_replace(" ", "-",$_strumParcouru [3]), "H2"); // Login
+        $_renduHtml .= entreBalise(str_replace(" ", "-",$_strumParcouru [1]), "H2"); // Strum
 
-        if (($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) ) {
+        if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
             $_image = Image($cheminImages . $iconeEdit, 32, 32);
-            $_ancre = Ancre("$_strumForm?id=" . $_strumParcouru [0], $_image,-1, -1, "modifier le strum" );
+            $_ancre = Ancre("$_strumForm?id=" . $_strumParcouru [0], $_image,-1, -1, "modifier le strum" ); //id
             $_renduHtml .= TblCellule($_ancre);
         }
+        switch ($_strumParcouru [3]) {
+            case 4 :
+                $_uniteStrum = "noires";
+                break;
+            case 8 :
+                $_uniteStrum = "croches";
+                break;
+            case 16 :
+                $_uniteStrum = "double-croches";
+                break;
+            default : $_uniteStrum = sprintf("%s", $_strumParcouru[3]);
+        }
 
-        $_renduHtml .= $_strumParcouru [2] . " / " . $_strumParcouru [1]; //  longueur / unité
-        $_renduHtml .= " - "  . $_strumParcouru [4]; // description
+
+        $_renduHtml .= $_strumParcouru [2] . "  " .$_uniteStrum; //  longueur / unité
+        $chansons_liste = Strum::chansonsDuStrum($_strumParcouru[1]);
+        $_renduHtml .= " - "  . $_strumParcouru [4] . " (utilisé dans " .$_strumParcouru [5]  . " chansons : $chansons_liste)"; // description
 
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
         if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {

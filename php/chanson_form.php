@@ -59,6 +59,7 @@ if ($mode == "MAJ"){
 }
 if ($mode == "INS"){
     $sortie .= sprintf("<H1> Création - %s</H1>", $table);
+    $id = 0;
 }
 
 $sortie .= formulaireChanson($_chanson, $mode);
@@ -384,7 +385,7 @@ function comboAjoutStrum($listeStrums)
     <select name= 'strum' >";
     foreach ( $listeStrums as $_strum)
     {
-        $monCombo .= " <option id= 'strum' value='".$_strum->getstrum()."'>".$_strum->getstrum()."</option>";
+        $monCombo .= " <option id= 'strum' value='".$_strum->getstrum()."'>".$_strum->getstrum()." - ".$_strum->getdescription() . "</option>";
     }
     $monCombo .= "   </select>";
     return($monCombo);
@@ -397,7 +398,7 @@ function comboAjoutStrum($listeStrums)
  * @param string $sortie
  * @return string
  */
-function recherches_sur_chanson(Chanson $_chanson, mixed $id): string
+function recherches_sur_chanson(Chanson $_chanson, int $id): string
 {
     $urlCherche = "chanson_chercher.php?chanson=" . urlencode($_chanson->getNom()) . "&artiste=" . urlencode($_chanson->getInterprete());
     $urlCherche .= "&idChanson=$id";
@@ -407,7 +408,7 @@ function recherches_sur_chanson(Chanson $_chanson, mixed $id): string
     if ($_chanson->getNom()) {
 
         $sortie .= "Pour chercher la chanson sur youtube : <a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom()) . "' target='_blank'>ici</a><br>\n";
-        $sortie .= "Pour chercher des images : <a href='https://www.qwant.com/?q=" . urlencode($_chanson->getNom()) . "&amp;t=images=' target='_blank'>ici</a><br>\n";
+        $sortie .= "Pour chercher des images : <a href='https://www.qwant.com/?q=discogs+" . urlencode($_chanson->getNom()) . "&amp;t=images=' target='_blank'>ici</a><br>\n";
 
         $rechercheBpm = htmlentities(str_replace(" ", "-", strtolower($_chanson->getNom())));
         $sortie .= "Pour chercher le tempo sur <a href='https://songbpm.com/$rechercheBpm' target='_blank'>songbpm</a><br>\n";
@@ -427,7 +428,7 @@ function recherches_sur_chanson(Chanson $_chanson, mixed $id): string
  * @param Chanson $_chanson
  * @return mixed
  */
-function afficheFichiersChanson(mixed $id, string $_DOSSIER_CHANSONS, string $iconePoubelle, string $cheminImages, array $listeSongbooks, Chanson $_chanson)
+function afficheFichiersChanson(int $id, string $_DOSSIER_CHANSONS, string $iconePoubelle, string $cheminImages, array $listeSongbooks, Chanson $_chanson)
 {
 // Cherche un document et le renvoie s'il existe
     $lignes = chercheDocumentsTableId(CHANSON, $id);
@@ -466,8 +467,8 @@ function afficheFichiersChanson(mixed $id, string $_DOSSIER_CHANSONS, string $ic
     <form action='chanson_upload.php' method='post'
           enctype='multipart/form-data'>
         <input type='hidden' name='MAX_FILE_SIZE' value='10000000'>
-        <input type='hidden' name='id' value='" . $_chanson->getId() . "
-        <label for='fichier'> </label>
+        <input type='hidden' name='id' value='" . $_chanson->getId() . "'>
+        <label for='fichier'> Fichier : </label>
         <input type='file' id='fichier' name='fichierUploade' size='40'>
         <input type='submit' value='Envoyer'>
     </form>";
@@ -484,7 +485,8 @@ function afficheStrumsChanson(Chanson $_chanson)
 {
     $contenuHtml = "<div id='tabs-3' class='col-lg-12 centrer'>";
 // Affiche les strums de la chanson
-    $_listeDesLiensStrums = chercheLiensStrumChanson("idChanson", $_chanson->getId());
+    $_listeDesLiensStrums =
+        chercheLiensStrumChanson("idChanson", $_chanson->getId());
 
     $monStrum = new Strum();
     $contenuHtml .= "<h2> Liste des strums pour cette chanson</h2>";
