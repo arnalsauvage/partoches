@@ -31,6 +31,17 @@ class ChiffrementTest extends TestCase
         $this->assertEquals("invite", $decrypt);
     }
 
+    public function testDecrypteInviteEric()
+    {
+        $_chaineAdecrypter = "9JH8rmleN6Oz8KXzlVZj9Q==";
+        $_chaineAttendue = "Erreur";
+
+        $decrypt = Chiffrement::decrypt($_chaineAdecrypter);
+
+        $this->assertEquals($_chaineAttendue, $decrypt);
+    }
+
+
     public function testEncrypteInvite()
     {
         $_chaine = "invite";

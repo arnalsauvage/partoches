@@ -15,8 +15,16 @@ $sortie .= "<body>
 ";
 
 // Traitement du formulaire si besoin
-function envoieMailRecup()
+function envoieMailRecup($_email)
 {
+
+    $resultat = chercheUtilisateurParEmail($_email);
+    if ($resultat == null) {
+        //echo "Pas de résultat...";
+        return 0;
+    }
+    $prenom = $resultat[3];
+    $nom = $resultat[4];
 // Envoie un email de récupération de mot de passe
 
     $emailCrypte = Chiffrement::crypt($_POST ['email']);
@@ -38,10 +46,6 @@ function envoieMailRecup()
         
         ";
 
-    $resultat = chercheUtilisateurs('email', $_POST['email']);
-    $prenom = $resultat[3];
-    $nom = $resultat[4];
-
     // Pour envoyer un mail HTML, l'en-tête Content-type doit être défini
     $headers[] = 'MIME-Version: 1.0';
     $headers[] = 'Content-type: text/html; charset=iso-8859-1';
@@ -52,19 +56,28 @@ function envoieMailRecup()
 
     // Envoi
     mail($_POST['email'], $sujet, $contenu, implode("\r\n", $headers));
-    // echo "sujet : " . $sujet . "<br>";
-    //  echo "Contenu : " . $contenu . "<br>";
+    echo "sujet : " . $sujet . "<br>";
+    echo "Contenu : " . $contenu . "<br>";
+    return true;
 }
 
 if (isset ($_POST ['email'])) {
+    if (!filter_var($_POST ['email'], FILTER_VALIDATE_EMAIL)) {
+        echo "Email address '" . $_POST ['email'] . "' is considered invalid.\n";
+        return;
+    }
     $reponse = "<h1>Top 5 Partoches - oubli de mot de passe (étape 2/4) </h1>";
-    $reponse .= "Un email de récupération de mot de passe vient de vous être adressé !";
+    if (envoieMailRecup($_POST ['email'])) {
+        $reponse .= "Un email de récupération de mot de passe vient de vous être adressé !";
+    } else {
+        $reponse .= "Si votre email est valide, votre compte est réactualisé...";
+    }
     echo $reponse;
-    envoieMailRecup();
     return;
 }
 
 if (isset ($_GET ['date']) && isset ($_GET ['compte'])) {
+    $reponse = "";
     $date = Chiffrement::decrypt($_GET ['date']);
     $compte = Chiffrement::decrypt($_GET ['compte']);
 
@@ -75,19 +88,14 @@ if (isset ($_GET ['date']) && isset ($_GET ['compte'])) {
 
     // echo "email cherché : " . $compte;
     // Si on ne trouve pas le compte en base, on informe de l'erreur
-    $resultat = chercheUtilisateurs('email', $compte);
+    $resultat = chercheUtilisateurParEmail($compte);
     if (!$resultat)
         $reponse .= "Email non trouvé dans la base...";
     else {
-        $nbLignes = $resultat-- > num_rows;
-        // echo "Nb resultats : " . $nbLignes;
-        $resultat = $resultat->fetch_row();
-        // echo $resultat;
         $_SESSION['id'] = $resultat[0];
         $reponse .= "Bienvenue, " . $resultat[3] . " ! <br>";
         $reponse .= "Il est temps de choisir un nouveau mot de passe !";
-    }
-    $reponse .= "<body>
+        $reponse .= "<body>
     <h1>Top 5 Partoches - oubli de mot de passe (étape 3/4)</h1>
     <p> Vous pouvez demander un nouveau mot de passe ici :</p>
 	<FORM action='oubliMotDePasse.php' class='login' method='post'>
@@ -95,7 +103,7 @@ if (isset ($_GET ['date']) && isset ($_GET ['compte'])) {
 			<input size='16' id='nouveauMdp' name='nouveauMdp' type='password' value='' placeholder='un mot de passe de qualité'>
 		<input type='submit' value='Ok'>
 	</FORM>";
-
+    }
 
     echo $reponse;
     return;

@@ -94,7 +94,8 @@ $contenu .= "		</button>\n
 			<li class='divider' role='separator'></li>\n
 			<li><a href='../php/songbook_liste.php'>Songbooks</a></li>\n
             <li><a href='../php/chanson_liste.php'>Chansons</a></li>\n
-            <li><a href='../php/strum_liste.php'>Strums</a></li>\n";
+            <li><a href='../php/strum_liste.php'>Strums</a></li>\n
+            <li><a href='../php/lienurl_liste.php'>Liens</a></li>\n";
 //            <li><a href='../php/playlist_liste.php'>Playlists</a></li>\n";
 // Le lien utilisateur est limité aux admin et login parametrage
 if (($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]))

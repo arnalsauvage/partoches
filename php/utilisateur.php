@@ -9,6 +9,17 @@ $GLOBALS["PRIVILEGE_ADMIN"] = 3;
 
 // Fonctions de gestion de l'utilisateur
 
+
+function chercheUtilisateurParEmail($_email)
+{
+    global $nomtable;
+    $maRequete = "SELECT * FROM " . $nomtable . " WHERE email LIKE '$_email'";
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheUtilisateurParEmail #1 : " . $_SESSION ['mysql']->error);
+    $ligne = $result->fetch_row();
+    // pour log echo "trouvé" . var_dump($ligne);
+    return ($ligne);
+}
+
 // Cherche les utilisateurs correspondant à un critère
 function chercheUtilisateurs($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
 {
