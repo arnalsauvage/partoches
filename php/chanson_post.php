@@ -133,7 +133,7 @@ if ($mode == "MAJ_SONGBPM") {
 // Gestion de la demande de suppression
 if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
     $_chanson = new Chanson($id);
-    $_chanson->supprimeChanson();
+    $_chanson->supprimeChansonBddFile();
     redirection($nomTable . "_liste.php");
 }
 

@@ -33,13 +33,10 @@ if (isset ($_POST ['tri'])) {
     $_SESSION[DOC_TRI] = $_POST ['tri'];
     $_SESSION[DOC_ORDRE_ASC] = true;
 }
-
 if (isset ($_GET ['triDesc'])) {
     $_SESSION[DOC_TRI] = $_GET ['triDesc'];
     $_SESSION[DOC_ORDRE_ASC] = false;
 }
-
-
 if (isset ($_POST['filtre'])) {
     $contenuFiltrer = $_POST['filtre'];
     $contenuFiltrer = htmlspecialchars($contenuFiltrer, ENT_QUOTES);

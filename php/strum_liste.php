@@ -23,7 +23,7 @@ $_renduHtml .= "Pour écouter le strum, copie le et colle le dans la fenêtre de
 ";
 
 // Chargement de la liste des strums
-    $marequete = "SELECT strum.id, lienstrumchanson.strum as lestrum , strum.longueur , strum.unite, strum.description  , count(lienstrumchanson.strum) as compte
+    $marequete = "SELECT strum.id, strum.strum as lestrum , strum.longueur , strum.unite, strum.description  , count(lienstrumchanson.strum) as compte
 FROM  strum 
 left join lienstrumchanson on binary lienstrumchanson.strum  = strum.strum 
 group by lestrum
@@ -68,7 +68,7 @@ while ($_strumParcouru = $_listeDesStrums->fetch_row()) {
 
 
         $_renduHtml .= $_strumParcouru [2] . "  " .$_uniteStrum; //  longueur / unité
-        $chansons_liste = Strum::chansonsDuStrum($_strumParcouru[1]);
+        $chansons_liste = Strum::chansonsDuStrumChaine($_strumParcouru[1]);
         $_renduHtml .= " - "  . $_strumParcouru [4] . " (utilisé dans " .$_strumParcouru [5]  . " chansons : $chansons_liste)"; // description
 
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer

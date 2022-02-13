@@ -38,7 +38,7 @@ class chansonListeTest extends TestCase
         $this->assertEquals(self::OLIVE, $_chanson->getInterprete());
         $this->assertEquals(self::LILA_LOUIS_987, $_chanson->getNom());
         // On le supprime en BDD
-        $_chanson->supprimeChanson();
+        $_chanson->supprimeChansonBddFile();
     }
 
     public function testChercheChansonBDD()
@@ -52,7 +52,7 @@ class chansonListeTest extends TestCase
         $this->assertEquals(self::OLIVE, $_chanson->getInterprete());
         $this->assertEquals(self::LILA_LOUIS_987, $_chanson->getNom());
         // On le supprime en BDD
-        $_chanson->supprimeChanson();
+        $_chanson->supprimeChansonBddFile();
         $this->assertEquals(0, $_chanson->chercheChansonParLeNom(self::LILA_LOUIS_987));
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Tester le filtre documents par Ajax et PHP, avec la commande POST </title>
-    <script src='../php/lib/javascript.js'></script>
+    <script src='../lib/javascript.js'></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </head>

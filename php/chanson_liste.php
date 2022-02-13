@@ -122,11 +122,9 @@ if (isset ($_GET['page']) && is_numeric($_GET['page'])) {
 }
 $pagination->setPageEnCours($page);
 
-
 // Affichage de la recherche
 require_once("chanson-v-comp-cherche.php");
 $contenuHtml .= $contenuHtmlCompCherche;
-
 
 // Affichage de la liste
 $largeur_ecran  = $_SESSION['largeur-fenetre'];
@@ -159,13 +157,11 @@ if ($largeur_ecran >1200) {
 if ($largeur_ecran > 700) {
     $contenuHtml .= titreColonne("Date pub.", DATE_PUB);
     $contenuHtml .= titreColonne("Publié par", "idUser");
-
     $contenuHtml .= titreColonne("Vues", "hits");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
 if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
     $contenuHtml .= tblEntete("action", "");
-
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 $contenuHtml .= TblFinLigne() . TblEnteteFin();
@@ -221,7 +217,6 @@ foreach ($resultat as $ligne) {
     if ($largeur_ecran >700) {
         $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=annee&" .  VAL_FILTRE . "=" .$_chanson->getAnnee()), $_chanson->getAnnee()),1, 1, CENTRER); // annee
     }
-
     if ($largeur_ecran >1200) {
         $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=tempo&" .  VAL_FILTRE . "=" .$_chanson->getTempo()), $_chanson->getTempo()), 1, 1, "alignerAdroite"); // tempo
         $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=mesure&" .  VAL_FILTRE . "=" .$_chanson->getMesure()), $_chanson->getMesure()), 1, 1, CENTRER); // mesure
@@ -254,7 +249,6 @@ if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
     $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Ajouter une chanson</a>\n";
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
-
 
 $contenuHtml .= "
 </div>\n

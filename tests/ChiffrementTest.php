@@ -1,5 +1,4 @@
 <?php
-
 use PHPUnit\Framework\TestCase;
 require_once("../php/lib/utilssi.php");
 

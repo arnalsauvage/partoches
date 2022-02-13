@@ -5,7 +5,6 @@ session_start();
 require_once "../php/lib/utilssi.php";
 require_once "../php/chanson.php";
 
-
 class chansonTest extends TestCase
 {
     const LILA_LOUIS_987 = "Lila Louis 987";
@@ -30,7 +29,7 @@ class chansonTest extends TestCase
         $this->assertEquals(self::OLIVE, $_chanson->getInterprete());
         $this->assertEquals(self::LILA_LOUIS_987, $_chanson->getNom());
         // On le supprime en BDD
-        $_chanson->supprimeChanson();
+        $_chanson->supprimeChansonBddFile();
     }
 
     public function testChercheChansonBDD()
@@ -44,7 +43,7 @@ class chansonTest extends TestCase
         $this->assertEquals(self::OLIVE, $_chanson->getInterprete());
         $this->assertEquals(self::LILA_LOUIS_987, $_chanson->getNom());
         // On le supprime en BDD
-        $_chanson->supprimeChanson();
+        $_chanson->supprimeChansonBddFile();
         $this->assertEquals(0, $_chanson->chercheChansonParLeNom(self::LILA_LOUIS_987));
     }
 }

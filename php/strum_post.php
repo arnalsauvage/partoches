@@ -33,7 +33,7 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     if (($_POST['mode'] == "UPDATE") && (is_numeric($id ))) {
         echo "UPDATE " . "post id : " . $_POST['id']. " strum : " . $strum;
         $strum = new Strum ($id, $strum, $unite, $longueur, $description);
-        $strum->creeModifiestrumBDD();
+        $strum->creeModifieStrumBDD();
         echo " ok !";
         return;
     }

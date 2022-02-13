@@ -398,7 +398,7 @@ class Chanson
     }
 
     // Supprime un chanson si elle existe
-    public function supprimeChanson()
+    public function supprimeChansonBddFile()
     {
         // On supprime les enregistrements dans chanson
         $maRequete = "DELETE FROM chanson WHERE id='" . $this->getId() . "'";
