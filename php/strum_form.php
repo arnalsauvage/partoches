@@ -27,6 +27,8 @@ else
 {
     $_strum = new Strum();
 }
+// Pour aider la saisie, on remplace les espaces par des tirets
+$_chaineStrumMiseEnForme = str_replace(" ", "-",$_strum->getStrum());
 ?>
 <h1>Strums</h1>
 <div id='editionStrum' class = 'formulaire' >
@@ -42,12 +44,12 @@ else
                value='<?= $_strum->getLongueur(); ?>'>
         <label for='strum'>Strum</label>
         <input id='strum' type='text' placeholder='ex : B BH HBH, voir aide'
-               value='<?= $_strum->getStrum(); ?>'>
+               value='<?= $_chaineStrumMiseEnForme; ?>'>
         <label for='description'>Description</label>
         <input id='description' type='text' placeholder='ici le nom du strum et sa description'
-               value='<?= $_strum->getDescription(); ?>'> <br>
+               value=<?= json_encode($_strum->getDescription()); ?>> <br>
         <div id='aide' style='display:none'>
-            <span class='glyphicon glyphicon-remove' title='fermer' aria-label '' onclick="document.getElementById('aide').style.display='none';"></span>
+            <span class='glyphicon glyphicon-remove' title='fermer' aria-label='' onclick="document.getElementById('aide').style.display='none';"></span>
         <p> Les caractères conseillés sont B et H pour bas ou haut , X pour le chunk, espace pour le non joué,
             b et h pour bas ou haut mais doucement ! <br>
             Pour la longueur, on utilisera le plus souvent 8 croches, donc ce sera alors longueur 8 et unité = 8 <br>
@@ -66,15 +68,15 @@ else
         }
         ?>
 
-        <button class='btn-danger'onclick="window.history.back();">Retour</button>
+        <button class='btn-danger' onclick="window.history.back();">Retour</button>
 
 </div>
 <div id="retour">
     résultat...
 </div>
 <?php
-$_renduHtml .= envoieFooter();
 $_renduHtml .= "
 <script src='../js/strum_liste.js'></script>
 ";
+$_renduHtml .= envoieFooter();
 echo $_renduHtml;

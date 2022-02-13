@@ -8,10 +8,6 @@ require_once "../php/strum.php";
 
 class strumTest extends TestCase
 {
-    const LILA_LOUIS_987 = "Lila Louis 987";
-    const OLIVE = "Olive";
-    const C = 1998;
-
     public function testConstructeur0()
     {
         // Etant donné que je n'ai pas de valeurs
