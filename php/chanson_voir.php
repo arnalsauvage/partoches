@@ -131,7 +131,7 @@ if ($result->num_rows > 0) {
     $contenuHtml .= FIN_SECTION . " \n";
 }
 
-    $contenuHtml .= afficheStrums($idChanson);
+$contenuHtml .= afficheStrums($idChanson);
 
 //Voir les liens associés à cette chanson
 //  id	table	idtable	url	type	description

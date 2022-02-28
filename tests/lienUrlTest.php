@@ -68,4 +68,32 @@ class lienUrlTest extends TestCase
         // Suppression de la donnée
         supprimeLienurl($idgenere);
     }
+    public function testAjouteHitk()
+    {
+        // Etant données les valeurs suivantes
+
+        $lienUrl_attendu = "http://testlien/fr/bidule.html";
+        $type_attendu = "vidéo";
+        $description_attendue = "une vidéo";
+        $table_attendue = "chanson";
+        $id_attendu=12;
+        $date_attendue = "24/12/2021";
+        $idUserAttendu = 4;
+        $hitsAttendus = 20;
+        creeLienurl($lienUrl_attendu, $type_attendu, $description_attendue, $table_attendue, $id_attendu, $date_attendue, $idUserAttendu, $hitsAttendus);
+
+        // Quand j'ajoute un hit au lienUrl en bdd
+
+        $lien = chercheLiensUrlsTableId($table_attendue, $id_attendu)->fetch_row();
+        $idgenere = $lien[0];
+        ajouteUnHit($idgenere);
+        $hitsAttendus++;
+        $lien = chercheLiensUrlsTableId($table_attendue, $id_attendu)->fetch_row();
+
+        // Alors j'obtiens l'objet avec les valeurs attendues
+        $this->assertEquals($hitsAttendus, $lien[8]);
+
+        // Suppression de la donnée
+        supprimeLienurl($idgenere);
+    }
 }

@@ -2,6 +2,7 @@
 require_once("lib/utilssi.php");
 require_once("menu.php");
 require_once("lienurl_voir.php");
+require_once("lienurl.php");
 require_once("Pagination.php");
 
 global $iconeAttention;
@@ -14,14 +15,15 @@ const LIENSURL_PAGE = 'liensurlPage';
 $nombreLiensParPage = 15;
 $_lienurlForm = "chanson_form.php";
 $_lienurlPost = "lienurl_post.php";
+$_lienurlPost = "lienurl.php";
 
 $_table_lien_url = "lienurl";
 $_renduHtml = "";
 $_renduHtml .= entreBalise("Liens", "H1");
 
 // Chargement de la liste des lienurls
-$marequete = "select * from $_table_lien_url ORDER BY 'date' DESC";
-$_listeDeslienurls = $_SESSION ['mysql']->query($marequete);
+$_listeDeslienurls = chargeLiensurls("date", false);
+
 if (!$_listeDeslienurls) {
     die ("Problème lienurlsListe #1 : " . $_SESSION ['mysql']->error);
 }

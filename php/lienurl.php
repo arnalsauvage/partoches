@@ -14,6 +14,16 @@ include_once "lib/configMysql.php";
 // TODO : contrôler que les id / Tables fournis existent bien
 
 // Cherche les Lienurls correspondant à un critère
+function chargeLiensurls($critereTri = 'date', $bTriAscendant = true)
+{
+    $maRequete = "SELECT * FROM lienurl ORDER BY $critereTri";
+    $maRequete = !$bTriAscendant ? $maRequete . " DESC" : $maRequete . " ASC";
+    // echo "ma requete : " . $maRequete;
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienurls #1 : " . $_SESSION ['mysql']->error);
+    return $result;
+}
+
+// Cherche les Lienurls correspondant à un critère
 function chercheLienurls($critere, $valeur, $critereTri = 'type', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM lienurl WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
@@ -104,6 +114,20 @@ function supprimeLienurl($id)
     $maRequete = "DELETE FROM lienurl
 	WHERE id='$id'";
     $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimeLienurl : " . $_SESSION ['mysql']->error);
+}
+
+function ajouteUnHit($idLien)
+{
+    $resultat = chercheLienurlId($idLien);
+    if ($resultat == NULL) {
+        return false;
+    }
+    $nbHits = $resultat[8] + 1;
+
+    $maRequete = "UPDATE  lienurl
+	SET hits = '$nbHits'
+	WHERE id = '$idLien' ";
+    $_SESSION ['mysql']->query($maRequete) or die ("Problème modifieLienurl #1 : " . $_SESSION ['mysql']->error . BR_REQUETE . $maRequete);
 }
 
 // Renvoie une chaine de description du Lienurl pour test
