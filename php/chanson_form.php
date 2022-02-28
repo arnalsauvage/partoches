@@ -108,7 +108,7 @@ if ($mode == "MAJ") {
         if (! $fichierOk) {
             $nbFichiersKO++;
             echo "Fichier corbeille : " . $fichierSurDisque[1] . " non répertorié par la Bdd ";
-            $urlFichier = "chanson_post.php?nomFic=" . urlencode("../".$_DOSSIER_CHANSONS . $id . "/" . $fichierSurDisque[1] . "&mode=SUPPRFIC&id=$id");
+            $urlFichier = "chanson_post.php?nomFic=" . urlencode("../".$_DOSSIER_CHANSONS . $id . "/" . $fichierSurDisque[1]) . "&mode=SUPPRFIC&id=$id";
             echo boutonSuppression($urlFichier, $iconePoubelle, $cheminImages) . "<br>$numeroElement";
             $numeroElement = count($fichiersSurDisque) + 1;
             ?>
@@ -228,9 +228,7 @@ echo "<br>";
 
         echo selectUtilisateur("nom", "%", "login", true, $idUserLien,"utilisateur", "idUser".$idLien );
 
-        echo "
-               
-                </div>
+        echo "  </div>
                 <div>    
                     <label for='hits$idLien'>Hits :</label>
                     <input size='255' id='hits$idLien' name='hits' value='$hits' placeholder='17' >

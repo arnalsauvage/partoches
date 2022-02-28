@@ -16,6 +16,7 @@ require_once("songbook.php");
 require_once ("lienStrumChanson.php");
 require_once ("lienurl_voir.php");
 require_once("UtilisateurNote.php");
+require_once("lienurl.php");
 
 $_strumForm = "strum_form.php";
 $_strumPost = "strum_post.php";
@@ -145,7 +146,7 @@ if ($liens->num_rows > 0) {
 
     while ($lien = $liens->fetch_row()) {
         $contenuHtml .= afficheLien($lien);
-
+        ajouteUnHit($lien[0]);
     }
 
     $contenuHtml .= FIN_SECTION;

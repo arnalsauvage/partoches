@@ -12,7 +12,6 @@ require_once("chanson.php");
 
 // ecritFichierLog("ajaxlog.htm", "entrée dans chanson_post");
 
-
 if ($_SESSION [PRIVILEGE] <= $GLOBALS["PRIVILEGE_INVITE"]) {
     redirection($nomTable . "_liste.php");
 }
