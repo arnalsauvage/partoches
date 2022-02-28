@@ -1,14 +1,15 @@
 <?php
-const BR_REQUETE = "<br>Requete : ";
-define("DOSSIER_DATA" ,"../data/");
+if(!defined("BR_REQUETE")) {
+    define("BR_REQUETE", "<br>Requete : ");
+}
+if(!defined("DOSSIER_DATA")) {
+    define("DOSSIER_DATA", "../data/");
+}
 include_once("lib/utilssi.php");
 include_once "lib/configMysql.php";
 
 // Fonctions de gestion de lien url
 //  id	nomtable	idtable	url	type	description
-
-// TODO : faire une fonction de contrôle des Lienurls sur disque :
-// Lienurls sur disque non vus en BDD & Lienurls BDD non vus sur disque
 
 // TODO : contrôler que les id / Tables fournis existent bien
 
@@ -59,16 +60,18 @@ function chercheLiensUrlsTableId($table, $id)
 }
 
 // Crée un Lienurl en base de données
-function creeLienurl($url, $type, $description, $nomTable, $idTable)
+function creeLienurl($url, $type, $description, $nomTable, $idTable, $date, $iduser, $hits)
 {
+    $date = convertitDateJJMMAAAAversMySql($date);
+    echo "Nouveau format de date : $date ";
     // id	nomtable	idtable	url	type	description
+    $maRequete = "INSERT INTO lienurl VALUES (NULL,  '$nomTable', '$idTable', '$url', '$type', '$description', '$date', $iduser,$hits)";
+    echo $maRequete;
     $resultat = chercheLienurlUrlTableId($url, $nomTable, $idTable);
     // Si le lien existe déjà, on ne le crée pas
     if ($resultat != NULL) {
         return false;
     }
-    $idUser = $_SESSION ['id'];
-    $maRequete = "INSERT INTO lienurl VALUES (NULL,  '$nomTable', '$idTable', '$url', '$type', '$description')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creeLienurl#1 : " . $_SESSION ['mysql']->error);
     return $result;
 }
@@ -81,14 +84,15 @@ function creeLienurl($url, $type, $description, $nomTable, $idTable)
  * @param $nomTable : table à laquelle est rattaché le Lienurl
  * @param $idTable : identifiant de l'objet auquel est rattaché ce Lienurl
  */
-function modifieLienurl($id, $url, $type, $description, $nomTable, $idTable)
+function modifieLienurl($id, $url, $type, $description, $nomTable, $idTable, $date, $idUser, $hits)
 {
     $resultat = chercheLienurlId($id);
     if ($resultat == NULL) {
         return false;
     }
+    $date = convertitDateJJMMAAAAversMySql($date);
     $maRequete = "UPDATE  lienurl
-	SET type = '$type', url = '$url', description = '$description', nomtable = '$nomTable', idtable = '$idTable'
+	SET type = '$type', url = '$url', description = '$description', nomtable = '$nomTable', idtable = '$idTable', date = '$date', idUser = '$idUser', hits = '$hits'
 	WHERE id = '$id' ";
     $_SESSION ['mysql']->query($maRequete) or die ("Problème modifieLienurl #1 : " . $_SESSION ['mysql']->error . BR_REQUETE . $maRequete);
 }

@@ -1,19 +1,17 @@
 <?php
 
-$nomtable = "utilisateur";
+$nomTableUtilisateur = "utilisateur";
 $GLOBALS["PRIVILEGE_INVITE"] = 0;
 $GLOBALS["PRIVILEGE_MEMBRE"] = 1;
 $GLOBALS["PRIVILEGE_EDITEUR"] = 2;
 $GLOBALS["PRIVILEGE_ADMIN"] = 3;
 
-
 // Fonctions de gestion de l'utilisateur
-
 
 function chercheUtilisateurParEmail($_email)
 {
-    global $nomtable;
-    $maRequete = "SELECT * FROM " . $nomtable . " WHERE email LIKE '$_email'";
+    global $nomTableUtilisateur;
+    $maRequete = "SELECT * FROM " . $nomTableUtilisateur . " WHERE email LIKE '$_email'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheUtilisateurParEmail #1 : " . $_SESSION ['mysql']->error);
     $ligne = $result->fetch_row();
     // pour log echo "trouvé" . var_dump($ligne);
@@ -23,8 +21,8 @@ function chercheUtilisateurParEmail($_email)
 // Cherche les utilisateurs correspondant à un critère
 function chercheUtilisateurs($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
 {
-    global $nomtable;
-    $maRequete = "SELECT * FROM " . $nomtable . " WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
+    global $nomTableUtilisateur;
+    $maRequete = "SELECT * FROM " . $nomTableUtilisateur . " WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
     if (!$bTriAscendant)
     {
         $maRequete .= " DESC";
@@ -34,7 +32,7 @@ function chercheUtilisateurs($critere, $valeur, $critereTri = 'nom', $bTriAscend
         $maRequete .= " ASC";
     }
     // echo "ma requete : " . $maRequete;
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheUtilisateurs #1 : " . $_SESSION ['mysql']->error);
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheUtilisateurs #1 : " . $_SESSION ['mysql']->error . $maRequete);
     return $result;
 }
 
@@ -85,7 +83,7 @@ function creeUtilisateur($login, $mdp, $prenom, $nom, $image, $site, $email, $si
     // Crypter le mdp
     $crypt = Chiffrement::crypt($mdp);
     // vérifier l'email
-    $date = convertitDateJJMMAAAA(date("d/m/Y"));
+    $date = convertitDateJJMMAAAAversMySql(date("d/m/Y"));
     $login = $_SESSION ['mysql']->escape_string($login);
     $prenom = $_SESSION ['mysql']->escape_string($prenom);
     $nom = $_SESSION ['mysql']->escape_string($nom);
@@ -109,7 +107,7 @@ function creeUtilisateur($login, $mdp, $prenom, $nom, $image, $site, $email, $si
 function modifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $nbreLogins, $privilege)
 {
     // On convertit la date au format mysql
-    $date = convertitDateJJMMAAAA(date("d/m/Y"));
+    $date = convertitDateJJMMAAAAversMySql(date("d/m/Y"));
     // Crypter le mdp
     $crypt = Chiffrement::crypt($mdp);
 
@@ -149,11 +147,9 @@ function modifieMdpUtilisateur($id, $mdp)
     }
 }
 
-
 // Cette fonction supprime un utilisateur si il existe
 function supprimeUtilisateur($idUtilisateur)
 {
-
     // On supprime les enregistrements dans utilisateur
     $maRequete = "DELETE FROM  utilisateur
 	WHERE id='$idUtilisateur'";
@@ -178,7 +174,6 @@ function creeModifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site,
 function login_utilisateur($login, $mdp)
 {
     $donnee = chercheUtilisateurParLeLogin($login);
-
     if ($mdp == Chiffrement::decrypt($donnee [2])) {
         $donnee [10] = $donnee [10] + 1;
         // echo "login ok";
@@ -242,9 +237,9 @@ function testUtilisateurs()
 
 // Prépare un combo en html avec les utilisateurs
 // SELECT * FROM utilisateur WHERE $critere LIKE '$valeur' ORDER BY $critereTri
-function selectUtilisateur($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true, $idSelectionne = 0)
+function selectUtilisateur($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true, $idSelectionne = 0, $nomDuChamp ='fidUser', $idDuChamp="fiduser")
 {
-    $retour = "<select name='fidUser'>\n";
+    $retour = "<select name='$nomDuChamp' id='$idDuChamp'>\n";
     // Ajouter des options
     $lignes = chercheUtilisateurs($critere, $valeur, $critereTri, $bTriAscendant);
     while ($ligne = $lignes->fetch_row()) {

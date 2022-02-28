@@ -60,7 +60,7 @@ function chercheSongbookParLeNom($nom)
 // Crée un songbook
 function creeSongbook($nom, $description, $date, $image, $hits)
 {
-    $date = convertitDateJJMMAAAA($date);
+    $date = convertitDateJJMMAAAAversMySql($date);
     $idUSer = $_SESSION ['id'];
     $maRequete = "INSERT INTO songbook VALUES (NULL, '$nom', '$description', '$date', '$image', '$hits', '$idUSer')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creesongbook#1 : " . $_SESSION ['mysql']->error);
@@ -69,7 +69,7 @@ function creeSongbook($nom, $description, $date, $image, $hits)
 // Modifie en base la songbook
 function modifiesSongbook($id, $nom, $description, $date, $image, $hits)
 {
-    $date = convertitDateJJMMAAAA($date);
+    $date = convertitDateJJMMAAAAversMySql($date);
     $maRequete = "UPDATE  songbook
 	SET nom = '$nom', description = '$description', date = '$date' , image = '$image', hits = '$hits'
 	WHERE id='$id'";

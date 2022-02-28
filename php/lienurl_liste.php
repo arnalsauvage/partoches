@@ -12,15 +12,15 @@ global $iconeEdit;
 
 const LIENSURL_PAGE = 'liensurlPage';
 $nombreLiensParPage = 15;
-$_lienurlForm = "lienurl_form.php";
+$_lienurlForm = "chanson_form.php";
 $_lienurlPost = "lienurl_post.php";
 
-$_table = "lienurl";
+$_table_lien_url = "lienurl";
 $_renduHtml = "";
 $_renduHtml .= entreBalise("Liens", "H1");
 
 // Chargement de la liste des lienurls
-$marequete = "select * from $_table ORDER BY 'dateDernierLogin' DESC";
+$marequete = "select * from $_table_lien_url ORDER BY 'date' DESC";
 $_listeDeslienurls = $_SESSION ['mysql']->query($marequete);
 if (!$_listeDeslienurls) {
     die ("Problème lienurlsListe #1 : " . $_SESSION ['mysql']->error);
@@ -32,7 +32,7 @@ $pagination = new Pagination ($_listeDeslienurls->num_rows, $nombreLiensParPage)
 if (isset ($_GET['page']) && is_numeric($_GET['page'])) {
     $_SESSION[LIENSURL_PAGE] = $_GET['page'];
 } else
-    if (!isset ($_SESSION[$_table."_page"])) {
+    if (!isset ($_SESSION[$_table_lien_url."_page"])) {
         $_SESSION[LIENSURL_PAGE] = 1;
     }
 $pagination->setPageEnCours($_SESSION[LIENSURL_PAGE]);
@@ -49,7 +49,11 @@ while ($_lienurlParcouru = $_listeDeslienurls->fetch_row()) {
         if (($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) ) {
             $_image = Image($cheminImages . $iconeEdit, 32, 32);
             $_image = str_replace("'>","' loading='lazy'>", $_image);
-            $_ancre = Ancre("$_lienurlForm?id=" . $_lienurlParcouru [0], $_image,-1, -1, "modifier le lienurl" );
+            $table_concernee = $_lienurlParcouru[1];
+            $id_concerne = $_lienurlParcouru[2];
+            if ($table_concernee == "chanson"){
+                $_ancre = Ancre("$_lienurlForm?id=" . $id_concerne, $_image,-1, -1, "modifier le lienurl" );
+            }
             $_renduHtml .= $_ancre;
         }
 

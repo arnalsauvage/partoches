@@ -75,7 +75,7 @@ function composeNomVersion($nom, $version)
 function creeDocument($nom, $tailleKo, $nomTable, $idTable)
 {
     $date = date("d/m/y");
-    $date = convertitDateJJMMAAAA($date);
+    $date = convertitDateJJMMAAAAversMySql($date);
     $version = 1;
 
     $resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);
@@ -99,7 +99,7 @@ function creeDocument($nom, $tailleKo, $nomTable, $idTable)
 function modifieDocument($nom, $tailleKo, $nomTable, $idTable)
 {
     $date = date("d/m/y");
-    $date = convertitDateJJMMAAAA($date);
+    $date = convertitDateJJMMAAAAversMySql($date);
     $idUser = $_SESSION ['id'];
 
     $resultat = chercheDocumentNomTableId($nom, $nomTable, $idTable);

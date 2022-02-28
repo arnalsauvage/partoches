@@ -46,7 +46,7 @@ class Chanson
         $this->setTempo(120);
         $this->setMesure("4/4");
         $this->setPulsation("binaire");
-        $this->setDatePub(convertitDateJJMMAAAA(date(self::D_M_Y)));
+        $this->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
         $this->setHits(0);
         $this->setTonalite("C");
     }
@@ -374,7 +374,7 @@ class Chanson
         $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
         $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
         $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
-        $this->_datePub = convertitDateJJMMAAAA(date(self::D_M_Y));
+        $this->_datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
         $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
 	        VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', 
 	        '%s', '%s' ,  '%s', '%s')",

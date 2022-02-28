@@ -69,6 +69,7 @@ $sortie .= "<h2>Liste des documents dans ce songbook</h2>";
 
 $lignes = chercheLiensDocSongbook('idSongbook', $idSongbook, "ordre");
 $listeDocs = "";
+$nbChansons = 0;
 while ($ligne = $lignes->fetch_row()) {
     $ligneDoc = chercheDocument($ligne [1]);
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
@@ -92,7 +93,8 @@ while ($ligne = $lignes->fetch_row()) {
         $sortie .= " - " . $maChanson->getNom() . " - " . $maChanson->getTonalite() . " - " . $maChanson->getAnnee() . " - " . $maChanson->getTempo() . " bpm";
     }
     $sortie .= " <br>\n";
+    $nbChansons++;
 }
-
+$sortie .= "$nbChansons chansons dans le songbook !";
 $sortie .= envoieFooter();
 echo $sortie;

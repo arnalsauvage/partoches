@@ -1,6 +1,6 @@
 // Clic sur un titre active le renommage
 
-$("label").click(function () {
+$("label.doc").click(function () {
     $('h1').css('background', getRandomColor());
     $(this).parent().find("button").show("slow");
     $(this).hide();
@@ -37,13 +37,13 @@ $("button[name='renommer']").click(function () {
 });
 
 // Clic sur un des boutons referme la saisie
-$("button").click(function () {
+$("button.document").click(function () {
     //						toastr.warning("Erreur dans la génération du pdf... un des pdf à assembler n'est pas pris en compte par nos outils .<br>Message d'erreur en bas de la page.");
     masqueSaisie(this);
 });
 
 function masqueSaisie(monThis) {
-    // On masque les boutons
+    // On masque les boutons renommer et annuler
     $(monThis).parent().children("button").hide();
     //On montre le label
     $(monThis).parent().children("label").show();

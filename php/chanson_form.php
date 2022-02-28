@@ -123,7 +123,7 @@ if ($mode == "MAJ") {
                         url: "chanson_post.php",
                         data: "id=<?php echo $id;?>&nomFic=<?php echo $fichierSurDisque[1];?>&mode=RESTAUREDOC",
                         datatype: 'html', // type de la donnée à recevoir
-                        success: function (code_html, statut) { // success est toujours en place, bien sûr !
+                        success: function (code_html, statut) {
                             if (code_html.search("n'a pas été traité.") === -1)
                                 toastr.success("Le document a été restauré ! <br> Le fichier a été raccroché à la chanson <br> Vous pouvez raffraîchir la page pour le voir.");
                             else {
@@ -164,8 +164,24 @@ echo "
                 <textarea id='lienDescription0' name='description'  placeholder='description longue du lien'> </textarea>
             </div>
             <div>    
-                <label for='lienUrl0'>Description  :</label>
+                <label for='lienUrl0'>Url :</label>
                 <input size='255' id='lienUrl0' name='url' value='' placeholder='http://youtu.be/3456' >
+            </div>
+            <div>    
+                <label for='date0'><Date</D>Date :</label>
+                <input size='255' id='date0' name='date' value='' placeholder='au format JJ/MM/AAAA' >
+            </div>
+            <div>    
+                <label for='idUser0'>Utilisateur :</label>";
+
+                echo selectUtilisateur("nom", "%", "login", true, 0,"utilisateur", "idUser0");
+
+                echo "
+               
+            </div>
+            <div>    
+                <label for='hits0'>Hits :</label>
+                <input size='255' id='hits0' name='hits' value='' placeholder='17' >
             </div>
             <div>
                 <button type='button' name='createLien' onclick=\"updateLienurl('NEW',0,'chanson', $id) \">créer</button>
@@ -184,39 +200,86 @@ echo "<br>";
         $url = $ligneLien[3] ;
         $type = $ligneLien[4];
         $description = $ligneLien[5];
+        $date = dateMysqlVersTexte($ligneLien[6]);
+        $idUserLien = $ligneLien[7];
+        $hits = $ligneLien[8];
         $nomtable = "chanson";
         $idtable = $id;
         echo "
-            <div>
-                <label for='lienType$idLien'>Type de lien :</label>   
-                <input size='255' id='lienType$idLien' name='type' value='" . htmlentities($type) . "' placeholder='video ou article'><br>
-            </div>           
-            <div>
-                <label for='lienDescription$idLien'>Description  :</label>
-                <textarea id='lienDescription$idLien' name='description' placeholder='description'>" . htmlentities($description) . " </textarea> <br>
-            </div>  
-            <div> 
-                <label for='lienUrl$idLien'>Description  :</label>
-                <input size='255' id='lienUrl$idLien' name='url' value='" . htmlentities($url) . "' placeholder='http://youtu.be/3456' >
-            </div>
-            <div>
-                <button type='button' name='updateLien$idLien' onclick=\"updateLienurl('UPDATE',$idLien,'chanson', $id) \">modifier</button>
-                <button name='deleteLien$idLien' onclick=\"updateLienurl('DEL',$idLien,'chanson', $id) \">supprimer</button>
-           </div> 
+            <div id='divlienUrl$idLien'>
+                <div>
+                    <label for='lienType$idLien'>Type de lien :</label>   
+                    <input size='255' id='lienType$idLien' name='type' value='" . htmlentities($type) . "' placeholder='video ou article'><br>
+                </div>           
+                <div>
+                    <label for='lienDescription$idLien'>Description  :</label>
+                    <textarea id='lienDescription$idLien' name='description' placeholder='description'>" . htmlentities($description) . " </textarea> <br>
+                </div>  
+                <div> 
+                    <label for='lienUrl$idLien'>Url  :</label>
+                    <input size='255' id='lienUrl$idLien' name='url' value='" . htmlentities($url) . "' placeholder='http://youtu.be/3456' >
+                </div>
+                            <div>    
+                    <label for='date$idLien'><Date</D>Date :</label>
+                    <input size='255' id='date$idLien' name='date' value='$date' placeholder='au format JJ/MM/AAAA' >
+                </div>
+                <div>    
+                    <label for='idUser$idLien'>Utilisateur :</label>";
+
+        echo selectUtilisateur("nom", "%", "login", true, $idUserLien,"utilisateur", "idUser".$idLien );
+
+        echo "
+               
+                </div>
+                <div>    
+                    <label for='hits$idLien'>Hits :</label>
+                    <input size='255' id='hits$idLien' name='hits' value='$hits' placeholder='17' >
+                </div>
+                <div>
+                    <button type='button' name='updateLien$idLien' onclick=\"updateLienurl('UPDATE',$idLien,'chanson', $id) \">modifier</button>
+                    <button type='button' name='deleteLien$idLien' onclick=\"updateLienurl('DEL',$idLien) \">supprimer</button>
+               </div> 
+           </div>
         ";
     }
         echo "</form>
 </div>";
 ?>
     <script>
-        function updateLienurl(mode,id, nomtable, idtable) {
-            url = document.getElementById("lienUrl"+id).value;
-            type = document.getElementById("lienType"+id).value;
-            description = document.getElementById("lienDescription"+id).value;
+        function ajouteParametre(nomParametre, valeurParametre, chaine) {
+            chaine = chaine + "&" + nomParametre + "=" + valeurParametre;
+            return (chaine);
+        }
+        function updateLienurl(mode, id, nomtable, idtable) {
+            var chaineData = "mode=" + mode;
+            if (mode === "DEL"){
+                chaineData = ajouteParametre("id", id, chaineData);
+                // supprimer la div du lien dans le DOM
+                let maDiv = document.getElementById("divlienUrl"+id);
+                maDiv.remove();
+            }
+            if (mode === "NEW" || mode === "UPDATE"){
+                var url = document.getElementById("lienUrl" + id).value;
+                var type = document.getElementById("lienType" + id).value;
+                var description = document.getElementById("lienDescription" + id).value;
+                var date = document.getElementById("date" + id).value;
+                var idUser = document.getElementById("idUser" + id).value;
+                var hits = document.getElementById("hits" + id).value;
+                chaineData = ajouteParametre("id", id, chaineData);
+                chaineData = ajouteParametre("nomtable", nomtable, chaineData);
+                chaineData = ajouteParametre("idtable", idtable, chaineData);
+                chaineData = ajouteParametre("url", url, chaineData);
+                chaineData = ajouteParametre("type", type, chaineData);
+                chaineData = ajouteParametre("description", description, chaineData);
+                chaineData = ajouteParametre("date", date, chaineData);
+                chaineData = ajouteParametre("idUser", idUser, chaineData);
+                chaineData = ajouteParametre("hits", hits, chaineData);
+            }
+
             $.ajax({
                 type: "POST",
                 url: "lienurlPost.php",
-                data: "mode="+mode+"&id="+id+"&url="+url+"&type="+type+"&description="+description+"&nomtable="+nomtable+"&idtable="+idtable,
+                data: chaineData,
                 datatype: 'html', // type de la donnée à recevoir
                 success: function (code_html, statut) { // success est toujours en place, bien sûr !
                     if (code_html.search("n'a pas été traité.") === -1)
@@ -366,7 +429,6 @@ function formulaireChanson(Chanson $_chanson, string $mode): string
     return $sortie;
 }
 
-
 function comboAjoutSongbook($listeSongbooks)
 {
     $monCombo = " <br>   <label class='inline col-sm-4'> * Ajouter au songbook :</label> 
@@ -390,7 +452,6 @@ function comboAjoutStrum($listeStrums)
     $monCombo .= "   </select>";
     return($monCombo);
 }
-
 
 /**
  * @param Chanson $_chanson
@@ -450,8 +511,8 @@ function afficheFichiersChanson(int $id, string $_DOSSIER_CHANSONS, string $icon
         $listeDocs .= "<label class='doc'>" . htmlentities($fichierCourt) . "</label>";
         $listeDocs .= " (" . intval($ligneDoc [2] / 1024) . " ko )
 		    <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
-		    <button name='renommer' style='display:none;'>renommer</button>
-            <button style='display:none;'>x</button>";
+		    <button name='renommer' class='document' style='display:none;'>renommer</button>
+            <button style='display:none;' class='document' >x</button>";
         if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
             $listeDocs .= boutonSuppression("chanson_post.php" . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
         }
@@ -475,7 +536,6 @@ function afficheFichiersChanson(int $id, string $_DOSSIER_CHANSONS, string $icon
     echo $formulaireEnvoiFichier;
     return $lignes;
 }
-
 
 /**
  * @param Chanson $_chanson
@@ -508,7 +568,5 @@ function afficheStrumsChanson(Chanson $_chanson)
     echo "<button> Ajouter le strum </button> </form>
             </div>";
     // Fermeture tab 3 Strums
-    return $idLien;
 }
-
 ?>

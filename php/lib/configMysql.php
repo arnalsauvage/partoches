@@ -31,13 +31,13 @@ if (FALSE == isset($configMysql)) {
 //	echo "connexion : $idconnect";
 //	return($idconnect);
 
-function convertitDateJJMMAAAA($date)
+function convertitDateJJMMAAAAversMySql($date)
 {
     // On convertit la date au format mysql : "JJ/MM/AAAA" devient "AAAA-MM-JJ"
-// 		echo "Ancienne date : $date ";
+	// echo "Ancienne date : $date ";
     $date = explode('/', $date);
     $new_date = $date[2] . '-' . $date[1] . '-' . $date[0];
-// 		echo " , New date : " . $new_date . "<br>";
+	// echo " , New date : " . $new_date . "<br>";
     return $new_date;
 }
 

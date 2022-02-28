@@ -51,7 +51,7 @@ function cherchePlaylistParLeNom($nom)
 // Crée une playlist
 function creePlaylist($nom, $description, $date, $image, $hits)
 {
-    $date = convertitDateJJMMAAAA($date);
+    $date = convertitDateJJMMAAAAversMySql($date);
     $idUSer = $_SESSION ['id'];
     $maRequete = "INSERT INTO playlist VALUES (NULL, '$nom', '$description', '$date', '$image', '$hits', '$idUSer')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creePlaylist#1 : " . $_SESSION ['mysql']->error);
@@ -60,7 +60,7 @@ function creePlaylist($nom, $description, $date, $image, $hits)
 // Modifie en base la playlist
 function modifiePlaylist($id, $nom, $description, $date, $image, $hits)
 {
-    $date = convertitDateJJMMAAAA($date);
+    $date = convertitDateJJMMAAAAversMySql($date);
     $maRequete = "UPDATE  playlist
 	SET nom = '$nom', description = '$description', date = '$date' , image = '$image', hits = '$hits'
 	WHERE id='$id'";
