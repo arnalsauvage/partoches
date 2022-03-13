@@ -56,6 +56,7 @@ if (isset ($_POST ['id']) || (isset ($_GET ['id']) && (is_numeric($_GET ['id']))
     $donnee [3] = "01/01/1970";
     $donnee [4] = "";
     $donnee [5] = 0;
+    $donnee [7] = 1;
 }
 
 if ($mode == "MAJ") {
@@ -77,6 +78,7 @@ $f->champTexte("Description :", "fdescription", $donnee [2], 64, 128);
 $f->champTexte("Date :", "fdate", $donnee [3], 10, 10);
 $f->champTexte("Image :", "fimage", $donnee [4], 64, 64);
 $f->champTexte("Hits :", "fhits", $donnee [5], 10, 10);
+$f->champTexte("Type :", "ftype", $donnee [7], 10, 10);
 $f->champCache("mode", $mode);
 $f->champValider(" Valider ", "valider");
 $sortie .= $f->fin();
@@ -169,7 +171,7 @@ if ($mode == "MAJ") {
         <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
         <input type="submit" value="Envoyer">
     </form>
-    <button onclick='genereUnPdf()'>Genère le songbook en pdf</button>
+    <button onclick='genereUnPdf()'>Génère le songbook en pdf</button>
 
     <div id="div1"></div>
     <script>
@@ -200,30 +202,29 @@ if ($mode == "MAJ") {
         // Gestion de l'ordre dans le songbook
         // On va renvoyer à la page traiteOrdre.php l'identifiant du songbook, et un tableau avec
         // positions[idDoc,ancienRang]
-        // ex : si le 1er élémelent est passé en 2 :
+        // ex : si le 1er élément est passé en 2 :
         // positions[387,2][366,1][167,3][274,4]
 
          //   $('#sortable').sortable();
-            $('#sortable').sortable({
-                axis: 'y',
-                update: function(index) {
-                    let positions = [];
-                    $(this).children().each(function( index)
-                    {
-                        // console.log('déplacement du ' + $(this).attr('data-index'));
-                        positions.push([$(this).attr('data-index'),$(this).attr('data-position')]);
-                    });
-                    $.ajax({
-                        data: {
-                            idSongbook :  <?=$id?>,
-                            positions : positions
-                        },
-                        type: 'POST',
-                        url: 'traiteOrdre.php'
-                    });
-                }
-            });
-            $('#sortable').disableSelection();
+        $('#sortable').sortable({
+            axis: 'y',
+            update: function (index) {
+                let positions = [];
+                $(this).children().each(function (index) {
+                    // console.log('déplacement du ' + $(this).attr('data-index'));
+                    positions.push([$(this).attr('data-index'), $(this).attr('data-position')]);
+                });
+                $.ajax({
+                    data: {
+                        idSongbook: <?=$id?>,
+                        positions: positions
+                    },
+                    type: 'POST',
+                    url: 'traiteOrdre.php'
+                });
+            }
+        });
+        $('#sortable').disableSelection();
     </script>
     <?php
     echo envoieFooter();

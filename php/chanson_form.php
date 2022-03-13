@@ -28,17 +28,17 @@ if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_EDITEUR"]) {
     redirection($urlRedirection);
 }
 
-// $id, $nom, $interprete, $annee, $idUser, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
+// $id, $nom, $interprete, $année, $idUser, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
 $_chanson = new Chanson();
 
 // Chargement des donnees de la chanson si l'identifiant est fourni
 
 if (isset ($_POST ['id']))
 {
-    $id = $_POST ['id'];
+    $id = intval($_POST ['id']);
 }
 if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
-    $id = $_GET ['id'];
+    $id = intval($_GET ['id']);
     $_chanson->chercheChanson($id);
     $mode = "MAJ";
 } else {
@@ -151,97 +151,7 @@ if ($mode == "MAJ") {
     echo "</div>"; ////// Fin du 2nd tab fichiers
 
     afficheStrumsChanson($_chanson);
-    echo "<div id='tabs-4' class='col-lg-12 centrer'><h2>Liste des liens de cette chanson</h2>";
-
-echo "
-        <form>
-            <div>              
-                <label for='lienType0'>Type de lien :</label>
-                <input size='128' id='lienType0' name='type' value='' placeholder='video ou article'>
-            </div>
-            <div>
-                <label for='lienDescription0'>Description  :</label>
-                <textarea id='lienDescription0' name='description'  placeholder='description longue du lien'> </textarea>
-            </div>
-            <div>    
-                <label for='lienUrl0'>Url :</label>
-                <input size='255' id='lienUrl0' name='url' value='' placeholder='http://youtu.be/3456' >
-            </div>
-            <div>    
-                <label for='date0'><Date</D>Date :</label>
-                <input size='255' id='date0' name='date' value='' placeholder='au format JJ/MM/AAAA' >
-            </div>
-            <div>    
-                <label for='idUser0'>Utilisateur :</label>";
-
-                echo selectUtilisateur("nom", "%", "login", true, 0,"utilisateur", "idUser0");
-
-                echo "
-               
-            </div>
-            <div>    
-                <label for='hits0'>Hits :</label>
-                <input size='255' id='hits0' name='hits' value='' placeholder='17' >
-            </div>
-            <div>
-                <button type='button' name='createLien' onclick=\"updateLienurl('NEW',0,'chanson', $id) \">créer</button>
-             </div>     
-              ";
-echo "<br>";
-// Fin 4eme tab Liens
-
-    // Cherche un lienurl et le renvoie s'il existe
-    $lignes = chercheLiensUrlsTableId(CHANSON, $id);
-    $listeLiensUrl = "";
-    // Pour chaque lien
-    while ($ligneLien = $lignes->fetch_row()) {
-        $idLien = $ligneLien [0];
-        // renvoie la ligne sélectionnée : //  id	nomtable	idtable	url	type	description
-        $url = $ligneLien[3] ;
-        $type = $ligneLien[4];
-        $description = $ligneLien[5];
-        $date = dateMysqlVersTexte($ligneLien[6]);
-        $idUserLien = $ligneLien[7];
-        $hits = $ligneLien[8];
-        $nomtable = "chanson";
-        $idtable = $id;
-        echo "
-            <div id='divlienUrl$idLien'>
-                <div>
-                    <label for='lienType$idLien'>Type de lien :</label>   
-                    <input size='255' id='lienType$idLien' name='type' value='" . htmlentities($type) . "' placeholder='video ou article'><br>
-                </div>           
-                <div>
-                    <label for='lienDescription$idLien'>Description  :</label>
-                    <textarea id='lienDescription$idLien' name='description' placeholder='description'>" . htmlentities($description) . " </textarea> <br>
-                </div>  
-                <div> 
-                    <label for='lienUrl$idLien'>Url  :</label>
-                    <input size='255' id='lienUrl$idLien' name='url' value='" . htmlentities($url) . "' placeholder='http://youtu.be/3456' >
-                </div>
-                            <div>    
-                    <label for='date$idLien'><Date</D>Date :</label>
-                    <input size='255' id='date$idLien' name='date' value='$date' placeholder='au format JJ/MM/AAAA' >
-                </div>
-                <div>    
-                    <label for='idUser$idLien'>Utilisateur :</label>";
-
-        echo selectUtilisateur("nom", "%", "login", true, $idUserLien,"utilisateur", "idUser".$idLien );
-
-        echo "  </div>
-                <div>    
-                    <label for='hits$idLien'>Hits :</label>
-                    <input size='255' id='hits$idLien' name='hits' value='$hits' placeholder='17' >
-                </div>
-                <div>
-                    <button type='button' name='updateLien$idLien' onclick=\"updateLienurl('UPDATE',$idLien,'chanson', $id) \">modifier</button>
-                    <button type='button' name='deleteLien$idLien' onclick=\"updateLienurl('DEL',$idLien) \">supprimer</button>
-               </div> 
-           </div>
-        ";
-    }
-        echo "</form>
-</div>";
+    afficheLiensChanson($id);
 ?>
     <script>
         function ajouteParametre(nomParametre, valeurParametre, chaine) {
@@ -249,7 +159,7 @@ echo "<br>";
             return (chaine);
         }
         function updateLienurl(mode, id, nomtable, idtable) {
-            var chaineData = "mode=" + mode;
+            let chaineData = "mode=" + mode;
             if (mode === "DEL"){
                 chaineData = ajouteParametre("id", id, chaineData);
                 // supprimer la div du lien dans le DOM
@@ -257,12 +167,12 @@ echo "<br>";
                 maDiv.remove();
             }
             if (mode === "NEW" || mode === "UPDATE"){
-                var url = document.getElementById("lienUrl" + id).value;
-                var type = document.getElementById("lienType" + id).value;
-                var description = document.getElementById("lienDescription" + id).value;
-                var date = document.getElementById("date" + id).value;
-                var idUser = document.getElementById("idUser" + id).value;
-                var hits = document.getElementById("hits" + id).value;
+                let url = document.getElementById("lienUrl" + id).value;
+                let type = document.getElementById("lienType" + id).value;
+                let description = document.getElementById("lienDescription" + id).value;
+                let date = document.getElementById("date" + id).value;
+                let idUser = document.getElementById("idUser" + id).value;
+                let hits = document.getElementById("hits" + id).value;
                 chaineData = ajouteParametre("id", id, chaineData);
                 chaineData = ajouteParametre("nomtable", nomtable, chaineData);
                 chaineData = ajouteParametre("idtable", idtable, chaineData);
@@ -303,8 +213,8 @@ echo "<br>";
 ?>
     <script>
         function envoieFichierDansSongbook(idFichier) {
-            // Récupérer l'id du songbook dans la combo
-            var idSongbook = $("select[name='idSongbook'] option:selected").val() ;
+            // Récupérer l' id du songbook dans la combo
+            const idSongbook = $("select[name='idSongbook'] option:selected").val() ;
             // alert('idSongbook = ' + idSongbook);
             // Appel Ajax
             $.ajax({
@@ -462,7 +372,7 @@ function recherches_sur_chanson(Chanson $_chanson, int $id): string
     $urlCherche = "chanson_chercher.php?chanson=" . urlencode($_chanson->getNom()) . "&artiste=" . urlencode($_chanson->getInterprete());
     $urlCherche .= "&idChanson=$id";
 
-// $sortie .= "<br> Nouvelle fonctionnalité !!! Enregistrer la chanson avec titre et interprête, puis cliquez ici pour remplir automatiquement via une base de données !!!";
+// $sortie .= "<br> Nouvelle fonctionnalité !!! Enregistrer la chanson avec titre et interprète, puis cliquez ici pour remplir automatiquement via une base de données !!!";
     $sortie = "<br> <a href='" . $urlCherche . "'>Chercher année, tempo, mesure, tonalité et image depuis getsongbpm !</a><br>";
     if ($_chanson->getNom()) {
 
@@ -539,7 +449,7 @@ function afficheFichiersChanson(int $id, string $_DOSSIER_CHANSONS, string $icon
  * @param Chanson $_chanson
  * @return mixed
  */
-function afficheStrumsChanson(Chanson $_chanson)
+function afficheStrumsChanson(Chanson $_chanson) :void
 {
     $contenuHtml = "<div id='tabs-3' class='col-lg-12 centrer'>";
 // Affiche les strums de la chanson
@@ -566,5 +476,98 @@ function afficheStrumsChanson(Chanson $_chanson)
     echo "<button> Ajouter le strum </button> </form>
             </div>";
     // Fermeture tab 3 Strums
+}
+
+
+/**
+ * @param mixed $id
+ */
+function afficheLiensChanson(int $id): void
+{
+    echo "<div id='tabs-4' class='col-lg-12 centrer'><h2>Liste des liens de cette chanson</h2>";
+
+    echo "
+        <form>
+            <div>              
+                <label for='lienType0'>Type de lien :</label>
+                <input size='128' id='lienType0' name='type' value='' placeholder='video ou article'>
+            </div>
+            <div>
+                <label for='lienDescription0'>Description  :</label>
+                <textarea id='lienDescription0' name='description'  placeholder='description longue du lien'> </textarea>
+            </div>
+            <div>    
+                <label for='lienUrl0'>Url :</label>
+                <input size='255' id='lienUrl0' name='url' value='' placeholder='http://youtu.be/3456' >
+            </div>
+            <div>    
+                <label for='date0'><Date</D>Date :</label>
+                <input size='255' id='date0' name='date' value='' placeholder='au format JJ/MM/AAAA' >
+            </div>
+            <div>    
+                <label for='idUser0'>Utilisateur :</label>";
+
+    echo selectUtilisateur("nom", "%", "login", true, 0, "utilisateur", "idUser0");
+
+    echo "  </div>
+            <div>    
+                <label for='hits0'>Hits :</label>
+                <input size='255' id='hits0' name='hits' value='' placeholder='17' >
+            </div>
+            <div>
+                <button type='button' name='createLien' onclick=\"updateLienurl('NEW',0,'chanson', $id) \">créer</button>
+             </div>     
+              ";
+    echo "<br>";
+// Fin 4eme tab Liens
+
+    // Cherche un lienurl et le renvoie s'il existe
+    $lignes = chercheLiensUrlsTableId(CHANSON, $id);
+    // Pour chaque lien
+    while ($ligneLien = $lignes->fetch_row()) {
+        $idLien = $ligneLien [0];
+        // renvoie la ligne sélectionnée : //  id	nomtable	idtable	url	type	description
+        $url = $ligneLien[3];
+        $type = $ligneLien[4];
+        $description = $ligneLien[5];
+        $date = dateMysqlVersTexte($ligneLien[6]);
+        $idUserLien = $ligneLien[7];
+        $hits = $ligneLien[8];
+
+        echo "
+            <div id='divlienUrl$idLien'>
+                <div>
+                    <label for='lienType$idLien'>Type de lien :</label>   
+                    <input size='255' id='lienType$idLien' name='type' value='" . htmlentities($type) . "' placeholder='video ou article'><br>
+                </div>           
+                <div>
+                    <label for='lienDescription$idLien'>Description  :</label>
+                    <textarea id='lienDescription$idLien' name='description' placeholder='description'>" . htmlentities($description) . " </textarea> <br>
+                </div>  
+                <div> 
+                    <label for='lienUrl$idLien'>Url  :</label>
+                    <input size='255' id='lienUrl$idLien' name='url' value='" . htmlentities($url) . "' placeholder='http://youtu.be/3456' >
+                </div>
+                            <div>    
+                    <label for='date$idLien'><Date</D>Date :</label>
+                    <input size='255' id='date$idLien' name='date' value='$date' placeholder='au format JJ/MM/AAAA' >
+                </div>
+                <div>    
+                    <label for='idUser$idLien'>Utilisateur :</label>";
+        echo selectUtilisateur("nom", "%", "login", true, $idUserLien, "utilisateur", "idUser" . $idLien);
+        echo "  </div>
+                <div>    
+                    <label for='hits$idLien'>Hits :</label>
+                    <input size='255' id='hits$idLien' name='hits' value='$hits' placeholder='17' >
+                </div>
+                <div>
+                    <button type='button' name='updateLien$idLien' onclick=\"updateLienurl('UPDATE',$idLien,'chanson', $id) \">modifier</button>
+                    <button type='button' name='deleteLien$idLien' onclick=\"updateLienurl('DEL',$idLien) \">supprimer</button>
+               </div> 
+           </div>
+        ";
+    }
+    echo "</form>
+</div>";
 }
 ?>

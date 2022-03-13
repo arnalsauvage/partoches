@@ -58,7 +58,7 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
 $contenuHtml .= "</div>" . FIN_DIV;
 
 $contenuHtml .= DIV_CLASS_ROW;
-$contenuHtml .= "<div class='col-sm-11'><h3> " . htmlentities($_chanson->getInterprete()) . " - " . $_chanson->getAnnee() . " </h3>" . FIN_DIV . "\n";
+$contenuHtml .= "<div class='col-sm-11'><h3> " . htmlentities($_chanson->getInterprete())  . " </h3>" . FIN_DIV .  " - <a href='chanson_liste.php?filtre=annee&valFiltre=". $_chanson->getAnnee()."'>" . $_chanson->getAnnee() . "</a>\n";
 $contenuHtml .= FIN_DIV;
 $contenuHtml .= DIV_CLASS_ROW;
 $contenuHtml .= " <div class='col-sm-8'>Tonalité : " . $_chanson->getTonalite() . ", Tempo : " . $_chanson->getTempo();
@@ -177,8 +177,7 @@ if ($songbooks->num_rows > 0) {
     $contenuHtml .= "</section>";
 }
 /**
- * @param int|string $idChanson
- * @param string $contenuHtml
+ * @param int $idChanson
  * @return string
  */
 function afficheStrums(int $idChanson): string
@@ -192,9 +191,9 @@ FROM lienstrumchanson, strum
 where lienstrumchanson.strum  = strum.strum AND lienStrumChanson.idChanson = $idChanson
 GROUP BY lienstrumchanson.strum 
 order by count(*) DESC";
-    $_listeDesStrums = $_SESSION ['mysql']->query($marequete);
+    $_SESSION ['mysql']->query($marequete);
     if ($_listeDesLiensStrums->num_rows > 0) {
-        $titre = "Strum";;
+        $titre = "Strum";
         if ($_listeDesLiensStrums->num_rows > 1) {
             $titre .= "s";
         }
@@ -206,7 +205,7 @@ order by count(*) DESC";
             $contenuHtml .= $monStrum->getLongueur() . " " . $monStrum->renvoieUniteEnFrancais(); //  longueur / unité
 
             $contenuHtml .= " - " . $monStrum->getDescription(); // description
-            $contenuHtml .= $monStrum->chansonsDuStrum($monStrum->getStrum());
+            $contenuHtml .= $monStrum->chansonsDuStrum();
         }
     }
     return $contenuHtml;

@@ -9,7 +9,7 @@ include_once("songbook.php");
 include_once("lienDocSongbook.php");
 $nomTable = "songbook";
 
-// Les modifs sont reservées aux utilisateurs authentifiés et habilités
+// Les modifs sont réservées aux utilisateurs authentifiés et habilités
 if ($_SESSION [PRIVILEGE] <= $GLOBALS["PRIVILEGE_INVITE"]) {
     redirection($nomTable . "_liste.php");
 }
@@ -39,6 +39,7 @@ if (($mode == "MAJ") || ($mode == "INS")) {
     $fnom = $_SESSION ['mysql']->real_escape_string($_POST ['fnom']);
     $fdescription = $_SESSION ['mysql']->real_escape_string($_POST ['fdescription']);
     $fimage = $_POST ['fimage'];
+    $ftype = $_POST['ftype'];
 
     // Seul admin peut modifier hits et date
     if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
@@ -63,9 +64,8 @@ if ($mode == "MAJ") {
         $fhits = $songbook[5];
         $fdate = dateMysqlVersTexte($songbook[3]);
     }
-
     /** @noinspection PhpUndefinedVariableInspection */
-    modifiesSongbook($id, $fnom, $fdescription, $fdate, $fimage, $fhits);
+    modifiesSongbook($id, $fnom, $fdescription, $fdate, $fimage, $fhits, $ftype);
 }
 
 // Cas de l'ajout d'un Songbook
@@ -73,7 +73,7 @@ if ($mode == "INS") {
     $fhits = 0;
     $fdate = date("d/m/Y");
     /** @noinspection PhpUndefinedVariableInspection */
-    creeSongbook($fnom, $fdescription, $fdate, $fimage, $fhits);
+    creeSongbook($fnom, $fdescription, $fdate, $fimage, $fhits, $ftype);
 }
 
 // Gestion de la demande de suppression
@@ -109,10 +109,10 @@ if ($mode == "GENEREPDF") {
 if (($mode != "GENEREPDF") && ($mode != "RESTAUREDOC")) {
     redirection($nomTable . "_form.php?id=$id");
 }
-function menageNomVersion($nomFic)
+function menageNomVersion($nomFic) :string
 {
     $nom = substr($nomFic, 0, strlen($nomFic) - 4);
-    $nomextension = substr($nomFic, -3);
+    $nomExtension = substr($nomFic, -3);
 
     $fin = substr($nom, -3);
     if (substr($fin, 0, 2) == "-v") {
@@ -126,14 +126,10 @@ function menageNomVersion($nomFic)
         $nom = (substr($nom, 0, strlen($nom) - 4));
         echo "nom = $nom <br>";
     }
-
-
-    return ($nom . "." . $nomextension);
-
+    return ($nom . "." . $nomExtension);
 }
 
 if ($mode == "RESTAUREDOC") {
-
     $repertoire = "../data/songbooks/" . $_POST [ID_SONGBOOK] . "/";
     // echo "Répertoire : " . $repertoire . "<BR>";
     $size = filesize($repertoire . $_POST[NOM_FIC]);
@@ -142,7 +138,6 @@ if ($mode == "RESTAUREDOC") {
     // echo "version " . $version . " du doc " .$_POST[NOM_FIC] . "de taille $size demandé.";
 }
 if ($mode == "TEST") {
-
     echo "test menageNomVersion bidule-v1= " . menageNomVersion("bidule-v1.jpg") . " doit être égal à bidule.jpg <br>";
     echo "test menageNomVersion bidule-v12= " . menageNomVersion("bidule-v12.pdf") . " doit être égal à bidule.pdf <br>";
     echo "test menageNomVersion bidule-v9= " . menageNomVersion("bidule-v9.doc") . " doit être égal à bidule.doc <br>";

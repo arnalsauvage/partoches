@@ -32,10 +32,30 @@ if (isset ($_GET ['tri'])) {
 }
 
 // Chargement de la liste des songbooks
-$resultat = chercheSongbooks("nom", "%", $tri, $ordreAsc);
+if(isset ($_GET['type'])){
+    $resultat = chercheSongbooks("type", $_GET['type'], $tri, $ordreAsc);
+}
+else
+{
+    $resultat = chercheSongbooks("nom", "%", $tri, $ordreAsc);
+}
 $numligne = 0;
 
 // Affichage de la liste
+
+$fichiersDuSongbook = "
+<form action='songbook_liste.php'>
+<label for='type-select'>Choisir un genre de songbook :</label>
+
+<select name='type' id='type-select'>
+    <option value=''>--Tous--</option>
+    <option value='1'>Songbook de saison</option>
+    <option value='2'>Songbook de concert</option>
+    <option value='3'>Songbook à thème</option>
+</select>
+<button>Filtrer</button>
+</form>
+";
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] >=$GLOBALS["PRIVILEGE_EDITEUR"]) {
@@ -72,8 +92,14 @@ while ($ligne = $resultat->fetch_row()) {
     }
 
     $fichiersDuSongbook .= TblCellule(Ancre($songbookVoir . "?id=$ligne[0]", entreBalise($ligne [1], "H2"))); // Nom
-
-    $fichiersDuSongbook .= TblCellule("  " . $ligne [2]); // description
+    switch($ligne[7])
+    {
+        case 1 : $description = "anthologie - "; break;
+        case 2 : $description = "concert - "; break;
+        case 3 : $description = "thème - "; break;
+        default : $description = "";
+    }
+    $fichiersDuSongbook .= TblCellule($description . $ligne [2]); // description
     $fichiersDuSongbook .= TblCellule(" " . dateMysqlVersTexte($ligne [3])); // date
     $fichiersDuSongbook .= TblCellule("  -  " . $ligne [5] . " hit(s)"); // hits
 

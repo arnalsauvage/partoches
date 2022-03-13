@@ -34,14 +34,14 @@ if (!isset ($FichierUtilsSi)) {
 
     // Cette fonction, pompée dans "PHP en action", p547, éditions O'Reilly
     // parcourt un sous-répertoire et exporte la liste des fichiers dans un tableau
-    function pc_process_dir($nom_rep, $profondeur_max = 10, $profondeur = 0)
+    function pc_process_dir($nom_rep, $profondeur_max = 10, $profondeur = 0) :array
     {
+        $fichiers = array();
         if ($profondeur >= $profondeur_max) {
             error_log("Profondeur maximum $profondeur_max atteinte dans $nom_rep.");
-            return false;
+            return $fichiers;
         }
         $sous_repertoires = array();
-        $fichiers = array();
         if (is_dir($nom_rep) && is_readable($nom_rep)) {
             $d = dir($nom_rep);
             while (false !== ($f = $d->read())) {
@@ -67,12 +67,12 @@ if (!isset ($FichierUtilsSi)) {
     }
 
     // Cette fonction affiche un player mp3 ou un lien vers le fichier en mode popup
-    function affichePlayer($mp3 = "vide")
+    function affichePlayer($mp3 = "vide") : string
     {
         if (is_file("mp3/" . $mp3)) {
             if (substr($mp3, -3, 3) == "mp3") {
                 $texte = ' <audio controls="controls" preload="none"> ' . '\n';
-                $texte .= '<!-- On ouvre la balise audio, on affiche les controles et sans pre-charger les titres. -->\n';
+                $texte .= '<!-- On ouvre la balise audio, on affiche les contrôles et sans pre-charger les titres. -->\n';
                 $texte .= '<source src="mp3/' . $mp3 . '" type="audio/mpeg"/>\n';
                 // <!-- Apres avoir indique les chemins des deux fichiers, on charge le lecteur dewplayer.-->
                 // <!-- Ce code ne sera execute que si le navigateur de votre visiteur ne prends pas en charge la balise audio. -->
@@ -96,7 +96,7 @@ if (!isset ($FichierUtilsSi)) {
     }
 
     // Cette fonction écrit le $log dans le $fichier
-    // TODO    ancien fichier de log à supprimer
+    // TODO    ancien fichier de log à supprimer quand le logger sera mis en place
     function ecritFichierLog($fichier, $log)
     {
         $time = date("l, j F Y [h:i a]");
@@ -106,20 +106,20 @@ if (!isset ($FichierUtilsSi)) {
         fputs($fp, " 
 			<table  
 			<tr> 
-			<td valign=top>< size=1>$ip</></td> <td valign=top width=10></td> 
-			<td valign=top><t size=1>$time</t></td><td valign=top></td> 
-			<td valign=top>< size=2>$log</></td><td valign=top></td> 		
+			<td >< size=1>$ip</></td> <td  ></td> 
+			<td ><t size=1>$time</t></td><td ></td> 
+			<td >< size=2>$log</></td><td ></td> 		
 			</tr></table><br>");
         // pour debug : echo "Fichier : $fichier <br>\n";
         fclose($fp);
     }
 
-    function insereJavaScript($source)
+    function insereJavaScript($source) :string
     {
         return "<script type='text/javascript' src='$source'></script>\n";
     }
 
-    // Cette fonction retourne une liste des images disponibles sur le site, eventuellement dans un sous-dossier
+    // Cette fonction retourne une liste des images disponibles sur le site, éventuellement dans un sous-dossier
     function listeImages($subDir = "")
     {
         $d = dir("../images" . $subDir);
@@ -136,13 +136,16 @@ if (!isset ($FichierUtilsSi)) {
     }
 
     // Cette fonction retourne un bouton de suppression avec message de confirmation
-    function boutonSuppression($lien, $iconePoubelle, $cheminImages)
-    { // <img src="x.png" onclick="getattrs(this);">
+    function boutonSuppression($lien, $iconePoubelle, $cheminImages) :string
+    {
         return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer' onclick =\"confirmeSuppr('" . $lien . "','Voulez-vous vraiment supprimer cet élément ?');\" >";
     }
 
     /**
-     * @return Logger
+     * renverra un Logger
+     * @param $date
+     * @param string $format
+     * @return bool
      */
     /*
         function init_logger()
@@ -171,4 +174,11 @@ if (!isset ($FichierUtilsSi)) {
             return $logger;
         }
     */
+
+    // Vérifie qu'une date, selon un format donné, est bien valide - repris sur un exemple dans la doc php
+    function validateDate($date, $format = 'd/m/Y') :bool
+    {
+        $d = DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) == $date;
+    }
 }

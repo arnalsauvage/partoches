@@ -2,7 +2,7 @@
 require_once("lib/utilssi.php");
 require("lienurl.php");
 require("utilisateur.php");
-// Un non-admin non editeur ne peut modifier les liens
+// Un non-admin non éditeur ne peut modifier les liens
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     // Suppression
     if ($_POST['mode'] == "DEL") {
@@ -14,10 +14,21 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     $type = $_SESSION ['mysql']->real_escape_string($_POST['type']);
     $description = $_SESSION ['mysql']->real_escape_string($_POST['description']);
     $nomtable = $_SESSION ['mysql']->real_escape_string($_POST['nomtable']);
+    /** @noinspection SpellCheckingInspection */
     $idtable = $_SESSION ['mysql']->real_escape_string($_POST['idtable']);
     $date = $_SESSION ['mysql']->real_escape_string($_POST['date']);
     $idUser = $_SESSION ['mysql']->real_escape_string($_POST['idUser']);
     $hits = $_SESSION ['mysql']->real_escape_string($_POST['hits']);
+
+    // Contrôle des données
+
+    if ($hits==("")){
+        $hits = "0";
+    }
+    if (! validateDate($date))
+    {
+        $date = date("d/m/Y");
+    }
 
     // Creation
     if ($_POST['mode'] == "NEW")
@@ -25,6 +36,7 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
         //echo "NEW";
         creeLienurl($url, $type, $description, $nomtable, $idtable, $date, $idUser, $hits);
     }
+
     // Modification
     if (($_POST['mode'] == "UPDATE") && (is_numeric($id ))) {
         //echo "Update";
@@ -32,3 +44,4 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     }
 }
 //header('Location: ./chanson_form.php?id=' . $_POST['idTable']);
+

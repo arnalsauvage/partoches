@@ -1,4 +1,7 @@
 <?php
+
+use JetBrains\PhpStorm\Pure;
+
 const PRIVILEGE = 'privilege';
 const CHANSON = "chanson";
 const ORDRE_ASC = 'ordreAsc';
@@ -40,7 +43,6 @@ if (isset($_GET['filtre'])){
 if (isset($_GET['raz-recherche'])){
     $_SESSION[CHERCHE] = "";
 }
-
 
 // Gestion du paramètre de tri
 // On prend en compte une demande de tri ascendant
@@ -173,7 +175,6 @@ $cheminImagesChanson = "../".$_DOSSIER_CHANSONS;
 $_chanson = new Chanson();
 $maNote = new UtilisateurNote(0, 1, 1, 1);
 
-/** @noinspection PhpUndefinedMethodInspection */
 foreach ($resultat as $ligne) {
     $numligne++;
     if (($numligne < $pagination->getItemDebut()) || $numligne > $pagination->getItemFin()) {
@@ -191,7 +192,7 @@ foreach ($resultat as $ligne) {
     }
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-    if (($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) )
+    if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"])
     {
         $_image = Image($cheminImages . $iconeEdit, 32, 32);
         $_ancre = Ancre("$chansonForm?id=" . $_id, $_image,-1, -1, "modifier la chanson" );
@@ -256,7 +257,7 @@ $contenuHtml .= "
 $contenuHtml .= envoieFooter();
 echo $contenuHtml;
 
-function titreColonne($libelle, $nomRubrique)
+#[Pure] function titreColonne($libelle, $nomRubrique): string
 {
     $lienCroissant = "<button onclick=\"window.location.href='?tri=$nomRubrique'\" title='tri croissant par $nomRubrique'>
                         <span class='glyphicon glyphicon-chevron-up'> </span>
