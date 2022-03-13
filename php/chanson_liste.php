@@ -257,7 +257,7 @@ $contenuHtml .= "
 $contenuHtml .= envoieFooter();
 echo $contenuHtml;
 
-#[Pure] function titreColonne($libelle, $nomRubrique): string
+function titreColonne($libelle, $nomRubrique): string
 {
     $lienCroissant = "<button onclick=\"window.location.href='?tri=$nomRubrique'\" title='tri croissant par $nomRubrique'>
                         <span class='glyphicon glyphicon-chevron-up'> </span>

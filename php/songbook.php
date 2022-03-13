@@ -21,7 +21,7 @@ $cheminImagesSongbook = "../data/songbooks/";
  * @param bool $bTriAscendant
  * @return mixed
  */
-function chercheSongbooks($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true) :array
+function chercheSongbooks($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true) :object
 {
     $maRequete = "SELECT * FROM songbook WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
     if (! $bTriAscendant) {
@@ -31,8 +31,9 @@ function chercheSongbooks($critere, $valeur, $critereTri = 'nom', $bTriAscendant
     {
         $maRequete .= " ASC";
     }
-        // echo "ma requete : " . $maRequete;
+//    echo "ma requete : " . $maRequete;
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchesongbook #1 : " . $_SESSION ['mysql']->error);
+  //  echo "mon resultat : " . var_dump($result);
     return $result;
 }
 

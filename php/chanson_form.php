@@ -15,7 +15,7 @@ global $iconePoubelle;
 global $cheminImages;
 global $_DOSSIER_CHANSONS;
 
-$listeSongbooks =[];
+$listeSongbooks = [];
 $listeSongbooks = listeSongbooks();
 
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
