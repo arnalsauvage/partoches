@@ -3,9 +3,9 @@ use PHPUnit\Framework\TestCase;
 // require_once 'PHPUnit/Autoload.php';
 session_start();
 require_once "../php/lib/utilssi.php";
-require_once "../php/chanson.php";
+require_once "../php/chanson/chanson.php";
 
-class chansonTest extends TestCase
+class ChansonTest extends TestCase
 {
     const LILA_LOUIS_987 = "Lila Louis 987";
     const OLIVE = "Olive";
@@ -46,4 +46,6 @@ class chansonTest extends TestCase
         $_chanson->supprimeChansonBddFile();
         $this->assertEquals(0, $_chanson->chercheChansonParLeNom(self::LILA_LOUIS_987));
     }
+
+    
 }

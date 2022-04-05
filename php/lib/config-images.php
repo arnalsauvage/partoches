@@ -1,5 +1,5 @@
 <?php
-$cheminImages = "../images/";
+$cheminImages = "../../images/";
 
 // Pour les icones
 $cheminIcones = $cheminImages . "icones/";
@@ -18,7 +18,7 @@ $iconePuce = $cheminIcones . "grib-rouge.jpg";
 $tailleicones = 64;
 
 // Pour les vignettes
-$cheminVignettes = "../vignettes/";
+$cheminVignettes = "../../vignettes/";
 $largeur_max_vignette = 128;
 $hauteur_max_vignette = 100;
 
