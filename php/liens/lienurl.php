@@ -6,7 +6,7 @@ if(!defined("DOSSIER_DATA")) {
     define("DOSSIER_DATA", "../../data/");
 }
 include_once "../lib/configMysql.php";
-include_once("../lib/utilssi.php");
+include_once "../lib/utilssi.php";
 
 // Fonctions de gestion de lien url
 //  id	nomtable	idtable	url	type	description

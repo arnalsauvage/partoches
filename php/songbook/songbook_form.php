@@ -2,9 +2,7 @@
 const RACINE = "../../";
 
 require_once("../lib/utilssi.php");
-
 require_once("songbook.php");
-
 require_once("../document/document.php");
 require_once("../liens/lienDocSongbook.php");
 require_once("../navigation/menu.php");

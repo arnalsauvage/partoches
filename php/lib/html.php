@@ -185,17 +185,12 @@ if (!isset ($FichierHtml)) {
 		<meta charset='UTF-8' >";
 
         // Pour BootStrap
-        $retour .= "<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+        $retour .= "
+        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
 		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
     	<link href='../../css/bootstrap.min.css' rel='stylesheet'>
         <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
     	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel='stylesheet'>
-    	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-		<!--[if lt IE 9]>
- 		<script src='https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js'></script>
-  		<script src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js'></script>
-		<![endif]-->
     	";
 
         $retour .= "<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
@@ -204,7 +199,6 @@ if (!isset ($FichierHtml)) {
 		<script src=\"../../js/jquery-1.12.4.min.js\"></script>
         <!-- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
 		<script src='../../js/jquery-ui.1.12.1.min.js'></script>
-
         <script src='../../js/bootstrap.3.2.0.min.js'></script>
 		<link href='../../css/toastr.min.css' rel='stylesheet' type='text/css'>
 		<title>$titrePage</title>

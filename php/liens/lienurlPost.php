@@ -1,7 +1,7 @@
 <?php
 require_once("../lib/utilssi.php");
-require("../liens/lienurl.php");
-require("../utilisateur/utilisateur.php");
+require_once("../liens/lienurl.php");
+require_once("../utilisateur/utilisateur.php");
 
 // Un non-admin non éditeur ne peut modifier les liens
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {

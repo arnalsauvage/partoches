@@ -20,13 +20,14 @@ if (!isset ($_FILES [FICHIER_UPLOADE])) {
 // TODO : créer un paramètre d'application modifiable par l'admin
 $autorisees = "pdf doc docx gif jpg png swf mp3 odt ppt pptx svg crd txt m4a ogg mscz mid";
 
-$repertoire = "../".$_DOSSIER_CHANSONS . $_POST ['id'] . "/";
+$repertoire = $_DOSSIER_CHANSONS . $_POST ['id'] . "/";
+// echo "répertoire de destination : $repertoire";
 if (!file_exists($repertoire)) {
     mkdir($repertoire, 0755);
     // echo " -=> Création du repertoire $repertoire réussi<br>";
 }
 
-// taille autorisées (min & max -- en octets)
+// taille autorisée (min & max -- en octets)
 $file_min_size = 1;
 $file_max_size = 10000000;
 // On vérifie la présence d'un fichier à uploader
@@ -64,9 +65,11 @@ $doc = chercheDocumentNomTableId($name_file, "chanson", $_POST ['id']);
 $name_file = str_replace(".$ext", "-v" . ($doc [4]), $name_file) . ".$ext";
 
 // Si le formulaire est validé, on copie le fichier dans le dossier de destination
-if (!move_uploaded_file($tmp_file, "../../" . $repertoire . $name_file)) {
+if (!move_uploaded_file($tmp_file, $repertoire . $name_file)) {
     $errors [FICHIER_UPLOADE] = "Il y a des erreurs! Impossible de copier le fichier dans le dossier cible";
     echo $errors [FICHIER_UPLOADE];
+    // TODO : on supprime    le fichier en bdd
+    supprimeDocument($doc[0]);
     return 0;
 }
 

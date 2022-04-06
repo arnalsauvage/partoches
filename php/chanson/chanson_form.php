@@ -6,15 +6,15 @@ const CHANSON_POST_PHP = "chanson_post.php";
 const CHANSON_CHERCHER = "chanson_chercher";
 const CHANSON_UPLOAD = "chanson_upload.php";
 const CHEMIN_LIEN_URL_POST_PHP = RETOUR_RACINE ."liens/lienurlPost.php";
-const LIENS_LIEN_STRUM_CHANSON_POST_PHP = RETOUR_RACINE.  "liens/lienStrumChanson_post.php";
+const LIENS_LIEN_STRUM_CHANSON_POST_PHP = RETOUR_RACINE . "liens/lienStrumChanson_post.php";
 const CHEMIN_SONGBOOK_FORM = RETOUR_RACINE . "songbook/songbook_form.php";
+const JS_CHANSON_FORM_JS = RETOUR_RACINE . RETOUR_RACINE . "js/chansonForm.js";
 
-const JS_CHANSON_FORM_JS = "../js/chansonForm.js";
 require_once("chanson.php");
 require_once("../document/document.php");
 require_once('../liens/lienStrumChanson.php');
 require_once('../liens/lienurl.php');
-require_once('../liens/lienurlPost.php');
+// require_once('../liens/lienurlPost.php');
 require_once("../navigation/menu.php");
 require_once("../songbook/songbook.php");
 require_once('../strum/strum.php');
@@ -139,11 +139,11 @@ if ($mode == "MAJ") {
                                 toastr.success("Le document a été restauré ! <br> Le fichier a été raccroché à la chanson <br> Vous pouvez raffraîchir la page pour le voir.");
                             else {
                                 toastr.warning("Erreur dans l'opération...<br>Le document n'a pas pu être raccroché...");
-                                $("#div1").html(code_html);
+                                $("#msgLien").html(code_html);
                             }
                         },
                         error: function (resultat, statut, erreur) {
-                            $("#div<?php echo $numeroElement;?>").html(resultat);
+                            $("#msgLien<?= $numeroElement ?>").html(resultat);
                         }
                     });
                 }
@@ -196,7 +196,7 @@ if ($mode == "MAJ") {
             }
             $.ajax({
                 type: "POST",
-                url: "<?CHEMIN_LIEN_URL_POST_PHP?>",
+                url: "<?=CHEMIN_LIEN_URL_POST_PHP?>",
                 data: chaineData,
                 datatype: 'html', // type de la donnée à recevoir
                 success: function (code_html, statut) { // success est toujours en place, bien sûr !
@@ -204,11 +204,11 @@ if ($mode == "MAJ") {
                         toastr.success("Le lien a été modifié ! <br> Le lien de la chanson a été modifié <br> Vous pouvez raffraîchir la page pour le voir.");
                     else {
                         toastr.warning("Erreur dans l'opération...<br>Le lien n'a pas pu être modifié...");
-                        $("#div1").html(code_html);
+                        $("#msgLien"+id).html(code_html);
                     }
                 },
                 error: function (resultat, statut, erreur) {
-                    $("#div<?php echo $numeroElement;?>").html(resultat);
+                        $("#msgLien"+id).html(resultat);
                 }
             });
         }
@@ -217,7 +217,6 @@ if ($mode == "MAJ") {
         }
     </script>
 <?php
-    echo "</ul>";
     echo "    </div> \n";
     echo "        	<script src='". JS_CHANSON_FORM_JS ."'></script>";
 ?>
@@ -267,95 +266,95 @@ function formulaireChanson(Chanson $_chanson, string $mode): string
 // Création du formulaire
 
     $sortie .= "
-<div id='tabs'>
-  <ul>
-    <li><a href='#tabs-1'>Chanson</a></li>
-    <li><a href='#tabs-2'>Fichiers</a></li>
-    <li><a href='#tabs-3'>Strums</a></li>
-    <li><a href='#tabs-4'>Liens</a></li>
-  </ul>
-<div id='tabs-1' class='col-lg-12 centrer'>
-<FORM  METHOD='POST' ACTION='". CHANSON_POST_PHP ."' NAME='Form'>
-<INPUT TYPE=HIDDEN NAME='id' VALUE='" . $_chanson->getId() . "'>
-<div class = 'row'>
-<label class='inline col-sm-3'>Nom :</label><INPUT class= 'col-sm-7' TYPE='TEXT' NAME='fnom' VALUE='" . htmlspecialchars($_chanson->getNom(), ENT_QUOTES) . "' SIZE='64' MAXLENGTH='128' placeholder='titre de la chanson'><br>
-</div>
-<div class = 'row'>
-<label class='inline col-sm-3'>Interprète :</label><INPUT class = 'col-sm-7' TYPE='TEXT' NAME='finterprete' VALUE='" . htmlspecialchars($_chanson->getInterprete(), ENT_QUOTES) . "' SIZE='64'  placeholder='interprète'><br>
-</div>
-<div class = 'row'>
-<label class='inline col-sm-3'>Année :</label><INPUT class= 'col-sm-7' TYPE='number' min='0' max='2100' NAME='fannee' VALUE='" . $_chanson->getAnnee() . "' SIZE='4'><br>
-</div>
-<script>function outputUpdate(vol) {
-	document.querySelector('#tempo').value = vol;
-}</script>
-<div class = 'row'>
-    <label class='inline col-sm-3' for='fader'>Tempo :</label>
-        <div class = 'col-sm-5'>
-        <input  TYPE='range' id='fader' min='30' max='250' step='1' oninput='outputUpdate(value)' name='ftempo' value='" . $_chanson->getTempo() . "' size='3' >
-        </div>
-    <output class = 'inline col-sm-2' for='fader' id='tempo'>" . $_chanson->getTempo() . "</output>
-</div>
-<div class = 'row'>
-<label class='inline col-sm-3'>Mesure :</label><INPUT class= 'col-sm-7' TYPE='TEXT' NAME='fmesure' VALUE='" . $_chanson->getMesure() . "' SIZE='4' MAXLENGTH='128'>
-</div>
-<div class = 'row'>
-<label class='inline col-sm-3'> Pulsation :</label>
-    <select class= 'col-sm-7' NAME='fpulsation' >
-    <option value='binaire'";
-    if ($_chanson->getPulsation() == "binaire") {
-        $sortie .= " selected";
-    }
-    $sortie .= ">binaire
-    </option>
-    <option value='ternaire' ";
-    if ($_chanson->getPulsation() == "ternaire") {
-        $sortie .= " selected";
-    }
-    $sortie .= "
->ternaire</option>
-    </select>";
+    <div id='tabs'>
+      <ul>
+        <li><a href='#tabs-1'>Chanson</a></li>
+        <li><a href='#tabs-2'>Fichiers</a></li>
+        <li><a href='#tabs-3'>Strums</a></li>
+        <li><a href='#tabs-4'>Liens</a></li>
+      </ul>
+        <div id='tabs-1' class='col-lg-12 centrer'>
+            <FORM  METHOD='POST' ACTION='". CHANSON_POST_PHP ."' name='Form'>
+                <input type=HIDDEN name='id' VALUE='" . $_chanson->getId() . "'>
+                <div class = 'row'>
+                    <label class='inline col-sm-3'>Nom :</label><input class= 'col-sm-7' type='text' name='fnom' VALUE='" . htmlspecialchars($_chanson->getNom(), ENT_QUOTES) . "' SIZE='64' MAXLENGTH='128' placeholder='titre de la chanson'><br>
+                </div>
+                <div class = 'row'>
+                    <label class='inline col-sm-3'>Interprète :</label><input class = 'col-sm-7' type='text' name='finterprete' VALUE='" . htmlspecialchars($_chanson->getInterprete(), ENT_QUOTES) . "' SIZE='64'  placeholder='interprète'><br>
+                </div>
+                <div class = 'row'>
+                    <label class='inline col-sm-3'>Année :</label><input class= 'col-sm-7' type='number' min='0' max='2100' name='fannee' VALUE='" . $_chanson->getAnnee() . "' ><br>
+                </div>
+                <script>function outputUpdate(vol) {
+                    document.querySelector('#tempo').value = vol;
+                }</script>
+                <div class = 'row'>
+                    <label class='inline col-sm-3' for='fader'>Tempo :</label>
+                    <div class = 'col-sm-5'>
+                        <input  type='range' id='fader' min='30' max='250' step='1' oninput='outputUpdate(value)' name='ftempo' value='" . $_chanson->getTempo() . "' >
+                    </div>
+                    <output class = 'inline col-sm-2' for='fader' id='tempo'>" . $_chanson->getTempo() . "</output>
+                </div>
+                <div class = 'row'>
+                    <label class='inline col-sm-3'>Mesure :</label>
+                    <input class= 'col-sm-7' type='text' name='fmesure' VALUE='" . $_chanson->getMesure() . "' SIZE='4' MAXLENGTH='128'>
+                </div>
+                <div class = 'row'>
+                    <label class='inline col-sm-3'> Pulsation :</label>
+                    <select class= 'col-sm-7' name='fpulsation' >
+                        <option value='binaire'";
+                        if ($_chanson->getPulsation() == "binaire") {
+                            $sortie .= " selected";
+                        }
+                        $sortie .= ">binaire
+                        </option>
+                        <option value='ternaire' ";
+                        if ($_chanson->getPulsation() == "ternaire") {
+                            $sortie .= " selected";
+                        }
+                        $sortie .= ">ternaire</option>
+                    </select>";
 
-    $sortie .= "
-</div>
-<div class = 'row'>
-<label class='inline col-sm-3'> Tonalité :</label>
-<INPUT class= 'col-sm-7' TYPE='TEXT' NAME='ftonalite' VALUE='" . $_chanson->getTonalite() . "' SIZE='10' placeholder='ex :Am ou C ou F#'>
-</div>
-<div class = 'row'>
-<label class='inline col-sm-3'> Date publication :</label>
-<INPUT class= 'col-sm-7' TYPE='TEXT' NAME='fdate' VALUE='" . dateMysqlVersTexte($_chanson->getDatePub()) . "' SIZE='10' MAXLENGTH='128'>
- </div>
-<div class = 'row'>
-<label class='inline col-sm-3'> Hits :</label>
-<INPUT class= 'col-sm-7' TYPE='number' NAME='fhits' VALUE='" . $_chanson->getHits() . "' SIZE='10'>
-</div>
-<div class = 'row'>
-<label class='inline col-sm-3'> Utilisateur :</label>"
-        . selectUtilisateur("nom", "%", "login", true, $_chanson->getIdUser()) . "
-<INPUT TYPE=HIDDEN NAME='mode' VALUE='$mode'>
-<label class='inline'> </label><INPUT TYPE='SUBMIT' NAME='valider' VALUE=' Valider ' >
-</div>
-</FORM>
+                    $sortie .= "
+                </div>
+                <div class = 'row'>
+                    <label class='inline col-sm-3'> Tonalité :</label>
+                    <input class= 'col-sm-7' type='text' name='ftonalite' VALUE='" . $_chanson->getTonalite() . "' SIZE='10' placeholder='ex :Am ou C ou F#'>
+                </div>
+                <div class = 'row'>
+                    <label class='inline col-sm-3'> Date publication :</label>
+                    <input class= 'col-sm-7' type='text' name='fdate' VALUE='" . dateMysqlVersTexte($_chanson->getDatePub()) . "' SIZE='10' MAXLENGTH='128'>
+                 </div>
+                <div class = 'row'>
+                    <label class='inline col-sm-3'> Hits :</label>
+                    <input class= 'col-sm-7' type='number' name='fhits' VALUE='" . $_chanson->getHits() . "' >
+                </div>
+                <div class = 'row'>
+                    <label class='inline col-sm-3'> Utilisateur :</label>"
+                            . selectUtilisateur("nom", "%", "login", true, $_chanson->getIdUser()) . "
+                    <input type=hidden name='mode' VALUE='$mode'>
+                    <label class='inline'> </label><input type='submit' name='valider' VALUE=' Valider ' >
+                </div>
+        </FORM>
 ";
     if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
         // On verrouille les champs hits, date publication, et utilisateur
-        $sortie = str_replace("NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie);
-        $sortie = str_replace("NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie);
-        $sortie = str_replace("name='fidUser'", "NAME='fidUser' disabled='disabled' ", $sortie);
+        $sortie = str_replace("name='fdate'", "name='fdate' disabled='disabled' ", $sortie);
+        $sortie = str_replace("name='fhits'", "name='fhits' disabled='disabled' ", $sortie);
+        $sortie = str_replace("name='fidUser'", "name='fidUser' disabled='disabled' ", $sortie);
     }
     return $sortie;
 }
 
 function comboAjoutSongbook($listeSongbooks)
 {
-    $monCombo = " <br>   <label class='inline col-sm-4'> * Ajouter au songbook :</label> 
+    $monCombo = " <li class='fichiers'><label class='inline col-sm-4'> * Ajouter au songbook :</label> \n
     <select name= 'idSongbook' >";
     foreach ( $listeSongbooks as $songbook)
     {
         $monCombo .= " <option value='".$songbook[0]."'>".$songbook[1]."</option>";
     }
-    $monCombo .= "   </select>";
+    $monCombo .= "   </select></li> \n";
     return($monCombo);
 }
 
@@ -365,7 +364,7 @@ function comboAjoutStrum($listeStrums)
     <select name= 'strum' >";
     foreach ( $listeStrums as $_strum)
     {
-        $monCombo .= " <option id= 'strum' value='".$_strum->getstrum()."'>".$_strum->getstrum()." - ".$_strum->getdescription() . "</option>";
+        $monCombo .= " <option id= 'strum". $_strum->getId()."' value='".$_strum->getstrum()."'>".$_strum->getstrum()." - ".$_strum->getdescription() . "</option>";
     }
     $monCombo .= "   </select>";
     return($monCombo);
@@ -417,27 +416,29 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
         $idDoc = $ligneDoc [0];
         // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
         $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-        $fichier = RETOUR_RACINE . RETOUR_RACINE . $_dossier_chansons . "$id/" . rawurlencode($fichierCourt);
+        $fichier = RETOUR_RACINE . $_dossier_chansons . "$id/" . rawurlencode($fichierCourt);
         $extension = substr(strrchr($ligneDoc[1], '.'), 1);
         $icone = Image("../../images/icones/$extension.png", 32, 32, "icone");
         if (!file_exists("../../images/icones/$extension.png")) {
             $icone = Image("../../images/icones/fichier.png", 32, 32, "icone");
         }
-        $listeDocs .= "<li class='fichiers'> <div> <a href= '" . $fichier . "' target='_blank'> $icone </a> ";
+        $listeDocs .= "<li class='fichiers'> 
+                            <div> <a href= '" . $fichier . "' target='_blank'> $icone </a> ";
         //    $listeDocs .= "Id chanson : $id  id doc : " . $ligneDoc[0] . "fichier court : $fichierCourt <br>";
-        $listeDocs .= "<label class='doc'>" . htmlentities($fichierCourt) . "</label>";
-        $listeDocs .= " (" . intval($ligneDoc [2] / 1024) . " ko )
-		    <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
-		    <button name='renommer' class='document' style='display:none;'>renommer</button>
-            <button style='display:none;' class='document' >x</button>";
-        if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
-            $listeDocs .= boutonSuppression(CHANSON_POST_PHP . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
-        }
-        //$listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
+                $listeDocs .= "<label class='doc'>" . htmlentities($fichierCourt) . "</label>";
+                $listeDocs .= " (" . intval($ligneDoc [2] / 1024) . " ko )
+		                        <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
+                	    	    <button name='renommer' class='document' style='display:none;'>renommer</button>
+                                <button style='display:none;' class='document' >x</button>";
+                                if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
+                                    $listeDocs .= boutonSuppression(CHANSON_POST_PHP . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
+                                }
+                                //$listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
+                                $listeDocs .= "<button onclick=envoieFichierDansSongbook(" . $ligneDoc[0] . ") >ajouter au songbook</button>";
+                $listeDocs .= "</div>";
         $listeDocs .= "</li>";
-        $listeDocs .= "<button onclick=envoieFichierDansSongbook(" . $ligneDoc[0] . ") >ajouter au songbook</button>";
     }
-    $listeDocs .= "<br><div>" . comboAjoutSongbook($listeSongbooks) . "</div><br>";
+    $listeDocs .= comboAjoutSongbook($listeSongbooks);
     echo $listeDocs;
 
     $formulaireEnvoiFichier = "</ul>
@@ -497,33 +498,21 @@ function afficheLiensChanson(int $id): void
 
     echo "
         <form>
-            <div>              
+            <div id='lien$id'>
+                <span id='msgLien$id'> </span>    
                 <label for='lienType0'>Type de lien :</label>
                 <input size='128' id='lienType0' name='type' value='' placeholder='video ou article'>
-            </div>
-            <div>
                 <label for='lienDescription0'>Description  :</label>
                 <textarea id='lienDescription0' name='description'  placeholder='description longue du lien'> </textarea>
-            </div>
-            <div>    
                 <label for='lienUrl0'>Url :</label>
                 <input size='255' id='lienUrl0' name='url' value='' placeholder='http://youtu.be/3456' >
-            </div>
-            <div>    
-                <label for='date0'><Date</D>Date :</label>
+                <label for='date0'>Date :</label>
                 <input size='255' id='date0' name='date' value='' placeholder='au format JJ/MM/AAAA' >
-            </div>
-            <div>    
                 <label for='idUser0'>Utilisateur :</label>";
-
     echo selectUtilisateur("nom", "%", "login", true, 0, "utilisateur", "idUser0");
-
-    echo "  </div>
-            <div>    
+    echo "  
                 <label for='hits0'>Hits :</label>
-                <input size='255' id='hits0' name='hits' value='' placeholder='17' >
-            </div>
-            <div>
+                <input size='255' id='hits0' name='hits' value='' placeholder='17' >          
                 <button type='button' name='createLien' onclick=\"updateLienurl('NEW',0,'chanson', $id) \">créer</button>
              </div>     
               ";
@@ -558,7 +547,7 @@ function afficheLiensChanson(int $id): void
                     <input size='255' id='lienUrl$idLien' name='url' value='" . htmlentities($url) . "' placeholder='http://youtu.be/3456' >
                 </div>
                             <div>    
-                    <label for='date$idLien'><Date</D>Date :</label>
+                    <label for='date$idLien'>Date :</label>
                     <input size='255' id='date$idLien' name='date' value='$date' placeholder='au format JJ/MM/AAAA' >
                 </div>
                 <div>    
