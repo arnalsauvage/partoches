@@ -12,7 +12,6 @@ class UtilisateurNote
     private $_nomObjet; // nom de la table de l'objet noté
     private $_idObjet; // id de l'objet noté
 
-
     public function __construct($_note, $_idUtilisateur, $_nomObjetNote, $_idObjetNote)
     {
         $this->setId (0);
@@ -23,7 +22,6 @@ class UtilisateurNote
     }
 
     // Créée un champ html de vote à étoiles pour que l'utilisateur vote
-
     static function starBarUtilisateur($mediaNom, $mediaId, $nombreEtoiles, $largeurEtoiles) {
 
         $maNote = new UtilisateurNote( 0, 1, 1, 1);
@@ -35,14 +33,16 @@ class UtilisateurNote
 
         $getJSON = array('nombreEtoiles' => $nombreEtoiles, 'mediaId' => $mediaId); // We create a JSON with the number of stars and the media ID
         $getJSON = json_encode($getJSON);
-
-        $starBar = '<div id="'.$mediaId.'">';
-        $starBar .= '<div class="star_bar" style="width:'.$nbrPixelsInDiv.'px; height:'.$largeurEtoiles.'px; background: 
+        $_id_star_bar = $mediaNom."_".$mediaId;
+        $starBar = '<div>';
+        $starBar .= '<div id="'.$_id_star_bar.'" class="star_bar" style="width:'.$nbrPixelsInDiv.'px; height:'.$largeurEtoiles.'px; background: 
     linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX. self::PX_CCC .$numEnlightedPX. self::PX_CCC .$nbrPixelsInDiv.'px);" >';
 //    linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX. self::PX_CCC .$numEnlightedPX. self::PX_CCC .$nbrPixelsInDiv.'px);" rel=\''.$getJSON.'\'>';
         // Une boucle pour créer le nombre d'étoiles demandées
         for ($i=1; $i<=$nombreEtoiles; $i++) {
-            $starBar .= '<div title="'.$i.'/'.$nombreEtoiles.'" id="'.$i.'" class="star"';
+            $id_etoile = $mediaNom."_".$mediaId."_".$i;
+            // echo ("UtilisateurNote.php : idEtoile = $id_etoile <br>\n");
+            $starBar .= '<div title="'.$i.'/'.$nombreEtoiles.'" id="'.$id_etoile.'" class="star"';
             // Supprimé pour pouvoir changer son vote
             // if( !isset($_COOKIE[$cookie_name]) )
             $starBar .= '
@@ -87,7 +87,7 @@ class UtilisateurNote
     linear-gradient(to right, #ffc600 0px,#ffc600 '.$numEnlightedPX. self::PX_CCC .$numEnlightedPX. self::PX_CCC .$nbrPixelsInDiv.'px);" rel=\''.$getJSON.'\'>';
         // Une boucle pour créer le nombre d'étoiles demandées
         for ($i=1; $i<=$nombreEtoiles; $i++) {
-            $starBar .= '<div title="'.$i.'/'.$nombreEtoiles.'" id="'.$i.'" class="star"';
+            $starBar .= '<div title="'.$i.'/'.$nombreEtoiles.'" id="'.$mediaId."_".$i.'" class="star"';
             $starBar .= '></div>';
         }
         $starBar .= self::DIV;

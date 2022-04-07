@@ -161,7 +161,7 @@ if ($largeur_ecran > 700) {
 }
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
 if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
-    $contenuHtml .= tblEntete("action", "");
+    $contenuHtml .= tblEntete("action");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 $contenuHtml .= TblFinLigne() . TblEnteteFin();
