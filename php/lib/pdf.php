@@ -84,7 +84,6 @@ function pdfCreeSongbook($idSongBook, $version, $intitule, $imageCouverture, $li
 
     $version = pageDeCouverture($pdf, $version, $idSongBook, $imageCouverture, $intitule);
 
-
     foreach ($listeNomsFichiers as $nomFichier) {
         $idChanson = array_shift($listeIdChanson); // Pour récupérer l'id de la chanson
         $versionDoc = array_shift($listeVersionsDoc);
@@ -159,8 +158,8 @@ function ajouteSommaire(SongBookPDF $pdf, $listeNomsChanson, $str): void
 
     $pdf->SetFont(ARIAL, 'B', $hauteur_ligne);
     // On met une petite ligne vide pour faire de la place
-    $pdf->cell(10, $hauteur_ligne, " ", 0, 1, "L");
-    $numeroChanson = 3;
+    $pdf->cell(10, $hauteur_ligne/2, " ", 0, 1, "L");
+    $numeroChanson = 2;
     foreach ($listeNomsChanson as $nomChanson) {
         $pdf->Cell(10, $hauteur_ligne, $numeroChanson++ . " - " . utf8_decode($nomChanson), 0, 1, "L");
     }
