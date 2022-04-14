@@ -7,7 +7,7 @@ const CHANSON_CHERCHER = "chanson_chercher";
 const CHANSON_UPLOAD = "chanson_upload.php";
 const CHEMIN_LIEN_URL_POST_PHP = RETOUR_RACINE ."liens/lienurlPost.php";
 const LIENS_LIEN_STRUM_CHANSON_POST_PHP = RETOUR_RACINE . "liens/lienStrumChanson_post.php";
-const CHEMIN_SONGBOOK_FORM = RETOUR_RACINE . "songbook/songbook_form.php";
+const CHEMIN_SONGBOOK_FORM = RETOUR_RACINE . "/songbook/songbook_form.php";
 const JS_CHANSON_FORM_JS = RETOUR_RACINE . RETOUR_RACINE . "js/chansonForm.js";
 
 require_once("chanson.php");
@@ -229,7 +229,7 @@ if ($mode == "MAJ") {
 
             $.ajax({
                 type: "POST",
-                url: "<?CHEMIN_SONGBOOK_FORM?>",
+                url: "<?=CHEMIN_SONGBOOK_FORM?>",
                 data: "id="+idSongbook+"&documentJoint="+idFichier+"&ajax=11",
                 datatype: 'html', // type de la donnée à recevoir
                 success: function (code_html, statut) { // success est toujours en place, bien sûr !

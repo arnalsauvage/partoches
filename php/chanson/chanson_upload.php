@@ -66,7 +66,7 @@ $name_file = str_replace(".$ext", "-v" . ($doc [4]), $name_file) . ".$ext";
 
 // Si le formulaire est validé, on copie le fichier dans le dossier de destination
 if (!move_uploaded_file($tmp_file, $repertoire . $name_file)) {
-    $errors [FICHIER_UPLOADE] = "Il y a des erreurs! Impossible de copier le fichier dans le dossier cible";
+    $errors [FICHIER_UPLOADE] = "Il y a des erreurs! Impossible de copier le fichier $name_file dans le dossier cible $repertoire";
     echo $errors [FICHIER_UPLOADE];
     // TODO : on supprime    le fichier en bdd
     supprimeDocument($doc[0]);
