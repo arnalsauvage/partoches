@@ -10,11 +10,11 @@ const LIENS_LIEN_STRUM_CHANSON_POST_PHP = RETOUR_RACINE . "liens/lienStrumChanso
 const CHEMIN_SONGBOOK_FORM = RETOUR_RACINE . "/songbook/songbook_form.php";
 const JS_CHANSON_FORM_JS = RETOUR_RACINE . RETOUR_RACINE . "js/chansonForm.js";
 
+const DIV = "</div>";
 require_once("chanson.php");
 require_once("../document/document.php");
 require_once('../liens/lienStrumChanson.php');
 require_once('../liens/lienurl.php');
-// require_once('../liens/lienurlPost.php');
 require_once("../navigation/menu.php");
 require_once("../songbook/songbook.php");
 require_once('../strum/strum.php');
@@ -74,7 +74,7 @@ if ($mode == "INS"){
 }
 
 $sortie .= formulaireChanson($_chanson, $mode);
-$sortie .= recherches_sur_chanson($_chanson, $id) . "</div>";
+$sortie .= recherches_sur_chanson($_chanson, $id) . DIV;
 // Fin Tab 1 chanson
 echo $sortie;
 
@@ -100,19 +100,19 @@ if ($mode == "MAJ") {
 
     $nbFichiersKO = 0;
     while (count($fichiersSurDisque) > 0) {
-        //echo "nb fichiers : "     .   count($fichiersSurDisque) / 3;
+        // pour debug echo "nb fichiers : "     .   count($fichiersSurDisque) / 3;
 
         $fichierSurDisque[0] = array_shift($fichiersSurDisque);
         $fichierSurDisque[1] = array_shift($fichiersSurDisque);
         $fichierSurDisque[2] = array_shift($fichiersSurDisque);
-        //echo ".......FichierDisque ". $fichierSurDisque[1] ."<br>";
+        //pour debug echo ".......FichierDisque ". $fichierSurDisque[1] ."<br>";
         $fichierOk = false;
         foreach ($fichiersEnBdd as $fichierEnBdd) {
             //echo "cherche version du " . $fichierEnBdd[1] . " " . $fichierEnBdd[4] . "<br>";
             // si le fichierBDD est sur disque, alors fichierOk
             if (composeNomVersion($fichierEnBdd[1], $fichierEnBdd[4]) == $fichierSurDisque[1]) {
                 $fichierOk = true;
-                //echo "Fichier $fichierSurDisque[1] trouvé !!!!!!!!!!!!!!!!!!!<br>";
+                // pour debug echo "Fichier $fichierSurDisque[1] trouvé !!!!!!!!!!!!!!!!!!!<br>";
             }
         }
         $numeroElement = 1;
@@ -134,7 +134,7 @@ if ($mode == "MAJ") {
                         url: "<?CHANSON_POST_PHP?>",
                         data: "id=<?php echo $id;?>&nomFic=<?php echo $fichierSurDisque[1];?>&mode=RESTAUREDOC",
                         datatype: 'html', // type de la donnée à recevoir
-                        success: function (code_html, statut) {
+                        success: function (code_html) {
                             if (code_html.search("n'a pas été traité.") === -1)
                                 toastr.success("Le document a été restauré ! <br> Le fichier a été raccroché à la chanson <br> Vous pouvez raffraîchir la page pour le voir.");
                             else {
@@ -143,7 +143,7 @@ if ($mode == "MAJ") {
                             }
                         },
                         error: function (resultat, statut, erreur) {
-                            $("#msgLien<?= $numeroElement ?>").html(resultat);
+                            $("#msgLien<?= $numeroElement ?>").html("Status : " + statut + ". Résultat : " + resultat + " <br>\n Erreur :" + erreur);
                         }
                     });
                 }
@@ -159,7 +159,7 @@ if ($mode == "MAJ") {
         echo "La corbeille est vide pour cette chanson.\n";
     }
 }
-    echo "</div>"; ////// Fin du 2nd tab fichiers
+    echo DIV; ////// Fin du 2nd tab fichiers
 
     afficheStrumsChanson($_chanson);
     afficheLiensChanson($id);
@@ -204,11 +204,11 @@ if ($mode == "MAJ") {
                         toastr.success("Le lien a été modifié ! <br> Le lien de la chanson a été modifié <br> Vous pouvez raffraîchir la page pour le voir.");
                     else {
                         toastr.warning("Erreur dans l'opération...<br>Le lien n'a pas pu être modifié...");
-                        $("#msgLien"+id).html(code_html);
+                        $("#msgLien"+id).html("Status : " + statut + ". retour : " + code_html);
                     }
                 },
                 error: function (resultat, statut, erreur) {
-                        $("#msgLien"+id).html(resultat);
+                    $("#msgLien"+id).html("Status : " + statut + ". Résultat : " + resultat + " <br>\n Erreur :" + erreur);
                 }
             });
         }
@@ -237,11 +237,11 @@ if ($mode == "MAJ") {
                         toastr.success("Le document a été ajouté au songbook ! <br> Le fichier a été raccroché au songbook <br> Vous pouvez raffraîchir la page pour le voir.");
                     else {
                         toastr.warning("Erreur dans l'opération...<br>Le document n'a pas pu être raccroché... :-(");
-                        $("#div1").html(code_html);
+                        $("#div1").html("Status : " + statut + ". Retour : " + code_html);
                     }
                 },
                 error: function (resultat, statut, erreur) {
-                    $("#div1").html(resultat);
+                    $("#div1").html("Status : " + statut + ". Résultat : " + resultat + " <br>\n Erreur :" + erreur);
                 }
             });
             // Retour ok : toast vert
@@ -346,7 +346,7 @@ function formulaireChanson(Chanson $_chanson, string $mode): string
     return $sortie;
 }
 
-function comboAjoutSongbook($listeSongbooks)
+function comboAjoutSongbook($listeSongbooks): string
 {
     $monCombo = " <li class='fichiers'><label class='inline col-sm-4'> * Ajouter au songbook :</label> \n
     <select name= 'idSongbook' >";
@@ -358,7 +358,7 @@ function comboAjoutSongbook($listeSongbooks)
     return($monCombo);
 }
 
-function comboAjoutStrum($listeStrums)
+function comboAjoutStrum($listeStrums): string
 {
     $monCombo = " <br>   <label class='inline col-sm-4'> Ajouter un strum :</label> 
     <select name= 'strum' >";
@@ -380,8 +380,7 @@ function recherches_sur_chanson(Chanson $_chanson, int $id): string
     $urlCherche = CHANSON_CHERCHER . ".php" ."?chanson=" . urlencode($_chanson->getNom()) . "&artiste=" . urlencode($_chanson->getInterprete());
     $urlCherche .= "&idChanson=$id";
 
-// $sortie .= "<br> Nouvelle fonctionnalité !!! Enregistrer la chanson avec titre et interprète, puis cliquez ici pour remplir automatiquement via une base de données !!!";
-    $sortie = "<br> <a href='" . $urlCherche . "'>Chercher année, tempo, mesure, tonalité et image depuis getsongbpm !</a><br>";
+    $sortie = "<br> <a href='" . $urlCherche . "'>Chercher infos depuis getsongbpm ! (ko :-( )</a><br>";
     if ($_chanson->getNom()) {
 
         $sortie .= "Pour chercher la chanson sur youtube : <a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom()) . "' target='_blank'>ici</a><br>\n";
@@ -412,7 +411,7 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
     $listeDocs = "";
     // Pour chaque document
     while ($ligneDoc = $lignes->fetch_row()) {
-        // var_dump( $ligneDoc);
+        // pour debug var_dump( $ligneDoc);
         $idDoc = $ligneDoc [0];
         // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
         $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
@@ -424,7 +423,7 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
         }
         $listeDocs .= "<li class='fichiers'> 
                             <div> <a href= '" . $fichier . "' target='_blank'> $icone </a> ";
-        //    $listeDocs .= "Id chanson : $id  id doc : " . $ligneDoc[0] . "fichier court : $fichierCourt <br>";
+        // pour debug   $listeDocs .= "Id chanson : $id  id doc : " . $ligneDoc[0] . "fichier court : $fichierCourt <br>";
                 $listeDocs .= "<label class='doc'>" . htmlentities($fichierCourt) . "</label>";
                 $listeDocs .= " (" . intval($ligneDoc [2] / 1024) . " ko )
 		                        <input size='16' id='$idDoc' name='user' value='" . htmlentities($fichierCourt) . "' placeholder='nomDeFichier.ext' style='display:none;'>
@@ -433,9 +432,9 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
                                 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
                                     $listeDocs .= boutonSuppression(CHANSON_POST_PHP . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
                                 }
-                                //$listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
+                                // pour debug $listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
                                 $listeDocs .= "<button onclick=envoieFichierDansSongbook(" . $ligneDoc[0] . ") >ajouter au songbook</button>";
-                $listeDocs .= "</div>";
+                $listeDocs .= DIV;
         $listeDocs .= "</li>";
     }
     $listeDocs .= comboAjoutSongbook($listeSongbooks);
