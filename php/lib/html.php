@@ -191,16 +191,27 @@ if (!isset ($FichierHtml)) {
     	<link href='../../css/bootstrap.min.css' rel='stylesheet'>
         <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
     	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel='stylesheet'>
-    	";
+    	 ";
 
-        $retour .= "<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
+        $retour .= "
+        
+        <link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
 		<script src='..//lib/javascript.js'></script>
-		<!-- source : https://code.jquery.com/jquery-1.12.4.js -->
+		<!-- Jquery --- source : https://code.jquery.com/jquery-1.12.4.js -->
 		<script src=\"../../js/jquery-1.12.4.min.js\"></script>
-        <!-- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
+        <!-- jquery-ui --- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
 		<script src='../../js/jquery-ui.1.12.1.min.js'></script>
+        
+		<!-- Pour bootstrap         -->
         <script src='../../js/bootstrap.3.2.0.min.js'></script>
+		
+		<!-- Pour Toaster, les petites infos instantanées         -->
 		<link href='../../css/toastr.min.css' rel='stylesheet' type='text/css'>
+		
+		<!-- Pour Select2, le combo amélioré         -->
+		<link href='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' rel='stylesheet' />
+        <script src='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'></script>
+		
 		<title>$titrePage</title>
 		</head>";
         return $retour;

@@ -11,7 +11,7 @@ $GLOBALS["PRIVILEGE_ADMIN"] = 3;
 function chercheUtilisateurParEmail($_email)
 {
     global $nomTableUtilisateur;
-    $maRequete = "SELECT * FROM " . $nomTableUtilisateur . " WHERE email LIKE '$_email'";
+    $maRequete = "SELECT * FROM utilisateur WHERE email LIKE '$_email'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheUtilisateurParEmail #1 : " . $_SESSION ['mysql']->error);
     $ligne = $result->fetch_row();
     // pour log echo "trouvé" . var_dump($ligne);
@@ -239,7 +239,7 @@ function testUtilisateurs()
 // SELECT * FROM utilisateur WHERE $critere LIKE '$valeur' ORDER BY $critereTri
 function selectUtilisateur($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true, $idSelectionne = 0, $nomDuChamp ='fidUser', $idDuChamp="fiduser")
 {
-    $retour = "<select name='$nomDuChamp' id='$idDuChamp'>\n";
+    $retour = "<select class='js-example-basic-single' name='$nomDuChamp' id='$idDuChamp'>\n";
     // Ajouter des options
     $lignes = chercheUtilisateurs($critere, $valeur, $critereTri, $bTriAscendant);
     while ($ligne = $lignes->fetch_row()) {

@@ -349,7 +349,7 @@ function formulaireChanson(Chanson $_chanson, string $mode): string
 function comboAjoutSongbook($listeSongbooks): string
 {
     $monCombo = " <li class='fichiers'><label class='inline col-sm-4'> * Ajouter au songbook :</label> \n
-    <select name= 'idSongbook' >";
+    <select class='js-example-basic-single' name= 'idSongbook' >";
     foreach ( $listeSongbooks as $songbook)
     {
         $monCombo .= " <option value='".$songbook[0]."'>".$songbook[1]."</option>";
@@ -361,7 +361,7 @@ function comboAjoutSongbook($listeSongbooks): string
 function comboAjoutStrum($listeStrums): string
 {
     $monCombo = " <br>   <label class='inline col-sm-4'> Ajouter un strum :</label> 
-    <select name= 'strum' >";
+    <select class='js-example-basic-single'  name= 'strum' >";
     foreach ( $listeStrums as $_strum)
     {
         $monCombo .= " <option id= 'strum". $_strum->getId()."' value='".$_strum->getstrum()."'>".$_strum->getstrum()." - ".$_strum->getdescription() . "</option>";
