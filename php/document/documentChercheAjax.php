@@ -3,8 +3,10 @@ include_once("../chanson/chanson.php");
 include_once("../document/document.php");
 include_once("../lib/formulaire.php");
 include_once("../lib/utilssi.php");
+require("../utilisateur/utilisateur.php");
 
 global $_DOSSIER_CHANSONS;
+const RACINE = "../../";
 
 $table =  "documents";
 $sortie = "";

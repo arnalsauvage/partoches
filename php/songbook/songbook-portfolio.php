@@ -93,7 +93,7 @@ global $_DOSSIER_CHANSONS;
             // Si on n'a pas de pdf pour le songbook, on affiche juste l'image
             $largeur_max_vignette = 200;
             $hauteur_max_vignette = "";
-            $baliseImage = afficheVignette($imageSongBook, "../data/songbooks/$songbook[0]/" , "../../data/songbooks/vignettes/", "vignette du songbook " . $songbook [1]);
+            $baliseImage = afficheVignette($imageSongBook, "../../data/songbooks/$songbook[0]/" , "../../data/songbooks/vignettes/", "vignette du songbook " . $songbook [1]);
             if ($pdfSongbook == "vide") {
                 echo $baliseImage;
             } else {
