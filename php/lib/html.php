@@ -185,28 +185,33 @@ if (!isset ($FichierHtml)) {
 		<meta charset='UTF-8' >";
 
         // Pour BootStrap
-        $retour .= "<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+        $retour .= "
+        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
 		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    	<link href='../css/bootstrap.min.css' rel='stylesheet'>
+    	<link href='../../css/bootstrap.min.css' rel='stylesheet'>
         <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
-    	 <link href=\"../css/jquery-ui.1.12.1.css\" rel='stylesheet'>
-    	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-		<!--[if lt IE 9]>
- 		<script src='https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js'></script>
-  		<script src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js'></script>
-		<![endif]-->
-    	";
+    	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel='stylesheet'>
+    	 ";
 
-        $retour .= "<link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
-		<script src='./lib/javascript.js'></script>
-		<!-- source : https://code.jquery.com/jquery-1.12.4.js -->
-		<script src=\"../js/jquery-1.12.4.min.js\"></script>
-        <!-- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
-		<script src=\"../js/jquery-ui.1.12.1.min.js\"></script>
-
-        <script src=\"../js/bootstrap.3.2.0.min.js\"></script>
-		<link href='../css/toastr.min.css' rel='stylesheet' type='text/css'>
+        $retour .= "
+        
+        <link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
+		<script src='..//lib/javascript.js'></script>
+		<!-- Jquery --- source : https://code.jquery.com/jquery-1.12.4.js -->
+		<script src=\"../../js/jquery-1.12.4.min.js\"></script>
+        <!-- jquery-ui --- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
+		<script src='../../js/jquery-ui.1.12.1.min.js'></script>
+        
+		<!-- Pour bootstrap         -->
+        <script src='../../js/bootstrap.3.2.0.min.js'></script>
+		
+		<!-- Pour Toaster, les petites infos instantanées         -->
+		<link href='../../css/toastr.min.css' rel='stylesheet' type='text/css'>
+		
+		<!-- Pour Select2, le combo amélioré         -->
+		<link href='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' rel='stylesheet' />
+        <script src='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'></script>
+		
 		<title>$titrePage</title>
 		</head>";
         return $retour;
@@ -214,7 +219,7 @@ if (!isset ($FichierHtml)) {
 
     function envoieFooter()
     {
-        $retour = file_get_contents('../html/footer.html', FILE_USE_INCLUDE_PATH);
+        $retour = file_get_contents('../../html/footer.html', FILE_USE_INCLUDE_PATH);
         $retour .= "\n</html>";
         return $retour;
     }

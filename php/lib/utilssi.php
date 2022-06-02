@@ -1,4 +1,7 @@
 <?php
+const IMAGES = "../../images";
+const ICONES = IMAGES . "/icones/";
+
 $a = session_id();
 if (empty ($a)) {
     session_start();
@@ -122,7 +125,7 @@ if (!isset ($FichierUtilsSi)) {
     // Cette fonction retourne une liste des images disponibles sur le site, éventuellement dans un sous-dossier
     function listeImages($subDir = "")
     {
-        $d = dir("../images" . $subDir);
+        $d = dir(IMAGES . $subDir);
         while (false !== ($entry = $d->read())) {
             if (($entry != ".") && ($entry != "..")) {
                 // pour debug : echo "<option " . "value=$entry> echo $ligne[1]" . "</option>";
