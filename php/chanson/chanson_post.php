@@ -93,31 +93,57 @@ $chaine = "Mode  : " . $mode;
 //ecritFichierLog("ajaxlog.htm", $chaine);
 
 
-// On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
+// On gère 5 cas :
+//  1- création d'une chanson,
+//  2 - modif,
+//  3 - suppression chanson
+//  4 - MAJ des infos depuis une API
+//  5 - suppression d'un doc de la chanson
+
+//  1- création d'une chanson,
+if ($mode == "INS") {
+    // echo "FHits = " . $fhits;
+    $fhits = 0;
+    $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
+    $id = $_chanson->creeChansonBDD();
+    $repertoire = "../". $_DOSSIER_CHANSONS . $id . "/";
+    if (!file_exists($repertoire)) {
+        mkdir($repertoire, 0755);
+        echo " -=> Création du repertoire $repertoire réussi<br>";
+    }
+}
+
+//  2 - modif,
 if ($mode == "MAJ") {
     if ($_SESSION [PRIVILEGE] < 3) {
-        // On doit recharger les hits, le user et la date pour qu'ils ne soient remis à zéro
+        // On doit recharger les hits pour qu'ils ne soient remis à zéro
         $_chanson->chercheChanson($id);
         $fhits = $_chanson->getHits();
-        $fidUser = $_chanson->getIdUser();
-        $fdate = $_chanson->getDatePub();
-    } else {
-        $fdate = dateTexteVersMysql($fdate);
     }
+    $fdate = dateTexteVersMysql($fdate);
+
     $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
     $_chanson->creeModifieChansonBDD();
 }
 
-// On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
+//  3 - suppression chanson
+// Gestion de la demande de suppression
+if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
+    $_chanson = new Chanson($id);
+    $_chanson->supprimeChansonBddFile();
+    redirection($nomTable . "_liste.php");
+}
+
+//  4 - MAJ des infos depuis une API
 if ($mode == "MAJ_SONGBPM") {
-        // On doit recharger les hits, le user et la date pour qu'ils ne soient remis à zéro
-        $_chanson->chercheChanson($id);
-        $fhits = $_chanson->getHits();
-        $fidUser = $_chanson->getIdUser();
-        $fdate = $_chanson->getDatePub();
-        $fnom = $_chanson->getNom();
-        $finterprete = $_chanson->getInterprete();
-        $fpulsation = $_chanson->getPulsation();
+    // On doit recharger les hits, le user et la date pour qu'ils ne soient remis à zéro
+    $_chanson->chercheChanson($id);
+    $fhits = $_chanson->getHits();
+    $fidUser = $_chanson->getIdUser();
+    $fdate = $_chanson->getDatePub();
+    $fnom = $_chanson->getNom();
+    $finterprete = $_chanson->getInterprete();
+    $fpulsation = $_chanson->getPulsation();
     $fannee = $_GET ['annee'];
     $ftempo = $_GET ['tempo'];
     $fmesure = $_GET ['mesure'];
@@ -129,29 +155,7 @@ if ($mode == "MAJ_SONGBPM") {
     telechargeImageFromUrl($fimage, $fnom . "-" . $finterprete , $id, $_DOSSIER_CHANSONS);
 }
 
-// Gestion de la demande de suppression
-if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
-    $_chanson = new Chanson($id);
-    $_chanson->supprimeChansonBddFile();
-    redirection($nomTable . "_liste.php");
-}
-
-if ($mode == "INS") {
-    // echo "FHits = " . $fhits;
-    $fhits = 0;
-    // Seul admin peut attribuer une chanson à un autre
-    if ($_SESSION [PRIVILEGE] < 3) {
-        $fidUser = $_SESSION ['id'];
-    }
-    $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
-    $id = $_chanson->creeChansonBDD();
-    $repertoire = "../". $_DOSSIER_CHANSONS . $id . "/";
-    if (!file_exists($repertoire)) {
-        mkdir($repertoire, 0755);
-        echo " -=> Création du repertoire $repertoire réussi<br>";
-    }
-}
-
+//  5 - gestion des docs de la chanson
 // Gestion de la demande de suppression de document dans la chanson
 if ($mode == "SUPPRDOC" && $_SESSION [PRIVILEGE] > 1) {
     // 	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
