@@ -224,7 +224,6 @@ class Chanson
             return "";
         }
         else {
-
             return $this->_pulsation;
         }
     }
@@ -234,9 +233,7 @@ class Chanson
      */
     public function setPulsation(string $pulsation)
     {
-        if (($pulsation >= 0) && ($pulsation < 300)) {
             $this->_pulsation = $pulsation;
-        }
     }
 
     /**
