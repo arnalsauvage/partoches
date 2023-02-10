@@ -328,11 +328,9 @@ function formulaireChanson(Chanson $_chanson, string $mode): string
 </div>
 </FORM>
 ";
+    // Il faut être admin pour changer les hits d'une chanson
     if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-        // On verrouille les champs hits, date publication, et utilisateur
-        $sortie = str_replace("NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie);
         $sortie = str_replace("NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie);
-        $sortie = str_replace("name='fidUser'", "NAME='fidUser' disabled='disabled' ", $sortie);
     }
     return $sortie;
 }

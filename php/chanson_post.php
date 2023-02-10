@@ -96,14 +96,12 @@ $chaine = "Mode  : " . $mode;
 // On gère 4 cas : création d'une chanson, modif, suppression chanson ou suppression d'un doc de la chanson
 if ($mode == "MAJ") {
     if ($_SESSION [PRIVILEGE] < 3) {
-        // On doit recharger les hits, le user et la date pour qu'ils ne soient remis à zéro
+        // On doit recharger les hits pour qu'ils ne soient remis à zéro
         $_chanson->chercheChanson($id);
         $fhits = $_chanson->getHits();
-        $fidUser = $_chanson->getIdUser();
-        $fdate = $_chanson->getDatePub();
-    } else {
-        $fdate = dateTexteVersMysql($fdate);
     }
+    $fdate = dateTexteVersMysql($fdate);
+
     $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
     $_chanson->creeModifieChansonBDD();
 }
@@ -140,9 +138,6 @@ if ($mode == "INS") {
     // echo "FHits = " . $fhits;
     $fhits = 0;
     // Seul admin peut attribuer une chanson à un autre
-    if ($_SESSION [PRIVILEGE] < 3) {
-        $fidUser = $_SESSION ['id'];
-    }
     $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
     $id = $_chanson->creeChansonBDD();
     $repertoire = "../". $_DOSSIER_CHANSONS . $id . "/";
