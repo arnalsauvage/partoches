@@ -1,5 +1,5 @@
 <?php
-$fichier = "../conf/params.ini";
+$fichier = "../../conf/params.ini";
 
 // On lit les données dans le fichier ini
 $ini_objet = new FichierIni ();
@@ -12,6 +12,6 @@ $_SESSION ['loginParam'] = $ini_objet->m_valeur("loginParam", "general");
 $niveauDeLog = $ini_objet->m_valeur("niveauDeLog", "general");
 // echo "Niveau de log : " . $niveauDeLog;
 
-$_DOSSIER_DATA = "data/";
+$_DOSSIER_DATA = "../../data/";
 $_DOSSIER_CHANSONS = $_DOSSIER_DATA . "chansons/";
 $_DOSSIER_SONGBOOKS = $_DOSSIER_DATA . "songbooks/";

@@ -20,7 +20,18 @@ if (!isset ($ModuleTable)) {
 
     function TblEntete($contenu, $nbLig = 1, $nbCol = 1): string
     {
-        return "<th ROWSPAN='$nbLig' COLSPAN='$nbCol'>$contenu</th>\n";
+        //echo "Appel de tbl entete avec contenu = $contenu, nbLig = $nbLig et nbCol = $nbCol";
+        $_entete = "<th ";
+        if ($nbLig <> 1){
+            $_entete .= "rowspan='$nbLig' ";
+        }
+        if ($nbCol <> 1){
+            $_entete .= "colspan='$nbCol' ";
+        }
+        $_entete .= "> " . $contenu;
+        $_entete .= "</th>\n";
+
+        return $_entete;
     }
 
     function TblEnteteFin(): string

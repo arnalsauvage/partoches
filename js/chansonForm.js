@@ -64,3 +64,7 @@ function getRandomColor() {
 function setRandomColor() {
     $("#colorpad").css("background-color", getRandomColor());
 }
+
+$(document).ready(function() {
+    $('.js-example-basic-single').select2();
+});

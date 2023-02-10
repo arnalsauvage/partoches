@@ -2,18 +2,17 @@
 // On utilise la librairie fpdf http://www.fpdf.org/
 // ainsi que la librairie fpdi pour importer des pdf existants https://www.setasign.com/products/fpdi/manual/
 
-const DATA_SONGBOOKS = "../data/songbooks/";
 const ARIAL = 'Arial';
+const IMAGES_ICONES_TOP_5_PNG = '../../images/icones/top5.png';
 require_once('fpdf/fpdf.php');
 require_once('fpdi/autoload.php');
 require_once('fpdi/Fpdi.php');
 use setasign\Fpdi\Fpdi;
 
-const DOSSIER_CHANSONS = "data/chansons/";
+const DOSSIER_CHANSONS = "../data/chansons/";
 
 class SongBookPDF extends FPDI
 {
-
     const ARIAL = 'Arial';
     public $_nombrePages;
 
@@ -83,45 +82,7 @@ function pdfCreeSongbook($idSongBook, $version, $intitule, $imageCouverture, $li
 {
     $pdf = new SongBookPDF();
 
-    // On fait une couverture avec l'image
-    $pdf->AddPage();
-
-    $version++;
-    $dateDuJour = date("d/m/Y");
-    // Position at 1.5 cm from bottom
-    $pdf->Image(DATA_SONGBOOKS . $idSongBook . "/" . $imageCouverture, 5, 5, 190, 250);
-    $pdf->SetY(260);
-    $pdf->SetFont(ARIAL, 'B', 10);
-    $pdf->SetTextColor(50, 50, 50);
-    $pdf->Cell(0, 12, $intitule . " - v" . $version . " du " . $dateDuJour, 0, 0, "C");
-    // TODO : ici on pourrait déterminer le ratio de l'image pour ne pas avoir d'image trop étirée
-    // Page number
-//    $this->Cell(0, 10, 'Page ' . $this->PageNo(), 0, 0, 'C');
-    // On crée un sommaire
-    $pdf->AddPage();
-    // Logo
-    $pdf->SetFont(ARIAL, 'B', 20);
-    $pdf->SetTextColor(50, 50, 50);
-
-    $pdf->Cell(30, 10, ' ', 0, 0, "C"); // Centré
-    $pdf->Cell(150, 10, 'Sommaire', 1, 1, "C"); // Centré
-    // $pdf->Cell(10, 10, " ", 0, 1, "L");
-    $pdf->Image('../images/icones/top5.png',10,6,20);
-
-    // On a une hauteur de 240 à répartir sur la feuille
-    $hauteur_ligne = 240 / (count($listeNomsChanson) + 1);
-    if ($hauteur_ligne > 40){
-        $hauteur_ligne = 40;
-    }
-
-    $pdf->SetFont(ARIAL, 'B', $hauteur_ligne);
-    // On met une petite ligne vide pour faire de la place
-    $pdf->cell(10, $hauteur_ligne, " ",0,1, "L");
-    $numeroChanson = 3;
-    foreach ($listeNomsChanson as $nomChanson) {
-        $pdf->Cell(10, $hauteur_ligne, $numeroChanson++ . " - " . utf8_decode($nomChanson), 0, 1, "L");
-    }
-    /// *** FIN SOMMAIRE /////
+    $version = pageDeCouverture($pdf, $version, $idSongBook, $imageCouverture, $intitule);
 
     foreach ($listeNomsFichiers as $nomFichier) {
         $idChanson = array_shift($listeIdChanson); // Pour récupérer l'id de la chanson
@@ -134,6 +95,7 @@ function pdfCreeSongbook($idSongBook, $version, $intitule, $imageCouverture, $li
             echo "Le fichier $nomFichier n'a pas été traité. <br> Exception reçue : ", $e->getMessage(), "\n<br>";
         }
     }
+    ajouteSommaire($pdf, $listeNomsChanson,  IMAGES_ICONES_TOP_5_PNG );
     $intitule = make_alias ($intitule);
     $intitule = str_replace("'","",$intitule);
     $nom_pdf_songbook = "songbook_".$intitule . ".pdf";
@@ -143,7 +105,65 @@ function pdfCreeSongbook($idSongBook, $version, $intitule, $imageCouverture, $li
     $version = creeModifieDocument($nom_pdf_songbook, $taille, "songbook", $idSongBook);
     $nouveauNom = composeNomVersion($nom_pdf_songbook, $version);
     rename(DATA_SONGBOOKS . $idSongBook . "/" . $nom_pdf_songbook, DATA_SONGBOOKS . $idSongBook . "/" . $nouveauNom);
-    echo "Fichier <a href='../data/songbooks/$idSongBook/$nouveauNom' target='_blank''>$nouveauNom</a> généré à partir de la liste des partoches";
+    echo "Fichier <a href='../../data/songbooks/$idSongBook/$nouveauNom' target='_blank''>$nouveauNom</a> généré à partir de la liste des partoches";
+}
+
+/**
+ * @param SongBookPDF $pdf
+ * @param $version
+ * @param $idSongBook
+ * @param $imageCouverture
+ * @param $intitule
+ * @return int
+ */
+function pageDeCouverture(SongBookPDF $pdf, $version, $idSongBook, $imageCouverture, $intitule): int
+{
+// On fait une couverture avec l'image
+    $pdf->AddPage();
+    $version++;
+    $dateDuJour = date("d/m/Y");
+    // Position at 1.5 cm from bottom
+    $pdf->Image(DATA_SONGBOOKS . $idSongBook . "/" . $imageCouverture, 5, 5, 190, 250);
+    $pdf->SetY(260);
+    $pdf->SetFont(ARIAL, 'B', 10);
+    $pdf->SetTextColor(50, 50, 50);
+    $pdf->Cell(0, 12, $intitule . " - v" . $version . " du " . $dateDuJour, 0, 0, "C");
+    return $version;
+    // TODO : ici on pourrait déterminer le ratio de l'image pour ne pas avoir d'image trop étirée
+}
+
+/**
+ * @param SongBookPDF $pdf
+ * @param $listeNomsChanson
+ * @param $str
+ */
+function ajouteSommaire(SongBookPDF $pdf, $listeNomsChanson, $str): void
+{
+// On crée un sommaire
+    $pdf->AddPage();
+    // Logo
+    $pdf->SetFont(ARIAL, 'B', 20);
+    $pdf->SetTextColor(50, 50, 50);
+
+    $pdf->Cell(30, 10, ' ', 0, 0, "C"); // Centré
+    $pdf->Cell(150, 10, 'Sommaire', 1, 1, "C"); // Centré
+    // $pdf->Cell(10, 10, " ", 0, 1, "L");
+    $pdf->Image( $str , 10, 6, 20);
+
+    // On a une hauteur de 240 à répartir sur la feuille
+    $hauteur_ligne = 240 / (count($listeNomsChanson) + 1);
+    if ($hauteur_ligne > 40) {
+        $hauteur_ligne = 40;
+    }
+
+    $pdf->SetFont(ARIAL, 'B', $hauteur_ligne);
+    // On met une petite ligne vide pour faire de la place
+    $pdf->cell(10, $hauteur_ligne/2, " ", 0, 1, "L");
+    $numeroChanson = 2;
+    foreach ($listeNomsChanson as $nomChanson) {
+        $pdf->Cell(10, $hauteur_ligne, $numeroChanson++ . " - " . utf8_decode($nomChanson), 0, 1, "L");
+    }
+    /// *** FIN SOMMAIRE /////
 }
 
 function make_alias($name)
