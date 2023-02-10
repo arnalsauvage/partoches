@@ -338,10 +338,8 @@ function formulaireChanson(Chanson $_chanson, string $mode): string
         </FORM>
 ";
     if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-        // On verrouille les champs hits, date publication, et utilisateur
-        $sortie = str_replace("name='fdate'", "name='fdate' disabled='disabled' ", $sortie);
+        // On verrouille le champs hits sauf pour l'admin
         $sortie = str_replace("name='fhits'", "name='fhits' disabled='disabled' ", $sortie);
-        $sortie = str_replace("name='fidUser'", "name='fidUser' disabled='disabled' ", $sortie);
     }
     return $sortie;
 }
