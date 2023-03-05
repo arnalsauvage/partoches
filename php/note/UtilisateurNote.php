@@ -78,7 +78,13 @@ class UtilisateurNote
         $result = UtilisateurNote::scoreEtNombreDeVotes($mediaNom, $mediaId);
 
         if ($result['nbrRate']< self::MINIMUM_VOTES) {
-            return ('<div style="font-size: small; color: grey"></div>');
+            $message = match ($result['nbrRate']) {
+                0 => "Pas (encore) de vote ",
+                1 => "1 vote ",
+                default => $result['nbrRate'] . " votes ",
+            };
+                    return ('<div style="font-size: small; color: grey"> '. $message .' </div>');
+
         }
 
         //nombre de pixels à colorier en jaune selon le score atteint
