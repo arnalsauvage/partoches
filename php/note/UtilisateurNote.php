@@ -81,10 +81,9 @@ class UtilisateurNote
             $message = match ($result['nbrRate']) {
                 0 => "Pas (encore) de vote ",
                 1 => "1 vote ",
-                default => $result['nbrRate'] . " votes ",
+                default => $result['nbrRate'] . " vote(s) ",
             };
-                    return ('<div style="font-size: small; color: grey"> '. $message .' </div>');
-
+            return ('<div style="font-size: small; color: grey"> '. $message .' </div>');
         }
 
         //nombre de pixels à colorier en jaune selon le score atteint
