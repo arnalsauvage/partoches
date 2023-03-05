@@ -6,7 +6,7 @@ class UtilisateurNote
 {
     const PX_CCC = 'px,#ccc ';
     const DIV = "</div>";
-    const MINIMUM_VOTES = 7; // Nombre minimum de votes pour afficher la note
+    const MINIMUM_VOTES = 5; // Nombre minimum de votes pour afficher la note
     private  $_id; // id ds BDD
     private $_note; // note de 1 à 5
     private $_idUtilisateur; // identifiant de l'utilisateur

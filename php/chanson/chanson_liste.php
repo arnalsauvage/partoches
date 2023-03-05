@@ -145,7 +145,10 @@ $contenuHtml .= TblEntete("  Pochette  ");
 $contenuHtml .= titreColonne("Nom", "nom");
 $contenuHtml .= titreColonne("Interprète", "interprete");
 if ($largeur_ecran > 700) {
-    $contenuHtml .= titreColonne("  Votes  ", "votes");
+    // Pour les privileges > INVITE, on affiche les colonnes votes et annee
+    if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
+        $contenuHtml .= titreColonne("  Votes  ", "votes");
+     }
     $contenuHtml .= titreColonne("Année", "annee");
 }
 if ($largeur_ecran >1200) {
@@ -208,13 +211,14 @@ foreach ($resultat as $ligne) {
     $url = $_SERVER['REQUEST_URI'];
     $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=interprete&" .  VAL_FILTRE . "=" .urlencode($_chanson->getInterprete())),limiteLongueur($_chanson->getInterprete(),21))); // interprete
     if ($largeur_ecran >700) {
-
-        if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
-            $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
-        } else {
+        if ($_SESSION [PRIVILEGE] >= $GLOBALS["PRIVILEGE_ADMIN"]) {
+         // le résultat des votes est visible pour admin
             $contenuHtml .= TblCellule(UtilisateurNote::starBar(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
         }
-
+        else {
+            if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
+                $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
+            }}
     }
     if ($largeur_ecran >700) {
         $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=annee&" .  VAL_FILTRE . "=" .$_chanson->getAnnee()), $_chanson->getAnnee()),1, 1, CENTRER); // annee
