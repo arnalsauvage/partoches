@@ -208,11 +208,13 @@ foreach ($resultat as $ligne) {
     $url = $_SERVER['REQUEST_URI'];
     $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=interprete&" .  VAL_FILTRE . "=" .urlencode($_chanson->getInterprete())),limiteLongueur($_chanson->getInterprete(),21))); // interprete
     if ($largeur_ecran >700) {
+
         if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
             $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
         } else {
             $contenuHtml .= TblCellule(UtilisateurNote::starBar(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
         }
+
     }
     if ($largeur_ecran >700) {
         $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=annee&" .  VAL_FILTRE . "=" .$_chanson->getAnnee()), $_chanson->getAnnee()),1, 1, CENTRER); // annee

@@ -6,6 +6,7 @@ class UtilisateurNote
 {
     const PX_CCC = 'px,#ccc ';
     const DIV = "</div>";
+    const MINIMUM_VOTES = 7; // Nombre minimum de votes pour afficher la note
     private  $_id; // id ds BDD
     private $_note; // note de 1 à 5
     private $_idUtilisateur; // identifiant de l'utilisateur
@@ -75,6 +76,10 @@ class UtilisateurNote
         $nbrPixelsInDiv = $nombreEtoiles * $largeurEtoiles; // Calcule la largeur du DIV en pixels
 
         $result = UtilisateurNote::scoreEtNombreDeVotes($mediaNom, $mediaId);
+
+        if ($result['nbrRate']< self::MINIMUM_VOTES) {
+            return ('<div style="font-size: small; color: grey"></div>');
+        }
 
         //nombre de pixels à colorier en jaune selon le score atteint
         $numEnlightedPX = round($nbrPixelsInDiv * $result['average'] / $nombreEtoiles, 0);
