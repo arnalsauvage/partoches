@@ -28,6 +28,15 @@ global $iconeEdit;
 global $iconePoubelle;
 global $contenuHtmlCompCherche;
 
+function logueRecherche($critereCherche): void
+{
+    $date = new DateTime();
+    $myfile = fopen("logRecherche.txt", "a");
+    $txt = $date->format('Y-m-d--H-i') . " : " . $critereCherche . "\n";
+    fwrite($myfile, $txt);
+    fclose($myfile);
+}
+
 $contenuHtml = "<div class='container'> \n
   <div class='starter-template'> \n";
 
@@ -82,9 +91,12 @@ if (isset ($_GET [FILTRE])) {
     }
 }
 
+
+
+
 // Gestion paramètres de recherche
 if (isset ($_POST [CHERCHE])) {
-
+    logueRecherche($_POST[CHERCHE]);
     $_SESSION[CHERCHE] = $_POST[CHERCHE];
 } else {
     if (!isset($_SESSION[CHERCHE])) {

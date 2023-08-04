@@ -106,7 +106,7 @@ global $_DOSSIER_CHANSONS;
             ?>
             </a>
             </div>
-			<div class="titres">
+			<div class="titres" style="height: 240px; overflow:hidden">
                 <?php
             $lignes = chercheLiensDocSongbook('idSongbook', $songbook [0], "ordre");
             $listeDocs = "";

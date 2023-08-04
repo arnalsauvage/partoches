@@ -10,17 +10,17 @@ class Chanson
 {
     const D_M_Y = "d/m/Y";
     const MYSQL = 'mysql';
-    private $_id; // identifiant en BDD
-    private $_nom; // titre de la chanson , chaine de caractères
-    private $_interprete; // interprete de reference de la chanson, chaîne de caractères
-    private $_annee; // annee de sortie de la version, entier entre 0 et 2100
-    private $_idUser; // identifiant de l'utilisateur ayant propose la chanson, entier
-    private $_tempo; // bpm principal de la chanson, entier entre 0 et 300 environ
-    private $_mesure; // chaine indiquant la mesure, le plus souvent "4/4" ou "3/4"
-    private $_pulsation; // chaine, indique si les temps se découpent en "binaire" ou "ternaire"
-    private $_datePub; // date de publication de la chanson en chaine de caractères JJ/MM/AAAA
-    private $_hits; // compteur de visites de la chanson, corresponds aux affichages de la page chanson
-    private $_tonalite;
+    private int $_id; // identifiant en BDD
+    private string $_nom; // titre de la chanson , chaine de caractères
+    private string $_interprete; // interprete de reference de la chanson, chaîne de caractères
+    private int $_annee; // annee de sortie de la version, entier entre 0 et 2100
+    private int $_idUser; // identifiant de l'utilisateur ayant propose la chanson, entier
+    private int $_tempo; // bpm principal de la chanson, entier entre 0 et 300 environ
+    private string $_mesure; // chaine indiquant la mesure, le plus souvent "4/4" ou "3/4"
+    private string $_pulsation; // chaine, indique si les temps se découpent en "binaire" ou "ternaire"
+    private string $_datePub; // date de publication de la chanson en chaine de caractères JJ/MM/AAAA
+    private int $_hits; // compteur de visites de la chanson, corresponds aux affichages de la page chanson
+    private string $_tonalite;
     // static $_logger;
 
     // Fonction conseillée pour gérer plusieurs constructeurs
@@ -110,9 +110,11 @@ class Chanson
     /**
      * @param mixed $id
      */
-    public function setId(int $id)
+    public function setId(int $id): void
     {
-        $this->_id = $id;
+        if ($id > 0) {
+            $this->_id = $id;
+        }
     }
 
     /**
@@ -126,7 +128,7 @@ class Chanson
     /**
      * @param mixed $nom
      */
-    public function setNom(string $nom)
+    public function setNom(string $nom) : void
     {
         $this->_nom = $nom;
     }
@@ -158,7 +160,7 @@ class Chanson
     /**
      * @param mixed $annee
      */
-    public function setAnnee(int $annee)
+    public function setAnnee(int $annee): void
     {
         if ($annee > 0) {
             $this->_annee = $annee;
@@ -178,7 +180,9 @@ class Chanson
      */
     public function setIdUser(int $idUser)
     {
+        if ($idUser > 0){
         $this->_idUser = $idUser;
+        }
     }
 
     /**
@@ -192,7 +196,7 @@ class Chanson
     /**
      * @param int $tempo
      */
-    public function setTempo(int $tempo)
+    public function setTempo(int $tempo) : void
     {
         if ($tempo > 0) {
             $this->_tempo = $tempo;
@@ -200,7 +204,7 @@ class Chanson
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getMesure(): string
     {
@@ -216,7 +220,7 @@ class Chanson
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPulsation(): string
     {

@@ -46,18 +46,38 @@ function envoieMailRecup($_email)
         ";
 
     // Pour envoyer un mail HTML, l'en-tête Content-type doit être défini
-    $headers[] = 'MIME-Version: 1.0';
-    $headers[] = 'Content-type: text/html; charset=iso-8859-1';
+    $headers = 'MIME-Version: 1.0';
+    $headers .= 'Content-type: text/html; charset=iso-8859-1';
 
     // En-têtes additionnels
-    $headers[] = 'To: $prenom $nom<' . $_POST['email'] . '>';
-    $headers[] = 'From: Top 5 partoches <hello@top5.re>';
+    $headers .= 'To: $prenom $nom<' . $_POST['email'] . '>';
+    $headers .= 'From: Top 5 partoches <hello@top5.re>';
 
     // Envoi
-    mail($_POST['email'], $sujet, $contenu, implode("\r\n", $headers));
-    echo "sujet : " . $sujet . "<br>";
-    echo "Contenu : " . $contenu . "<br>";
+    $CR_Mail = TRUE;
+    $CR_Mail = mail($_POST['email'], $sujet, $contenu, $headers);
+
+    // Pour le debuggage seulement !!!
+
+    // echo "sujet : " . $sujet . "<br>";
+    // echo "Contenu : " . $contenu . "<br>";
+
+    if ($CR_Mail === FALSE)
+
+    {
+
+        echo " ### CR_Mail=$CR_Mail - Erreur envoi mail <br> \n";
+        return false;
+    }
+
+    else
+
+    {
+
+        echo " *** CR_Mail=$CR_Mail - Mail envoyé<br> \n";
     return true;
+
+    }
 }
 
 if (isset ($_POST ['email'])) {
@@ -80,23 +100,24 @@ if (isset ($_GET ['date']) && isset ($_GET ['compte'])) {
     $date = Chiffrement::decrypt($_GET ['date']);
     $compte = Chiffrement::decrypt($_GET ['compte']);
 
-    if ($date <> date("d/m/Y"))
+    if ($date <> date("d/m/Y")) {
         $reponse = "Votre jeton n'est pas valide, désolé !";
+    }
     //else
     //    $reponse = "date reçue = " . $date;
 
     // echo "email cherché : " . $compte;
     // Si on ne trouve pas le compte en base, on informe de l'erreur
     $resultat = chercheUtilisateurParEmail($compte);
-    if (!$resultat)
+    if (!$resultat) {
         $reponse .= "Email non trouvé dans la base...";
-    else {
+    }    else {
         $_SESSION['id'] = $resultat[0];
         $reponse .= "Bienvenue, " . $resultat[3] . " ! <br>";
         $reponse .= "Il est temps de choisir un nouveau mot de passe !";
         $reponse .= "<body>
     <h1>Top 5 Partoches - oubli de mot de passe (étape 3/4)</h1>
-    <p> Vous pouvez demander un nouveau mot de passe ici :</p>
+    <p> Vous pouvez taper un nouveau mot de passe ici :</p>
 	<FORM action='oubliMotDePasse.php' class='login' method='post'>
 		<label for='nouveauMdp'>Nouveau mdp :</label>
 			<input size='16' id='nouveauMdp' name='nouveauMdp' type='password' value='' placeholder='un mot de passe de qualité'>
@@ -110,7 +131,7 @@ if (isset ($_GET ['date']) && isset ($_GET ['compte'])) {
 
 if (isset ($_POST ['nouveauMdp'])) {
     $url = $_SERVER ['SERVER_ADDR'] . "/chanson_liste.php";
-    $url = "./chanson_liste.php";
+    $url = "../chanson/chanson_liste.php";
     $reponse = "<body>
     <h1>Top 5 Partoches - oubli de mot de passe (étape 4/4)</h1>
     <p> Votre mot de passe a bien été changé : vous pouvez vous reconnecter !</p>
