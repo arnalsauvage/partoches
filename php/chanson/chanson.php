@@ -38,7 +38,7 @@ class Chanson
     // Constructeur par défaut
     public function __construct0()
     {
-        $this->setId(0);
+        $this->_id = 0;
         $this->setNom("");
         $this->setInterprete("");
         $this->setAnnee(1975);

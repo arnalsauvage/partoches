@@ -131,7 +131,7 @@ if ($mode == "MAJ") {
                 function restaureDocument<?php echo $numeroElement;?>() {
                     $.ajax({
                         type: "POST",
-                        url: "<?CHANSON_POST_PHP?>",
+                        url: "<?phpCHANSON_POST_PHP?>",
                         data: "id=<?php echo $id;?>&nomFic=<?php echo $fichierSurDisque[1];?>&mode=RESTAUREDOC",
                         datatype: 'html', // type de la donnée à recevoir
                         success: function (code_html) {
