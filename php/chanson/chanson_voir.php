@@ -193,7 +193,7 @@ function afficheStrums(int $idChanson, int $tempo, bool $ternaire): string
     // Chargement de la liste des strums
     $marequete = "SELECT strum.id, lienstrumchanson.strum, strum.longueur , strum.unite, strum.description , count(*)   
 FROM lienstrumchanson, strum
-where lienstrumchanson.strum  = strum.strum AND lienStrumChanson.idChanson = $idChanson
+where lienstrumchanson.strum  = strum.strum AND lienstrumchanson.idChanson = $idChanson
 GROUP BY lienstrumchanson.strum 
 order by count(*) DESC";
     $_SESSION ['mysql']->query($marequete);

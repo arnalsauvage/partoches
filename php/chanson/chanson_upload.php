@@ -18,7 +18,7 @@ if (!isset ($_FILES [FICHIER_UPLOADE])) {
 }
 
 // TODO : créer un paramètre d'application modifiable par l'admin
-$autorisees = "pdf doc docx gif jpg png swf mp3 odt ppt pptx svg crd txt m4a ogg mscz mid";
+$autorisees = "pdf doc docx gif jpg png swf mp3 mp4 odt ppt pptx svg crd txt m4a ogg mscz mid";
 
 $repertoire = $_DOSSIER_CHANSONS . $_POST ['id'] . "/";
 // echo "répertoire de destination : $repertoire";
