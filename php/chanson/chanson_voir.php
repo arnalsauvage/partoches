@@ -7,16 +7,16 @@ const FIN_SECTION = "</section>";
 global $_DOSSIER_CHANSONS;
 global $iconeEdit;
 global $cheminImages;
-require_once("../lib/utilssi.php");
-require_once("../chanson/chanson.php");
-require_once("../document/document.php");
-require_once("../liens/lienStrumChanson.php");
-require_once("../liens/lienurl.php");
-require_once("../liens/lienurl_voir.php");
-require_once("../navigation/menu.php");
-require_once("../note/UtilisateurNote.php");
-require_once("../songbook/songbook.php");
-require_once("../strum/strum.php");
+require_once "../lib/utilssi.php";
+require_once "../chanson/chanson.php";
+require_once "../document/document.php";
+require_once "../liens/lienStrumChanson.php";
+require_once "../liens/lienurl.php";
+require_once "../liens/lienurl_voir.php";
+require_once "../navigation/menu.php";
+require_once "../note/UtilisateurNote.php";
+require_once "../songbook/songbook.php";
+require_once "../strum/strum.php";
 
 $_strumForm = "strum_form.php";
 $_strumPost = "strum_post.php";
@@ -61,7 +61,8 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
 $contenuHtml .= "</div>" . FIN_DIV;
 
 $contenuHtml .= DIV_CLASS_ROW;
-$contenuHtml .= "<div class='col-sm-11'><h3> " . htmlentities($_chanson->getInterprete())  . " </h3>" . FIN_DIV .  " - <a href='chanson_liste.php?filtre=annee&valFiltre=". $_chanson->getAnnee()."'>" . $_chanson->getAnnee() . "</a>\n";
+$contenuHtml .= "<div class='col-sm-11'><h3> " . htmlentities($_chanson->getInterprete())  . " </h3>" . FIN_DIV .
+    " - <a href='chanson_liste.php?filtre=annee&valFiltre=". $_chanson->getAnnee()."'>" . $_chanson->getAnnee() . "</a>\n";
 $contenuHtml .= FIN_DIV;
 $contenuHtml .= DIV_CLASS_ROW;
 $contenuHtml .= " <div class='col-sm-8'>Tonalité : " . $_chanson->getTonalite() . ", Tempo : " . $_chanson->getTempo();
@@ -69,9 +70,15 @@ $contenuHtml .= ", mesure : " . $_chanson->getMesure() . ", pulsation : " . $_ch
 $contenuHtml .= " Publiée le  :$datePub, par $utilisateur, affichée $hits fois. <br>\n" . FIN_DIV . "\n";
 
 // Propose des recherches sur la chanson
-$contenuHtml .= "<div class='col-sm-4'><a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank'><img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png' alt = 'recherche youtube' width='64'></a>\n";
-$rechercheWikipedia = "https://fr.wikipedia.org/w/index.php?search=" . urlencode(($_chanson->getNom() . " " . $_chanson->getInterprete()));
-$contenuHtml .= "<a href='$rechercheWikipedia' target='_blank'><img src='https://fr.wikipedia.org/static/images/project-logos/frwiki.png' alt='recherche wikipedia' width='64'></a><br>\n" . FIN_DIV . "\n";
+$contenuHtml .= "<div class='col-sm-4'><a href='https://www.youtube.com/results?search_query=" .
+    urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank'>
+<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png'
+    alt = 'recherche youtube' width='64'></a>\n";
+$rechercheWikipedia = "https://fr.wikipedia.org/w/index.php?search=" .
+    urlencode(($_chanson->getNom() . " " . $_chanson->getInterprete()));
+$contenuHtml .= "<a href='$rechercheWikipedia' target='_blank'>
+    <img src='https://fr.wikipedia.org/static/images/project-logos/frwiki.png'
+    alt='recherche wikipedia' width='64'></a><br>\n" . FIN_DIV . "\n";
 $contenuHtml .= FIN_DIV;
 $contenuHtml .= FIN_SECTION;
 $contenuHtml .= "<section class='col-sm-4'>";
@@ -109,7 +116,8 @@ if ($result->num_rows > 0) {
         if (!file_exists(ICONES. $extension . ".png")) {
             $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
         }
-        $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" . htmlentities($fichierSec) . "</a> <br>\n";
+        $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" .
+            htmlentities($fichierSec) . "</a> <br>\n";
         $contenuHtml .= FIN_DIV;
     }
     $contenuHtml .= FIN_SECTION . "\n";
@@ -119,16 +127,25 @@ if ($result->num_rows > 0) {
     $contenuHtml .= "<br><section class='row'>\n";
     $result = chercheDocumentsTableId(CHANSON, $idChanson);
 
-// Pour chaque fichier audio
+// Pour chaque fichier audio ou vidéo
     while ($ligne = $result->fetch_row()) {
         $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
         $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
         $extension = substr(strrchr($ligne [1], '.'), 1);
         if (($extension == "mp3") || ($extension == "m4a")) {
             $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
-            $baliseAudio = htmlentities($fichierSec) . "<br><audio controls='controls'>   <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
+            $baliseAudio = htmlentities($fichierSec) . "<br><audio controls='controls'>
+                <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
             Votre navigateur ne prend pas en charge l'élément <code>audio</code></audio>";
             $contenuHtml .= $baliseAudio . "\n";
+            $contenuHtml .= FIN_DIV;
+        }
+        elseif ($extension == "mp4"){
+            $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
+            $baliseVideo = htmlentities($fichierSec) . "<br><video width='320' controls='controls'>
+            <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='video/ogg'>
+            Votre navigateur ne prend pas en charge l'élément <code>audio</code></video>";
+            $contenuHtml .= $baliseVideo . "\n";
             $contenuHtml .= FIN_DIV;
         }
     }
@@ -191,10 +208,10 @@ function afficheStrums(int $idChanson, int $tempo, bool $ternaire): string
 // Affiche les strums de la chanson
     $_listeDesLiensStrums = chercheLiensStrumChanson("idChanson", $idChanson);
     // Chargement de la liste des strums
-    $marequete = "SELECT strum.id, lienstrumchanson.strum, strum.longueur , strum.unite, strum.description , count(*)   
+    $marequete = "SELECT strum.id, lienstrumchanson.strum, strum.longueur , strum.unite, strum.description , count(*)
 FROM lienstrumchanson, strum
 where lienstrumchanson.strum  = strum.strum AND lienstrumchanson.idChanson = $idChanson
-GROUP BY lienstrumchanson.strum 
+GROUP BY lienstrumchanson.strum
 order by count(*) DESC";
     $_SESSION ['mysql']->query($marequete);
     if ($_listeDesLiensStrums->num_rows > 0) {
