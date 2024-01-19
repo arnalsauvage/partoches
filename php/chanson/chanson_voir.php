@@ -134,10 +134,18 @@ if ($result->num_rows > 0) {
         $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
         $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
         $extension = substr(strrchr($ligne [1], '.'), 1);
-        if (($extension == "mp3") || ($extension == "m4a")) {
+        if (($extension == "mp3") || ($extension == "m4a")|| ($extension == "aac")) {
             $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
             $baliseAudio = htmlentities($fichierSec) . "<br><audio controls='controls'>
-                <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='audio/mp3'>
+                <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='";
+            if ($extension == "aac") {
+                $baliseAudio .= "audio/mpeg";
+            }
+
+            else{
+                $baliseAudio .= "audio/mp3";
+            }
+                $baliseAudio .= "'>
             Votre navigateur ne prend pas en charge l'élément <code>audio</code></audio>";
             $contenuHtml .= $baliseAudio . "\n";
             $contenuHtml .= FIN_DIV;
