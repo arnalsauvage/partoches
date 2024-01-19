@@ -1,0 +1,11 @@
+[general]
+urlSite = localhost/fuck
+loginParam = admin
+EmailAdmin = arnaud@lamedina.net
+niveauDeLog = debug
+cleGetSongBpm = e2768650841b9c491f1fc2ca28fd0006
+[mysql]
+monServeur = localhost
+maBase = partoches
+login = root
+motDePasse = root

@@ -116,7 +116,7 @@ if ($result->num_rows > 0) {
         if (!file_exists(ICONES. $extension . ".png")) {
             $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
         }
-        if ($extension <> "mp3" && $extension <> "m4a" && $extension<> "mp4") {
+        if ($extension <> "mp3" && $extension <> "m4a" && $extension<> "mp4" && $extension <> "aac") {
             $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" .
                 htmlentities($fichierSec) . "</a> <br>\n";
             $contenuHtml .= FIN_DIV;
