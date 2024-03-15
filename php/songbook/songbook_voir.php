@@ -77,6 +77,8 @@ $nbChansons = 0;
 while ($ligne = $lignes->fetch_row()) {
     $ligneDoc = chercheDocument($ligne [1]);
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
+    $maChanson = $listeChansons->recupereChanson($ligneDoc[6]);
+    $idPublicateurChanson = $maChanson->getIdUser();
     $lienChanson = "./chanson_voir.php?id=" . $ligneDoc [6];
     $fichier = RACINE .$_DOSSIER_CHANSONS. "/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
@@ -87,12 +89,11 @@ while ($ligne = $lignes->fetch_row()) {
     }
     $vignetteChanson = Image(RACINE .$_DOSSIER_CHANSONS. "/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
     $vignetteChanson = Ancre($lienChanson,$vignetteChanson);
-    $vignettePublicateur = Image(VIGNETTES . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
+    $vignettePublicateur = Image(VIGNETTES . $tabUsers[$idPublicateurChanson][1], 48, 48, $tabUsers[$idPublicateurChanson][0]);
     $sortie .= $vignettePublicateur . $vignetteChanson . $icone;
     $sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a>";
     $sortie .= " (" . intval($ligneDoc[2] / 1024) . " ko)";
     // echo "chanson " . $ligneDoc[6];
-    $maChanson = $listeChansons->recupereChanson($ligneDoc[6]);
     if ($maChanson != null) {
         $sortie .= " - " . $maChanson->getNom() . " - " . $maChanson->getTonalite() . " - " . $maChanson->getAnnee() . " - " . $maChanson->getTempo() . " bpm";
     }
