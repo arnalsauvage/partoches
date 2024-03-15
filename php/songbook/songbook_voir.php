@@ -79,7 +79,7 @@ while ($ligne = $lignes->fetch_row()) {
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $maChanson = $listeChansons->recupereChanson($ligneDoc[6]);
     $idPublicateurChanson = $maChanson->getIdUser();
-    $lienChanson = "./chanson_voir.php?id=" . $ligneDoc [6];
+    $lienChanson = "../chanson/chanson_voir.php?id=" . $ligneDoc [6];
     $fichier = RACINE .$_DOSSIER_CHANSONS. "/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
     $icone = Image(IMAGES_ICONES . $extension . ".png", 32, 32, "icone");
