@@ -61,19 +61,21 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
 $contenuHtml .= "</div>" . FIN_DIV;
 
 $contenuHtml .= DIV_CLASS_ROW;
+$urlChercheAnChanson = "chanson_liste.php?filtre=annee&valFiltre=". $_chanson->getAnnee()."'>" . $_chanson->getAnnee();
 $contenuHtml .= "<div class='col-sm-11'><h3> " . htmlentities($_chanson->getInterprete())  . " </h3>" . FIN_DIV .
-    " - <a href='chanson_liste.php?filtre=annee&valFiltre=". $_chanson->getAnnee()."'>" . $_chanson->getAnnee() . "</a>\n";
+    " - <a href='" . $urlChercheAnChanson . "</a>\n";
 $contenuHtml .= FIN_DIV;
 $contenuHtml .= DIV_CLASS_ROW;
 $contenuHtml .= " <div class='col-sm-8'>Tonalité : " . $_chanson->getTonalite() . ", Tempo : " . $_chanson->getTempo();
 $contenuHtml .= ", mesure : " . $_chanson->getMesure() . ", pulsation : " . $_chanson->getPulsation() . " <br>\n";
 $contenuHtml .= " Publiée le  :$datePub, par $utilisateur, affichée $hits fois. <br>\n" . FIN_DIV . "\n";
 
+$ICONEWIIKIPEDIA = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/";
+$ICONEWIIKIPEDIA.="YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png";
 // Propose des recherches sur la chanson
 $contenuHtml .= "<div class='col-sm-4'><a href='https://www.youtube.com/results?search_query=" .
     urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank'>
-<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png'
-    alt = 'recherche youtube' width='64'></a>\n";
+<img src='$ICONEWIIKIPEDIA' alt = 'recherche youtube' width='64'></a>\n";
 $rechercheWikipedia = "https://fr.wikipedia.org/w/index.php?search=" .
     urlencode(($_chanson->getNom() . " " . $_chanson->getInterprete()));
 $contenuHtml .= "<a href='$rechercheWikipedia' target='_blank'>
@@ -84,7 +86,8 @@ $contenuHtml .= FIN_SECTION;
 $contenuHtml .= "<section class='col-sm-4'>";
 
 if ("" != $monImage) {
-    $contenuHtml .= Image("../../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $monImage, 200, "", "pochette", "img-thumbnail");
+    $urlImage = "../../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $monImage;
+    $contenuHtml .= Image($urlImage, 200, "", "pochette", "img-thumbnail");
 }
 
 if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
@@ -107,16 +110,16 @@ if ($result->num_rows > 0) {
     /** @noinspection PhpUndefinedMethodInspection */
     /** @noinspection PhpUndefinedMethodInspection */
     while ($ligne = $result->fetch_row()) {
-        $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
         $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
-        // $fichier = "../".$_DOSSIER_CHANSONS" . $idChanson . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
         $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
         $extension = substr(strrchr($ligne [1], '.'), 1);
-        $icone = Image(ICONES. $extension . ".png", 32, 32, "icone");
-        if (!file_exists(ICONES. $extension . ".png")) {
-            $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
-        }
-        if ($extension <> "mp3" && $extension <> "m4a" && $extension<> "mp4" && $extension <> "aac") {
+        if ($extension <> "mp3" && $extension <> "m4a" && $extension <> "mp4" && $extension <> "aac") {
+            $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
+            // $fichier = "../".$_DOSSIER_CHANSONS" . $idChanson . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
+            $icone = Image(ICONES . $extension . ".png", 32, 32, "icone");
+            if (!file_exists(ICONES . $extension . ".png")) {
+                $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+            }
             $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" .
                 htmlentities($fichierSec) . "</a> <br>\n";
             $contenuHtml .= FIN_DIV;
@@ -237,7 +240,8 @@ order by count(*) DESC";
 
             $contenuHtml .= $monStrum->getLongueur() . " " . $monStrum->renvoieUniteEnFrancais(); //  longueur / unité
 
-            $urlDuStrum = $urlBoiteAstrum . "?strum=" . str_replace(" ", "-",$monStrum->getStrum()) . "&tempo=" . $tempo;
+            $urlDuStrum = $urlBoiteAstrum . "?strum=";
+            $urlDuStrum .= str_replace(" ", "-",$monStrum->getStrum()) . "&tempo=" . $tempo;
             if ($ternaire){
                 $urlDuStrum .= "&ternaire=true";
             }
