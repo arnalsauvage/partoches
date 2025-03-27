@@ -20,7 +20,11 @@
     $(document).ajaxSuccess(function (event, xhr, settings) {
         if (settings.url === "../document/documentChercheAjax.php") {
             $("#storage").html("Documents trouvés :  " + xhr.responseText);
-            //alert (xhr.responseText);
+            if ($("#storage").html().indexOf("Documents trouvés :  ") !== -1 && $("#storage").html().indexOf("Aucun document trouvé") === -1) {
+                $("#envoyer").show();
+            } else {
+                $("#envoyer").hide();
+            }
         }
     });
 </script>

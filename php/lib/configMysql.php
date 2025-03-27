@@ -1,10 +1,10 @@
 <?php
-require_once ('../lib/FichierIni.php');
-require_once ('../lib/mysql.php');
+require_once $_SERVER['DOCUMENT_ROOT'].'/php/lib/FichierIni.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/php/lib/mysql.php';
 if (FALSE == isset($configMysql)) {
     $configMysql = TRUE;
 
-    $fichier = "../../conf/params.ini";
+    $fichier = $_SERVER['DOCUMENT_ROOT'] . "/conf/params.ini";
 
     // On lit les données dans le fichier ini
     $ini_objet = new FichierIni ();
@@ -14,6 +14,7 @@ if (FALSE == isset($configMysql)) {
     $mabase = $ini_objet->m_valeur("maBase", "mysql");
     $LOGIN = $ini_objet->m_valeur("login", "mysql");
     $MOTDEPASSE = $ini_objet->m_valeur("motDePasse", "mysql");
+    echo "Tentative de connexion avec $monserveur $mabase $LOGIN $MOTDEPASSE";
 
     $mysqli = new mysqli($monserveur, $LOGIN, $MOTDEPASSE, $mabase);
     if ($mysqli->connect_error) {

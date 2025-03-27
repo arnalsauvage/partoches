@@ -54,7 +54,7 @@ function chercheLienParIdSongbookIdDoc($idSongbook, $idDoc)
         return (0);
 }
 
-// Cherche le nieme lienDocSongbook  d'un Songbooket le renvoie s'il existe
+// Cherche le nieme lienDocSongbook  d'un Songbook et le renvoie s'il existe
 function chercheLienParIdSongbookOrdre($idSongbook, $ordre)
 {
     $maRequete = "SELECT * FROM liendocsongbook WHERE ordre = '$ordre' AND idSongbook = '$idSongbook'";
@@ -222,3 +222,4 @@ function testelienDocSongbook()
 // testelienDocSongbook ();
 // ordonneLiensSongbook(24);
 // TODO ajouter des logs pour tracer l'activité du site
+

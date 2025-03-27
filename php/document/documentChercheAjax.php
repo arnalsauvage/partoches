@@ -111,3 +111,8 @@ echo $sortie;
 if ($nombreItems >= $nombreItemsMax) {
     echo "le nombre de résultats est limité à $nombreItemsMax... Mettre plus de critères !";
 }
+if ($nombreItems == 0) {
+
+    $sortie = "Aucun document trouvé";
+
+}

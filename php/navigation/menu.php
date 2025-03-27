@@ -143,3 +143,4 @@ $contenu .= " </div> <!--/.container --></div><!--/.starter-template -->";
 if (!isset($pasDeMenu) || !$pasDeMenu) {
     echo $contenu . "\n\n";
 }
+

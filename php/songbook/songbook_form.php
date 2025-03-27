@@ -24,6 +24,7 @@ if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_EDITEUR"]) {
         redirection($urlRedirection);
     } else {
         echo "Erreur n°1 dans Songbook_form.php, merci de contacter notre numéro vert.";
+        exit();
     }
 }
 
@@ -87,8 +88,8 @@ $sortie .= $f->fin();
 $sortie .= "</div>\n";
 
 if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-    // On verrouille les champs hits, date publication
-    $sortie = str_replace("NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie);
+    // On verrouille le champ hits, date
+    // $sortie = str_replace("NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie);
     $sortie = str_replace("NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie);
 }
 
@@ -171,12 +172,36 @@ if ($mode == "MAJ") {
         require "../document/documentCherche.php";
         ?>
         <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
-        <input type="submit" value="Envoyer">
+        <input id="envoyer" type="submit" value="Envoyer" style="display: none;">
     </form>
     <button onclick='genereUnPdf()'>Génère le songbook en pdf</button>
 
     <div id="div1"></div>
     <script>
+        // bouton valider masqué par défaut
+        $(document).ready(function () {
+            $("#valider").hide();
+        });
+        // bouton validé montré après une recherche
+        $(document).on("change", "input[type='radio']", function() {
+            if ($("input[type='radio']:checked").length > 0) {
+                $("#valider").show();
+            } else {
+                $("#valider").hide();
+            }
+        });
+        // entrée ayu clavier lance la recherche
+        // Ajoutez l'attribut autofocus à l'élément de recherche
+        $("#nomCherche").attr("autofocus", true);
+
+        // Ajoutez un événement keydown à l'élément de recherche
+        $("#nomCherche").on("keydown", function(event) {
+            if (event.which === 13) { // La touche Entrée a été appuyée
+                $("#btnChercheDocuments").click(); // Déclenche le clic sur le bouton de recherche
+                return false; // Empêche la soumission du formulaire
+            }
+        });
+
         function genereUnPdf() {
             $.ajax({
                 type: "POST",

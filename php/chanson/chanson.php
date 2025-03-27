@@ -1,7 +1,7 @@
 <?php
-require_once "../document/document.php";
-require_once "../lib/utilssi.php";
-require_once "../lib/configMysql.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/document/document.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/utilssi.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
 
 
 // Fonctions de gestion de la chanson
@@ -102,7 +102,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getId() : int
+    public function getId(): int
     {
         return $this->_id;
     }
@@ -120,7 +120,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getNom() : string
+    public function getNom(): string
     {
         return $this->_nom;
     }
@@ -128,7 +128,7 @@ class Chanson
     /**
      * @param mixed $nom
      */
-    public function setNom(string $nom) : void
+    public function setNom(string $nom): void
     {
         $this->_nom = $nom;
     }
@@ -136,7 +136,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getInterprete() : string
+    public function getInterprete(): string
     {
         return $this->_interprete;
     }
@@ -180,8 +180,8 @@ class Chanson
      */
     public function setIdUser(int $idUser)
     {
-        if ($idUser > 0){
-        $this->_idUser = $idUser;
+        if ($idUser > 0) {
+            $this->_idUser = $idUser;
         }
     }
 
@@ -196,7 +196,7 @@ class Chanson
     /**
      * @param int $tempo
      */
-    public function setTempo(int $tempo) : void
+    public function setTempo(int $tempo): void
     {
         if ($tempo > 0) {
             $this->_tempo = $tempo;
@@ -224,10 +224,9 @@ class Chanson
      */
     public function getPulsation(): string
     {
-        if ( is_null($this->_pulsation)) {
+        if (is_null($this->_pulsation)) {
             return "";
-        }
-        else {
+        } else {
             return $this->_pulsation;
         }
     }
@@ -237,13 +236,13 @@ class Chanson
      */
     public function setPulsation(string $pulsation)
     {
-            $this->_pulsation = $pulsation;
+        $this->_pulsation = $pulsation;
     }
 
     /**
      * @return mixed
      */
-    public function getDatePub() : string
+    public function getDatePub(): string
     {
         return $this->_datePub;
     }
@@ -259,7 +258,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getHits() : int
+    public function getHits(): int
     {
         return $this->_hits;
     }
@@ -277,7 +276,7 @@ class Chanson
     /**
      * @return mixed
      */
-    public function getTonalite() : string
+    public function getTonalite(): string
     {
         return $this->_tonalite;
     }
@@ -301,9 +300,9 @@ class Chanson
         // renvoie la ligne sélectionnée : id, nom, interprète, année
         if ($ligne = $result->fetch_row()) {
             $this->mysqlRowVersObjet($ligne);
-            return (1);
+            return 1;
         } else {
-            return (0);
+            return 0;
         }
     }
 
@@ -348,7 +347,7 @@ class Chanson
         if ($this->_id == 0) {
             $this->creeChansonBDD();
             $this->setId($_SESSION [self::MYSQL]->insert_id);
-            return ($this->getId());
+            return $this->getId();
         } else {
             $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
             $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
@@ -450,6 +449,45 @@ class Chanson
         return $retour;
     }
 
+    public static function moteurRecherche($recherche): string
+    {
+        $rechercheNormalisee = self::normalize($recherche);
+        $maRequete = "SELECT id, nom, interprete FROM chanson";
+        $retour = "";
+        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème chercheChanson #2 : " . $_SESSION[self::MYSQL]->error . " Requete : $maRequete");
+        $matches = [];
+        if ($result->num_rows > 0) {
+            // Parcourir les résultats et calculer la distance de Levenshtein
+            while ($row = $result->fetch_assoc()) {
+                $normalized_titre = self::normalize($row["nom"]);
+                $normalized_interprete = self::normalize($row["interprete"]);
+                $distance_titre = levenshtein($rechercheNormalisee, $normalized_titre);
+                $distance_interprete = levenshtein($rechercheNormalisee, $normalized_interprete);
+                // Choisir la plus petite distance entre le titre et l'interprète
+                $distance = min($distance_titre, $distance_interprete);
+                // Stocker la distance avec le résultat
+                $row['distance'] = $distance;
+                $matches[] = $row;
+            }
+        }
+        // Trier les résultats par distance
+        usort($matches, function ($a, $b) {
+            return $a['distance'] <=> $b['distance'];
+        });
+        // Garder seulement les 10 meilleurs résultats
+        $top_matches = array_slice($matches, 0, 10);
+        if (count($top_matches) > 0) {
+            $retour .= "Matches : ";
+            foreach ($top_matches as $row) {
+                $retour .= "Titre: " . $row["nom"] . " - Interprète: " . $row["interprete"] . " - Distance: " . $row['distance'] . "<br>\n";
+            }
+            $retour = $top_matches[0]["nom"];
+        } else {
+            $retour .= "0 résultats";
+        }
+        return $retour;
+    }
+
 // Cherche les chansons sur le titre ou l'interprete, renvoie le tableau des identifiants
     public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true, $champFiltre = "", $valfiltre = ""): array
     {
@@ -461,7 +499,6 @@ class Chanson
             $maRequete .= " WHERE ( nom LIKE '$critere' OR interprete LIKE '$critere' )";
             $_bool_where_defini = true;
         }
-
         if ($champFiltre <> "" && $valfiltre <> "") {
             if (!$_bool_where_defini) {
                 $maRequete .= " WHERE ";
@@ -470,7 +507,6 @@ class Chanson
             }
             if ($champFiltre == "contributeur") {
                 $maRequete .= " iduser =  " . $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
-
             }
             if ($champFiltre == 'tempo' || $champFiltre == 'mesure' || $champFiltre == 'tonalite' || $champFiltre == 'pulsation' || $champFiltre == 'annee' || $champFiltre == 'interprete') {
                 $maRequete .= $champFiltre . " =  '" . $_SESSION[self::MYSQL]->real_escape_string($valfiltre) . "'";
@@ -489,7 +525,6 @@ class Chanson
                 ORDER BY noteUtilisateur.note";
             }
         }
-
         if (!$bTriAscendant) {
             $maRequete .= " DESC";
         } else {
@@ -513,7 +548,6 @@ class Chanson
 //32        	Vergers de l îlot
 //33        	Fête de Printemps
 //33         	Fête de Printemps
-
     public function chercheSongbooksDocuments()
     {
         $maRequete = "SELECT DISTINCT songbook.id, songbook.nom from songbook, liendocsongbook , document ,
@@ -525,8 +559,7 @@ class Chanson
         // Chanson::$_logger->warning(var_dump($result));
         return $result;
     }
-
-
+    
 // Cherche les liens associés à cette chanson
 
     public function chercheLiensChanson()
@@ -540,7 +573,27 @@ class Chanson
         return $result;
     }
 
+// Fonction pour normaliser les chaînes de caractères
+    public
+    static function normalize($string)
+    {
+        echo "Normalize $string ;";
+        $string = strtolower($string); // Convertir en minuscules
+        $string = preg_replace('/[áàâãäå]/u', 'a', $string);
+        $string = preg_replace('/[éèêë]/u', 'e', $string);
+        $string = preg_replace('/[íìîï]/u', 'i', $string);
+        $string = preg_replace('/[óòôõö]/u', 'o', $string);
+        $string = preg_replace('/[úùûü]/u', 'u', $string);
+        $string = preg_replace('/[ýÿ]/u', 'y', $string);
+        $string = preg_replace('/ç/u', 'c', $string);
+        $string = preg_replace('/ñ/u', 'n', $string);
+        $string = preg_replace('/[^a-z0-9\s]/', '', $string); // Supprimer les caractères non-alphanumériques
+        $string = preg_replace('/\s+/', ' ', $string); // Réduire les espaces multiples
+        echo " devient $string ;";
+        return trim($string); // Supprimer les espaces au début et à la fin
+    }
 }
+
 /// TODO fonctions à supprimer
 
 // Cherche les chansons correspondant à un critère
@@ -563,7 +616,7 @@ function chercheChansons($critere, $valeur, $critereTri = 'nom', $bTriAscendant 
 function limiteLongueur($chaine, $tailleMax): string
 {
     if (strlen($chaine) > $tailleMax) {
-        return (mb_substr($chaine, 0, $tailleMax - 4) . "...");
+        return mb_substr($chaine, 0, $tailleMax - 4) . "...";
     } else {
         return $chaine;
     }
