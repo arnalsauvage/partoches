@@ -2,7 +2,7 @@
 require_once("../lib/utilssi.php");
 require_once("../utilisateur/utilisateur.php");
 
-$sortie = envoieHead("Partoches", "../../css/index.css");
+$sortie = envoieHead("Partoches", "../../css/index.css?v=25.3.28");
 $sortie .= "<body>";
 // Si l'utilisateur a demandé la déconnexion, on efface les infos de la session
 if (isset ($_GET ['logoff'])) {

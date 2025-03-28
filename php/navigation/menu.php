@@ -52,7 +52,7 @@ if (isset($_SESSION['login'])&&($_SESSION['login'] == "ko")){
     $_SESSION['login'] = "";
 }
 
-$contenu = envoieHead("Top 5 Partoches", "../../css/index.css");
+$contenu = envoieHead("Top 5 Partoches", "../../css/index.css?v=25.3.28");
 $contenu .= "<body>";
 $contenu .= "<script> if (window.innerWidth !== " . $_SESSION['largeur-fenetre'] . ") {
     const donnees = 'largeur_fenetre=' + window.innerWidth;

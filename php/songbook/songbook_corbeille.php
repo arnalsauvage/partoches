@@ -70,5 +70,5 @@ while (count($fichiersSurDisque) > 0) {
 if ($nbFichiersKO == 0) {
     echo "La corbeille est vide pour ce songbook.\n";
 }
-echo "        	<script src='../../js/chansonForm.js '></script>";
+echo "        	<script src='../../js/chansonForm.js?v=25.3.28'></script>";
 ?>

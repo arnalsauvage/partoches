@@ -2,7 +2,7 @@
 include_once("../lib/utilssi.php");
 include_once("../utilisateur/utilisateur.php");
 
-$sortie = envoieHead("Partoches", "../../css/index.css");
+$sortie = envoieHead("Partoches", "../../css/index.css?v=25.3.28");
 $sortie .= "<body>
     <h1>Top 5 Partoches - oubli de mot de passe (étape 1/4)</h1>
     <p> Vous pouvez demander un nouveau mot de passe ici :</p>

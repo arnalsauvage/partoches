@@ -7,7 +7,7 @@ $nomTable = "utilisateur";
 $utilisateurListe = "utilisateur_liste.php";
 
 // require_once ("params.php");
-$sortie = envoieHead("Menu", "../../css/index.css");
+$sortie = envoieHead("Menu", "../../css/index.css?v=25.3.28");
 $table = "utilisateur";
 entreBalise("Utilisateurs", "H1");
 

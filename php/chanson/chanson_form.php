@@ -8,7 +8,7 @@ const CHANSON_UPLOAD = "chanson_upload.php";
 const CHEMIN_LIEN_URL_POST_PHP = RETOUR_RACINE ."liens/lienurlPost.php";
 const LIENS_LIEN_STRUM_CHANSON_POST_PHP = RETOUR_RACINE . "liens/lienStrumChanson_post.php";
 const CHEMIN_SONGBOOK_FORM = RETOUR_RACINE . "/songbook/songbook_form.php";
-const JS_CHANSON_FORM_JS = RETOUR_RACINE . RETOUR_RACINE . "js/chansonForm.js";
+const JS_CHANSON_FORM_JS = RETOUR_RACINE . RETOUR_RACINE . "js/chansonForm.js?v=25.3.28";
 
 const DIV = "</div>";
 require_once("chanson.php");

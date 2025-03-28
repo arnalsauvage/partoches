@@ -221,11 +221,16 @@ function afficheStrums(int $idChanson, int $tempo, bool $ternaire): string
 // Affiche les strums de la chanson
     $_listeDesLiensStrums = chercheLiensStrumChanson("idChanson", $idChanson);
     // Chargement de la liste des strums
-    $marequete = "SELECT strum.id, lienstrumchanson.strum, strum.longueur , strum.unite, strum.description , count(*)
-FROM lienstrumchanson, strum
-where lienstrumchanson.strum  = strum.strum AND lienstrumchanson.idChanson = $idChanson
-GROUP BY lienstrumchanson.strum
-order by count(*) DESC";
+    $marequete = "SELECT strum.id, 
+        lienstrumchanson.strum, 
+        strum.longueur , 
+        strum.unite, 
+        strum.description 
+FROM lienstrumchanson    JOIN 
+        strum ON lienstrumchanson.strum = strum.strum
+    WHERE 
+        lienstrumchanson.idChanson = $idChanson
+";
     $_SESSION ['mysql']->query($marequete);
     if ($_listeDesLiensStrums->num_rows > 0) {
         $titre = "Strum";

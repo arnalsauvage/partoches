@@ -2,7 +2,7 @@
 include_once("../lib/utilssi.php");
 include_once("../note/UtilisateurNote.php");
 
-echo envoieHead("Partoches", "../../css/index.css") . PHP_EOL;
+echo envoieHead("Partoches", "../../css/index.css?v=25.3.28") . PHP_EOL;
 
 // Display 4 star bar system for 4 different IDs
 echo UtilisateurNote::starBar( "chanson", 5, 10, 25); // 5 stars, Media ID 201, 25px star image
