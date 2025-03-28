@@ -74,7 +74,7 @@ if ($mode == "INS"){
 }
 
 $sortie .= formulaireChanson($_chanson, $mode);
-$sortie .= recherches_sur_chanson($_chanson, $id) . DIV;
+$sortie .= recherchesSurChanson($_chanson, $id) . DIV;
 // Fin Tab 1 chanson
 echo $sortie;
 
@@ -131,7 +131,7 @@ if ($mode == "MAJ") {
                 function restaureDocument<?php echo $numeroElement;?>() {
                     $.ajax({
                         type: "POST",
-                        url: "<?phpCHANSON_POST_PHP?>",
+                        url: "<?php CHANSON_POST_PHP?>",
                         data: "id=<?php echo $id;?>&nomFic=<?php echo $fichierSurDisque[1];?>&mode=RESTAUREDOC",
                         datatype: 'html', // type de la donnée à recevoir
                         success: function (code_html) {
@@ -221,9 +221,16 @@ if ($mode == "MAJ") {
     echo "        	<script src='". JS_CHANSON_FORM_JS ."'></script>";
 ?>
     <script>
-        function envoieFichierDansSongbook(idFichier) {
+        function envoieFichierDansSongbook() {
             // Récupérer l' id du songbook dans la combo
             const idSongbook = $("select[name='idSongbook'] option:selected").val() ;
+            // Récupérer l'idFichier dans le champ caché
+            const idFichier = $("input[id='idDocumentEnvoiSongbook']").val() ;
+            // Vérifier qu'un idSongbook est selectionné
+            if (idSongbook === '') {
+                alert("Veuillez selectionner un songbook!");
+                return;
+            }
             // alert('idSongbook = ' + idSongbook);
             // Appel Ajax
 
@@ -237,7 +244,7 @@ if ($mode == "MAJ") {
                         toastr.success("Le document a été ajouté au songbook ! <br> Le fichier a été raccroché au songbook <br> Vous pouvez raffraîchir la page pour le voir.");
                     else {
                         toastr.warning("Erreur dans l'opération...<br>Le document n'a pas pu être raccroché... :-(");
-                        $("#div1").html("Status : " + statut + ". Retour : " + code_html);
+                        toastr.warning("Status : " + statut + ". Retour : " + code_html);
                     }
                 },
                 error: function (resultat, statut, erreur) {
@@ -344,28 +351,29 @@ function formulaireChanson(Chanson $_chanson, string $mode): string
     return $sortie;
 }
 
+
 function comboAjoutSongbook($listeSongbooks): string
 {
-    $monCombo = " <li class='fichiers'><label class='inline col-sm-4'> * Ajouter au songbook :</label> \n
+    $monCombo = " <li class='fichiers'><label class='inline col-sm-4'> Ajouter au songbook :</label> \n
     <select class='js-example-basic-single' name= 'idSongbook' >";
     foreach ( $listeSongbooks as $songbook)
     {
         $monCombo .= " <option value='".$songbook[0]."'>".$songbook[1]."</option>";
     }
     $monCombo .= "   </select></li> \n";
-    return($monCombo);
+    return $monCombo;
 }
 
 function comboAjoutStrum($listeStrums): string
 {
-    $monCombo = " <br>   <label class='inline col-sm-4'> Ajouter un strum :</label> 
+    $monCombo = " <br>   <label class='inline col-sm-4'> Ajouter un strum :</label>
     <select class='js-example-basic-single'  name= 'strum' >";
     foreach ( $listeStrums as $_strum)
     {
         $monCombo .= " <option id= 'strum". $_strum->getId()."' value='".$_strum->getstrum()."'>".$_strum->getstrum()." - ".$_strum->getdescription() . "</option>";
     }
     $monCombo .= "   </select>";
-    return($monCombo);
+    return $monCombo;
 }
 
 /**
@@ -373,7 +381,7 @@ function comboAjoutStrum($listeStrums): string
  * @param mixed $id
  * @return string
  */
-function recherches_sur_chanson(Chanson $_chanson, int $id): string
+function recherchesSurChanson(Chanson $_chanson, int $id): string
 {
     $urlCherche = CHANSON_CHERCHER . ".php" ."?chanson=" . urlencode($_chanson->getNom()) . "&artiste=" . urlencode($_chanson->getInterprete());
     $urlCherche .= "&idChanson=$id";
@@ -419,7 +427,7 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
         if (!file_exists("../../images/icones/$extension.png")) {
             $icone = Image("../../images/icones/fichier.png", 32, 32, "icone");
         }
-        $listeDocs .= "<li class='fichiers'> 
+        $listeDocs .= "<li class='fichiers'>
                             <div> <a href= '" . $fichier . "' target='_blank'> $icone </a> ";
         // pour debug   $listeDocs .= "Id chanson : $id  id doc : " . $ligneDoc[0] . "fichier court : $fichierCourt <br>";
                 $listeDocs .= "<label class='doc'>" . htmlentities($fichierCourt) . "</label>";
@@ -431,11 +439,49 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
                                     $listeDocs .= boutonSuppression(CHANSON_POST_PHP . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
                                 }
                                 // pour debug $listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
-                                $listeDocs .= "<button onclick=envoieFichierDansSongbook(" . $ligneDoc[0] . ") >ajouter au songbook</button>";
+                                $listeDocs .= "<button onclick=openModaleAjoutAuSongbook(" . $ligneDoc[0] . ") >ajouter au songbook</button>";
+                                $listeDocs .= "<button onclick=openModaleNouvelleVersionDocument(" . $ligneDoc[0] .  ")>Envoyer une nouvelle version</button>
+
+";
+
+        ";
+                            </li>";
                 $listeDocs .= DIV;
         $listeDocs .= "</li>";
     }
+    $listeDocs .= "
+    <!-- Modal -->
+
+<div id='myModalEnvoieNouvelleVersion' class='modal' style='display:none;'>
+
+    <div class='modal-content'>
+        <span class='close' onclick='closeModaleNouvelleVersionDocument()'>&times;</span>
+        <h2>Envoyer une nouvelle version</h2>
+        <form action='chanson_upload.php' method='post' enctype='multipart/form-data'>
+            <input type='hidden' name='id' value='$id'>
+            <input type='hidden' id='oldFile' name='oldFile' value=''>
+            <label for='newFile'>Nouvelle version : </label>
+            <input type='file' id='newFile' name='fichierUploade' size='40'>
+            <input type='submit' value='Envoyer'>
+        </form>
+    </div>
+</div>
+<div id='myModalAjouterAuSongbook' class='modal' style='display:;'>
+
+    <div class='modal-content'>
+        <span class='close' onclick='closeModaleAjouterAuSongbook()'>&times;</span>
+        <h2>Ajoute ce document à un Songbook</h2>
+        <form >
+        <input type='hidden' id='idDocumentEnvoiSongbook' value='$id'>";
+
     $listeDocs .= comboAjoutSongbook($listeSongbooks);
+    $listeDocs .= "
+            <input type='button' value='Envoyer' onclick='envoieFichierDansSongbook()'>
+        </form>
+    </div>
+</div>
+";
+
     echo $listeDocs;
 
     $formulaireEnvoiFichier = "</ul>
@@ -496,7 +542,7 @@ function afficheLiensChanson(int $id): void
     echo "
         <form>
             <div id='lien$id'>
-                <span id='msgLien$id'> </span>    
+                <span id='msgLien$id'> </span>
                 <label for='lienType0'>Type de lien :</label>
                 <input size='128' id='lienType0' name='type' value='' placeholder='video ou article'>
                 <label for='lienDescription0'>Description  :</label>
@@ -507,11 +553,11 @@ function afficheLiensChanson(int $id): void
                 <input size='255' id='date0' name='date' value='' placeholder='au format JJ/MM/AAAA' >
                 <label for='idUser0'>Utilisateur :</label>";
     echo selectUtilisateur("nom", "%", "login", true, 0, "utilisateur", "idUser0");
-    echo "  
+    echo "
                 <label for='hits0'>Hits :</label>
-                <input size='255' id='hits0' name='hits' value='' placeholder='17' >          
+                <input size='255' id='hits0' name='hits' value='' placeholder='17' >
                 <button type='button' name='createLien' onclick=\"updateLienurl('NEW',0,'chanson', $id) \">créer</button>
-             </div>     
+             </div>
               ";
     echo "<br>";
 // Fin 4eme tab Liens
@@ -532,37 +578,37 @@ function afficheLiensChanson(int $id): void
         echo "
             <div id='divlienUrl$idLien'>
                 <div>
-                    <label for='lienType$idLien'>Type de lien :</label>   
+                    <label for='lienType$idLien'>Type de lien :</label>
                     <input size='255' id='lienType$idLien' name='type' value='" . htmlentities($type) . "' placeholder='video ou article'><br>
-                </div>           
+                </div>
                 <div>
                     <label for='lienDescription$idLien'>Description  :</label>
                     <textarea id='lienDescription$idLien' name='description' placeholder='description'>" . htmlentities($description) . " </textarea> <br>
-                </div>  
-                <div> 
+                </div>
+                <div>
                     <label for='lienUrl$idLien'>Url  :</label>
                     <input size='255' id='lienUrl$idLien' name='url' value='" . htmlentities($url) . "' placeholder='http://youtu.be/3456' >
                 </div>
-                            <div>    
+                            <div>
                     <label for='date$idLien'>Date :</label>
                     <input size='255' id='date$idLien' name='date' value='$date' placeholder='au format JJ/MM/AAAA' >
                 </div>
-                <div>    
+                <div>
                     <label for='idUser$idLien'>Utilisateur :</label>";
         echo selectUtilisateur("nom", "%", "login", true, $idUserLien, "utilisateur", "idUser" . $idLien);
         echo "  </div>
-                <div>    
+                <div>
                     <label for='hits$idLien'>Hits :</label>
                     <input size='255' id='hits$idLien' name='hits' value='$hits' placeholder='17' >
                 </div>
                 <div>
                     <button type='button' name='updateLien$idLien' onclick=\"updateLienurl('UPDATE',$idLien,'chanson', $id) \">modifier</button>
                     <button type='button' name='deleteLien$idLien' onclick=\"updateLienurl('DEL',$idLien) \">supprimer</button>
-               </div> 
+               </div>
            </div>
         ";
     }
     echo "</form>
 </div>";
 }
-?>
+

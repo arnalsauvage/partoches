@@ -9,9 +9,8 @@ $("label.doc").click(function () {
 
 $("button[name='renommer']").click(function () {
     $('h2').css('background', getRandomColor());
-    nouveauNom = $(this).parent().children("input").val();
-    id = $(this).parent().children("input").attr("id");
-    //alert("id : " + id);
+    let nouveauNom = $(this).parent().children("input").val();
+    const id = $(this).parent().children("input").attr("id");
     $(this).parent().children("label").text(nouveauNom);
     alert("nouveau nom : " + encodeURI(nouveauNom) + " \n idDoc : " + id );
     $.ajax({
@@ -53,9 +52,9 @@ function masqueSaisie(monThis) {
 
 // Pour le débogage, un changement de couleur
 function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
@@ -68,3 +67,25 @@ function setRandomColor() {
 $(document).ready(function() {
     $('.js-example-basic-single').select2();
 });
+
+// Gestion de la modale "envoyer une nouvelle version"
+
+function openModaleNouvelleVersionDocument(fileId) {
+    document.getElementById('myModalEnvoieNouvelleVersion' ).style.display = 'block';
+    document.getElementById('oldFile' ).value = fileId;
+}
+
+function closeModaleNouvelleVersionDocument() {
+    document.getElementById('myModalEnvoieNouvelleVersion').style.display = 'none';
+}
+
+// Gestion de la modale "envoyer une nouvelle version"
+
+function openModaleAjoutAuSongbook(fileId) {
+    document.getElementById('myModalAjouterAuSongbook' ).style.display = 'block';
+    document.getElementById('idDocumentEnvoiSongbook' ).value = fileId;
+}
+
+function closeModaleAjouterAuSongbook() {
+    document.getElementById('myModalAjouterAuSongbook').style.display = 'none';
+}

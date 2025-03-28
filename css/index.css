@@ -232,3 +232,41 @@ span.selected {
 	border: 5px;
 	border-radius :22px;
 }
+
+
+/*// Style pour la modale*/
+
+.modal {
+	display: none; /* Masqué par défaut */
+	position: fixed; /* Reste en place */
+	z-index: 1; /* Au-dessus des autres éléments */
+	left: 0;
+	top: 0;
+	width: 100%; /* Largeur complète */
+	height: 100%; /* Hauteur complète */
+	overflow: auto; /* Ajoute un défilement si nécessaire */
+	background-color: rgb(0,0,0); /* Couleur de fond */
+	background-color: rgba(0,0,0,0.68); /* Couleur de fond avec transparence */
+}
+
+.modal-content {
+	background-color: #fefefe;
+	margin: 15% auto; /* 15% du haut et centré */
+	padding: 20px;
+	border: 1px solid #888;
+	width: 66%; /* Largeur du modal */
+}
+
+.close {
+	color: #FF0000; /* Couleur de la croix */
+	float: right; /* Aligne à droite */
+	font-size: 56px; /* Taille de la croix */
+	font-weight: bold; /* Gras */
+}
+
+.close:hover,
+.close:focus {
+	color: black; /* Change la couleur au survol */
+	text-decoration: none; /* Pas de soulignement */
+	cursor: pointer; /* Curseur en forme de main */
+}
