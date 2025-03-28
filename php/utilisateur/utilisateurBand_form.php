@@ -63,7 +63,7 @@ order by votes DESC";
         die ("Problème utilisateursBand #1 : " . $_SESSION ['mysql']->error);
     }
 // Affichage de la liste de selection des utilisateurs
-    $affichage .= ">";
+    $affichage .= "<form action=\"utilisateurBand_form.php\" method=\"post\" enctype=\"multipart/form-data\">";
     $numligne = 0;
     while ($ligne = $resultat->fetch_row()) {
         $numligne++;
