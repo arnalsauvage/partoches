@@ -14,7 +14,6 @@ if (FALSE == isset($configMysql)) {
     $mabase = $ini_objet->m_valeur("maBase", "mysql");
     $LOGIN = $ini_objet->m_valeur("login", "mysql");
     $MOTDEPASSE = $ini_objet->m_valeur("motDePasse", "mysql");
-    echo "Tentative de connexion avec $monserveur $mabase $LOGIN $MOTDEPASSE";
 
     $mysqli = new mysqli($monserveur, $LOGIN, $MOTDEPASSE, $mabase);
     if ($mysqli->connect_error) {
@@ -38,4 +37,19 @@ function convertitDateJJMMAAAAversMySql($date)
     $new_date = $date[2] . '-' . $date[1] . '-' . $date[0];
     // echo " , New date : " . $new_date . "<br>";
     return $new_date;
+}
+
+function convertitDateMySqlVersJJMMAAAA($date)
+{
+    // On vérifie que la date est au format MySQL : "AAAA-MM-JJ"
+    $date = explode('-', $date);
+
+    // On s'assure qu'on a bien trois éléments
+    if (count($date) === 3) {
+        $new_date = $date[2] . '/' . $date[1] . '/' . $date[0];
+        return $new_date;
+    } else {
+        // Gérer le cas où la date n'est pas au format attendu
+        return null; // ou une exception, selon vos besoins
+    }
 }
