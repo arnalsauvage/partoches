@@ -211,4 +211,10 @@ class MediaTest extends TestCase
         // $this->assertStringContainsString("Le média existe déjà.", $output);
     }
 
+    public function testAjouteNdernieresPartoches(){
+        // Créer une instance de Media
+        $media = new Media();
+        $media->chercheNdernieresPartoches();
+    }
+
 }

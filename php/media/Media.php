@@ -338,6 +338,24 @@ class Media
         return $retour;
     }
 
+    function chercheNdernieresPartoches($nombrePartoches=20){
+        $compteur =0;
+        // lance la requete cherche documents avec tableNom = chanson
+        $documents = chercheDocuments("nomTable", "chanson", "date", false);
+        while ($compteur <$nombrePartoches){
+            $document = $documents->fetch_row();
+// if document[1] contient "pdf"
+
+            if (str_ends_with($document[1],".pdf")){
+             $this->ajoutePartoche($document[0]);
+             // TODO n'ajouter le media qu =e s'il n'existe pas déjà !
+
+             $compteur++;
+            echo "ajoute partoche $compteur";
+            }
+        }
+    }
+
     public function transformePartocheEnMedia( $idDocPartoche): void
     {
         // partant de l'id du document de partoche, on cherche la chanson
