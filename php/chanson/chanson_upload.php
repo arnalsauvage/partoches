@@ -122,3 +122,4 @@ function handleFileUpload()
 
 // Appel de la fonction principale
 handleFileUpload();
+header('Location: ./chanson_form.php?id=' . $_POST ['id']);
