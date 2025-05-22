@@ -1,0 +1,51 @@
+body {
+    text-align: center;
+}
+
+h1 {
+    font-family: Rockwell, Georgia, sans-serif;
+    text-transform: uppercase;
+    display: inline-block;
+    background: #FF5252;
+    padding: 0 .5em;
+    max-width: 60%;
+    position: relative;
+    box-sizing: border-box;
+    font-size: 2em;
+    color: #ffffff;
+    margin-top: 4vh;
+    letter-spacing: .1em;
+}
+
+@media all and (min-width:600px) {
+    h1 {
+        font-size: 3vw;
+    }
+}
+
+.aide {
+    font-size: 1vw;
+}
+
+.logo {
+    height: 6vw;
+    margin: 10px;
+}
+
+.bouton {
+    height: 4vw;
+    margin: 4vw;
+}
+
+.imageFleche {
+    height: 16vh;
+    margin: 10px;
+}
+
+footer {
+    color: #cf3030;
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    left: 0;
+    text-align: center;
+    font-size: 12px;
+}
