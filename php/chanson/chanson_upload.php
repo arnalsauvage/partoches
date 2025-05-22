@@ -70,7 +70,7 @@ function handleFileUpload()
     }
 
     // Paramètres d'application
-    $allowedExtensions = "pdf doc docx gif jpg png swf mp3 mp4 aac odt ppt pptx svg crd txt m4a ogg mscz mid";
+    $allowedExtensions = "pdf doc docx gif jpg png swf mp3 mp4 aac odt ppt pptx svg crd txt m4a ogg mscz mid xls xlsx";
     $repertoire = $_DOSSIER_CHANSONS . $_POST['id'] . "/";
     createDirectoryIfNotExists($repertoire);
 
