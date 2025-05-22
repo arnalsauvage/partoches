@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>La Boîte A Strum</title>
+    <link href="css/main.css" rel="stylesheet">
+    <script src="js/soundjs.min.js"></script>
+    <script src="js/preloadjs.min.js"></script>
+    <script src="js/easeljs.min.js"></script>
+    <script src="js/comp/chargementMedias.js"></script>
+    <script src="js/logger.js"></script>
+    <script src="js/basGraphique.js"></script>
+    <script src="js/basSonore.js"></script>
+    <script src="js/strum.js"></script>
+    <script src="js/main.js"></script>
+</head>
+
+<body onload="init()">
+<header>
+    <img src="medias/img/boiteAstrum.png" id="logo" class="logo" alt="logo la boite à strum">
+</header>
+<h1>La Boîte à Strum</h1>
+<div>
+    <label for='strumVersionTexte'> Tape ton strum ici :</label>
+    <input type="text" id="strumVersionTexte" value="B BH HBH" onKeyUp="majTexteStrum();">
+    <p id="mesure">4 temps </p>
+    <p class="aide">Pour saisir un strum, entrer des B (pour bas), des H (pour haut), des espaces ou des tirets (pour des silences)
+        <br>on pourra mettre une majuscule pour un strum fort, et une minuscule pour un strum moins fort.
+        <br> Le texte sous la boîte de saisie indique combien de temps et de mesures sont saisis...
+        <br> Normalement, un strum est sur une ou deux mesures...
+        <br> Pour l'instant, on considère qu'une mesure est forcément à 4 temps !
+    </p>
+    <div>
+        <img id="b1" src="medias/img/flecheBasForce0.png"  alt="" class="imageFleche">
+        <img id="h1" src="medias/img/flecheHautForce0.png" alt="" class="imageFleche">
+        <img id="b2" src="medias/img/flecheBasForce0.png"  alt="" class="imageFleche">
+        <img id="h2" src="medias/img/flecheHautForce0.png" alt="" class="imageFleche">
+        <img id="b3" src="medias/img/flecheBasForce0.png"  alt="" class="imageFleche">
+        <img id="h3" src="medias/img/flecheHautForce0.png" alt="" class="imageFleche">
+        <img id="b4" src="medias/img/flecheBasForce0.png"  alt="" class="imageFleche">
+        <img id="h4" src="medias/img/flecheHautForce0.png" alt="" class="imageFleche">
+        <img id="b5" src="medias/img/flecheBasForce0.png"  alt="" class="imageFleche">
+        <img id="h5" src="medias/img/flecheHautForce0.png" alt="" class="imageFleche">
+        <img id="b6" src="medias/img/flecheBasForce0.png"  alt="" class="imageFleche">
+        <img id="h6" src="medias/img/flecheHautForce0.png" alt="" class="imageFleche">
+        <img id="b7" src="medias/img/flecheBasForce0.png"  alt="" class="imageFleche">
+        <img id="h7" src="medias/img/flecheHautForce0.png" alt="" class="imageFleche">
+        <img id="b8" src="medias/img/flecheBasForce0.png"  alt="" class="imageFleche">
+        <img id="h8" src="medias/img/flecheHautForce0.png" alt="" class="imageFleche">
+    </div>
+    <script>
+        function outputUpdate(identifiant, valeur) {
+            document.getElementById(identifiant).value = valeur;
+        }
+    </script>
+    <div class="col-sm-5">
+        <label for="ternaire">Ternaire</label>
+        <input type="checkbox" onclick="clickSurPause();" id="ternaire">
+        <label class="inline col-sm-3" for="faderTempo">Tempo :</label>
+        <input type="range" id="faderTempo" min="30" max="250" step="1" oninput="outputUpdate('tempo',value);tempo=value;clickSurPlay();" name="ftempo" value="120">
+        <output class="inline col-sm-2" for="fader" id="tempo">120</output>
+        <div style="display:none">
+            <input type="checkbox" id="metronome" name="metronome" checked>
+            <br>
+            <label class="inline col-sm-3 " for="faderVolume">Volume :</label>
+            <input type="range" id="faderVolume" min="0" max="100" step="1" oninput="outputUpdate( 'volume', value) " name="fvolume" value="90" >
+            <output class="inline col-sm-2 " for="fader" id="volume">90</output>
+        </div>
+    </div>
+    <img alt="jouer le strum " src="medias/img/boutonPlay.png " class="bouton " onclick='clickSurPlay();'>
+    <img alt="mettre le strum en pause " src="medias/img/boutonPause.png " class="bouton imageFleche" onclick="clickSurPause();" >
+</div>
+<!-- <canvas width="800 " height="450 " id="monCanvas "></canvas> -->
+<footer>un outil pédagogique pour le strum codé par Arnal</footer>
+</body>
+</html>
