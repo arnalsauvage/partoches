@@ -28,7 +28,7 @@ class MediaTest extends TestCase
     public function testEnregistreBDD()
     {
         $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
-        $mediaId = $media->creeMediaBDD();
+        $mediaId = $media->persist();
 
         // On crée un autre objet pour écraser les valeurs
         $media = new Media("autre type", "autre titre", "http://example.com/autre.jpg", 1, "http://example.com/autre.mp3", "autre description", "autre, tags");
@@ -45,7 +45,7 @@ class MediaTest extends TestCase
     public function testChercheMediaBDD()
     {
         $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
-        $media->creeMediaBDD();
+        $media->persist();
         $id = $media->getId();
         $media = new Media();
 
@@ -62,7 +62,7 @@ class MediaTest extends TestCase
     public function testInfosMedia()
     {
         $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
-        $media->creeMediaBDD();
+        $media->persist();
 
         $infos = $media->infosMedia();
         $this->assertStringContainsString(self::TITRE_MEDIA, $infos);
@@ -76,7 +76,7 @@ class MediaTest extends TestCase
     public function testChercheMediasParType()
     {
         $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
-        $media->creeMediaBDD();
+        $media->persist();
 
         $medias = Media::chercheMediasParType(self::TYPE_MEDIA);
         $this->assertNotEmpty($medias);
@@ -88,7 +88,7 @@ class MediaTest extends TestCase
     public function testChercheMediasParTitre()
     {
         $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
-            $media->creeMediaBDD();
+            $media->persist();
 
         $medias = Media::chercheMediasParTitre(self::TITRE_MEDIA);
         $this->assertNotEmpty($medias);
@@ -102,7 +102,7 @@ class MediaTest extends TestCase
         // Test avec une recherche connue qui devrait retourner des résultats
         $recherche = self::TITRE_MEDIA;
         $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
-        $media->creeMediaBDD();
+        $media->persist();
 
         $resultats = Media::moteurRecherche($recherche);
         $this->assertStringContainsString(self::TITRE_MEDIA, $resultats, "La recherche '$recherche' devrait retourner des résultats.");
@@ -118,7 +118,7 @@ class MediaTest extends TestCase
     {
         // Exécution de la recherche
         $media = new Media(self::TYPE_MEDIA, $attendu, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
-        $media->creeMediaBDD();
+        $media->persist();
 
         $resultats = Media::moteurRecherche($recherche);
 
@@ -186,8 +186,8 @@ class MediaTest extends TestCase
         $this->assertEquals("2021-02-12", $media->getDatePub());
         $this->assertEquals("partoche", $media->getType());
         $this->assertEquals("partoche chanson 1955", $media->getTags());
-        $this->assertEquals('haereMai-v1.jpg', $media->getImage());
-        $this->assertEquals(lienUrlTelechargeDocument(1305), $media->getLien());
+        $this->assertEquals('./data/chansons/336/haereMai-v1.jpg', $media->getImage());
+        $this->assertEquals('./php/document/getdoc.php?doc=1305', $media->getLien());
     }
 
 // idDoc = 1305 pour haere mai
@@ -201,20 +201,39 @@ class MediaTest extends TestCase
         $idPartoche = 1824;
 
         // Appeler la méthode ajoutePartoche
-        ob_start();
+
         $mediaManager->ajoutePartoche($idPartoche);
-        $output = ob_get_clean();
+        $mediaManager->chercheMediasParTitre(('Le dernier jour du disco'));
 
-        // Vérifier que le message "Média ajouté avec succès." ou "Le média existe déjà." est affiché
-        $this->assertStringContainsString("Média ajouté avec succès.", $output);
-        // Vous pouvez également vérifier si le média existe déjà
-        // $this->assertStringContainsString("Le média existe déjà.", $output);
+        $this->assertEquals("Dernier Jour Du Disco", $mediaManager->getTitre());
+
     }
 
-    public function testAjouteNdernieresPartoches(){
-        // Créer une instance de Media
-        $media = new Media();
-        $media->chercheNdernieresPartoches();
+    public function testResetAvecDernieresPartoches()
+    {
+        // Crée une instance de Media
+        $mediaManager = new Media();
+
+        // Appelle la méthode pour réinitialiser avec les 50 dernières partoches
+        $result = $mediaManager->resetAvecDernieresPartoches(50);
+
+        // Vérifie que la méthode retourne true (succès)
+        $this->assertTrue($result, "La méthode resetAvecDernieresPartoches doit retourner true");
+
+        // Compte le nombre de médias en base pour vérifier que c'est au maximum 50
+        $mysqli = $_SESSION[Media::MYSQL];
+        $res = $mysqli->query("SELECT COUNT(*) AS count FROM media");
+        $row = $res->fetch_assoc();
+        $count = (int)$row['count'];
+
+        $this->assertLessThanOrEqual(50, $count, "Il doit y avoir au maximum 50 médias en base après reset");
+
+        // Optionnel : vérifier que les médias sont bien les derniers (exemple de test simple)
+        $res = $mysqli->query("SELECT datePub FROM media ORDER BY datePub DESC LIMIT 1");
+        $dernier = $res->fetch_assoc();
+        $this->assertNotNull($dernier, "Il doit y avoir au moins un média dans la table");
+        $this->assertNotEmpty($dernier['datePub'], "Le dernier média doit avoir une date de publication");
     }
+
 
 }

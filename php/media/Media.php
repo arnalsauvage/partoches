@@ -1,6 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . "/php/document/document.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/php/chanson/chanson.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/utilisateur/utilisateur.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/utilssi.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
 
@@ -172,38 +173,36 @@ class Media
     }
 
     // Méthode pour créer ou modifier un média en BDD
-    public function creeModifieMediaBDD()
+    public function persist()
     {
-        if ($this->_id == 0) {
-            $this->creeMediaBDD();
-            $this->setId($_SESSION[self::MYSQL]->insert_id);
-            return $this->getId();
+        $idExistant = self::verifieExistenceMedia($this->_lien);
+        if ($idExistant !== null) {
+            $this->setId($idExistant);
+            return $this->modifieMediaBDD();
         } else {
-            $this->_titre = $_SESSION[self::MYSQL]->real_escape_string($this->_titre);
-            $this->_image = $_SESSION[self::MYSQL]->real_escape_string($this->_image);
-            $this->_lien = $_SESSION[self::MYSQL]->real_escape_string($this->_lien);
-            $this->_description = $_SESSION[self::MYSQL]->real_escape_string($this->_description);
-            $this->_tags = $_SESSION[self::MYSQL]->real_escape_string($this->_tags);
-            $maRequete = sprintf("UPDATE media SET type = '%s', titre = '%s', image = '%s', auteur = %s, 
-            lien = '%s', description = '%s', tags = '%s', datePub = '%s', hits = '%s' WHERE id = '%s'",
-                $this->_type,
-                $this->_titre,
-                $this->_image,
-                $this->_auteur,
-                $this->_lien,
-                $this->_description,
-                $this->_tags,
-                $this->_datePub,
-                $this->_hits,
-                $this->_id);
-            $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans creeModifieMediaBDD : " . $_SESSION[self::MYSQL]->error);
-            return $this->_id;
+            return $this->creeMediaBDD();
         }
     }
 
-    // Crée un média et renvoie l'id du média créé
-    public function creeMediaBDD()
+    private static function verifieExistenceMedia(string $lienurl): ?int
     {
+        $lienurl = $_SESSION[self::MYSQL]->real_escape_string($lienurl);
+        $requete = "SELECT id FROM media WHERE lien = '$lienurl' LIMIT 1";
+        $result = $_SESSION[self::MYSQL]->query($requete);
+
+        if ($result && $row = $result->fetch_assoc()) {
+            return (int) $row['id'];
+        }
+        return null;
+    }
+
+    // Crée un média et renvoie l'id du média créé
+    private function creeMediaBDD()
+    {
+        // Conversion de la date au format MySQL avant l'insertion
+        // Bug ? Doublon ?
+        $this->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
+
         $this->_titre = $_SESSION[self::MYSQL]->real_escape_string($this->_titre);
         $this->_image = $_SESSION[self::MYSQL]->real_escape_string($this->_image);
         $this->_lien = $_SESSION[self::MYSQL]->real_escape_string($this->_lien);
@@ -220,10 +219,43 @@ class Media
             $this->_tags,
             $this->_datePub,
             $this->_hits);
-        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans creeMediaBDD : " . $_SESSION[self::MYSQL]->error);
+
+        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans persist : " . $_SESSION[self::MYSQL]->error);
+
         $this->setId($_SESSION[self::MYSQL]->insert_id);
         return $this->getId();
     }
+
+    private function modifieMediaBDD()
+    {
+        // Échappement des chaînes
+        $this->_titre = $_SESSION[self::MYSQL]->real_escape_string($this->_titre);
+        $this->_image = $_SESSION[self::MYSQL]->real_escape_string($this->_image);
+        $this->_lien = $_SESSION[self::MYSQL]->real_escape_string($this->_lien);
+        $this->_description = $_SESSION[self::MYSQL]->real_escape_string($this->_description);
+        $this->_tags = $_SESSION[self::MYSQL]->real_escape_string($this->_tags);
+
+        $id = (int) $this->getId();
+
+        $maRequete = sprintf(
+            "UPDATE media SET type='%s', titre='%s', image='%s', auteur='%s', lien='%s', description='%s', tags='%s', datePub='%s', hits='%s' WHERE id=%d",
+            $this->_type,
+            $this->_titre,
+            $this->_image,
+            $this->_auteur,
+            $this->_lien,
+            $this->_description,
+            $this->_tags,
+            $this->_datePub,
+            $this->_hits,
+            $id
+        );
+
+        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans modifieMediaBDD : " . $_SESSION[self::MYSQL]->error);
+
+        return $result; // true si ok, false sinon
+    }
+
 
     // Supprime un média si il existe
     public function supprimeMediaBDD()
@@ -338,20 +370,17 @@ class Media
         return $retour;
     }
 
-    function chercheNdernieresPartoches($nombrePartoches=20){
+    public function chercheNdernieresPartoches($nombrePartoches=100){
         $compteur =0;
         // lance la requete cherche documents avec tableNom = chanson
         $documents = chercheDocuments("nomTable", "chanson", "date", false);
         while ($compteur <$nombrePartoches){
             $document = $documents->fetch_row();
-// if document[1] contient "pdf"
-
+            // On ne garde que les documents de type partoche
             if (str_ends_with($document[1],".pdf")){
              $this->ajoutePartoche($document[0]);
              // TODO n'ajouter le media qu =e s'il n'existe pas déjà !
-
              $compteur++;
-            echo "ajoute partoche $compteur";
             }
         }
     }
@@ -380,8 +409,55 @@ class Media
     {
             // Transformer la partoche en média
             $this->transformePartocheEnMedia($idPartoche); // Méthode fictive pour transformer
-            $this->creeMediaBDD(); // Utilisation de la méthode existante pour créer le média
+            $this->persist(); // Utilisation de la méthode existante pour créer le média
+    }
+
+    public function resetAvecDernieresPartoches(int $nb = 50)
+    {
+        // Suppression de toutes les entrées
+        $deleteQuery = "DELETE FROM media";
+        $resultDelete = $_SESSION[self::MYSQL]->query($deleteQuery);
+        if (!$resultDelete) {
+            die("Erreur lors de la suppression des médias : " . $_SESSION[self::MYSQL]->error);
+        }
+
+        // Création des $nb dernières partoches
+        $this->chercheNdernieresPartoches($nb);
+        return true;
+    }
+
+
+    public function afficheComposantMedia(): string {
+        $type = htmlspecialchars($this->_type);
+        $titre = htmlspecialchars($this->_titre);
+        $image = htmlspecialchars($this->_image);
+        $lien = "../../" .htmlspecialchars($this->_lien);
+        $description = htmlspecialchars($this->_description);
+        $tags = htmlspecialchars($this->_tags);
+        $datePub = htmlspecialchars($this->_datePub);
+        $hits = $this->_hits;
+
+        // Récupération du nom de l’auteur ou "Auteur inconnu"
+        $auteur = chercheUtilisateur($this->_auteur);
+        $auteurNom = $auteur[3];
+
+        return <<<HTML
+<div style="width:200px;height:350px;border:1px solid #ccc;border-radius:8px;overflow:hidden;box-shadow:2px 2px 6px rgba(0,0,0,0.1);font-family:sans-serif;margin:10px;">
+    <img src="../../$image" alt="Illustration de $titre" style="width:100%;height:150px;object-fit:cover;">
+    <div style="padding:10px;">
+        <h3 style="margin:0;font-size:18px;">$titre</h3>
+        <p style="font-size:12px;color:#666;margin:4px 0;">publié le $datePub par <strong>$auteurNom</strong></p>
+        <p style="font-size:13px;margin:6px 0;max-height:60px;overflow:hidden;text-overflow:ellipsis;">$description</p>
+        <p style="font-size:12px;color:#999;margin:4px 0;"><strong>Tags :</strong> $tags</p>
+        <a href="$lien" target="_blank" style="display:inline-block;margin-bottom:8px;padding:6px 12px;background-color:#007BFF;color:#fff;text-decoration:none;border-radius:4px;font-size:13px;">Voir le média</a>
+    </div>
+</div>
+HTML;
     }
 
 }
+
+// TODO
+// - ne pas pouvoir de créer de media ayant déjà un lien existant !
+// - un media peut être un doc pdf, mp3, lien vidéo yt, une partoche, un soungbook
 
