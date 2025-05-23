@@ -56,7 +56,9 @@ if (isset($_POST['ajax_action']) && $_POST['ajax_action'] === 'reset_partoches')
     if ($success) {
         echo json_encode(['status' => 'ok', 'message' => "Réinitialisation des $nb dernières partoches réussie."]);
     } else {
-        echo json_encode(['status' => 'error', 'message' => "Échec lors de la réinitialisation des partoches."]);
+        // On peut récupérer l'erreur SQL ou autre message d'erreur dans la classe Media si possible
+        $errorMessage = method_exists($media, 'getLastError') ? $media->getLastError() : "Échec lors de la réinitialisation des partoches.";
+        echo json_encode(['status' => 'error', 'message' => $errorMessage]);
     }
     exit();
 }
@@ -148,7 +150,7 @@ echo $sortie;
             .catch(() => {
                 const resultDiv = document.getElementById('resetResult');
                 resultDiv.style.color = 'red';
-                resultDiv.textContent = 'Erreur lors de la requête.';
+                resultDiv.textContent = 'Erreur lors de la requête : ' + error.message;
             })
             .finally(() => {
                 btn.disabled = false;

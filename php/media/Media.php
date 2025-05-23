@@ -20,6 +20,7 @@ class Media
     private string $_tags; // tags associés au média
     private string $_datePub; // date de publication
     private int $_hits; // compteur de visites
+    private $_lastError = ""; // pour stocker la dernière erreur
 
     function __construct()
     {
@@ -172,6 +173,12 @@ class Media
         }
     }
 
+    public function getLastError()
+    {
+        return $this->_lastError;
+    }
+
+
     // Méthode pour créer ou modifier un média en BDD
     public function persist()
     {
@@ -220,7 +227,12 @@ class Media
             $this->_datePub,
             $this->_hits);
 
-        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans persist : " . $_SESSION[self::MYSQL]->error);
+        $result = $_SESSION[self::MYSQL]->query($maRequete);
+        if (!$result) {
+            $this->_lastError = $_SESSION[self::MYSQL]->error;
+            return false; // Erreur lors de l'insertion
+        }
+
 
         $this->setId($_SESSION[self::MYSQL]->insert_id);
         return $this->getId();
