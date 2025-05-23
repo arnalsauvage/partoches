@@ -3,7 +3,7 @@ use PHPUnit\Framework\TestCase;
 
 session_start();
 $_SERVER['DOCUMENT_ROOT'] = "../";
-require_once "../php/lib/utilssi.php";
+require_once  "../php/lib/utilssi.php";
 require_once "../php/media/media.php"; // Assurez-vous que le chemin est correct
 
 class MediaTest extends TestCase

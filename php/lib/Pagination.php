@@ -205,13 +205,17 @@ class Pagination
 
     public function urlAjouteParam($url, $_leparam){
 
-        if (!strstr($url,"?")){
-            $url .= "?";
+        // Gérer ce lessage d'alerte : Deprecated: parse_url(): Passing null to parameter #1 ($url) of type string is deprecated in C:\Users\medin\PhpstormProjects\partoches\php\lib\Pagination.php on line 207
+        if (empty($url)) {
+            $url = $_SERVER['REQUEST_URI'];
+
         }
-        else {
-            $url .= "&";
+        $parsedUrl = parse_url($url);
+        if (isset($parsedUrl['query'])) {
+            $url .= "&" . $_leparam;
+        } else {
+            $url .= "?" . $_leparam;
         }
-        $url.= $_leparam;
-        return ($url);
+        return $url;
     }
 }
