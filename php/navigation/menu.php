@@ -87,7 +87,10 @@ if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege
     $contenu .= "<span class='icon-bar'></span>\n";
 }
 $contenu .= "		</button>\n
-		<a class='navbar-brand' href='../media/listeMedias.php'>Top 5 Partoches</a>\n
+		<a class='navbar-brand' href='../media/listeMedias.php'>
+    <img src='../../images/navigation/top-5-logo-officiel-300x.webp' alt='logo Top 5 ukulélé' width='32' style='display:inline; vertical-align:middle; margin-right:8px;'>
+    Top 5 Partoches
+</a>\n
 	</div> <!--/.navbar-header -->\n
     <div id='main-menu' class='collapse navbar-collapse'>\n
           <ul class='nav navbar-nav'>\n
@@ -126,7 +129,7 @@ $contenu .= "
 $contenu .= "<div class='container'>\n
 			<div class='starter-template'>\n";
 
-$contenu .= "<br><br><br> sur Top 5 partoches, les amis de Top5 partagent leurs partoches (venues du club ou d'ailleurs...) pour le plaisir de gratter l'ukulélé <br>\n";
+$contenu .= "<br><br><br> sur Top 5 partoches, les amis de Top5 partagent leurs partoches (venues du club et parfois d'ailleurs...) pour le plaisir de gratter l'ukulélé <br>\n";
 
 $contenu .= image("{$cheminVignettes}" . $_SESSION ['image'], 64, 64, $_SESSION['user']) . "\n";
 
