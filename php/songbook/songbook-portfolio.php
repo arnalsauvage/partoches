@@ -1,6 +1,6 @@
 <?php
 require_once("../lib/utilssi.php");
-$pasDeMenu = true;
+
 require_once("../navigation/menu.php");
 require_once("songbook.php");
 require_once("../document/document.php");
@@ -10,51 +10,7 @@ $table = "songbook";
 global $_DOSSIER_CHANSONS;
 
 ?>
-<!DOCTYPE html>
-<html lang="fr">
 
-<head>
-    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
-
-    <!--    Indexation OpenGraph pourles réseaux sociaux-->
-    <meta property="og:title" content="Songbooks ukulele en ligne : les partoches du club de ukulele top 5"/>
-    <meta property="og:type" content="sur partoches, les amis de top 5 partagent des partoches de ukulélé venues
-    de top 5 ou d'ailleurs, pour le plaisir de chanter, en grattant son ukulélé."/>
-    <meta property="og:url" content="http://partoches.top5.re/"/>
-    <meta property="og:image" content="http://partoches.top5.re/apple-touch-icon-152x152-precomposed.png"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Songbooks ukulele en ligne : les partoches du club de ukulele top 5</title>
-    <meta name="description" content="sur partoches, les amis de top 5 partagent des partoohes de ukulélé venues
-    de top 5 ou d'ailleurs, pour le plaisir de chanter, en grattant son ukulélé.">
-    <link rel="stylesheet" type="text/css" href="../../css/styles.css">
-    <link rel="stylesheet" href="../../css/bootstrap.min.css">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
-    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120-precomposed.png"/>
-    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152-precomposed.png"/>
-</head>
-
-<body>
-<div class="navigation">
-    <header>
-
-    <h1>les songbooks en ligne
-    <nav>
-        <a href="../chanson/chanson_liste.php" class="btn btn-success" style="font-weight: bold">
-            Entrez !
-        </a>
-    </nav>
-    </h1>
-    </header>
-</div>
-
-<div class="info-cookies">
-    <span>
-        Ce site contient un cookie avec une seule donnée pour vous identifer comme visiteur ou contributeur.
-        En poursuivant votre navigation, vous acceptez ce cookie et offrez votre coeur et votre âme au ukulélé !
-    </span>
-</div>
 <div class="content-box">
 
     <?php
@@ -123,7 +79,7 @@ global $_DOSSIER_CHANSONS;
                 $titreCourt = htmlspecialchars(limiteLongueur($titresChansons [$ligneDoc [6]], 18), ENT_QUOTES);
                 echo "<a href= '../../" . $fichier . "' target='_blank' title='" . htmlspecialchars($titresChansons [$ligneDoc [6]], ENT_QUOTES) . "'> " . $titreCourt . "</a> \n";
 
-                echo "<a aria-label='ouvrir la chanson '" . htmlspecialchars($titresChansons [$ligneDoc [6]]) . " href= '../chanson/chanson_voir.php?id=" . $ligneDoc [6] . "' > $iconeMusique </a> <br>\n";
+                echo "<a aria-label='ouvrir la chanson " . htmlspecialchars($titresChansons [$ligneDoc [6]]) . "' href= '../chanson/chanson_voir.php?id=" . $ligneDoc [6] . "' > $iconeMusique </a> <br>\n";
                 ?>
                     <?php
             }
@@ -135,9 +91,6 @@ global $_DOSSIER_CHANSONS;
         <?php
             } // Boucle tous les songbooks
             ?>
-
 </div>
-	<!-- content box -->
-</body>
-
-</html>
+</div>
+</div>	<!-- content box -->

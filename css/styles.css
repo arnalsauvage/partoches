@@ -1,14 +1,13 @@
 body {
-    background-image: url("../images/navigation/fond.png");
+ /*   background-image: url("../images/navigation/fond.webp");*/
     background-repeat: repeat;
     background-attachment: fixed;
 }
 
-
 /* Barre de navigation */
 
 .navigation {
-    background-color: rgba(255, 255, 255, 1);
+    background-color: rgba(255, 200, 200, 1);
     display: inline-block;
     /* height: 60px; */
     font-family: 'Roboto', sans-serif;
@@ -45,37 +44,137 @@ h1 {
 
 /*  Corps de la page */
 
-.contentcontent-box {
+/* Cible ton conteneur principal – adapte si le sélecteur est différent */
+.content-box {
     background: rgba(255, 255, 255, 0.5);
+    margin: 0 auto; /* centre horizontalement */
+    padding: 20px;
+    width: 100%;
+    max-width: 100%; /* par défaut : prend toute la largeur sur mobile */
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 20px 10px; /* haut/bas: 20px ; gauche/droite: 10px */
+}
+
+/* Quand l'écran dépasse 800px, on limite la largeur à 75% */
+@media (min-width: 800px) {
+    .content-box {
+        max-width: 75%;
+    }
+}
+
+/*  - - - - - - - - styles info cookies - - - - - - - -  */
+.info-cookies {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    font-size: 14px;
+}
+
+#cookieToggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+#cookieToggle img {
+    width: 60px;
+    height: auto;
+}
+
+/* Popup masquée par défaut */
+.cookie-popup {
+    display: none;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    max-width: 300px;
+    margin-top: 10px;
+    position: relative;
+}
+
+/* Croix de fermeture */
+.close-cookie {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #444;
+}
+
+/* Quand actif : cacher le bouton image, afficher la popup */
+.info-cookies.active #cookieToggle {
+    display: none;
+}
+
+.info-cookies.active .cookie-popup {
+    display: block;
+}
+
+/*  - - - - - - - - styles info cookies - - - - - - - -  */
+
+
+
+.mentionsLegales {
+    background: rgba(255, 255, 255, 0.89);
     margin: 0 auto;
     position: relative;
     top: 100px;
     width: 80%;
-    display: flex;
+   /* display: flex;
     justify-content: space-around;
-    flex-wrap: wrap;
+    flex-wrap: wrap;*/
 }
 
-.info-cookies {
-    background: rgba(255, 155, 155, 0.75);
-    margin: 0 auto;
-    width: 80%;
+.titre-container {
     display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    font-size: 10px;
-    z-index:  2;
-    position: absolute;
-    top: 10px;
-    left: 720px;
-    width: 400px;
-    height: 55px;
-    color: black;
-    font-size: 11px;
-    padding-left: 15px;
-    border: 5px;
-    border-radius :22px;
+    background: rgba(255, 255, 255, 0.89);
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 900px;
+    margin: 13px auto;
+    padding: 27px;
+
+    border: 1px solid black;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 12px; /* optionnel : pour arrondir un peu les coins */
 }
+
+/* Zone du titre centrée */
+.titre-gauche {
+    text-align: center;
+    flex: 1;
+}
+
+/* Bouton à droite en position absolue */
+.titre-droite {
+    position: absolute;
+    right: 20px;
+}
+
+/* h1 proprement centré dans sa div */
+.titre-gauche h1 {
+    margin: 0;
+}
+
+/* Pour que le logo n'écrase pas tout sur petit écran */
+.top5-logo {
+    max-width: 100px;
+    height: auto;
+}
+
+
+/* Styles portfolio sdongbook */
+
+
 
 .songbook {
     background-color: #FFF;
@@ -121,15 +220,4 @@ h1 {
 
 img {
     border: 0;
-}
-
-.mentionsLegales {
-    background: rgba(255, 255, 255, 0.89);
-    margin: 0 auto;
-    position: relative;
-    top: 100px;
-    width: 80%;
-   /* display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;*/
 }

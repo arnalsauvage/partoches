@@ -191,6 +191,7 @@ if (!isset ($FichierHtml)) {
     	<link href='../../css/bootstrap.min.css' rel='stylesheet'>
         <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
     	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel='stylesheet'>
+        <link rel='stylesheet' type='text/css' href='../../css/styles.css'>
     	 ";
 
         $retour .= "

@@ -4,5 +4,5 @@
 if (isset ($_SESSION ['user']))
     header('Location: php/chanson/chanson_liste.php');
 else {
-    header('Location: php/songbook/songbook-portfolio.php');
+    header('Location: php/media/listeMedias.php');
 }

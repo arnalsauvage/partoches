@@ -18,7 +18,7 @@ class Media
     private string $_lien; // URL de la ressource
     private string $_description; // description du média
     private string $_tags; // tags associés au média
-    private string $_datePub; // date de publication
+    private string $_datePub; // date de publication en AAAA-MM-JJ
     private int $_hits; // compteur de visites
     private $_lastError = ""; // pour stocker la dernière erreur
 
@@ -198,7 +198,7 @@ class Media
         $result = $_SESSION[self::MYSQL]->query($requete);
 
         if ($result && $row = $result->fetch_assoc()) {
-            return (int) $row['id'];
+            return (int)$row['id'];
         }
         return null;
     }
@@ -208,13 +208,12 @@ class Media
     {
         // Conversion de la date au format MySQL avant l'insertion
         // Bug ? Doublon ?
-        $this->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
-
         $this->_titre = $_SESSION[self::MYSQL]->real_escape_string($this->_titre);
         $this->_image = $_SESSION[self::MYSQL]->real_escape_string($this->_image);
         $this->_lien = $_SESSION[self::MYSQL]->real_escape_string($this->_lien);
         $this->_description = $_SESSION[self::MYSQL]->real_escape_string($this->_description);
         $this->_tags = $_SESSION[self::MYSQL]->real_escape_string($this->_tags);
+        $this->_date = $_SESSION[self::MYSQL]->real_escape_string($this->_datePub);
         $maRequete = sprintf("INSERT INTO media (id, type, titre, image, auteur, lien, description, tags, datePub, hits)
             VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
             $this->_type,
@@ -224,7 +223,7 @@ class Media
             $this->_lien,
             $this->_description,
             $this->_tags,
-            $this->_datePub,
+            $this->_date,
             $this->_hits);
 
         $result = $_SESSION[self::MYSQL]->query($maRequete);
@@ -247,7 +246,7 @@ class Media
         $this->_description = $_SESSION[self::MYSQL]->real_escape_string($this->_description);
         $this->_tags = $_SESSION[self::MYSQL]->real_escape_string($this->_tags);
 
-        $id = (int) $this->getId();
+        $id = (int)$this->getId();
 
         $maRequete = sprintf(
             "UPDATE media SET type='%s', titre='%s', image='%s', auteur='%s', lien='%s', description='%s', tags='%s', datePub='%s', hits='%s' WHERE id=%d",
@@ -343,7 +342,8 @@ class Media
     public static function normalize($string): string
     {
         // Convertir en minuscules
-        $string = mb_strtolower($string); echo $string;
+        $string = mb_strtolower($string);
+        echo $string;
 
         // Remplacer les caractères accentués par leurs équivalents non accentués
         $string = preg_replace('/[áàâãäå]/u', 'a', $string);
@@ -382,46 +382,47 @@ class Media
         return $retour;
     }
 
-    public function chercheNdernieresPartoches($nombrePartoches=100){
-        $compteur =0;
+    public function chercheNdernieresPartoches($nombrePartoches = 100)
+    {
+        $compteur = 0;
         // lance la requete cherche documents avec tableNom = chanson
         $documents = chercheDocuments("nomTable", "chanson", "date", false);
-        while ($compteur <$nombrePartoches){
+        while ($compteur < $nombrePartoches) {
             $document = $documents->fetch_row();
             // On ne garde que les documents de type partoche
-            if (str_ends_with($document[1],".pdf")){
-             $this->ajoutePartoche($document[0]);
-             // TODO n'ajouter le media qu =e s'il n'existe pas déjà !
-             $compteur++;
+            if (str_ends_with($document[1], ".pdf")) {
+                $this->ajoutePartoche($document[0]);
+                // TODO n'ajouter le media que de la dernière version du doc !
+                $compteur++;
             }
         }
     }
 
-    public function transformePartocheEnMedia( $idDocPartoche): void
+    public function transformePartocheEnMedia($idDocPartoche): void
     {
         // partant de l'id du document de partoche, on cherche la chanson
-        $partoche = chercheDocument($idDocPartoche);
-        $idChanson = $partoche[6];
+        $document = chercheDocument($idDocPartoche);
+        $idChanson = $document[6];
 
         $chanson = new Chanson();
         $chanson->chercheChanson($idChanson);
         $this->setTitre($chanson->getNom());
-        $this->setDescription( "partoche de la chanson de " . $chanson->getInterprete() . " " . $chanson->getAnnee());
-            $this->setAuteur($chanson->getIdUser ()); // Identifiant de l'utilisateur
-        $this->setDatePub($chanson->getDatePub());
+        $this->setDescription("Partoche pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
+        $this->setAuteur($document[7]); // Identifiant de l'utilisateur
+        $this->setDatePub($document[3]); // Date de publication du document
         $this->setType("partoche");
-        $this->setTags("partoche chanson "  . $chanson->getAnnee() );
+        $this->setTags("partoche " . $chanson->getAnnee());
 
-        $this->setImage("./data/chansons/$idChanson/".rawurlencode(imageTableId(self::TABLE_CHANSON, $idChanson)));
-        $this->setLien("./php/document/".lienUrlTelechargeDocument($idDocPartoche));
+        $this->setImage("./data/chansons/$idChanson/" . rawurlencode(imageTableId(self::TABLE_CHANSON, $idChanson)));
+        $this->setLien("./php/document/" . lienUrlTelechargeDocument($idDocPartoche));
     }
 
     // Ajoute une partoche par l'id de son document rattaché à la chanson
     public function ajoutePartoche($idPartoche)
     {
-            // Transformer la partoche en média
-            $this->transformePartocheEnMedia($idPartoche); // Méthode fictive pour transformer
-            $this->persist(); // Utilisation de la méthode existante pour créer le média
+        // Transformer la partoche en média
+        $this->transformePartocheEnMedia($idPartoche); // Méthode fictive pour transformer
+        $this->persist(); // Utilisation de la méthode existante pour créer le média
     }
 
     public function resetAvecDernieresPartoches(int $nb = 50)
@@ -439,11 +440,12 @@ class Media
     }
 
 
-    public function afficheComposantMedia(): string {
+    public function afficheComposantMedia(): string
+    {
         $type = htmlspecialchars($this->_type);
         $titre = htmlspecialchars($this->_titre);
         $image = htmlspecialchars($this->_image);
-        $lien = "../../" .htmlspecialchars($this->_lien);
+        $lien = "../../" . htmlspecialchars($this->_lien);
         $description = htmlspecialchars($this->_description);
         $tags = htmlspecialchars($this->_tags);
         $datePub = htmlspecialchars($this->_datePub);
@@ -454,14 +456,25 @@ class Media
         $auteurNom = $auteur[3];
 
         return <<<HTML
-<div style="width:200px;height:350px;border:1px solid #ccc;border-radius:8px;overflow:hidden;box-shadow:2px 2px 6px rgba(0,0,0,0.1);font-family:sans-serif;margin:10px;">
+<div style="width:200px;height:350px;border:1px solid #ccc;
+background-color: rgba(255, 255, 255, 0.8); /* fond blanc 80% opaque */
+    border:1px solid #ccc;border-radius:8px;overflow:hidden;
+            box-shadow:2px 2px 6px rgba(0,0,0,0.1);font-family:sans-serif;margin:10px;
+            display:flex; flex-direction:column; justify-content:space-between;">
     <img src="../../$image" alt="Illustration de $titre" style="width:100%;height:150px;object-fit:cover;">
-    <div style="padding:10px;">
+    <div style="padding:10px; text-align:center;">
         <h3 style="margin:0;font-size:18px;">$titre</h3>
         <p style="font-size:12px;color:#666;margin:4px 0;">publié le $datePub par <strong>$auteurNom</strong></p>
         <p style="font-size:13px;margin:6px 0;max-height:60px;overflow:hidden;text-overflow:ellipsis;">$description</p>
         <p style="font-size:12px;color:#999;margin:4px 0;"><strong>Tags :</strong> $tags</p>
-        <a href="$lien" target="_blank" style="display:inline-block;margin-bottom:8px;padding:6px 12px;background-color:#007BFF;color:#fff;text-decoration:none;border-radius:4px;font-size:13px;">Voir le média</a>
+        <div style="margin-top:auto; text-align:center;">
+         <a href="$lien" target="_blank" 
+            style="display:inline-block;margin-bottom:8px;padding:6px 12px;background-color:#007BFF;
+            color:#fff;text-decoration:none;border-radius:4px;font-size:13px;">
+       Voir le média
+    </a>
+</div>
+
     </div>
 </div>
 HTML;

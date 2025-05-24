@@ -87,13 +87,19 @@ if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege
     $contenu .= "<span class='icon-bar'></span>\n";
 }
 $contenu .= "		</button>\n
-		<a class='navbar-brand' href='../songbook/songbook-portfolio.php'>Top 5 Partoches</a>\n
+		<a class='navbar-brand' href='../media/listeMedias.php'>Top 5 Partoches</a>\n
 	</div> <!--/.navbar-header -->\n
     <div id='main-menu' class='collapse navbar-collapse'>\n
           <ul class='nav navbar-nav'>\n
-			<li class='divider' role='separator'></li>\n
-			<li><a href='../songbook/songbook_liste.php'>Songbooks</a></li>\n
-            <li><a href='../chanson/chanson_liste.php'>Chansons</a></li>\n
+			<li class='divider' role='separator'></li>\n";
+// Le lien utilisateur est limité aux admin et login parametrage
+if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
+    $contenu .= "<li><a href='../songbook/songbook_liste.php'>Songbooks</a></li>\n";
+}
+else{
+    $contenu .= "<li><a href='../songbook/songbook-portfolio.php'>Songbooks</a></li>\n";
+}
+$contenu .= "<li><a href='../chanson/chanson_liste.php'>Chansons</a></li>\n
             <li><a href='../strum/strum_liste.php'>Strums</a></li>\n
             <li><a href='../liens/lienurl_liste.php'>Liens</a></li>\n";
 //            <li><a href='../php/playlist_liste.php'>Playlists</a></li>\n";
