@@ -34,7 +34,7 @@ require_once 'Media.php';
     <title>Songbooks ukulele en ligne : les partoches du club de ukulele top 5</title>
     <meta name="description" content="sur partoches, les amis de top 5 partagent des partoohes de ukulélé venues
     de top 5 ou d'ailleurs, pour le plaisir de chanter, en grattant son ukulélé.">
-    <link rel="stylesheet" type="text/css" href="../../css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../../css/styles.0.1.css">
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -77,10 +77,14 @@ require_once 'Media.php';
 
 
 <?php
+
 // Récupération des ID de médias de type "partoche"
 $idsMedias = Media::chercheMediasParType("partoche");
 
 // Affichage HTML
+echo '<div class="content-box">';
+echo '<h2>Nos dernières publications</h2><br>';
+echo '</div>';
 echo '<div class="content-box">';
 $compteur = 0;
 
