@@ -1,6 +1,6 @@
 <?php /** @noinspection PhpMethodParametersCountMismatchInspection */
 include_once "../lib/utilssi.php";
-include_once("../navigation/menu.php");
+include_once("menu.php");
 $fichier = "../../conf/params.ini";
 $sortie = "";
 $sortie .= "<table><tr><td>";
@@ -9,7 +9,7 @@ $sortie .= "<table><tr><td>";
 if (!isset ($_SESSION['user']) || $_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
     // Affichage du formulaire de login
     $sortie .= $sortie;
-    include "../html/menuLogin.html";
+    include "../../html/menuLogin.html";
     exit();
 }
 // On lit les données dans le fichier ini
@@ -52,6 +52,7 @@ function traiteModif(FichierIni &$ini_objet, string $fichier, string $rubrique, 
         $medias = new Media();
         $nombreMedias =$_GET['resetmedias'];
         $medias->resetAvecDernieresPartoches($nombreMedias);
+        $medias->resetAvecDernieresVideos($nombreMedias);
         $sortie .= "<p>Réinitialisation des médias effectuée</p>";
     }
     if (isset ($_POST['testTexte']))
