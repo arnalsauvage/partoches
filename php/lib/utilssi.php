@@ -184,4 +184,47 @@ if (!isset ($FichierUtilsSi)) {
         $d = DateTime::createFromFormat($format, $date);
         return $d && $d->format($format) == $date;
     }
+
+    // Fonction pour filtrer les données venant de POST et GET
+    function filtreGetPost($source, $cle, $type = 'string', $options = []) {
+        $valeur = null;
+
+        if (!isset($source[$cle])) {
+            return null;
+        }
+
+        switch ($type) {
+            case 'int':
+                $valeur = filter_var($source[$cle], FILTER_VALIDATE_INT);
+                break;
+
+            case 'float':
+                $valeur = filter_var($source[$cle], FILTER_VALIDATE_FLOAT);
+                break;
+
+            case 'bool':
+                $valeur = filter_var($source[$cle], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                break;
+
+            case 'email':
+                $valeur = filter_var($source[$cle], FILTER_VALIDATE_EMAIL);
+                break;
+
+            case 'url':
+                $valeur = filter_var($source[$cle], FILTER_VALIDATE_URL);
+                break;
+
+            case 'string':
+            default:
+                $valeur = strip_tags($source[$cle]);
+                $valeur = trim($valeur);
+                if (isset($options['max_length'])) {
+                    $valeur = substr($valeur, 0, (int)$options['max_length']);
+                }
+                break;
+        }
+
+        return $valeur;
+    }
+
 }

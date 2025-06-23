@@ -9,12 +9,12 @@ const CHERCHE = 'cherche';
 const CENTRER = "centrer";
 const VAL_FILTRE = "valFiltre";
 const FILTRE = "filtre";
-require_once("../lib/utilssi.php");
-require_once("../lib/Pagination.php");
-require_once("chanson.php");
-require_once("../document/document.php");
-require_once("../navigation/menu.php");
-require_once("../note/UtilisateurNote.php");
+require_once "../lib/utilssi.php";
+require_once "../lib/Pagination.php";
+require_once "chanson.php";
+require_once "../document/document.php";
+require_once "../navigation/menu.php";
+require_once "../note/UtilisateurNote.php";
 
 $chansonForm = "chanson_form.php";
 $chansonPost = "chanson_post.php";
@@ -43,7 +43,9 @@ $contenuHtml = "<div class='container'> \n
 $contenuHtml .= entreBalise("Chansons", "H1");
 
 if (isset($_GET['filtre'])){
-    $contenuHtml .= "<p class='filtres'> filtre présent : " . $_GET['filtre'] . " = " . $_GET['valFiltre'];
+    $filtre = filtreGetPost($_GET, FILTRE);
+    $valeur_filtre = filtreGetPost($_GET, VAL_FILTRE);
+    $contenuHtml .= "<p class='filtres'> filtre présent : $filtre = $valeur_filtre" ;
     $contenuHtml .= " " . Ancre($_SERVER['PHP_SELF'],"effacer le filtre") . "</p>";
 }
 
@@ -54,23 +56,24 @@ if (isset($_GET['raz-recherche'])){
 // Gestion du paramètre de tri
 // On prend en compte une demande de tri ascendant
 if (isset ($_GET [TRI]) ) {
-    $_SESSION[TRI] = $_GET [TRI];
-    $_SESSION[ORDRE_ASC] = true;
-    // echo "session tri = get tro = " . $_SESSION['tri'] = $_GET ['tri'];
-} // On prend en compte une demande de tri descendant
-else {
-    if (isset ($_GET ['triDesc'])) {
-        $_SESSION[TRI] = $_GET ['triDesc'];
+    // Gestion du paramètre de tri
+    $triAsc = filtreGetPost($_GET, 'tri');
+    $triDesc = filtreGetPost($_GET, 'triDesc');
+
+    if ($triAsc !== null) {
+        // Tri ascendant explicite
+        $_SESSION[TRI] = $triAsc;
+        $_SESSION[ORDRE_ASC] = true;
+    } elseif ($triDesc !== null) {
+        // Tri descendant explicite
+        $_SESSION[TRI] = $triDesc;
         $_SESSION[ORDRE_ASC] = false;
-        // echo "session tri desc = get tro = " . $_SESSION['tri'] = $_GET ['triDesc'];
-    } // Sinon, on installe le tri par date dégressif
-    else {
-        if (!isset ($_SESSION[TRI])) {
-            $_SESSION[TRI] = DATE_PUB;
-            $_SESSION[ORDRE_ASC] = false;
-            // echo "tri par défaut ";
-        }
+    } elseif (!isset($_SESSION[TRI])) {
+        // Tri par défaut (date décroissante)
+        $_SESSION[TRI] = DATE_PUB;
+        $_SESSION[ORDRE_ASC] = false;
     }
+
 }
 
 // Gestion du parametre nonVote
@@ -79,28 +82,38 @@ if (isset ($_GET ['nonVote'])) {
 }
 
 // Gestion du parametre filtre
-        $filtre = "";
+$filtre = "";
 if (isset ($_GET [FILTRE])) {
-    if ($_GET [FILTRE]=='contributeur'){
-        $filtre = "contributeur";
-        $valeur_filtre  = $_GET [VAL_FILTRE];
-    }
-    if ($_GET [FILTRE]=='tempo'||$_GET [FILTRE]=='mesure'||$_GET [FILTRE]=='tonalite'||$_GET [FILTRE]=='pulsation'||$_GET [FILTRE]=='annee'||$_GET [FILTRE]=='interprete'){
-        $filtre = $_GET [FILTRE];
-        $valeur_filtre  = $_GET [VAL_FILTRE];
+    // Gestion du paramètre de filtre
+    $filtreGet = filtreGetPost($_GET, FILTRE);
+    $valeurGet = filtreGetPost($_GET, VAL_FILTRE);
+
+    $filtre = null;
+    $valeur_filtre = null;
+
+    $filtres_valides = ['contributeur', 'tempo', 'mesure', 'tonalite', 'pulsation', 'annee', 'interprete'];
+
+    if ($filtreGet !== null && in_array($filtreGet, $filtres_valides, true)) {
+        $filtre = $filtreGet;
+        $valeur_filtre = $valeurGet;
     }
 }
 
-
-
-
 // Gestion paramètres de recherche
 if (isset ($_POST [CHERCHE])) {
-    logueRecherche($_POST[CHERCHE]);
-    $_SESSION[CHERCHE] = $_POST[CHERCHE];
-} else {
-    if (!isset($_SESSION[CHERCHE])) {
-        $_SESSION[CHERCHE] = "";
+    // Gestion du champ de recherche
+    $recherche = filtreGetPost($_POST, CHERCHE);
+
+    // Nettoyage minimal pour le log
+    $recherche_log = strip_tags($recherche); // Supprime tout code HTML
+
+    if ($recherche !== null) {
+        logueRecherche($recherche);
+        $_SESSION[CHERCHE] = $recherche;
+    } else {
+        if (!isset($_SESSION[CHERCHE])) {
+            $_SESSION[CHERCHE] = "";
+        }
     }
 }
 
@@ -135,7 +148,7 @@ if (isset ($_GET['page']) && is_numeric($_GET['page'])) {
 $pagination->setPageEnCours($page);
 
 // Affichage de la recherche
-require_once("chanson-v-comp-cherche.php");
+require_once "chanson-v-comp-cherche.php";
 $contenuHtml .= $contenuHtmlCompCherche;
 
 // Affichage de la liste
@@ -189,6 +202,15 @@ $cheminImagesChanson = $_RACINE .$_DOSSIER_CHANSONS;
 $_chanson = new Chanson();
 $maNote = new UtilisateurNote(0, 1, 1, 1);
 
+
+    function celluleFiltrable($libelle, $cle, $valeur, $alignement = '', $longueurMax = null) {
+        global $pagination;
+        $url = $_SERVER['REQUEST_URI'];
+        $texte = $longueurMax ? limiteLongueur($libelle, $longueurMax) : $libelle;
+        $urlFiltre = $pagination->urlAjouteParam($url, FILTRE . "=$cle&" . VAL_FILTRE . "=" . urlencode($valeur));
+        return TblCellule(Ancre($urlFiltre, $texte), 1, 1, $alignement);
+    }
+
 foreach ($resultat as $ligne) {
     $numligne++;
     if (($numligne < $pagination->getItemDebut()) || $numligne > $pagination->getItemFin()) {
@@ -221,35 +243,40 @@ foreach ($resultat as $ligne) {
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", $imagePochette));
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"), -1 ,-1,$_chanson->getNom())); // Nom
     $url = $_SERVER['REQUEST_URI'];
-    $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=interprete&" .  VAL_FILTRE . "=" .urlencode($_chanson->getInterprete())),limiteLongueur($_chanson->getInterprete(),21))); // interprete
-    if ($largeur_ecran >700) {
-        if ($_SESSION [PRIVILEGE] >= $GLOBALS["PRIVILEGE_ADMIN"]) {
-         // le résultat des votes est visible pour admin
+
+    $contenuHtml .= celluleFiltrable($_chanson->getInterprete(), "interprete", $_chanson->getInterprete(), '', 21); // interprete
+
+    if ($largeur_ecran > 700) {
+        if ($_SESSION[PRIVILEGE] >= $GLOBALS["PRIVILEGE_ADMIN"]) {
             $contenuHtml .= TblCellule(UtilisateurNote::starBar(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
-        }
-        else {
-            if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
+        } else {
+            if ($_SESSION[PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
                 $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
-            }}
+            }
+        }
     }
-    if ($largeur_ecran >700) {
-        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=annee&" .  VAL_FILTRE . "=" .$_chanson->getAnnee()), $_chanson->getAnnee()),1, 1, CENTRER); // annee
+
+    if ($largeur_ecran > 700) {
+        $contenuHtml .= celluleFiltrable($_chanson->getAnnee(), "annee", $_chanson->getAnnee(), CENTRER); // annee
     }
-    if ($largeur_ecran >1200) {
-        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=tempo&" .  VAL_FILTRE . "=" .$_chanson->getTempo()), $_chanson->getTempo()), 1, 1, "alignerAdroite"); // tempo
-        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=mesure&" .  VAL_FILTRE . "=" .$_chanson->getMesure()), $_chanson->getMesure()), 1, 1, CENTRER); // mesure
-        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=pulsation&" .  VAL_FILTRE . "=" .$_chanson->getPulsation()), $_chanson->getPulsation()), 1, 1, CENTRER); // pulsation
-        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url, FILTRE ."=tonalite&" .  VAL_FILTRE . "=" .$_chanson->getTonalite()), $_chanson->getTonalite()), 1, 1, CENTRER); // tonalité
+
+    if ($largeur_ecran > 1200) {
+        $contenuHtml .= celluleFiltrable($_chanson->getTempo(), "tempo", $_chanson->getTempo(), "alignerAdroite"); // tempo
+        $contenuHtml .= celluleFiltrable($_chanson->getMesure(), "mesure", $_chanson->getMesure(), CENTRER); // mesure
+        $contenuHtml .= celluleFiltrable($_chanson->getPulsation(), "pulsation", $_chanson->getPulsation(), CENTRER); // pulsation
+        $contenuHtml .= celluleFiltrable($_chanson->getTonalite(), "tonalite", $_chanson->getTonalite(), CENTRER); // tonalité
     }
-    if ($largeur_ecran >700) {
+
+    if ($largeur_ecran > 700) {
         $contenuHtml .= TblCellule(dateMysqlVersTexte($_chanson->getDatePub())); // Date Pub
         $nomAuteur = chercheUtilisateur($_chanson->getIdUser());
         $nomAuteur = $nomAuteur[3];
-        $contenuHtml .= TblCellule(Ancre($pagination->urlAjouteParam($url,FILTRE . "=contributeur&" . VAL_FILTRE . "=" . $_chanson->getIdUser()), $nomAuteur), 1, 1,CENTRER); // auteur
+        $contenuHtml .= celluleFiltrable($nomAuteur, "contributeur", $_chanson->getIdUser(), CENTRER); // auteur
         $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite"); // hits
     }
+
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-    if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
+        if ($_SESSION [PRIVILEGE] >= $GLOBALS["PRIVILEGE_ADMIN"]) {
         $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages));
         // //////////////////////////////////////////////////////////////////////ADMIN
     }
