@@ -1,144 +1,147 @@
 <?php
-include_once("../lib/utilssi.php");
-include_once("../utilisateur/utilisateur.php");
+include_once "../lib/utilssi.php";
+include_once "utilisateur.php";
 
-$sortie = envoieHead("Partoches", "../../css/index.css?v=25.3.28");
-$sortie .= "<body>
-    <h1>Top 5 Partoches - oubli de mot de passe (étape 1/4)</h1>
-    <p> Vous pouvez demander un nouveau mot de passe ici :</p>
-	<form action='oubliMotDePasse.php' class='login' method='post'>
-		<label class='email' for='email'>Adresse mail :</label>
-			<input size='16' id='email' name='email' value='' placeholder='adresse@email.fr'>
-		<input type='submit' value='Ok'>
-	</form>
+// Initialisation
+$nomEmail = $_SESSION['nomEmailOubliMotDePasse'] ?? '';
+echo envoieHead("Partoches", "../../css/index.css?v=25.3.28");
 
-";
-
-// Traitement du formulaire si besoin
-function envoieMailRecup($_email)
-{
-    $resultat = chercheUtilisateurParEmail($_email);
-    if ($resultat == null) {
-        //echo "Pas de résultat...";
-        return 0;
+// Routage
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['email'])) {
+        // Traite l'envoi d'email (étape 2/4)
+        handleEmailSubmission($_POST['email']);
+    } elseif (isset($_POST['nouveauMdp'])) {
+        // Traite la soumission du nouveau mot de passe (étape 4/4)
+        handleNewPasswordSubmission($_POST['nouveauMdp']);
     }
-    $prenom = $resultat[3];
-    $nom = $resultat[4];
-// Envoie un email de récupération de mot de passe
+} elseif (isset($_GET['date'], $_GET['compte'])) {
+    // Gère la vérification du lien (étape 3/4)
+    handleTokenVerification($_GET['date'], $_GET['compte']);
+} else {
+    // Affiche le formulaire initial (étape 1/4)
+    showInitialForm($nomEmail);
+}
 
-    $emailCrypte = Chiffrement::crypt($_POST ['email']);
-    $dateDuJour = Chiffrement::crypt(date("d/m/Y"));
-    $url = $_SERVER ['HTTP_REFERER'] . "?compte=" . urlencode($emailCrypte) . "&date=" . urlencode($dateDuJour);
+// Affiche le formulaire initial (étape 1/4)
+function showInitialForm($nomEmail)
+{
+    echo <<<HTML
+    <body>
+        <h1>$nomEmail - oubli de mot de passe (étape 1/4)</h1>
+        <p>Vous pouvez demander un nouveau mot de passe ici :</p>
+        <form action='oubliMotDePasse.php' class='login' method='post'>
+            <label class='email' for='email'>Adresse mail :</label>
+            <input size='16' id='email' name='email' value='' placeholder='adresse@email.fr'>
+            <input type='submit' value='Ok'>
+        </form>
+    </body>
+HTML;
+}
 
-    $sujet = "Oubli de mot de passe sur Partoches Top 5 - étape 2/4";
+// Traite l'envoi d'email (étape 2/4)
+function handleEmailSubmission($email)
+{
+    global $nomEmail;
 
-    $contenu = "Bonjour, vous avez certainement demandé la régénération de votre mot de passe sur partoche.
-        Voici un lien actif aujourd'hui pour le réinitialiser : 
-        
-        <a href='" . $url . "'>cliquez ici</a>";
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "Adresse email invalide : '$email'.";
+        return;
+    }
 
-    $contenu .= "
-        Si ce n'est pas vous, du coup, c'est plutôt bizarre...
-        
-        Cordialement,
-        Arnaud
-        
-        ";
+    echo "<h1>$nomEmail - oubli de mot de passe (étape 2/4)</h1>";
 
-    // Pour envoyer un mail HTML, l'en-tête Content-type doit être défini
-    $headers = 'MIME-Version: 1.0';
-    $headers .= 'Content-type: text/html; charset=iso-8859-1';
+    if (envoieMailRecup($email)) {
+        echo "Un email de récupération de mot de passe vient de vous être adressé !<br>Rendez-vous dans votre boîte mail pour poursuivre.";
+    } else {
+        echo "Si votre email est valide, votre compte est réactualisé...";
+    }
+}
 
-    // En-têtes additionnels
-    $headers .= 'To: $prenom $nom<' . $_POST['email'] . '>';
-    $headers .= 'From: Top 5 partoches <hello@top5.re>';
+// Gère la vérification du lien (étape 3/4)
+function handleTokenVerification($dateCryptee, $compteCrypte)
+{
+    global $nomEmail;
 
-    // Envoi
-    $CR_Mail = TRUE;
-    $CR_Mail = mail($_POST['email'], $sujet, $contenu, $headers);
+    $date = Chiffrement::decrypt($dateCryptee);
+    $email = Chiffrement::decrypt($compteCrypte);
 
-    // Pour le debuggage seulement !!!
+    if ($date !== date("d/m/Y")) {
+        echo "Votre jeton n'est pas valide, désolé !";
+        return;
+    }
 
-    // echo "sujet : " . $sujet . "<br>";
-    // echo "Contenu : " . $contenu . "<br>";
+    $utilisateur = chercheUtilisateurParEmail($email);
+    if (!$utilisateur) {
+        echo "Email non trouvé dans la base...";
+        return;
+    }
 
-    if ($CR_Mail === FALSE)
+    $_SESSION['id'] = $utilisateur[0];
 
-    {
+    $prenomNom = htmlspecialchars($utilisateur[3], ENT_QUOTES);
 
-        echo " ### CR_Mail=$CR_Mail - Erreur envoi mail <br> \n";
+    echo <<<HTML
+    <body>
+        <h1>$nomEmail - oubli de mot de passe (étape 3/4)</h1>
+        <p>Bienvenue, $prenomNom ! Il est temps de choisir un nouveau mot de passe :</p>
+        <form action='oubliMotDePasse.php' class='login' method='post'>
+            <label for='nouveauMdp'>Nouveau mot de passe :</label>
+            <input size='16' id='nouveauMdp' name='nouveauMdp' type='password' placeholder='un mot de passe de qualité'>
+            <input type='submit' value='Ok'>
+        </form>
+    </body>
+HTML;
+}
+
+// Traite la soumission du nouveau mot de passe (étape 4/4)
+function handleNewPasswordSubmission($nouveauMdp)
+{
+    global $nomEmail;
+
+    if (!isset($_SESSION['id'])) {
+        echo "Session invalide. Veuillez recommencer le processus.";
+        return;
+    }
+
+    modifieMdpUtilisateur($_SESSION['id'], $nouveauMdp);
+
+    $url = "../chanson/chanson_liste.php";
+
+    echo <<<HTML
+    <body>
+        <h1>$nomEmail - oubli de mot de passe (étape 4/4)</h1>
+        <p>Votre mot de passe a bien été changé. Vous pouvez vous reconnecter :</p>
+        <a href='$url'>par ici !</a>
+    </body>
+HTML;
+}
+
+// Fonction d'envoi du mail
+function envoieMailRecup($email)
+{
+    $utilisateur = chercheUtilisateurParEmail($email);
+    if (!$utilisateur) {
         return false;
     }
 
-    else
+    $emailCrypte = Chiffrement::crypt($email);
+    $dateCryptee = Chiffrement::crypt(date("d/m/Y"));
+    $referer = $_SERVER['HTTP_REFERER'] ?? 'http://localhost';
+    $url = "$referer?compte=" . urlencode($emailCrypte) . "&date=" . urlencode($dateCryptee);
 
-    {
+    $sujet = "Oubli de mot de passe sur Partoches Top 5 - étape 2/4";
+    $contenu = <<<HTML
+    Bonjour, vous avez certainement demandé la régénération de votre mot de passe sur un site partoches.<br><br>
+    Voici un lien actif aujourd'hui pour le réinitialiser :<br>
+    <a href="$url">Cliquez ici pour entrer un nouveau mot de passe</a><br><br>
+    Si ce n'est pas vous, du coup, c'est plutôt bizarre...<br><br>
+    Cordialement,<br>Arnaud
+HTML;
 
-        echo " *** CR_Mail=$CR_Mail - Mail envoyé<br> \n";
-    return true;
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
+    $headers .= "From: " . ($_SESSION['mailOubliMotDePasse'] ?? 'no-reply@partoches.local') . "\r\n";
 
-    }
+    return mail($email, $sujet, $contenu, $headers);
 }
-
-if (isset ($_POST ['email'])) {
-    if (!filter_var($_POST ['email'], FILTER_VALIDATE_EMAIL)) {
-        echo "Email address '" . $_POST ['email'] . "' is considered invalid.\n";
-        return;
-    }
-    $reponse = "<h1>Top 5 Partoches - oubli de mot de passe (étape 2/4) </h1>";
-    if (envoieMailRecup($_POST ['email'])) {
-        $reponse .= "Un email de récupération de mot de passe vient de vous être adressé !";
-    } else {
-        $reponse .= "Si votre email est valide, votre compte est réactualisé...";
-    }
-    echo $reponse;
-    return;
-}
-
-if (isset ($_GET ['date']) && isset ($_GET ['compte'])) {
-    $reponse = "";
-    $date = Chiffrement::decrypt($_GET ['date']);
-    $compte = Chiffrement::decrypt($_GET ['compte']);
-
-    if ($date <> date("d/m/Y")) {
-        $reponse = "Votre jeton n'est pas valide, désolé !";
-    }
-    //else
-    //    $reponse = "date reçue = " . $date;
-
-    // echo "email cherché : " . $compte;
-    // Si on ne trouve pas le compte en base, on informe de l'erreur
-    $resultat = chercheUtilisateurParEmail($compte);
-    if (!$resultat) {
-        $reponse .= "Email non trouvé dans la base...";
-    }    else {
-        $_SESSION['id'] = $resultat[0];
-        $reponse .= "Bienvenue, " . $resultat[3] . " ! <br>";
-        $reponse .= "Il est temps de choisir un nouveau mot de passe !";
-        $reponse .= "<body>
-    <h1>Top 5 Partoches - oubli de mot de passe (étape 3/4)</h1>
-    <p> Vous pouvez taper un nouveau mot de passe ici :</p>
-	<FORM action='oubliMotDePasse.php' class='login' method='post'>
-		<label for='nouveauMdp'>Nouveau mdp :</label>
-			<input size='16' id='nouveauMdp' name='nouveauMdp' type='password' value='' placeholder='un mot de passe de qualité'>
-		<input type='submit' value='Ok'>
-	</FORM>";
-    }
-
-    echo $reponse;
-    return;
-}
-
-if (isset ($_POST ['nouveauMdp'])) {
-    $url = $_SERVER ['SERVER_ADDR'] . "/chanson_liste.php";
-    $url = "../chanson/chanson_liste.php";
-    $reponse = "<body>
-    <h1>Top 5 Partoches - oubli de mot de passe (étape 4/4)</h1>
-    <p> Votre mot de passe a bien été changé : vous pouvez vous reconnecter !</p>
-    <a href='$url'>par ici !</a>";
-    modifieMdpUtilisateur($_SESSION['id'], $_POST ['nouveauMdp']);
-    echo $reponse;
-    return;
-}
-
-echo $sortie;
