@@ -190,8 +190,15 @@ if ($mode == RESTAUREDOC) {
     // Il faut renommer le doc en lui accolant son numéro de version
     rename($repertoire . $_POST [NOM_FIC], $repertoire . composeNomVersion($_POST [NOM_FIC], $version));
 }
+    resetMediasPartoches(99);
 
 // On fait une redirection dans tous les cas, sauf la demande de restauration d'un fichier - appel ajax
 if ($mode != RESTAUREDOC && $mode !=  RENDOC ) {
     redirection($nomTable . "_form.php?id=$id");
+}
+
+function resetMediasPartoches($nombreMedias){
+    require_once ("../media/Media.php");
+    $medias = new Media();
+    $medias->resetAvecDernieresPartoches($nombreMedias);
 }
