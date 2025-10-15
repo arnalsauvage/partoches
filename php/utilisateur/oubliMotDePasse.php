@@ -130,7 +130,7 @@ function envoieMailRecup($email)
     $referer = $_SERVER['HTTP_REFERER'] ?? 'http://localhost';
     $url = "$referer?compte=" . urlencode($emailCrypte) . "&date=" . urlencode($dateCryptee);
 
-    $sujet = "Oubli de mot de passe sur Partoches Top 5 - étape 2/4";
+    $sujet = "Oubli de mot de passe sur ". $_SESSION ['titreSite'] ." - étape 2/4";
     $contenu = <<<HTML
     Bonjour, vous avez certainement demandé la régénération de votre mot de passe sur un site partoches.<br><br>
     Voici un lien actif aujourd'hui pour le réinitialiser :<br>

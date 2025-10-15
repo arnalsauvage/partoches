@@ -52,7 +52,7 @@ if (isset($_SESSION['login'])&&($_SESSION['login'] == "ko")){
     $_SESSION['login'] = "";
 }
 
-$contenu = envoieHead("Top 5 Partoches", "../../css/index.css?v=25.3.28");
+$contenu = envoieHead($_SESSION ['titreSite'], "../../css/index.css?v=25.3.28");
 $contenu .= "<body>";
 $contenu .= "<script> if (window.innerWidth !== " . $_SESSION['largeur-fenetre'] . ") {
     const donnees = 'largeur_fenetre=' + window.innerWidth;
@@ -88,8 +88,8 @@ if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege
 }
 $contenu .= "		</button>\n
 		<a class='navbar-brand' href='../media/listeMedias.php'>
-    <img src='../../images/navigation/top-5-logo-officiel-300x.webp' alt='logo Top 5 ukulélé' width='32' style='display:inline; vertical-align:middle; margin-right:8px;'>
-    Top 5 Partoches
+            <img src='../../images/navigation/".$_SESSION['logoSite']."' width='42' class='logo'>
+    " . $_SESSION['titreSite'] . " sa mere !!!" . "
 </a>\n
 	</div> <!--/.navbar-header -->\n
     <div id='main-menu' class='collapse navbar-collapse'>\n
@@ -129,7 +129,7 @@ $contenu .= "
 $contenu .= "<div class='container'>\n
 			<div class='starter-template'>\n";
 
-$contenu .= "<br><br><br> sur Top 5 partoches, les amis de Top5 partagent leurs partoches (venues du club et parfois d'ailleurs...) pour le plaisir de gratter l'ukulélé <br>\n";
+$contenu .= "<br><br><br> ".$_SESSION ['sousTitreSite'] . " <br>\n";
 
 $contenu .= image("{$cheminVignettes}" . $_SESSION ['image'], 64, 64, $_SESSION['user']) . "\n";
 

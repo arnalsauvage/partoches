@@ -166,7 +166,7 @@ h1 {
 }
 
 /* Pour que le logo n'écrase pas tout sur petit écran */
-.top5-logo {
+.logo {
     max-width: 100px;
     height: auto;
 }

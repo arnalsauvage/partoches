@@ -10,6 +10,9 @@ $_SESSION ['emailAdmin'] = $ini_objet->m_valeur("EmailAdmin", "general");
 $_SESSION ['loginParam'] = $ini_objet->m_valeur("loginParam", "general");
 $_SESSION ['mailOubliMotDePasse'] = $ini_objet->m_valeur("mailOubliMotDePasse", "general");
 $_SESSION ['nomEmailOubliMotDePasse'] = $ini_objet->m_valeur("nomEmailOubliMotDePasse", "general");
+$_SESSION ['logoSite'] = $ini_objet->m_valeur("logoSite", "general");
+$_SESSION ['titreSite'] = $ini_objet->m_valeur("titreSite", "general");
+$_SESSION ['sousTitreSite'] = $ini_objet->m_valeur("sousTitreSite", "general");
 
 // Niveau de log : on écrit à partir de DEBUG / INFO / WARNING / ERROR
 $niveauDeLog = $ini_objet->m_valeur("niveauDeLog", "general");
