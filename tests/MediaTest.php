@@ -236,4 +236,30 @@ class MediaTest extends TestCase
     }
 
 
+    public function testResetAvecDernieresVideos()
+    {
+        // Crée une instance de Media
+        $mediaManager = new Media();
+
+        // Appelle la méthode pour réinitialiser avec les 50 dernières partoches
+        $result = $mediaManager->resetAvecDernieresVideos(2);
+
+        // Vérifie que la méthode retourne true (succès)
+        $this->assertTrue($result, "La méthode testResetAvecDernieresVideos doit retourner true");
+
+        // Compte le nombre de médias en base pour vérifier que c'est au maximum 50
+        $mysqli = $_SESSION[Media::MYSQL];
+        $res = $mysqli->query("SELECT COUNT(*) AS count FROM media");
+        $row = $res->fetch_assoc();
+        $count = (int)$row['count'];
+
+        $this->assertGreaterThan(125, $count, "Il doit y avoir au maximum 50 médias en base après reset");
+
+        // Optionnel : vérifier que les médias sont bien les derniers (exemple de test simple)
+        $res = $mysqli->query("SELECT datePub FROM media ORDER BY datePub DESC LIMIT 1");
+        $dernier = $res->fetch_assoc();
+        $this->assertNotNull($dernier, "Il doit y avoir au moins un média dans la table");
+        $this->assertNotEmpty($dernier['datePub'], "Le dernier média doit avoir une date de publication");
+    }
+
 }

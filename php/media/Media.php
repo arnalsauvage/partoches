@@ -1,5 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . "/php/document/document.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/liens/lienurl.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/php/chanson/chanson.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/php/utilisateur/utilisateur.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/utilssi.php";
@@ -398,7 +399,22 @@ class Media
         }
     }
 
-    public function transformePartocheEnMedia($idDocPartoche): void
+    public function chercheNdernieresVideos($nombreVideos = 50)
+    {
+        $compteur = 0;
+        // lance la requete cherche documents avec tableNom = chanson
+        $nderniersLiens = chercheNderniersLiens("video");
+        while ($compteur < $nombreVideos) {
+            $liensUrl = $nderniersLiens->fetch_row();
+
+            $this->ajouteLienUrl($liensUrl[0]);
+            // TODO n'ajouter le media que de la dernière version du doc !
+            $compteur++;
+        }
+    }
+
+    public
+    function transformePartocheEnMedia($idDocPartoche): void
     {
         // partant de l'id du document de partoche, on cherche la chanson
         $document = chercheDocument($idDocPartoche);
@@ -417,18 +433,51 @@ class Media
         $this->setLien("./php/document/" . lienUrlTelechargeDocument($idDocPartoche));
     }
 
-    // Ajoute une partoche par l'id de son document rattaché à la chanson
-    public function ajoutePartoche($idPartoche)
+    public
+    function transformeLienUrlEnMedia($idLienurl): void
+    {
+        // partant de l'id du document de partoche, on cherche la chanson
+        $lienUrl = chercheLienurlId($idLienurl);
+        $idChanson = $lienUrl[2];
+        echo $lienUrl;
+        var_dump($lienUrl);
+        $chanson = new Chanson();
+        $chanson->chercheChanson($idChanson);
+        $this->setTitre($chanson->getNom());
+        $this->setDescription("Vidéo pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
+        $this->setAuteur(intval($lienUrl[7])); // Identifiant de l'utilisateur
+        $this->setDatePub($lienUrl[6]); // Date de publication du document
+        $this->setType($lienUrl[4]);
+        $this->setTags($lienUrl[4] . " " . $chanson->getAnnee());
+
+        $this->setImage("./data/chansons/$idChanson/" . rawurlencode(imageTableId(self::TABLE_CHANSON, $idChanson)));
+        $this->setLien($lienUrl[3]);
+    }
+
+// Ajoute une partoche par l'id de son document rattaché à la chanson
+    public
+    function ajoutePartoche($idPartoche)
     {
         // Transformer la partoche en média
         $this->transformePartocheEnMedia($idPartoche); // Méthode fictive pour transformer
         $this->persist(); // Utilisation de la méthode existante pour créer le média
     }
 
-    public function resetAvecDernieresPartoches(int $nb = 50)
+// Ajoute ue vidéo par l'id de son lienurl rattaché
+    public
+    function ajouteLienurl($idPartoche)
+    {
+        // Transformer la partoche en média
+        $this->transformeLienUrlEnMedia($idPartoche); // Méthode fictive pour transformer
+        $this->persist(); // Utilisation de la méthode existante pour créer le média
+    }
+
+
+    public
+    function resetAvecDernieresPartoches(int $nb = 50)
     {
         // Suppression de toutes les entrées
-        $deleteQuery = "DELETE FROM media";
+        $deleteQuery = "DELETE FROM media WHERE type='partoche'";
         $resultDelete = $_SESSION[self::MYSQL]->query($deleteQuery);
         if (!$resultDelete) {
             die("Erreur lors de la suppression des médias : " . $_SESSION[self::MYSQL]->error);
@@ -439,8 +488,23 @@ class Media
         return true;
     }
 
+    public
+    function resetAvecDernieresVideos(int $nb = 50)
+    {
+        // Suppression de toutes les entrées
+        $deleteQuery = "DELETE FROM media WHERE type='video'";
+        $resultDelete = $_SESSION[self::MYSQL]->query($deleteQuery);
+        if (!$resultDelete) {
+            die("Erreur lors de la suppression des médias vidéos : " . $_SESSION[self::MYSQL]->error);
+        }
 
-    public function afficheComposantMedia(): string
+        // Création des $nb dernières partoches
+        $this->chercheNdernieresVideos($nb);
+        return true;
+    }
+
+    public
+    function afficheComposantMedia(): string
     {
         $type = htmlspecialchars($this->_type);
         $titre = htmlspecialchars($this->_titre);

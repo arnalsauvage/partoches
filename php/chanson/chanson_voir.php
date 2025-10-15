@@ -66,21 +66,24 @@ $contenuHtml .= "<div class='col-sm-11'><h3> " . htmlentities($_chanson->getInte
     " - <a href='" . $urlChercheAnChanson . "</a>\n";
 $contenuHtml .= FIN_DIV;
 $contenuHtml .= DIV_CLASS_ROW;
-$contenuHtml .= " <div class='col-sm-8'>Tonalité : " . $_chanson->getTonalite() . ", Tempo : " . $_chanson->getTempo();
+$contenuHtml .= " <div class='col-sm-6'>Tonalité : " . $_chanson->getTonalite() . ", Tempo : " . $_chanson->getTempo();
 $contenuHtml .= ", mesure : " . $_chanson->getMesure() . ", pulsation : " . $_chanson->getPulsation() . " <br>\n";
 $contenuHtml .= " Publiée le  :$datePub, par $utilisateur, affichée $hits fois. <br>\n" . FIN_DIV . "\n";
 
 $ICONEWIIKIPEDIA = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/";
 $ICONEWIIKIPEDIA.="YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png";
 // Propose des recherches sur la chanson
-$contenuHtml .= "<div class='col-sm-4'><a href='https://www.youtube.com/results?search_query=" .
+$contenuHtml .= "<div class='col-sm-6'><a href='https://www.youtube.com/results?search_query=" .
     urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank'>
 <img src='$ICONEWIIKIPEDIA' alt = 'recherche youtube' width='64'></a>\n";
 $rechercheWikipedia = "https://fr.wikipedia.org/w/index.php?search=" .
     urlencode(($_chanson->getNom() . " " . $_chanson->getInterprete()));
 $contenuHtml .= "<a href='$rechercheWikipedia' target='_blank'>
     <img src='https://fr.wikipedia.org/static/images/project-logos/frwiki.png'
-    alt='recherche wikipedia' width='64'></a><br>\n" . FIN_DIV . "\n";
+    alt='recherche wikipedia' width='64'></a>\n" ;
+
+$urlPageEnCours = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+$contenuHtml .= generateQRCode ($urlPageEnCours, 128);
 $contenuHtml .= FIN_DIV;
 $contenuHtml .= FIN_SECTION;
 $contenuHtml .= "<section class='col-sm-4'>";

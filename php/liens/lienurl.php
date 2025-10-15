@@ -1,8 +1,8 @@
 <?php
-if(!defined("BR_REQUETE")) {
+if (!defined("BR_REQUETE")) {
     define("BR_REQUETE", "<br>Requete : ");
 }
-if(!defined("DOSSIER_DATA")) {
+if (!defined("DOSSIER_DATA")) {
     define("DOSSIER_DATA", "../../data/");
 }
 include_once "../lib/configMysql.php";
@@ -41,8 +41,7 @@ function chercheLienurlId($id)
     // renvoie la ligne sélectionnée :id	nomtable	idtable	url	type	description
     if ($ligne = $result->fetch_row()) {
         return ($ligne);
-    }
-    else {
+    } else {
         return (0);
     }
 }
@@ -55,8 +54,7 @@ function chercheLienurlUrlTableId($url, $table, $id)
     // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
     if ($ligne = $result->fetch_row()) {
         return ($ligne);
-    }
-    else {
+    } else {
         return (0);
     }
 }
@@ -83,6 +81,16 @@ function creeLienurl($url, $type, $description, $nomTable, $idTable, $date, $idu
         return false;
     }
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creeLienurl#1 : " . $_SESSION ['mysql']->error);
+    return $result;
+}
+
+
+// Cherche les documents correspondant à un critère
+function chercheNderniersLiens($type)
+{
+    $maRequete = "SELECT * FROM lienurl WHERE type LIKE '$type' ORDER BY date DESC";
+    // echo "ma requete : " . $maRequete;
+    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheNderniersLiens #1 : " . $_SESSION ['mysql']->error);
     return $result;
 }
 

@@ -4,6 +4,7 @@ const PRIVILEGE = 'privilege';
 const CHANSON = "chanson";
 const ORDRE_ASC = 'ordreAsc';
 const TRI = 'tri';
+const TRIDESC = 'triDesc';
 const DATE_PUB = "datePub";
 const CHERCHE = 'cherche';
 const CENTRER = "centrer";
@@ -42,20 +43,30 @@ $contenuHtml = "<div class='container'> \n
 
 $contenuHtml .= entreBalise("Chansons", "H1");
 
-if (isset($_GET['filtre'])){
-    $filtre = filtreGetPost($_GET, FILTRE);
-    $valeur_filtre = filtreGetPost($_GET, VAL_FILTRE);
-    $contenuHtml .= "<p class='filtres'> filtre présent : $filtre = $valeur_filtre" ;
-    $contenuHtml .= " " . Ancre($_SERVER['PHP_SELF'],"effacer le filtre") . "</p>";
+if (!isset($_SESSION[TRI])) {
+    $_SESSION[TRI] = DATE_PUB;
+}
+if (!isset($_SESSION[ORDRE_ASC])) {
+    $_SESSION[ORDRE_ASC] = false;
+}
+if (!isset($_SESSION[CHERCHE])) {
+    $_SESSION[CHERCHE] = '';
 }
 
-if (isset($_GET['raz-recherche'])){
+if (isset($_GET['filtre'])) {
+    $filtre = filtreGetPost($_GET, FILTRE);
+    $valeur_filtre = filtreGetPost($_GET, VAL_FILTRE);
+    $contenuHtml .= "<p class='filtres'> filtre présent : $filtre = $valeur_filtre";
+    $contenuHtml .= " " . Ancre($_SERVER['PHP_SELF'], "effacer le filtre") . "</p>";
+}
+
+if (isset($_GET['raz-recherche'])) {
     $_SESSION[CHERCHE] = "";
 }
 
 // Gestion du paramètre de tri
 // On prend en compte une demande de tri ascendant
-if (isset ($_GET [TRI]) ) {
+if (isset ($_GET [TRI]) || isset ($_GET [TRIDESC])) {
     // Gestion du paramètre de tri
     $triAsc = filtreGetPost($_GET, 'tri');
     $triDesc = filtreGetPost($_GET, 'triDesc');
@@ -152,7 +163,7 @@ require_once "chanson-v-comp-cherche.php";
 $contenuHtml .= $contenuHtmlCompCherche;
 
 // Affichage de la liste
-$largeur_ecran  = $_SESSION['largeur-fenetre'];
+$largeur_ecran = $_SESSION['largeur-fenetre'];
 
 // $contenuHtml .= "Largeur d'écran : " . $largeur_ecran;
 // >1200 on affiche tout
@@ -173,10 +184,10 @@ if ($largeur_ecran > 700) {
     // Pour les privileges > INVITE, on affiche les colonnes votes et annee
     if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_INVITE"]) {
         $contenuHtml .= titreColonne("  Votes  ", "votes");
-     }
+    }
     $contenuHtml .= titreColonne("Année", "annee");
 }
-if ($largeur_ecran >1200) {
+if ($largeur_ecran > 1200) {
     $contenuHtml .= titreColonne("Tempo", "tempo");
     $contenuHtml .= titreColonne("Mesure", "mesure");
     $contenuHtml .= titreColonne("Pulsation", "pulsation");
@@ -198,18 +209,19 @@ $contenuHtml .= TblCorpsDebut();
 global $_DOSSIER_CHANSONS;
 
 $_RACINE = "../../";
-$cheminImagesChanson = $_RACINE .$_DOSSIER_CHANSONS;
+$cheminImagesChanson = $_RACINE . $_DOSSIER_CHANSONS;
 $_chanson = new Chanson();
 $maNote = new UtilisateurNote(0, 1, 1, 1);
 
 
-    function celluleFiltrable($libelle, $cle, $valeur, $alignement = '', $longueurMax = null) {
-        global $pagination;
-        $url = $_SERVER['REQUEST_URI'];
-        $texte = $longueurMax ? limiteLongueur($libelle, $longueurMax) : $libelle;
-        $urlFiltre = $pagination->urlAjouteParam($url, FILTRE . "=$cle&" . VAL_FILTRE . "=" . urlencode($valeur));
-        return TblCellule(Ancre($urlFiltre, $texte), 1, 1, $alignement);
-    }
+function celluleFiltrable($libelle, $cle, $valeur, $alignement = '', $longueurMax = null)
+{
+    global $pagination;
+    $url = $_SERVER['REQUEST_URI'];
+    $texte = $longueurMax ? limiteLongueur($libelle, $longueurMax) : $libelle;
+    $urlFiltre = $pagination->urlAjouteParam($url, FILTRE . "=$cle&" . VAL_FILTRE . "=" . urlencode($valeur));
+    return TblCellule(Ancre($urlFiltre, $texte), 1, 1, $alignement);
+}
 
 foreach ($resultat as $ligne) {
     $numligne++;
@@ -228,20 +240,17 @@ foreach ($resultat as $ligne) {
     }
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-    if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"])
-    {
+    if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
         $_image = Image($cheminImages . $iconeEdit, 32, 32);
-        $_ancre = Ancre("$chansonForm?id=" . $_id, $_image,-1, -1, "modifier la chanson" );
+        $_ancre = Ancre("$chansonForm?id=" . $_id, $_image, -1, -1, "modifier la chanson");
         $contenuHtml .= TblCellule($_ancre);
-    }
-    else
-    {
+    } else {
         $contenuHtml .= TblCellule(" ");
     }
     // TODO Supprimer les parametres filtres existant dans l'url pour les liens avec filtre !
     $imagePochette = Image(($cheminImagesChanson . $_id . "/" . rawurlencode(imageTableId(CHANSON, $_id))), 48, 48, "couverture");
     $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", $imagePochette));
-    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"), -1 ,-1,$_chanson->getNom())); // Nom
+    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"), -1, -1, $_chanson->getNom())); // Nom
     $url = $_SERVER['REQUEST_URI'];
 
     $contenuHtml .= celluleFiltrable($_chanson->getInterprete(), "interprete", $_chanson->getInterprete(), '', 21); // interprete
@@ -276,7 +285,7 @@ foreach ($resultat as $ligne) {
     }
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-        if ($_SESSION [PRIVILEGE] >= $GLOBALS["PRIVILEGE_ADMIN"]) {
+    if ($_SESSION [PRIVILEGE] >= $GLOBALS["PRIVILEGE_ADMIN"]) {
         $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages));
         // //////////////////////////////////////////////////////////////////////ADMIN
     }
