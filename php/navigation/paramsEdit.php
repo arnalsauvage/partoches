@@ -1,6 +1,7 @@
 <?php
 include_once "../lib/utilssi.php";
 include_once("menu.php");
+include_once "../navigation/Footer.php";
 
 $fichier = "../../conf/params.ini";
 $sortie = "<div class='container' style='padding:20px;'>";
@@ -36,6 +37,10 @@ $itemsMysql = [
     "motDePasse" => "Mot de passe MySQL"
 ];
 
+// Création de l'objet Footer
+$footer = new Footer();
+$bModif = false;
+
 // Traiter POST
 foreach (array_merge(array_keys($itemsGeneral), array_keys($itemsMysql)) as $item) {
     if (isset($_POST[$item])) {
@@ -43,7 +48,30 @@ foreach (array_merge(array_keys($itemsGeneral), array_keys($itemsMysql)) as $ite
         $ini_objet->m_put($_POST[$item], $item, $groupe);
         $bModif = true;
     }
+    // Traitement du pied de page
+    if (isset($_POST['footerHtml'])) {
+        // Autoriser un petit sous-ensemble de balises HTML
+        $footerHtml = strip_tags($_POST['footerHtml'], '<a><br><img><strong><em><p>');
+        $ini_objet->m_put($footerHtml, 'footerHtml', 'footer');
+        $bModif = true;
+    }
 }
+// Traitement POST pour le footer
+if (isset($_POST['footerHtml'])) {
+    // Autoriser un petit sous-ensemble de balises HTML
+    $footerHtml = strip_tags($_POST['footerHtml'], '<a><br><img><strong><em><p>');
+    $footer->setHtml($footerHtml);
+    $bModif = true;
+}
+
+// Sauvegarde si modifié
+if ($bModif) {
+    $footer->creeModifieBDD(); // Enregistre dans l'ini via la classe Footer
+}
+
+// Récupération du contenu HTML pour le formulaire
+$footerHtml = htmlspecialchars($footer->getHtml());
+
 
 // Upload logo
 $logoActuel = $ini_objet->m_valeur('logoSite', 'general');
@@ -113,7 +141,9 @@ $sortie .= <<<HTML
 <ul class="nav nav-tabs" role="tablist">
   <li class="active"><a href="#general" role="tab" data-toggle="tab">Général</a></li>
   <li><a href="#mysql" role="tab" data-toggle="tab">MySQL</a></li>
+  <li><a href="#footer" role="tab" data-toggle="tab">Pied de page</a></li>
 </ul>
+
 
 <div class="tab-content" style="margin-top:20px;">
   <div class="tab-pane fade in active" id="general">
@@ -142,6 +172,19 @@ foreach ($itemsMysql as $item => $label) {
     $sortie .= champInput($ini_objet, $item, $label, $type, "mysql");
 }
 $sortie .= "</div> <!-- fin onglet mysql -->";
+
+$sortie .= <<<HTML
+<div class='tab-pane fade' id="footer">
+    <div class="mb-3">
+        <label for="footerHtml" class="form-label">Contenu du pied de page</label>
+        <textarea class="form-control" name="footerHtml" id="footerHtml" rows="10" style="font-family: monospace;">$footerHtml</textarea>
+        <small class="text-muted d-block mt-2">
+            Vous pouvez insérer des liens, des images et du texte (balises autorisées : &lt;a&gt;, &lt;br&gt;, &lt;img&gt;, &lt;strong&gt;, &lt;em&gt;).
+        </small>
+    </div>
+</div> <!-- fin onglet footer -->
+HTML;
+
 $sortie .= "</div> <!-- fin tab-content -->";
 
 $sortie .= "<button type='submit' class='btn btn-primary mt-3'>Valider</button>";
@@ -163,6 +206,7 @@ $(document).ready(function(){
 });
 </script>
 HTML;
+
 
 // Footer
 $sortie .= envoieFooter();

@@ -43,7 +43,7 @@ $textes = [
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= $textes['siteTitle'] ?> - les derniers médias</title>
     <meta name="description" content="<?= $textes['siteSubtitle'] ?>">
-    <link rel="stylesheet" type="text/css" href="../../css/styles.0.1.css">
+    <link rel="stylesheet" type="text/css" href="../../css/styles.0.2.css">
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>

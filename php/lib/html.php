@@ -1,4 +1,6 @@
 <?php
+
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/navigation/Footer.php";
 if (!isset ($FichierHtml)) {
     $FichierHtml = 1;
     // Fonction retournant le code HTML pour un lien hypertexte____________
@@ -191,7 +193,7 @@ if (!isset ($FichierHtml)) {
     	<link href='../../css/bootstrap.min.css' rel='stylesheet'>
         <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
     	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel='stylesheet'>
-        <link rel='stylesheet' type='text/css' href='../../css/styles.0.1.css'>
+        <link rel='stylesheet' type='text/css' href='../../css/styles.0.2.css'>
     	 ";
 
         $retour .= "
@@ -220,10 +222,51 @@ if (!isset ($FichierHtml)) {
 
     function envoieFooter()
     {
-        $retour = file_get_contents('../../html/footer.html', FILE_USE_INCLUDE_PATH);
+        // On crée l'objet Footer
+        $footer = new Footer();
+
+        // On récupère le contenu HTML du footer
+        $footerHtml = $footer->getHtml();
+
+        // Si aucun HTML n'est défini, on met un contenu par défaut
+        if (!$footerHtml) {
+            $footerHtml = <<<HTML
+            Nom du club :
+            <a href="http://www.top5.re" target="_blank">Site web</a> |
+            <a href="https://padlet.com/top5asso/top5-atelier-d-butant-interm-diaire-wwiy3x9lz44a6vyx">padlet </a>   |
+            <a href="http://partoches.top5.re" target="_blank">partoches</a>
+            <a href="https://www.youtube.com/channel/UCFKyqYcs5cnML-EgPgYmwdg" target="_blank" title="youtube">
+                &nbsp;
+                <img src="https://cdn3.iconfinder.com/data/icons/peelicons-vol-1/50/YouTube-128.png" width="30" height="30" alt="youtube">
+            </a>
+            &nbsp;
+            <a href="https://twitter.com/top5ukeclub" target="_blank" title="twitter">
+                <img src="https://cdn3.iconfinder.com/data/icons/peelicons-vol-1/50/Twitter-128.png" width="30" height="30" alt="twitter">
+            </a>
+
+HTML;
+        }
+
+        // Construction du footer complet
+        $retour = <<<HTML
+<footer>
+    <div class='container'>
+        <div class='starter-template'>
+            <br>
+            $footerHtml
+            <br>
+            <a href='../html/mentionsLegales.html' target='_blank' class='lienMentionsLegales'>Mentions légales</a>
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js'></script>
+            <script src='../../js/precise-star-rating.js'></script>
+        </div>
+    </div>
+</footer>
+HTML;
+
         $retour .= "\n</html>";
         return $retour;
     }
+
 
 
     function myUrlEncode($string)

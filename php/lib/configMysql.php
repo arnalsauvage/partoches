@@ -1,10 +1,14 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/php/lib/FichierIni.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/php/lib/mysql.php';
-if (FALSE == isset($configMysql)) {
+require_once __DIR__ .'/FichierIni.php';
+require_once __DIR__ .'/mysql.php';
+if (!isset($configMysql)) {
     $configMysql = TRUE;
 
-    $fichier = $_SERVER['DOCUMENT_ROOT'] . "/conf/params.ini";
+    if (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING) {
+        $fichier = __DIR__ . "/../../conf/params_test.ini";
+    } else {
+        $fichier = $_SERVER['DOCUMENT_ROOT'] . "/conf/params.ini";
+    }
 
     // On lit les données dans le fichier ini
     $ini_objet = new FichierIni ();

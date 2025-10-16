@@ -89,7 +89,7 @@ if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege
 $contenu .= "		</button>\n
 		<a class='navbar-brand' href='../media/listeMedias.php'>
             <img src='../../images/navigation/".$_SESSION['logoSite']."' width='42' class='logo'>
-    " . $_SESSION['titreSite'] . " sa mere !!!" . "
+    " . $_SESSION['titreSite'] . "
 </a>\n
 	</div> <!--/.navbar-header -->\n
     <div id='main-menu' class='collapse navbar-collapse'>\n
