@@ -70,9 +70,10 @@ $(document).ready(function() {
 
 // Gestion de la modale "envoyer une nouvelle version"
 
-function openModaleNouvelleVersionDocument(fileId) {
+function openModaleNouvelleVersionDocument(fileId, nomDocument) {
     document.getElementById('myModalEnvoieNouvelleVersion' ).style.display = 'block';
     document.getElementById('oldFile' ).value = fileId;
+    document.getElementById('texteNomDocument').innerHTML = "pour le document <strong>" + nomDocument + "</strong>";
 }
 
 function closeModaleNouvelleVersionDocument() {

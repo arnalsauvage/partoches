@@ -66,7 +66,7 @@ if (isset($_POST['footerHtml'])) {
 
 // Sauvegarde si modifié
 if ($bModif) {
-    $footer->creeModifieBDD(); // Enregistre dans l'ini via la classe Footer
+    $footer->sauveBdd(); // Enregistre dans l'ini via la classe Footer
 }
 
 // Récupération du contenu HTML pour le formulaire

@@ -440,9 +440,8 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
                                 }
                                 // pour debug $listeDocs .= " ajouter au songbook id le document " . $ligneDoc[0];
                                 $listeDocs .= "<button onclick=openModaleAjoutAuSongbook(" . $ligneDoc[0] . ") >ajouter au songbook</button>";
-                                $listeDocs .= "<button onclick=openModaleNouvelleVersionDocument(" . $ligneDoc[0] .  ")>Envoyer une nouvelle version</button>
+                                $listeDocs .= "<button onclick=\"openModaleNouvelleVersionDocument(" . $ligneDoc[0] . ", '" . addslashes($fichierCourt) . "')\">Envoyer une nouvelle version</button>\n";
 
-";
 
         ";
                             </li>";
@@ -457,6 +456,7 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
     <div class='modal-content'>
         <span class='close' onclick='closeModaleNouvelleVersionDocument()'>&times;</span>
         <h2>Envoyer une nouvelle version</h2>
+        <p id='texteNomDocument'>pour le document nom_du_fichier</p>
         <form action='chanson_upload.php' method='post' enctype='multipart/form-data'>
             <input type='hidden' name='id' value='$id'>
             <input type='hidden' id='oldFile' name='oldFile' value=''>
