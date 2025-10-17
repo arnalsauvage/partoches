@@ -1,4 +1,35 @@
 <?php
+
+// Si c'est un appel Ajax pour récupérer la date
+if (isset($_POST['action']) && $_POST['action'] === 'derniere_date_modif') {
+    function trouverDerniereDateModif($dossier, $extensions = ['php', 'js', 'css', 'html']) {
+        $derniereDate = 0;
+        $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dossier));
+        foreach ($it as $fichier) {
+            if ($fichier->isFile()) {
+                $ext = strtolower(pathinfo($fichier->getFilename(), PATHINFO_EXTENSION));
+                if (in_array($ext, $extensions)) {
+                    $filemtime = $fichier->getMTime();
+                    if ($filemtime > $derniereDate) {
+                        $derniereDate = $filemtime;
+                    }
+                }
+            }
+        }
+        return $derniereDate;
+    }
+    $repertoire = __DIR__; // changer selon dossier à analyser
+    $timestampDerniereModif = trouverDerniereDateModif($repertoire);
+    if ($timestampDerniereModif > 0) {
+        echo date("d/m/Y H:i:s", $timestampDerniereModif);
+    } else {
+        echo "Aucun fichier trouvé.";
+    }
+    exit; // Terminer pour ajax uniquement
+}
+
+// Fin ajax
+
 include_once "../lib/utilssi.php";
 include_once("menu.php");
 include_once "../navigation/Footer.php";
@@ -11,6 +42,7 @@ if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_AD
     include "../../html/menuLogin.html";
     exit();
 }
+
 
 // Charge le fichier ini
 $ini_objet = new FichierIni();
@@ -194,6 +226,24 @@ $sortie .= "</form>";
 $sortie .= "<h2>Medias</h2>
 <a href='../media/listeMedias.php'>Voir les médias</a> |
 <a href='paramsEdit.php?resetmedias=125'>Réinitialiser les médias</a>";
+
+// Bouton dernière modif AJAX
+$sortie.= <<<HTML
+<button id="btnDerniereModif">Voir dernière modif</button>
+<div id="resultatDerniereModif" style="margin-top:10px; font-weight:bold;"></div>
+
+<script>
+$('#btnDerniereModif').click(function() {
+    $('#resultatDerniereModif').text('Chargement...');
+    $.post('', {action: 'derniere_date_modif'}, function(data) {
+        $('#resultatDerniereModif').text('Dernière date de modification : ' + data);
+    }).fail(function() {
+        $('#resultatDerniereModif').text('Erreur lors de la récupération.');
+    });
+});
+</script>
+HTML;
+
 
 // Script onglets Bootstrap
 $sortie .= <<<HTML
