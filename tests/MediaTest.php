@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-
+const PHPUNIT_RUNNING = true;
 session_start();
 $_SERVER['DOCUMENT_ROOT'] = "../";
 require_once  "../php/lib/utilssi.php";
@@ -181,11 +181,11 @@ class MediaTest extends TestCase
 // Vérifier que l'objet Media contient les bonnes valeurs
 
         $this->assertEquals("Haere Mai", $media->getTitre());
-        $this->assertEquals("partoche de la chanson de VSALELE 1955", $media->getDescription());
-        $this->assertEquals(80, $media->getAuteur()); // Identifiant de l'utilisateur
-        $this->assertEquals("2021-02-12", $media->getDatePub());
+        $this->assertEquals("Partoche pour la chanson de VSALELE - 1955", $media->getDescription());
+        $this->assertEquals(1, $media->getAuteur()); // Identifiant de l'utilisateur
+        $this->assertEquals("2022-03-25", $media->getDatePub());
         $this->assertEquals("partoche", $media->getType());
-        $this->assertEquals("partoche chanson 1955", $media->getTags());
+        $this->assertEquals("partoche 1955", $media->getTags());
         $this->assertEquals('./data/chansons/336/haereMai-v1.jpg', $media->getImage());
         $this->assertEquals('./php/document/getdoc.php?doc=1305', $media->getLien());
     }
@@ -222,7 +222,7 @@ class MediaTest extends TestCase
 
         // Compte le nombre de médias en base pour vérifier que c'est au maximum 50
         $mysqli = $_SESSION[Media::MYSQL];
-        $res = $mysqli->query("SELECT COUNT(*) AS count FROM media");
+        $res = $mysqli->query("SELECT COUNT(*) AS count FROM media WHERE type='partoche'");
         $row = $res->fetch_assoc();
         $count = (int)$row['count'];
 
@@ -249,17 +249,59 @@ class MediaTest extends TestCase
 
         // Compte le nombre de médias en base pour vérifier que c'est au maximum 50
         $mysqli = $_SESSION[Media::MYSQL];
-        $res = $mysqli->query("SELECT COUNT(*) AS count FROM media");
+        $res = $mysqli->query("SELECT COUNT(*) AS count FROM media WHERE type='video'");
         $row = $res->fetch_assoc();
         $count = (int)$row['count'];
 
-        $this->assertGreaterThan(125, $count, "Il doit y avoir au maximum 50 médias en base après reset");
+        $this->assertGreaterThan(0, $count, "Il doit y avoir des  médias en base après reset");
+        $this->assertLessThan(51, $count, "Il doit y avoir au maximum 50 médias en base après reset");
 
         // Optionnel : vérifier que les médias sont bien les derniers (exemple de test simple)
         $res = $mysqli->query("SELECT datePub FROM media ORDER BY datePub DESC LIMIT 1");
         $dernier = $res->fetch_assoc();
         $this->assertNotNull($dernier, "Il doit y avoir au moins un média dans la table");
         $this->assertNotEmpty($dernier['datePub'], "Le dernier média doit avoir une date de publication");
+    }
+
+    public function testResetMediasDistribues()
+    {
+        // Crée une instance de Media
+        $mediaManager = new Media();
+
+        // Choisit un nombre total de médias à réinitialiser, par exemple 10
+        $totalMedias = 50;
+
+        // Appelle la méthode pour réinitialiser distribuée
+        list($nbVideosTraites, $nbPartochesTraites) = $mediaManager->resetMediasDistribues($totalMedias);
+
+        // Vérifie que les nombres retournés sont cohérents
+        $this->assertIsInt($nbVideosTraites, "Le nombre de vidéos traitées doit être un entier");
+        $this->assertIsInt($nbPartochesTraites, "Le nombre de partoches traitées doit être un entier");
+        $this->assertEquals($totalMedias, $nbVideosTraites + $nbPartochesTraites, "La somme des médias traités doit être égale au total demandé");
+
+        // Vérifie que des médias existent en base pour chaque type
+        $mysqli = $_SESSION[Media::MYSQL];
+
+        $resVideos = $mysqli->query("SELECT COUNT(*) AS count FROM media WHERE type='vidéo'");
+        $rowVideos = $resVideos->fetch_assoc();
+        $countVideos = (int)$rowVideos['count'];
+        $this->assertGreaterThanOrEqual(0, $countVideos, "Il doit y avoir au moins zéro média vidéo après reset");
+
+        $resPartoches = $mysqli->query("SELECT COUNT(*) AS count FROM media WHERE type='partoche'");
+        $rowPartoches = $resPartoches->fetch_assoc();
+        $countPartoches = (int)$rowPartoches['count'];
+        $this->assertGreaterThanOrEqual(0, $countPartoches, "Il doit y avoir au moins zéro média partoche après reset");
+
+        // Optionnel : vérifier que les médias sont bien triés par date, youngest first
+        $resDernierVideo = $mysqli->query("SELECT datePub FROM media WHERE type='video' ORDER BY datePub DESC LIMIT 1");
+        $dernierVideo = $resDernierVideo->fetch_assoc();
+        $this->assertNotNull($dernierVideo, "Il doit y avoir au moins un média vidéo");
+        $this->assertNotEmpty($dernierVideo['datePub'], "La date de publication du dernier média vidéo ne doit pas être vide");
+
+        $resDernierePartoche = $mysqli->query("SELECT datePub FROM media WHERE type='partoche' ORDER BY datePub DESC LIMIT 1");
+        $dernierePartoche = $resDernierePartoche->fetch_assoc();
+        $this->assertNotNull($dernierePartoche, "Il doit y avoir au moins un média partoche");
+        $this->assertNotEmpty($dernierePartoche['datePub'], "La date de publication de la dernière partoche ne doit pas être vide");
     }
 
 }

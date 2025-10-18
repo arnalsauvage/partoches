@@ -56,7 +56,7 @@ class Media
         $this->setLien($_lien);
         $this->setDescription($_description);
         $this->setTags($_tags);
-        $this->setDatePub(date(self::D_M_Y));
+        $this->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
         $this->setHits(0);
     }
 
@@ -205,7 +205,7 @@ class Media
     }
 
     // Crée un média et renvoie l'id du média créé
-    private function creeMediaBDD()
+    private function creeMediaBDD(): bool|int
     {
         // Conversion de la date au format MySQL avant l'insertion
         // Bug ? Doublon ?
@@ -214,7 +214,7 @@ class Media
         $this->_lien = $_SESSION[self::MYSQL]->real_escape_string($this->_lien);
         $this->_description = $_SESSION[self::MYSQL]->real_escape_string($this->_description);
         $this->_tags = $_SESSION[self::MYSQL]->real_escape_string($this->_tags);
-        $this->_date = $_SESSION[self::MYSQL]->real_escape_string($this->_datePub);
+        $this->_datePub = $_SESSION[self::MYSQL]->real_escape_string($this->_datePub);
         $maRequete = sprintf("INSERT INTO media (id, type, titre, image, auteur, lien, description, tags, datePub, hits)
             VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
             $this->_type,
@@ -224,7 +224,7 @@ class Media
             $this->_lien,
             $this->_description,
             $this->_tags,
-            $this->_date,
+            $this->_datePub,
             $this->_hits);
 
         $result = $_SESSION[self::MYSQL]->query($maRequete);
@@ -238,7 +238,7 @@ class Media
         return $this->getId();
     }
 
-    private function modifieMediaBDD()
+    private function modifieMediaBDD() : bool
     {
         // Échappement des chaînes
         $this->_titre = $_SESSION[self::MYSQL]->real_escape_string($this->_titre);
@@ -327,6 +327,18 @@ class Media
         return $tableau;
     }
 
+    // Cherche tos les medias
+    public static function chercheTousLesMedias(): array
+    {
+        $maRequete = "SELECT id FROM media ";
+        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans chercheMediasParType : " . $_SESSION[self::MYSQL]->error);
+        $tableau = [];
+        while ($idMedia = $result->fetch_row()) {
+            array_push($tableau, $idMedia[0]);
+        }
+        return $tableau;
+    }
+
     // Cherche des médias par titre
     public static function chercheMediasParTitre($titre): array
     {
@@ -383,7 +395,7 @@ class Media
         return $retour;
     }
 
-    public function chercheNdernieresPartoches($nombrePartoches = 100)
+    public function chercheNdernieresPartoches($nombrePartoches = 100): void
     {
         $compteur = 0;
         // lance la requete cherche documents avec tableNom = chanson
@@ -399,11 +411,11 @@ class Media
         }
     }
 
-    public function chercheNdernieresVideos($nombreVideos = 50)
+    public function chercheNdernieresVideos($nombreVideos = 50): void
     {
         $compteur = 0;
         // lance la requete cherche documents avec tableNom = chanson
-        $nderniersLiens = chercheNderniersLiens("video");
+        $nderniersLiens = chercheNderniersLiens("vidéo");
         while ($compteur < $nombreVideos) {
             $liensUrl = $nderniersLiens->fetch_row();
 
@@ -456,7 +468,7 @@ class Media
 
 // Ajoute une partoche par l'id de son document rattaché à la chanson
     public
-    function ajoutePartoche($idPartoche)
+    function ajoutePartoche($idPartoche): void
     {
         // Transformer la partoche en média
         $this->transformePartocheEnMedia($idPartoche); // Méthode fictive pour transformer
@@ -465,19 +477,19 @@ class Media
 
 // Ajoute ue vidéo par l'id de son lienurl rattaché
     public
-    function ajouteLienurl($idPartoche)
+    function ajouteLienurl($idPartoche): void
     {
-        // Transformer la partoche en média
+        // Transformer le lien url en média
         $this->transformeLienUrlEnMedia($idPartoche); // Méthode fictive pour transformer
         $this->persist(); // Utilisation de la méthode existante pour créer le média
     }
 
 
     public
-    function resetAvecDernieresPartoches(int $nb = 50)
+    function resetAvecDernieresPartoches(int $nb = 50) :bool
     {
         // Suppression de toutes les entrées
-        $deleteQuery = "DELETE FROM media WHERE type='partoche'";
+        $deleteQuery = "DELETE  FROM media";
         $resultDelete = $_SESSION[self::MYSQL]->query($deleteQuery);
         if (!$resultDelete) {
             die("Erreur lors de la suppression des médias : " . $_SESSION[self::MYSQL]->error);
@@ -489,16 +501,16 @@ class Media
     }
 
     public
-    function resetAvecDernieresVideos(int $nb = 50)
+    function resetAvecDernieresVideos(int $nb = 50) :bool
     {
         // Suppression de toutes les entrées
-        $deleteQuery = "DELETE FROM media WHERE type='video'";
+        $deleteQuery = "DELETE FROM media WHERE type LIKE 'video' COLLATE utf8mb4_general_ci";
         $resultDelete = $_SESSION[self::MYSQL]->query($deleteQuery);
         if (!$resultDelete) {
             die("Erreur lors de la suppression des médias vidéos : " . $_SESSION[self::MYSQL]->error);
         }
 
-        // Création des $nb dernières partoches
+        // Création des $nb dernières videos
         $this->chercheNdernieresVideos($nb);
         return true;
     }
@@ -509,7 +521,11 @@ class Media
         $type = htmlspecialchars($this->_type);
         $titre = htmlspecialchars($this->_titre);
         $image = htmlspecialchars($this->_image);
-        $lien = "../../" . htmlspecialchars($this->_lien);
+        if ($type === "partoche") {
+            $lien = "../../" . htmlspecialchars($this->_lien);
+        } elseif ($type === "vidéo" || $type === "video" || $type === "Vidéo" || $type === "Video") {
+            $lien = htmlspecialchars($this->_lien);
+        }
         $description = htmlspecialchars($this->_description);
         $tags = htmlspecialchars($this->_tags);
         $datePub = htmlspecialchars($this->_datePub);
@@ -520,28 +536,57 @@ class Media
         $auteurNom = $auteur[3];
 
         return <<<HTML
-<div style="width:200px;height:350px;border:1px solid #ccc;
-background-color: rgba(255, 255, 255, 0.8); /* fond blanc 80% opaque */
-    border:1px solid #ccc;border-radius:8px;overflow:hidden;
-            box-shadow:2px 2px 6px rgba(0,0,0,0.1);font-family:sans-serif;margin:10px;
-            display:flex; flex-direction:column; justify-content:space-between;">
-    <img src="../../$image" alt="Illustration de $titre" style="width:100%;height:150px;object-fit:cover;">
-    <div style="padding:10px; text-align:center;">
-        <h3 style="margin:0;font-size:18px;">$titre</h3>
-        <p style="font-size:12px;color:#666;margin:4px 0;">publié le $datePub par <strong>$auteurNom</strong></p>
-        <p style="font-size:13px;margin:6px 0;max-height:60px;overflow:hidden;text-overflow:ellipsis;">$description</p>
-        <p style="font-size:12px;color:#999;margin:4px 0;"><strong>Tags :</strong> $tags</p>
-        <div style="margin-top:auto; text-align:center;">
-         <a href="$lien" target="_blank" 
-            style="display:inline-block;margin-bottom:8px;padding:6px 12px;background-color:#007BFF;
-            color:#fff;text-decoration:none;border-radius:4px;font-size:13px;">
-       Voir le média
-    </a>
-</div>
+        <div style="width:200px;height:350px;border:1px solid #ccc;
+        background-color: rgba(255, 255, 255, 0.8); /* fond blanc 80% opaque */
+            border:1px solid #ccc;border-radius:8px;overflow:hidden;
+                    box-shadow:2px 2px 6px rgba(0,0,0,0.1);font-family:sans-serif;margin:10px;
+                    display:flex; flex-direction:column; justify-content:space-between;">
+            <img src="../../$image" alt="Illustration de $titre" style="width:100%;height:150px;object-fit:cover;">
+            <div style="padding:10px; text-align:center;">
+                <h3 style="margin:0;font-size:18px;">$titre</h3>
+                <p style="font-size:12px;color:#666;margin:4px 0;">publié le $datePub par <strong>$auteurNom</strong></p>
+                <p style="font-size:13px;margin:6px 0;max-height:60px;overflow:hidden;text-overflow:ellipsis;">$description</p>
+                <p style="font-size:12px;color:#999;margin:4px 0;"><strong>Tags :</strong> $tags</p>
+                <div style="margin-top:auto; text-align:center;">
+                 <a href="$lien" target="_blank" 
+                    style="display:inline-block;margin-bottom:8px;padding:6px 12px;background-color:#007BFF;
+                    color:#fff;text-decoration:none;border-radius:4px;font-size:13px;">
+               Voir le média
+            </a>
+        </div>
+        
+            </div>
+        </div>
+        HTML;
+    }
 
-    </div>
-</div>
-HTML;
+    public function resetMediasDistribues(int $totalMedias): array
+    {
+        $medias = new Media();
+
+        $mysqli = $_SESSION[Media::MYSQL];
+
+        $resultVideos = $_SESSION[self::MYSQL]->query("SELECT COUNT(*) AS nb FROM lienurl WHERE type LIKE 'vidéo' OR type LIKE 'video' COLLATE utf8mb4_general_ci");
+        $nbVideos = $resultVideos ? (int) $resultVideos->fetch_assoc()["nb"] : 0;
+
+        $resultPartoches = $_SESSION[self::MYSQL]->query("SELECT COUNT(*) AS nb FROM document WHERE nomTable='chanson' AND (nom LIKE '%.pdf' OR nom LIKE '%.PDF')");
+        $nbPartoches = $resultPartoches ? (int) $resultPartoches->fetch_assoc()["nb"] : 0;
+
+        $totalExistants = $nbVideos + $nbPartoches;
+        if ($totalExistants === 0) {
+            // Évite division par zéro, traite par défaut moitié/moitié
+            $nbVideosATraiter = (int) round($totalMedias / 2);
+        } else {
+            $pctVideos = $nbVideos / $totalExistants;
+            $nbVideosATraiter = (int) round($pctVideos * $totalMedias);
+        }
+        $nbPartochesATraiter = $totalMedias - $nbVideosATraiter;
+
+        // Appels aux fonctions reset
+        $medias->resetAvecDernieresPartoches($nbPartochesATraiter);
+        $medias->resetAvecDernieresVideos($nbVideosATraiter);
+
+        return [$nbVideosATraiter, $nbPartochesATraiter];
     }
 
 }

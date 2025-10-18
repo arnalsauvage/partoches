@@ -88,7 +88,7 @@ function creeLienurl($url, $type, $description, $nomTable, $idTable, $date, $idu
 // Cherche les documents correspondant à un critère
 function chercheNderniersLiens($type)
 {
-    $maRequete = "SELECT * FROM lienurl WHERE type LIKE '$type' ORDER BY date DESC";
+    $maRequete = "SELECT * FROM lienurl WHERE type LIKE '$type' COLLATE utf8mb4_general_ci ORDER BY date DESC";
     // echo "ma requete : " . $maRequete;
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheNderniersLiens #1 : " . $_SESSION ['mysql']->error);
     return $result;

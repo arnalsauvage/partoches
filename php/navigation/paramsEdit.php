@@ -43,6 +43,31 @@ if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_AD
     exit();
 }
 
+/// Traitement de la reinitialisation des medias
+
+// Vérifie si le paramètre resetmedias est présent dans l’URL
+if (isset($_GET['resetmedias'])) {
+    // Récupère la valeur du paramètre (par exemple 125)
+    $nombreMedias = (int) $_GET['resetmedias'];
+
+    // Appelle la fonction de réinitialisation
+    resetMediasPartoches($nombreMedias);
+
+    echo "<p>Les médias ont été réinitialisés avec succès ($nombreMedias éléments).</p>";
+}
+
+// Fonction pour lancer le reset
+function resetMediasPartoches(int $nombreMedias) {
+    require_once("../media/Media.php");
+    $medias = new Media();
+    $medias->resetMediasDistribues($nombreMedias);
+}
+
+///
+/// Fin traitement reinitialisation medias
+///
+
+
 
 // Charge le fichier ini
 $ini_objet = new FichierIni();
@@ -236,7 +261,7 @@ $sortie.= <<<HTML
 $('#btnDerniereModif').click(function() {
     $('#resultatDerniereModif').text('Chargement...');
     $.post('', {action: 'derniere_date_modif'}, function(data) {
-        $('#resultatDerniereModif').text('Dernière date de modification : ' + data);
+        $('#resultatDerniereModif').text('Dernière date de modification (ajouter 2h): ' + data);
     }).fail(function() {
         $('#resultatDerniereModif').text('Erreur lors de la récupération.');
     });

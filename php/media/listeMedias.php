@@ -76,7 +76,7 @@ $textes = [
 </header>
 
 <?php
-$idsMedias = Media::chercheMediasParType("partoche");
+$idsMedias = Media::chercheTousLesMedias();
 
 echo '<div class="content-box">';
 echo '<h2>' . $textes['lastPublications'] . '</h2><br>';
