@@ -45,7 +45,7 @@ $totalMedias = count($idsMedias);
     <title><?= "{$textes['siteTitle']} – Dernières publications" ?></title>
     <meta name="description" content="<?= htmlspecialchars($textes['siteSubtitle']) ?>">
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../css/styles.0.2.css">
+    <link rel="stylesheet" href="../../css/styles.0.3.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 

@@ -321,3 +321,9 @@ img {
     padding-right: 0.75rem;
     padding-left: 0.75rem;
 }
+
+
+/* Espace vertical minimal entre les colonnes */
+.row > .col {
+    margin-bottom: 24px; /* espace vertical minimal */
+}

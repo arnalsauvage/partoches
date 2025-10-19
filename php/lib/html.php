@@ -187,13 +187,8 @@ if (!isset ($FichierHtml)) {
 		<meta charset='UTF-8' >";
 
         // Pour BootStrap
-        $retour .= "
-        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    	<link href='../../css/bootstrap.min.css' rel='stylesheet'>
-        <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
-    	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel='stylesheet'>
-        <link rel='stylesheet' type='text/css' href='../../css/styles.0.2.css'>
+        $retour .= " rel='stylesheet'>
+        <link rel='stylesheet' type='text/css' href='../../css/styles.0.3.css'>
     	 ";
 
         $retour .= "
