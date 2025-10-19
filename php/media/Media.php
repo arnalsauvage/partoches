@@ -330,7 +330,7 @@ class Media
     // Cherche tos les medias
     public static function chercheTousLesMedias(): array
     {
-        $maRequete = "SELECT id FROM media ";
+        $maRequete = "SELECT id FROM media ORDER BY datePub DESC";
         $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans chercheMediasParType : " . $_SESSION[self::MYSQL]->error);
         $tableau = [];
         while ($idMedia = $result->fetch_row()) {
@@ -515,50 +515,77 @@ class Media
         return true;
     }
 
-    public
-    function afficheComposantMedia(): string
+    public function afficheComposantMedia(): string
     {
-        $type = htmlspecialchars($this->_type);
-        $titre = htmlspecialchars($this->_titre);
-        $image = htmlspecialchars($this->_image);
-        if ($type === "partoche") {
-            $lien = "../../" . htmlspecialchars($this->_lien);
-        } elseif ($type === "vidéo" || $type === "video" || $type === "Vidéo" || $type === "Video") {
-            $lien = htmlspecialchars($this->_lien);
-        }
-        $description = htmlspecialchars($this->_description);
-        $tags = htmlspecialchars($this->_tags);
-        $datePub = htmlspecialchars($this->_datePub);
-        $hits = $this->_hits;
-
-        // Récupération du nom de l’auteur ou "Auteur inconnu"
-        $auteur = chercheUtilisateur($this->_auteur);
-        $auteurNom = $auteur[3];
+        $data = $this->prepareData();
 
         return <<<HTML
-        <div style="width:200px;height:350px;border:1px solid #ccc;
-        background-color: rgba(255, 255, 255, 0.8); /* fond blanc 80% opaque */
-            border:1px solid #ccc;border-radius:8px;overflow:hidden;
-                    box-shadow:2px 2px 6px rgba(0,0,0,0.1);font-family:sans-serif;margin:10px;
-                    display:flex; flex-direction:column; justify-content:space-between;">
-            <img src="../../$image" alt="Illustration de $titre" style="width:100%;height:150px;object-fit:cover;">
-            <div style="padding:10px; text-align:center;">
-                <h3 style="margin:0;font-size:18px;">$titre</h3>
-                <p style="font-size:12px;color:#666;margin:4px 0;">publié le $datePub par <strong>$auteurNom</strong></p>
-                <p style="font-size:13px;margin:6px 0;max-height:60px;overflow:hidden;text-overflow:ellipsis;">$description</p>
-                <p style="font-size:12px;color:#999;margin:4px 0;"><strong>Tags :</strong> $tags</p>
-                <div style="margin-top:auto; text-align:center;">
-                 <a href="$lien" target="_blank" 
-                    style="display:inline-block;margin-bottom:8px;padding:6px 12px;background-color:#007BFF;
-                    color:#fff;text-decoration:none;border-radius:4px;font-size:13px;">
-               Voir le média
+            <a href="{$data['lien']}" target="_blank" class="text-decoration-none media-link">
+                <article class="card media-card shadow-sm border m-2" style="width:220px;">
+                    <div class="card-body d-flex flex-column align-items-center text-center">
+                        <span class="badge bg-{$data['couleurBadge']} mb-2 fs-5">{$data['emoji']} {$data['type']}</span>
+                        <h5 class="card-title mb-1 text-dark">{$data['titre']}</h5>
+                        <img src="{$data['imageUrl']}{$data['imageCacheTag']}" alt="Illustration : {$data['titre']}"
+                             class="card-img-top my-2"
+                             loading="lazy"
+                             style="height:140px;width:100%;object-fit:cover;max-width:200px;">
+                        <p class="card-text small mt-2 mb-1">{$data['description']}</p>
+                        <p class="meta-pub mb-1">Publié le {$data['datePub']} par <strong>{$data['auteurNom']}</strong></p>
+                    </div>
+                </article>
             </a>
-        </div>
-        
-            </div>
-        </div>
-        HTML;
+            HTML;
     }
+
+    /**
+     * Prépare toutes les données nécessaires à l'affichage d'un média.
+     */
+    private function prepareData(): array
+    {
+        $type = strtolower($this->_type);
+        $titre = htmlspecialchars($this->_titre);
+        $imageRelative = htmlspecialchars($this->_image);
+        $imagePath = "../../" . $imageRelative;
+        $imageUrl = "../../" . $imageRelative;
+
+        // Gestion du cache-busting
+        $imageCacheTag = "";
+        if (file_exists($imagePath)) {
+            $mtime = filemtime($imagePath);
+            $imageCacheTag = "?v={$mtime}";
+        }
+
+        // Lien
+        $lien = ($type === "partoche")
+            ? "../../" . htmlspecialchars($this->_lien)
+            : htmlspecialchars($this->_lien);
+
+        // Auteur
+        $auteur = chercheUtilisateur($this->_auteur);
+        $auteurNom = htmlspecialchars($auteur[3] ?? "Auteur inconnu");
+
+        // Attributs vidéo / partoche
+        $isVideo = in_array($type, ["vidéo", "video"]);
+        $couleurBadge = $isVideo ? "primary" : "danger";
+        $emoji = $isVideo ? "🎬" : "🎵";
+
+        return [
+            'type' => $type,
+            'titre' => $titre,
+            'imageUrl' => $imageUrl,
+            'imageCacheTag' => $imageCacheTag,
+            'lien' => $lien,
+            'description' => htmlspecialchars($this->_description),
+            'datePub' => htmlspecialchars($this->_datePub),
+            'auteurNom' => $auteurNom,
+            'couleurBadge' => $couleurBadge,
+            'emoji' => $emoji
+        ];
+    }
+
+
+
+
 
     public function resetMediasDistribues(int $totalMedias): array
     {
