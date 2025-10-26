@@ -9,9 +9,7 @@ body {
 .navigation {
     background-color: rgba(255, 200, 200, 1);
     display: inline-block;
-    /* height: 60px; */
     font-family: 'Roboto', sans-serif;
-    /*position: fixed;*/
     left: 0;
     top: 0;
     z-index: 999;
@@ -29,7 +27,6 @@ h1 {
 }
 
 .navigation ul {
-    /*position: fixed;*/
     left: 400px;
     top: 5px;
     vertical-align: middle;
@@ -46,16 +43,17 @@ h1 {
 
 /* Cible ton conteneur principal – adapte si le sélecteur est différent */
 .content-box {
-    background: rgba(255, 255, 255, 0.5);
-    margin: 0 auto; /* centre horizontalement */
-    padding: 20px;
+    background: rgba(255,255,255,0.5);
+    margin: 0 auto;
+    padding: 20px 10px;
     width: 100%;
-    max-width: 100%; /* par défaut : prend toute la largeur sur mobile */
+    max-width: 100%;
     display: flex;
-    justify-content: space-around;
     flex-wrap: wrap;
-    padding: 20px 10px; /* haut/bas: 20px ; gauche/droite: 10px */
+    justify-content: space-around;
+    box-sizing: border-box;
 }
+
 
 /* Quand l'écran dépasse 800px, on limite la largeur à 75% */
 @media (min-width: 800px) {
@@ -99,6 +97,7 @@ h1 {
 
 /* Croix de fermeture */
 .close-cookie {
+    display: block;
     position: absolute;
     top: 6px;
     right: 10px;
@@ -110,13 +109,10 @@ h1 {
 }
 
 /* Quand actif : cacher le bouton image, afficher la popup */
-.info-cookies.active #cookieToggle {
-    display: none;
+.cookie-popup.active {
+    display: block !important;
 }
 
-.info-cookies.active .cookie-popup {
-    display: block;
-}
 
 /*  - - - - - - - - styles info cookies - - - - - - - -  */
 
@@ -128,9 +124,6 @@ h1 {
     position: relative;
     top: 100px;
     width: 80%;
-   /* display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;*/
 }
 
 .titre-container {
@@ -180,7 +173,6 @@ h1 {
     background-color: #FFF;
     list-style: none;
     margin: 10px 10px 10px 10px;
-    /*width: 100%;*/
     padding: 20px 40px;
     width: 400px;
     border-radius: 34px;
@@ -188,7 +180,6 @@ h1 {
 }
 
 .titres {
-    /*  background-color: #FFF;*/
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
     text-align: right;
@@ -285,26 +276,23 @@ img {
 .media-link {
     display: inline-block;
     color: inherit;
-    text-decoration: none;
-}
-
-.media-link:hover .media-card {
-    transform: translateY(-4px);
-    box-shadow: 4px 6px 14px rgba(0, 0, 0, 0.25);
-}
-
-.media-link,
-.media-link:hover,
-.media-link:focus,
-.media-link:active {
     text-decoration: none !important;
-    color: inherit !important;
 }
 
-.media-link:hover .media-card {
+.media-link:focus,
+.media-link:active,
+.media-link:hover {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+/* Effet au survol : déplacement + ombre + curseur */
+.media-link:hover .media-card,
+.media-link:focus .media-card {
     transform: translateY(-4px);
     box-shadow: 4px 6px 14px rgba(0, 0, 0, 0.25);
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* --- Correctif affichage en colonnes Bootstrap --- */
@@ -316,12 +304,11 @@ img {
 }
 
 .col {
-    flex: 1 0 0% !important;
+    flex: 1 0 0 !important;
     max-width: 100%;
     padding-right: 0.75rem;
     padding-left: 0.75rem;
 }
-
 
 /* Espace vertical minimal entre les colonnes */
 .row > .col {

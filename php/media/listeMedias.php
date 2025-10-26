@@ -1,10 +1,10 @@
 <?php
-require_once("../lib/utilssi.php");
-require_once("../lib/Pagination.php");
-require_once("../chanson/chanson.php");
-require_once("../document/document.php");
-require_once("../navigation/menu.php");
-require_once("../note/UtilisateurNote.php");
+require_once "../lib/utilssi.php";
+require_once "../lib/Pagination.php";
+require_once "../chanson/chanson.php";
+require_once "../document/document.php";
+//require_once "../navigation/menu.php";
+require_once "../note/UtilisateurNote.php";
 require_once 'Media.php';
 
 $pasDeMenu = true;
@@ -51,13 +51,15 @@ $totalMedias = count($idsMedias);
 
 <body>
 <header class="header-global">
-    <div class="cookie-banner" id="cookieBanner">
-        <button id="cookieToggle" aria-label="Afficher les informations sur les cookies">
-            <img src="../../images/navigation/cookie-320.webp" alt="cookie">
-        </button>
-        <div class="cookie-popup" id="cookiePopup">
-            <span><?= $textes['cookieMessage'] ?></span>
-            <button class="close-cookie" aria-label="Fermer">×</button>
+    <div class="info-cookies">
+        <div class="cookie-banner" id="cookieBanner">
+            <button id="cookieToggle" aria-label="Afficher les informations sur les cookies">
+                <img src="../../images/navigation/cookie-320.webp" alt="cookie">
+            </button>
+            <div class="cookie-popup" id="cookiePopup">
+                <span><?= $textes['cookieMessage'] ?></span>
+                <button class="close-cookie" aria-label="Fermer">×</button>
+            </div>
         </div>
     </div>
 
@@ -68,7 +70,10 @@ $totalMedias = count($idsMedias);
         </div>
         <div class="titre-droite">
             <nav>
-                <a href="../chanson/chanson_liste.php" class="btn btn-success entrer-btn fw-bold">
+                <a href="../chanson/chanson_liste.php"
+                   class="btn btn-success entrer-btn fw-bold"
+                   aria-label="Entrer sur la liste des chansons"
+                >
                     <?= $textes['enterBtn'] ?>
                 </a>
             </nav>
@@ -120,10 +125,10 @@ $totalMedias = count($idsMedias);
 
 <script>
     document.getElementById('cookieToggle').addEventListener('click', () => {
-        document.getElementById('infoCookies').classList.add('active');
+        document.getElementById('cookiePopup').classList.add('active');
     });
     document.getElementById('cookiePopup').addEventListener('click', () => {
-        document.getElementById('infoCookies').style.display = 'none';
+        document.getElementById('cookiePopup').classList.remove('active');
     });
 </script>
 </body>
