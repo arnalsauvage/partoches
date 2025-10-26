@@ -72,9 +72,9 @@ global $_DOSSIER_CHANSONS;
                 $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
 
                 $fichier =  $_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . myUrlEncode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
-                $icone = Image(  ICONES . $fichier [2] . ".png", 32, 32, "icone");
+                $icone = image(  ICONES . $fichier [2] . ".png", 32, 32, "icone");
                 if (!file_exists(ICONES . $fichier [2] . ".png")) {
-                    $icone = Image(ICONES . "fichier.png", 32, 32, "icone");
+                    $icone = image(ICONES . "fichier.png", 32, 32, "icone");
                 }
                 $titreCourt = htmlspecialchars(limiteLongueur($titresChansons [$ligneDoc [6]], 18), ENT_QUOTES);
                 echo "<a href= '../../" . $fichier . "' target='_blank' title='" . htmlspecialchars($titresChansons [$ligneDoc [6]], ENT_QUOTES) . "'> " . $titreCourt . "</a> \n";

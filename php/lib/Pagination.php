@@ -55,7 +55,7 @@ class Pagination
         // echo "url sans page : " . $_monUrlSansParamPage;
         $chaine = "<div class = nav> Pages :  ";
         if ($this->getPageEnCours() > 1) {
-            $chaine .= Ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=1"), "<< ");
+            $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=1"), "<< ");
         }
         else {
             $chaine .= " &lt;&lt; ";
@@ -64,7 +64,7 @@ class Pagination
         if ($pagePrecedente == 0) {
             $pagePrecedente = 1;
         }
-        $chaine = $this->getPageEnCours() > 1 ? $chaine . Ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$pagePrecedente"), " préc. ") : $chaine . " préc. ";
+        $chaine = $this->getPageEnCours() > 1 ? $chaine . ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$pagePrecedente"), " préc. ") : $chaine . " préc. ";
         for ($compteur = 1; $compteur <= ($this->getNombreDePages()); $compteur++) {
             if ($compteur > 1) {
                 $chaine .= " - ";
@@ -73,7 +73,7 @@ class Pagination
                 $chaine .= $compteur;
             }
             else {
-                $chaine .= Ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=" . $compteur), $compteur);
+                $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=" . $compteur), $compteur);
             }
         }
         $pageSuivante = $this->getPageEnCours() + 1;
@@ -81,8 +81,8 @@ class Pagination
             $pageSuivante = $this->getNombreDePages();
         }
         if ($this->getPageEnCours() < $this->getNombreDePages()) {
-            $chaine .= Ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$pageSuivante"), " suiv. ");
-            $chaine .= Ancre($this->urlAjouteParam($_monUrlSansParamPage,  "page=".$this->getNombreDePages()), " >>");
+            $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$pageSuivante"), " suiv. ");
+            $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage,  "page=".$this->getNombreDePages()), " >>");
         } else {
             $chaine .= " suiv. >>";
         }

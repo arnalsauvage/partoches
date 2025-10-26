@@ -34,7 +34,7 @@ $_numLigneParcourue = 0;
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
-    $_renduHtml .= "<BR>" . Ancre("$_strumForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau strum");
+    $_renduHtml .= "<BR>" . ancre("$_strumForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau strum");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 
@@ -46,8 +46,8 @@ while ($_strumParcouru = $_listeDesStrums->fetch_row()) {
         $_renduHtml .= "<a title='ouvrir dans la boîte à strum' href='$urlBoiteAstrum?strum=" . str_replace(" ", "-",$_strumParcouru [1]) ."'>
             <img src='$imageBoiteAstrum' alt='Ouvrir dans la boite a strum' height='50vw'> </a>";
         if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-            $_image = Image($cheminImages . $iconeEdit, 32, 32);
-            $_ancre = Ancre("$_strumForm?id=" . $_strumParcouru [0], $_image,-1, -1, "modifier le strum" ); //id
+            $_image = image($cheminImages . $iconeEdit, 32, 32);
+            $_ancre = ancre("$_strumForm?id=" . $_strumParcouru [0], $_image,-1, -1, "modifier le strum" ); //id
             $_renduHtml .= TblCellule($_ancre);
         }
         switch ($_strumParcouru [3]) {
@@ -79,7 +79,7 @@ while ($_strumParcouru = $_listeDesStrums->fetch_row()) {
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
-    $_renduHtml .= "<BR>" . Ancre("$_strumForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau strum");
+    $_renduHtml .= "<BR>" . ancre("$_strumForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau strum");
 }
 
 // //////////////////////////////////////////////////////////////////////ADMIN

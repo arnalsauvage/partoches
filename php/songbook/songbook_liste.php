@@ -59,7 +59,7 @@ $fichiersDuSongbook = "
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] >=$GLOBALS["PRIVILEGE_EDITEUR"]) {
-    $fichiersDuSongbook .= "<BR>" . Ancre("$songbookForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau songbook");
+    $fichiersDuSongbook .= "<BR>" . ancre("$songbookForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau songbook");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 
@@ -81,17 +81,17 @@ while ($ligne = $resultat->fetch_row()) {
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
     {
         if ($_SESSION ['privilege'] >=$GLOBALS["PRIVILEGE_EDITEUR"]) {
-            $fichiersDuSongbook .= TblCellule(Ancre($songbookForm . "?id=$ligne[0]", Image(($cheminImagesSongbook . $ligne[0] . "/" . urlencode(imageTableId("songbook", $ligne[0]))), 32, 32, "couverture")));
+            $fichiersDuSongbook .= TblCellule(ancre($songbookForm . "?id=$ligne[0]", image(($cheminImagesSongbook . $ligne[0] . "/" . urlencode(imageTableId("songbook", $ligne[0]))), 32, 32, "couverture")));
         } // image
         else {
-            $fichiersDuSongbook .= TblCellule(Image(($cheminImagesSongbook . $ligne[0]) . "/" . urlencode(imageTableId("songbook", $ligne[0])), 32, 32));
+            $fichiersDuSongbook .= TblCellule(image(($cheminImagesSongbook . $ligne[0]) . "/" . urlencode(imageTableId("songbook", $ligne[0])), 32, 32));
         }
     } // image
     else {
-        $fichiersDuSongbook .= TblCellule(Ancre($songbookForm . "?id=$ligne[0]", "voir"));
+        $fichiersDuSongbook .= TblCellule(ancre($songbookForm . "?id=$ligne[0]", "voir"));
     }
 
-    $fichiersDuSongbook .= TblCellule(Ancre($songbookVoir . "?id=$ligne[0]", entreBalise($ligne [1], "H2"))); // Nom
+    $fichiersDuSongbook .= TblCellule(ancre($songbookVoir . "?id=$ligne[0]", entreBalise($ligne [1], "H2"))); // Nom
     switch($ligne[7])
     {
         case 1 : $description = "anthologie - "; break;
@@ -106,7 +106,7 @@ while ($ligne = $resultat->fetch_row()) {
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
     if ($_SESSION ['privilege'] >=$GLOBALS["PRIVILEGE_EDITEUR"]) {
         $fichiersDuSongbook .= TblCellule(boutonSuppression($songbookGet . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
-        $fichiersDuSongbook .= TblCellule(Ancre($songbookGet . "?DUP=$ligne[0]", "dupliquer"));
+        $fichiersDuSongbook .= TblCellule(ancre($songbookGet . "?DUP=$ligne[0]", "dupliquer"));
         // //////////////////////////////////////////////////////////////////////ADMIN
 
         $fichiersDuSongbook .= TblFinLigne();
@@ -116,7 +116,7 @@ $fichiersDuSongbook .= TblFin();
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] >=$GLOBALS["PRIVILEGE_EDITEUR"]) {
-    $fichiersDuSongbook .= "<BR>" . Ancre("?page=$songbookForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel songbook");
+    $fichiersDuSongbook .= "<BR>" . ancre("?page=$songbookForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel songbook");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 $fichiersDuSongbook .= envoieFooter();
@@ -124,6 +124,6 @@ echo $fichiersDuSongbook;
 
 function titreColonne($libelle, $nomRubrique): string
 {
-    return TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> </span>")
-        . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'></span> "));
+    return TblCellule(ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> </span>")
+        . "  $libelle   " . ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'></span> "));
 }

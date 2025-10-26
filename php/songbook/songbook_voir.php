@@ -45,12 +45,12 @@ $donnee = chercheSongbook($idSongbook);
 $sortie .= "<h2>$donnee[1]</h2>"; // Titre
 
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-    $sortie .= Ancre($songbookForm . "?id=" . $idSongbook, Image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
+    $sortie .= ancre($songbookForm . "?id=" . $idSongbook, image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
 }
 
 if ("" != $monImage) {
     $repertoire = "../data/songbooks/" . $idSongbook . "/";
-    $sortie .= Image($repertoire . $monImage, 200, "", "pochette");
+    $sortie .= image($repertoire . $monImage, 200, "", "pochette");
 }
 
 $sortie .= $donnee [2] . "-" . $donnee [3] . "-" . $donnee [5] . " hit(s)<br>\n";
@@ -61,9 +61,9 @@ $sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
 $fichiersDuSongbook = fichiersSongbook($idSongbook);
 
 foreach ($fichiersDuSongbook as $fichier) {
-    $icone = Image(IMAGES_ICONES . $fichier [2] . ".png", 32, 32, "icone");
+    $icone = image(IMAGES_ICONES . $fichier [2] . ".png", 32, 32, "icone");
     if (!file_exists(IMAGES_ICONES . $fichier [2] . ".png")) {
-        $icone = Image(IMAGES_ICONES . "fichier.png", 32, 32, "icone");
+        $icone = image(IMAGES_ICONES . "fichier.png", 32, 32, "icone");
     }
     $sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> ";
     $sortie .= intval(filesize(($fichier [0] . $fichier [1])) / 1024) . " (ko) <br>\n";
@@ -82,14 +82,14 @@ while ($ligne = $lignes->fetch_row()) {
     $lienChanson = "../chanson/chanson_voir.php?id=" . $ligneDoc [6];
     $fichier = RACINE .$_DOSSIER_CHANSONS. "/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
-    $icone = Image(IMAGES_ICONES . $extension . ".png", 32, 32, "icone");
+    $icone = image(IMAGES_ICONES . $extension . ".png", 32, 32, "icone");
 
     if (!file_exists(IMAGES_ICONES . $extension . ".png")) {
-        $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+        $icone = image("../images/icones/fichier.png", 32, 32, "icone");
     }
-    $vignetteChanson = Image(RACINE .$_DOSSIER_CHANSONS. "/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
-    $vignetteChanson = Ancre($lienChanson,$vignetteChanson);
-    $vignettePublicateur = Image(VIGNETTES . $tabUsers[$idPublicateurChanson][1], 48, 48, $tabUsers[$idPublicateurChanson][0]);
+    $vignetteChanson = image(RACINE .$_DOSSIER_CHANSONS. "/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
+    $vignetteChanson = ancre($lienChanson,$vignetteChanson);
+    $vignettePublicateur = image(VIGNETTES . $tabUsers[$idPublicateurChanson][1], 48, 48, $tabUsers[$idPublicateurChanson][0]);
     $sortie .= $vignettePublicateur . $vignetteChanson . $icone;
     $sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a>";
     $sortie .= " (" . intval($ligneDoc[2] / 1024) . " ko)";

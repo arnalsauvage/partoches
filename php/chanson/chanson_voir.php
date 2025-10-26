@@ -56,7 +56,7 @@ $contenuHtml .= " <div class='col-sm-10'><h2>" . htmlentities($_chanson->getNom(
 $contenuHtml .= "<div class='col-sm-2'>";
 
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-    $contenuHtml .= Ancre("chanson_form.php?id=" . $idChanson, Image($cheminImages . $iconeEdit, 32, 32)); // Nom));
+    $contenuHtml .= ancre("chanson_form.php?id=" . $idChanson, image($cheminImages . $iconeEdit, 32, 32)); // Nom));
 }
 $contenuHtml .= "</div>" . FIN_DIV;
 
@@ -90,7 +90,7 @@ $contenuHtml .= "<section class='col-sm-4'>";
 
 if ("" != $monImage) {
     $urlImage = "../../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $monImage;
-    $contenuHtml .= Image($urlImage, 200, "", "pochette", "img-thumbnail");
+    $contenuHtml .= image($urlImage, 200, "", "pochette", "img-thumbnail");
 }
 
 if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
@@ -119,9 +119,9 @@ if ($result->num_rows > 0) {
         if ($extension <> "mp3" && $extension <> "m4a" && $extension <> "mp4" && $extension <> "aac") {
             $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
             // $fichier = "../".$_DOSSIER_CHANSONS" . $idChanson . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
-            $icone = Image(ICONES . $extension . ".png", 32, 32, "icone");
+            $icone = image(ICONES . $extension . ".png", 32, 32, "icone");
             if (!file_exists(ICONES . $extension . ".png")) {
-                $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+                $icone = image("../images/icones/fichier.png", 32, 32, "icone");
             }
             $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" .
                 htmlentities($fichierSec) . "</a> <br>\n";

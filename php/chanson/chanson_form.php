@@ -423,9 +423,9 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
         $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
         $fichier = RETOUR_RACINE . $_dossier_chansons . "$id/" . rawurlencode($fichierCourt);
         $extension = substr(strrchr($ligneDoc[1], '.'), 1);
-        $icone = Image("../../images/icones/$extension.png", 32, 32, "icone");
+        $icone = image("../../images/icones/$extension.png", 32, 32, "icone");
         if (!file_exists("../../images/icones/$extension.png")) {
-            $icone = Image("../../images/icones/fichier.png", 32, 32, "icone");
+            $icone = image("../../images/icones/fichier.png", 32, 32, "icone");
         }
         $listeDocs .= "<li class='fichiers'>
                             <div> <a href= '" . $fichier . "' target='_blank'> $icone </a> ";

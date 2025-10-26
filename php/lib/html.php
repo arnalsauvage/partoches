@@ -5,7 +5,7 @@ if (!isset ($FichierHtml)) {
     $FichierHtml = 1;
     // Fonction retournant le code HTML pour un lien hypertexte____________
 
-    function Ancre($url, $libelle, $classe = -1, $nouvellefenetre = -1, $titre=-1)
+    function ancre($url, $libelle, $classe = -1, $nouvellefenetre = -1, $titre=-1)
     {
         $optionClasse = "";
         $optionTitre = "";
@@ -33,7 +33,7 @@ if (!isset ($FichierHtml)) {
     }
 
     // Fonction retournant le code HTML pour une image ____________________
-    function Image($urlImage, $largeur = -1, $hauteur = -1, $alt = "image décorative", $class = "")
+    function image($urlImage, $largeur = -1, $hauteur = -1, $alt = "image décorative", $class = "")
     {
         $attrLargeur = "";
         $attrHauteur = "";
@@ -50,7 +50,7 @@ if (!isset ($FichierHtml)) {
 
     // Fonction créant un champ SELECT
     // Liste contient toutes les valeurs duchamp select
-    function ChampSelect($liste, $numero, $nom)
+    function champSelect($liste, $numero, $nom)
     {
         $champSelect = "";
         $champSelect .= "<select name = $nom size=\"1\">";
@@ -70,12 +70,12 @@ if (!isset ($FichierHtml)) {
 
     function ecritHtml($texte)
     {
-        return ($texte);
+        return $texte;
     }
 
     function entreBalise($texte, $balise)
     {
-        return ("<" . $balise . "> " . htmlentities($texte) . "</" . $balise . ">");
+        return "<" . $balise . "> " . htmlentities($texte) . "</" . $balise . ">";
     }
 
     // Cette fonction donne l'instruction au navigateur de se rediriger
@@ -84,7 +84,7 @@ if (!isset ($FichierHtml)) {
     function redirection($url)
     {
         if (headers_sent()) {
-            print('<meta http-equiv="refresh" content="0;URL=' . $url . '">');
+            print '<meta http-equiv="refresh" content="0;URL=' . $url . '">';
         }
         else {
             header("Location: $url");
@@ -163,7 +163,7 @@ if (!isset ($FichierHtml)) {
             echo "tableau[$indice] : $tableau[$indice]\n";
         }
 
-        if (strstr($tableau[$indice], "<") == FALSE) {
+        if (!str_contains($tableau[$indice], "<")) {
             $chaine = $tableau[$indice];
             $tableau[$indice] = lienCliquable($tableau[$indice]);
             if ($debug_fonc) {
@@ -193,8 +193,9 @@ if (!isset ($FichierHtml)) {
     	<link href='../../css/bootstrap.min.css' rel='stylesheet'>
         <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
     	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel='stylesheet'>
-        <link rel='stylesheet' type='text/css' href='../../css/styles.0.3.css'>
-    	 ";
+         <link rel='stylesheet' type='text/css' href='../../css/styles-communs.css?v=" . filemtime($_SERVER['DOCUMENT_ROOT'] . '/css/styles-communs.css') . "'>
+";
+// filemtime pour forcer le rechargement du css si modifié
 
         $retour .= "
         
@@ -285,8 +286,7 @@ HTML;
             'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss',
             'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c', 'è'=>'e', 'é'=>'e',
             'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o',
-            'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b',
-            'ÿ'=>'y', 'Ŕ'=>'R', 'ŕ'=>'r',
+            'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ÿ'=>'y', 'Ŕ'=>'R', 'ŕ'=>'r'
         );
 
         $_nomSimplifie = strtr($nomOriginal,$table) ;

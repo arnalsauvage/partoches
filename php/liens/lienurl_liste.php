@@ -51,12 +51,12 @@ while ($_lienurlParcouru = $_listeDeslienurls->fetch_row()) {
         $_renduHtml .= "<div class=\"col-xs-8 col-sm-6 col-md-4 \">" . entreBalise(str_replace(" ", "-",$_lienurlParcouru [4]), "H2"); // Login
 
         if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"] ) {
-            $_image = Image($cheminImages . $iconeEdit, 32, 32);
+            $_image = image($cheminImages . $iconeEdit, 32, 32);
             $_image = str_replace("'>","' loading='lazy'>", $_image);
             $table_concernee = $_lienurlParcouru[1];
             $id_concerne = $_lienurlParcouru[2];
             if ($table_concernee == "chanson"){
-                $_ancre = Ancre("$_lienurlForm?id=" . $id_concerne, $_image,-1, -1, "modifier le lienurl" );
+                $_ancre = ancre("$_lienurlForm?id=" . $id_concerne, $_image,-1, -1, "modifier le lienurl" );
             }
             $_renduHtml .= $_ancre;
         }
@@ -77,7 +77,7 @@ while ($_lienurlParcouru = $_listeDeslienurls->fetch_row()) {
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
-    $_renduHtml .= "<BR>" . Ancre("$_lienurlForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau lienurl");
+    $_renduHtml .= "<BR>" . ancre("$_lienurlForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau lienurl");
 }
 
 // //////////////////////////////////////////////////////////////////////ADMIN

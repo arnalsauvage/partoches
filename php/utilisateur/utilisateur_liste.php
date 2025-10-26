@@ -33,11 +33,11 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]){
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
-    $fichiersDuSongbook .= "<BR>" . Ancre("$utilisateurForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel utilisateur");
+    $fichiersDuSongbook .= "<BR>" . ancre("$utilisateurForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel utilisateur");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 
-    $fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
+    $fichiersDuSongbook .= image($iconeAttention, "100%", 1, 1);
 
 $fichiersDuSongbook .= TblDebut();
 
@@ -51,14 +51,14 @@ while ($ligne = $resultat->fetch_row()) {
             afficheVignette($ligne [5], $cheminImages . "utilisateur", $cheminVignettes, "vignette utilisateur");
             // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
             if (($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) || $_SESSION ['user'] == $ligne [1]) {
-                $fichiersDuSongbook .= TblCellule(Ancre($utilisateurForm . "?id=$ligne[0]", Image(($cheminVignettes . $ligne [5]), 32, 32)));
+                $fichiersDuSongbook .= TblCellule(ancre($utilisateurForm . "?id=$ligne[0]", image(($cheminVignettes . $ligne [5]), 32, 32)));
             } // image
             // //////////////////////////////////////////////////////////////////////ADMIN
             else {
-                $fichiersDuSongbook .= TblCellule(Image(($cheminVignettes . $ligne [5]), 32, 32));
+                $fichiersDuSongbook .= TblCellule(image(($cheminVignettes . $ligne [5]), 32, 32));
             } // image
         } else {
-            $fichiersDuSongbook .= TblCellule(Ancre($utilisateurForm . "?id=$ligne[0]", "voir"));
+            $fichiersDuSongbook .= TblCellule(ancre($utilisateurForm . "?id=$ligne[0]", "voir"));
         }
 
         $fichiersDuSongbook .= TblCellule(entreBalise($ligne [1], "H2")); // Login
@@ -79,10 +79,10 @@ while ($ligne = $resultat->fetch_row()) {
 }
 $fichiersDuSongbook .= TblFin();
 
-$fichiersDuSongbook .= Image($iconeAttention, "100%", 1, 1);
+$fichiersDuSongbook .= image($iconeAttention, "100%", 1, 1);
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
-    $fichiersDuSongbook .= "<BR>" . Ancre("?page=$utilisateurForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel utilisateur");
+    $fichiersDuSongbook .= "<BR>" . ancre("?page=$utilisateurForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel utilisateur");
 }
 // //////////////////////////////////////////////////////////////////////ADMIN
 $fichiersDuSongbook .= envoieFooter();

@@ -40,18 +40,18 @@ $sortie .= "<h2>$donnee[1]</h2>"; // Titre
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     global $playlistForm ;
     global $cheminImages, $iconeEdit;
-    $sortie .= Ancre($playlistForm . "?id=" . $idPlaylist, Image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
+    $sortie .= ancre($playlistForm . "?id=" . $idPlaylist, image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
 }
 
 if ("" != $monImage) {
-    $sortie .= Image($monImage [0] . $monImage [1], 200, "", "pochette");
+    $sortie .= image($monImage [0] . $monImage [1], 200, "", "pochette");
 }
 $sortie .= $donnee [2] . "-" . $donnee [3] . "-" . $donnee [5] . " hit(s)<br>\n";
 
 foreach ($fichiersDuPlaylist as $fichier) {
-    $icone = Image(ICONES. $fichier [2] . ".png", 32, 32, "icone");
+    $icone = image(ICONES. $fichier [2] . ".png", 32, 32, "icone");
     if (!file_exists(ICONES. $fichier [2] . ".png"))
-        $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
+        $icone = image("../images/icones/fichier.png", 32, 32, "icone");
     $sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> <br>\n";
 }
 
@@ -66,12 +66,12 @@ while ($ligne = $lignes->fetch_row()) {
     $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $fichier = "../".$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
     $extension = substr(strrchr($ligneDoc [1], '.'), 1);
-    $icone = Image(ICONES. $extension . ".png", 32, 32, "icone");
+    $icone = image(ICONES. $extension . ".png", 32, 32, "icone");
 
     if (!file_exists(ICONES. $extension . ".png"))
-        $icone = Image("../images/icones/fichier.png", 32, 32, "icone");
-    $vignetteChanson = Image("../".$_DOSSIER_CHANSONS . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson$vignettePublicateur =;");
-    $vignettePublicateur = Image("../images" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
+        $icone = image("../images/icones/fichier.png", 32, 32, "icone");
+    $vignetteChanson = image("../".$_DOSSIER_CHANSONS . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson$vignettePublicateur =;");
+    $vignettePublicateur = image("../images" . $tabUsers[$ligneDoc [7]][1], 48, 48, $tabUsers[$ligneDoc [7]][0]);
     $sortie .= $vignettePublicateur . $vignetteChanson . $icone;
     $sortie .= "<a href= 'getdoc.php?doc=" . $ligneDoc [0] . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> <br>\n";
 }

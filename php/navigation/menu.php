@@ -138,7 +138,7 @@ $heure = date("H:i");
 
 if ($_SESSION ['user'] != "invite") {
     $msgLogin = "se déconnecter";
-    $contenu .= Ancre("../navigation/login.php?logoff=1", $msgLogin) . " | \n";
+    $contenu .= ancre("../navigation/login.php?logoff=1", $msgLogin) . " | \n";
 } else {
     $msgLogin = "se connecter";
     $contenu .= file_get_contents('../../html/menuLogin.html');

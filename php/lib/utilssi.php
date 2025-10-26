@@ -90,7 +90,7 @@ if (!isset ($FichierUtilsSi)) {
                 $texte .= "</audio>";
                 return $texte;
             } else {
-                return (Ancre("mp3/" . $mp3, "ouvrir", -1, 1));
+                return (ancre("mp3/" . $mp3, "ouvrir", -1, 1));
             }
         } else {
             // pour debug : echo "fichier $mp3 non trouvé !!";

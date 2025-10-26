@@ -57,7 +57,7 @@ if (isset($_GET['filtre'])) {
     $filtre = filtreGetPost($_GET, FILTRE);
     $valeur_filtre = filtreGetPost($_GET, VAL_FILTRE);
     $contenuHtml .= "<p class='filtres'> filtre présent : $filtre = $valeur_filtre";
-    $contenuHtml .= " " . Ancre($_SERVER['PHP_SELF'], "effacer le filtre") . "</p>";
+    $contenuHtml .= " " . ancre($_SERVER['PHP_SELF'], "effacer le filtre") . "</p>";
 }
 
 if (isset($_GET['raz-recherche'])) {
@@ -220,7 +220,7 @@ function celluleFiltrable($libelle, $cle, $valeur, $alignement = '', $longueurMa
     $url = $_SERVER['REQUEST_URI'];
     $texte = $longueurMax ? limiteLongueur($libelle, $longueurMax) : $libelle;
     $urlFiltre = $pagination->urlAjouteParam($url, FILTRE . "=$cle&" . VAL_FILTRE . "=" . urlencode($valeur));
-    return TblCellule(Ancre($urlFiltre, $texte), 1, 1, $alignement);
+    return TblCellule(ancre($urlFiltre, $texte), 1, 1, $alignement);
 }
 
 foreach ($resultat as $ligne) {
@@ -241,16 +241,16 @@ foreach ($resultat as $ligne) {
 
     // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
     if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-        $_image = Image($cheminImages . $iconeEdit, 32, 32);
-        $_ancre = Ancre("$chansonForm?id=" . $_id, $_image, -1, -1, "modifier la chanson");
+        $_image = image($cheminImages . $iconeEdit, 32, 32);
+        $_ancre = ancre("$chansonForm?id=" . $_id, $_image, -1, -1, "modifier la chanson");
         $contenuHtml .= TblCellule($_ancre);
     } else {
         $contenuHtml .= TblCellule(" ");
     }
     // TODO Supprimer les parametres filtres existant dans l'url pour les liens avec filtre !
-    $imagePochette = Image(($cheminImagesChanson . $_id . "/" . rawurlencode(imageTableId(CHANSON, $_id))), 48, 48, "couverture");
-    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", $imagePochette));
-    $contenuHtml .= TblCellule(Ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"), -1, -1, $_chanson->getNom())); // Nom
+    $imagePochette = image(($cheminImagesChanson . $_id . "/" . rawurlencode(imageTableId(CHANSON, $_id))), 48, 48, "couverture");
+    $contenuHtml .= TblCellule(ancre("$chansonVoir?id=$_id", $imagePochette));
+    $contenuHtml .= TblCellule(ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"), -1, -1, $_chanson->getNom())); // Nom
     $url = $_SERVER['REQUEST_URI'];
 
     $contenuHtml .= celluleFiltrable($_chanson->getInterprete(), "interprete", $_chanson->getInterprete(), '', 21); // interprete

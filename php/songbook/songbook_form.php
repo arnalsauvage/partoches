@@ -109,9 +109,9 @@ if ($mode=="MAJ") {
         // echo "Chanson id : $id fichier court : $fichierCourt";
         $fichier =  RACINE . "data/songbooks/$id/" . urlencode($fichierCourt);
         $extension = substr(strrchr($ligneDoc[1], '.'), 1);
-        $icone = Image(RACINE ."images/icones/$extension.png", 32, 32, ICONE);
+        $icone = image(RACINE ."images/icones/$extension.png", 32, 32, ICONE);
         if (!file_exists(RACINE . "images/icones/$extension.png")) {
-            $icone = Image(RACINE . "images/icones/fichier.png", 32, 32, ICONE);
+            $icone = image(RACINE . "images/icones/fichier.png", 32, 32, ICONE);
         }
         $listeDocs .= "$icone <a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
         $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
@@ -149,9 +149,9 @@ if ($mode == "MAJ") {
         $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
         $fichier = RACINE .$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . urlencode($fichierCourt);
         $listeDocs .= "<li class='ui-state-default' data-index='$idDoc' data-position='$numero'>";
-        $icone = Image(RACINE ."images/icones/" . $fichier [2] . ".png", 32, 32, ICONE);
+        $icone = image(RACINE ."images/icones/" . $fichier [2] . ".png", 32, 32, ICONE);
         if (!file_exists(RACINE . "images/icones/" . $fichier [2] . ".png")) {
-            $icone = Image(RACINE . "images/icones/fichier.png", 32, 32, ICONE);
+            $icone = image(RACINE . "images/icones/fichier.png", 32, 32, ICONE);
         }
         $listeDocs .= "<a href= '" . htmlentities($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
         $listeDocs .= boutonSuppression($songbookGet . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);

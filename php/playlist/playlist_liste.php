@@ -1,7 +1,8 @@
 <?php
+global $playlistForm, $cheminImages, $iconeCreer, $iconeAttention, $playlistVoir, $playlistGet, $iconePoubelle;
 require_once("../lib/utilssi.php");
 require_once("../navigation/menu.php");
-require_once("playlist.php");
+require_once "../playlist/playlist.php";
 
 $table = "playlist";
 $fichiersDuPlaylist = "";
@@ -31,12 +32,12 @@ $numligne = 0;
 
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
 if ($_SESSION ['privilege'] >= $GLOBALS["PRIVILEGE_EDITEUR"])
-    $fichiersDuPlaylist .= "<BR>" . Ancre("$playlistForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel playlist");
+    $fichiersDuPlaylist .= "<BR>" . ancre("$playlistForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel playlist");
 // //////////////////////////////////////////////////////////////////////ADMIN
 
-$fichiersDuPlaylist .= Image($iconeAttention, "100%", 1, 1);
+$fichiersDuPlaylist .= image($iconeAttention, "100%", 1, 1);
 $fichiersDuPlaylist .= TblDebut(0);
-TblCellule(Ancre("?tri=hits", "Hits")) . TblFinLigne();
+TblCellule(ancre("?tri=hits", "Hits")) . TblFinLigne();
 
 $fichiersDuPlaylist .= TblDebut(0);
 $fichiersDuPlaylist .= TblDebutLigne() . TblCellule("  Tri  ");
@@ -53,13 +54,13 @@ while ($ligne = $resultat->fetch_row()) {
     if ($ligne [4])
         // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
         if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"])
-            $fichiersDuPlaylist .= TblCellule(Ancre($playlistForm . "?id=$ligne[0]", "modifier"));
+            $fichiersDuPlaylist .= TblCellule(ancre($playlistForm . "?id=$ligne[0]", "modifier"));
         else
-            $fichiersDuPlaylist .= TblCellule(Image(($cheminPlaylist . $ligne[0] . "/" . $ligne [4]), 32, 32)); // image
+            $fichiersDuPlaylist .= TblCellule(image(($cheminPlaylist . $ligne[0] . "/" . $ligne [4]), 32, 32)); // image
     else
-        $fichiersDuPlaylist .= TblCellule(Ancre($playlistForm . "?id=$ligne[0]", "voir"));
+        $fichiersDuPlaylist .= TblCellule(ancre($playlistForm . "?id=$ligne[0]", "voir"));
 
-    $fichiersDuPlaylist .= TblCellule(Ancre($playlistVoir . "?id=$ligne[0]", entreBalise($ligne [1], "H2"))); // Nom
+    $fichiersDuPlaylist .= TblCellule(ancre($playlistVoir . "?id=$ligne[0]", entreBalise($ligne [1], "H2"))); // Nom
 
     $fichiersDuPlaylist .= TblCellule("  " . $ligne [2]); // description
     $fichiersDuPlaylist .= TblCellule(" " . dateMysqlVersTexte($ligne [3], 0)); // date
@@ -75,16 +76,16 @@ while ($ligne = $resultat->fetch_row()) {
 }
 $fichiersDuPlaylist .= TblFin();
 
-$fichiersDuPlaylist .= Image($iconeAttention, "100%", 1, 1);
+$fichiersDuPlaylist .= image($iconeAttention, "100%", 1, 1);
 // //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
 if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"])
-    $fichiersDuPlaylist .= "<BR>" . Ancre("?page=$playlistForm", Image($cheminImages . $iconeCreer, 32, 32) . "Créer une nouvelle playlist");
+    $fichiersDuPlaylist .= "<BR>" . ancre("?page=$playlistForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer une nouvelle playlist");
 // //////////////////////////////////////////////////////////////////////ADMIN
 $fichiersDuPlaylist .= envoieFooter();
 echo $fichiersDuPlaylist;
 
 function titreColonne($libelle, $nomRubrique)
 {
-    $chaine = TblCellule(Ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . Ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
+    $chaine = TblCellule(ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
     return $chaine;
 }
