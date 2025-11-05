@@ -21,7 +21,7 @@ global $_DOSSIER_CHANSONS;
 $nomTable = "chanson";
 $_chanson = new Chanson();
 
-function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest)
+function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest): void
 {
     $repertoire = "../" . $dossierDest . $id . "/";
     $file = file_get_contents($monUrl);
@@ -197,7 +197,8 @@ if ($mode != RESTAUREDOC && $mode !=  RENDOC ) {
     redirection($nomTable . "_form.php?id=$id");
 }
 
-function resetMediasPartoches($nombreMedias){
+function resetMediasPartoches($nombreMedias): void
+{
     require_once ("../media/Media.php");
     $medias = new Media();
     $medias->resetAvecDernieresPartoches($nombreMedias);

@@ -57,7 +57,8 @@ if (isset($_GET['resetmedias'])) {
 }
 
 // Fonction pour lancer le reset
-function resetMediasPartoches(int $nombreMedias) {
+function resetMediasPartoches(int $nombreMedias): void
+{
     require_once("../media/Media.php");
     $medias = new Media();
     $medias->resetMediasDistribues($nombreMedias);

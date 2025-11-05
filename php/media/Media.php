@@ -583,10 +583,6 @@ class Media
         ];
     }
 
-
-
-
-
     public function resetMediasDistribues(int $totalMedias): array
     {
         $medias = new Media();
@@ -620,5 +616,5 @@ class Media
 
 // TODO
 // - ne pas pouvoir de créer de media ayant déjà un lien existant !
-// - un media peut être un doc pdf, mp3, lien vidéo yt, une partoche, un soungbook
+// - un media peut être un doc pdf, mp3, lien vidéo yt, une partoche, un songbook
 
