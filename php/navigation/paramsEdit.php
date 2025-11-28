@@ -133,6 +133,7 @@ $footerHtml = htmlspecialchars($footer->getHtml());
 // Upload logo
 $logoActuel = $ini_objet->m_valeur('logoSite', 'general');
 $uploadDir = "../../images/navigation/";
+$racineDir = "../../";
 
 if (isset($_FILES['logoSite']) && $_FILES['logoSite']['error'] === UPLOAD_ERR_OK) {
     $filename = basename($_FILES['logoSite']['name']);
@@ -148,11 +149,12 @@ if (isset($_FILES['logoSite']) && $_FILES['logoSite']['error'] === UPLOAD_ERR_OK
         switch ($ext) {
             case 'jpg':
             case 'jpeg': $srcImage = imagecreatefromjpeg($_FILES['logoSite']['tmp_name']); break;
-            case 'png': $srcImage = imagecreatefrompng($_FILES['logoSite']['tmp_name']); break;
+            case 'png':  $srcImage = imagecreatefrompng($_FILES['logoSite']['tmp_name']);  break;
             case 'webp': $srcImage = imagecreatefromwebp($_FILES['logoSite']['tmp_name']); break;
         }
 
         if ($srcImage) {
+            // 1) Logo 300x300
             $dstImage = imagecreatetruecolor(300, 300);
             if ($ext === 'png' || $ext === 'webp') {
                 imagealphablending($dstImage, false);
@@ -163,21 +165,59 @@ if (isset($_FILES['logoSite']) && $_FILES['logoSite']['error'] === UPLOAD_ERR_OK
             switch ($ext) {
                 case 'jpg':
                 case 'jpeg': imagejpeg($dstImage, $destination, 90); break;
-                case 'png': imagepng($dstImage, $destination); break;
+                case 'png':  imagepng($dstImage, $destination); break;
                 case 'webp': imagewebp($dstImage, $destination); break;
             }
-
-            imagedestroy($srcImage);
             imagedestroy($dstImage);
 
+            // 2) favicon.ico (simple ICO: un seul PNG renommé)
+            $faviconSize = 32;
+            $faviconImage = imagecreatetruecolor($faviconSize, $faviconSize);
+            imagealphablending($faviconImage, false);
+            imagesavealpha($faviconImage, true);
+            imagecopyresampled($faviconImage, $srcImage, 0, 0, 0, 0, $faviconSize, $faviconSize, $width, $height);
+
+            // On génère un PNG puis on le renomme en .ico (suffisant pour la plupart des navigateurs).
+            $faviconPngPath = $uploadDir . "favicon_tmp.png";
+            imagepng($faviconImage, $faviconPngPath);
+            imagedestroy($faviconImage);
+
+            // Renommage en .ico
+            $faviconIcoPath = $racineDir . "favicon.ico";
+            @unlink($faviconIcoPath);
+            rename($faviconPngPath, $faviconIcoPath);
+
+            // 3) Apple touch icon 120x120
+            $apple120Size = 120;
+            $apple120 = imagecreatetruecolor($apple120Size, $apple120Size);
+            imagealphablending($apple120, false);
+            imagesavealpha($apple120, true);
+            imagecopyresampled($apple120, $srcImage, 0, 0, 0, 0, $apple120Size, $apple120Size, $width, $height);
+            imagepng($apple120, $racineDir . "apple-touch-icon-120x120-precomposed.png");
+            imagedestroy($apple120);
+
+            // 4) Apple touch icon 152x152
+            $apple152Size = 152;
+            $apple152 = imagecreatetruecolor($apple152Size, $apple152Size);
+            imagealphablending($apple152, false);
+            imagesavealpha($apple152, true);
+            imagecopyresampled($apple152, $srcImage, 0, 0, 0, 0, $apple152Size, $apple152Size, $width, $height);
+            imagepng($apple152, $racineDir . "apple-touch-icon-152x152-precomposed.png");
+            imagedestroy($apple152);
+
+            // Nettoyage source
+            imagedestroy($srcImage);
+
+            // MAJ ini / message
             $ini_objet->m_put($newFilename, 'logoSite', 'general');
             $bModif = true;
             $logoActuel = $newFilename;
-            $sortie .= "<div class='alert alert-success'>Logo téléchargé et redimensionné avec succès !</div>";
+            $sortie .= "<div class='alert alert-success'>Logo téléchargé, redimensionné et icônes générées avec succès !</div>";
         }
     } else {
         $sortie .= "<div class='alert alert-danger'>Format invalide. Autorisé : jpg, jpeg, png, webp</div>";
     }
+
 }
 
 if ($bModif) $ini_objet->save();
