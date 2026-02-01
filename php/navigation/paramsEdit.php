@@ -84,7 +84,9 @@ $itemsGeneral = [
     "sousTitreSite" => "Sous-titre du site",
     "mailOubliMotDePasse" => "Email oubli mot de passe",
     "nomEmailOubliMotDePasse" => "Nom email oubli mot de passe",
-    "cleGetSongBpm" => "Clé GetSongBpm"
+    "cleGetSongBpm" => "Clé GetSongBpm",
+    "GEMINI_API_KEY" => "Clé GEMINI",
+    "MAMMOUTH_API_KEY" => "Cle Api Mammouth"
 ];
 
 $itemsMysql = [

@@ -7,7 +7,7 @@ body {
 /* Barre de navigation */
 
 .navigation {
-    background-color: rgba(255, 200, 200, 1);
+    background-color: rgba(237, 229, 213, 1);
     display: inline-block;
     font-family: 'Roboto', sans-serif;
     left: 0;
@@ -165,9 +165,7 @@ h1 {
 }
 
 
-/* Styles portfolio sdongbook */
-
-
+/* Styles portfolio songbook */
 
 .songbook {
     background-color: #FFF;
@@ -198,7 +196,7 @@ h1 {
 
 .madate {
     color: #333333;
-    background-color: #ffa0a0;
+    background-color: #ede5d5;
     text-align: center;
     width: 100%;
     vertical-align: bottom;
@@ -224,8 +222,8 @@ img {
 /* --- Styles personnalisés des cartes média --- */
 
 .media-card {
-    background-color: rgba(255, 200, 200, 0.35); /* rouge très clair */
-    border: 1px solid rgba(255, 150, 150, 0.7);
+    background-color: rgba(238, 230, 213, 0.35); /* fond beige Canopee */
+    border: 1px solid rgba(237, 229, 213, 0.7);
     border-radius: 14px;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.12);
     transition: transform 0.2s ease, box-shadow 0.3s ease;
