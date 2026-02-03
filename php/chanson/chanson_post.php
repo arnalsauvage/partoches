@@ -87,6 +87,10 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
         $fidUser = $_POST ['fidUser'];
     }
     $fdate = $_POST['fdate'];
+    // NOUVEAU : Convertir la date du formulaire au format MySQL
+    $fdate = dateTexteVersMysql($fdate);
+    // NOUVEAU : Récupérer le champ cover
+    $fcover = $_POST['fcover'] ?? null;
 }
 
 $chaine = "Mode  : " . $mode;
@@ -105,6 +109,8 @@ if ($mode == "INS") {
     // echo "FHits = " . $fhits;
     $fhits = 0;
     $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
+    // NOUVEAU : Définir la cover après la construction de l'objet
+    $_chanson->setCover($fcover);
     $id = $_chanson->creeChansonBDD();
     $repertoire = "../". $_DOSSIER_CHANSONS . $id . "/";
     if (!file_exists($repertoire)) {
@@ -120,9 +126,9 @@ if ($mode == "MAJ") {
         $_chanson->chercheChanson($id);
         $fhits = $_chanson->getHits();
     }
-    $fdate = dateTexteVersMysql($fdate);
-
     $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
+    // NOUVEAU : Définir la cover après la construction de l'objet
+    $_chanson->setCover($fcover);
     $_chanson->creeModifieChansonBDD();
 }
 

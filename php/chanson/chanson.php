@@ -21,6 +21,8 @@ class Chanson
     private string $_datePub; // date de publication de la chanson en chaine de caractères JJ/MM/AAAA
     private int $_hits; // compteur de visites de la chanson, corresponds aux affichages de la page chanson
     private string $_tonalite;
+    private ?string $_cover; // URL de la pochette
+
     // static $_logger;
 
     // Fonction conseillée pour gérer plusieurs constructeurs
@@ -49,6 +51,7 @@ class Chanson
         $this->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
         $this->setHits(0);
         $this->setTonalite("C");
+        $this->setCover(null); // Nouvelle initialisation
     }
 
     /**
@@ -76,6 +79,7 @@ class Chanson
         $this->setDatePub(date(self::D_M_Y));
         $this->setHits($_hits);
         $this->setTonalite($_tonalite);
+        $this->setCover(null); // Nouvelle initialisation
     }
 
     public function __construct10($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
@@ -289,6 +293,22 @@ class Chanson
         $this->_tonalite = $tonalite;
     } // Indique la tonalité de la chanson ex : "Am" , "C#m"
 
+    /**
+     * @return string|null
+     */
+    public function getCover(): ?string
+    {
+        return $this->_cover;
+    }
+
+    /**
+     * @param string|null $cover
+     */
+    public function setCover(?string $cover): void
+    {
+        $this->_cover = $cover;
+    }
+
 
     // Cherche une chanson et la renvoie si elle existe
     public function chercheChanson($id): int
@@ -321,6 +341,8 @@ class Chanson
         $this->_idUser = $ligne[8];
         $this->_hits = $ligne[9];
         $this->_tonalite = $ligne[10];
+        // Nouvelle colonne cover, supposée être à l'index 11
+        $this->_cover = $ligne[11] ?? null;
     }
 
     // Cherche un chanson, la charge et renvoie vrai si elle existe
@@ -352,9 +374,10 @@ class Chanson
             $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
             $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
             $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
+            $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? ''); // Assurez-vous que c'est une chaîne, même si null
             $maRequete = sprintf("UPDATE  chanson SET nom = '%s', interprete = '%s', annee = '%s',
             idUser = %s, tempo = '%s', mesure='%s', pulsation='%s', 
-            hits='%s', tonalite='%s', datePub='%s' WHERE id='%s'",
+            hits='%s', tonalite='%s', datePub='%s', cover='%s' WHERE id='%s'", // Ajout de cover='%s'
                 $this->_nom,
                 $this->_interprete,
                 $this->_annee,
@@ -365,6 +388,7 @@ class Chanson
                 $this->_hits,
                 $this->_tonalite,
                 $this->_datePub,
+                $this->_cover, // Ajout de _cover
                 $this->_id);
             // Chanson::$_logger = init_logger();
             // Chanson::$_logger->info("Modification d'une chanson $this->_nom - $this->_interprete");
@@ -380,10 +404,11 @@ class Chanson
         $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
         $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
         $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
+        $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? ''); // Assurez-vous que c'est une chaîne, même si null
         $this->_datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
-        $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite)
+        $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite, cover)
 	        VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', 
-	        '%s', '%s' ,  '%s', '%s')",
+	        '%s', '%s' ,  '%s', '%s', '%s')", // Ajout de '%s' pour cover
             $this->_nom,
             $this->_interprete,
             $this->_annee,
@@ -393,7 +418,8 @@ class Chanson
             $this->_pulsation,
             $this->_datePub,
             $this->_hits,
-            $this->_tonalite);
+            $this->_tonalite,
+            $this->_cover); // Ajout de _cover
         // Chanson::$_logger = init_logger();
         // Chanson::$_logger->debug($maRequete);
         // Chanson::$_logger->info("Création d'une chanson $this->_nom - $this->_interprete");
