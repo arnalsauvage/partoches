@@ -257,6 +257,8 @@ HTML;
             $footerHtml
             <br>
             <a href='../../html/mentionsLegales.html' target='_blank' class='lienMentionsLegales'>Mentions légales</a>
+            <a href='../../html/merci.html' target='_blank' class='lienMentionsLegales'>Mercis</a>
+
             <script src='https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js'></script>
             <script src='../../js/precise-star-rating.js'></script>
         </div>

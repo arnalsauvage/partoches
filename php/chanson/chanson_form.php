@@ -281,6 +281,7 @@ function formulaireChanson(Chanson $_chanson, string $mode): string
         <li><a href='#tabs-4'>Liens</a></li>
       </ul>
         <div id='tabs-1' class='col-lg-12 centrer'>
+            <a href='chanson_form_new.php?id=" . $_chanson->getId() . "'> nouvelle version du form</a>
             <FORM  METHOD='POST' ACTION='". CHANSON_POST_PHP ."' name='Form'>
                 <input type=HIDDEN name='id' VALUE='" . $_chanson->getId() . "'>
                 <div class = 'row'>

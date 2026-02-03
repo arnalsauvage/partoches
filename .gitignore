@@ -11,3 +11,5 @@ composer.json
 composer.lock
 composer.phar
 Dockerfile
+/html/diagrammes/Accords/
+conf/params.ini

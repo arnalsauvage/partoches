@@ -1,6 +1,6 @@
 <?php
-require_once("../lib/utilssi.php");
-require_once("../utilisateur/utilisateur.php");
+require_once "../lib/utilssi.php";
+require_once "../utilisateur/utilisateur.php";
 
 $cheminVignettes = "../../vignettes/";
 
