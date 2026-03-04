@@ -22,6 +22,7 @@ class Chanson
     private int $_hits; // compteur de visites de la chanson, corresponds aux affichages de la page chanson
     private string $_tonalite;
     private ?string $_cover; // URL de la pochette
+    private int $_publication; // 1 = publié, 0 = brouillon
 
     // static $_logger;
 
@@ -51,20 +52,12 @@ class Chanson
         $this->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
         $this->setHits(0);
         $this->setTonalite("C");
-        $this->setCover(null); // Nouvelle initialisation
+        $this->setCover(null); 
+        $this->setPublication(1); // Publié par défaut
     }
 
     /**
      * Chanson constructor.
-     * @param $_nom
-     * @param $_interprete
-     * @param $_annee
-     * @param $_idUser
-     * @param $_tempo
-     * @param $_mesure
-     * @param $_pulsation
-     * @param $_hits
-     * @param $_tonalite
      */
     public function __construct9($_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
     {
@@ -79,7 +72,8 @@ class Chanson
         $this->setDatePub(date(self::D_M_Y));
         $this->setHits($_hits);
         $this->setTonalite($_tonalite);
-        $this->setCover(null); // Nouvelle initialisation
+        $this->setCover(null);
+        $this->setPublication(1);
     }
 
     public function __construct10($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
@@ -291,7 +285,7 @@ class Chanson
     public function setTonalite(string $tonalite)
     {
         $this->_tonalite = $tonalite;
-    } // Indique la tonalité de la chanson ex : "Am" , "C#m"
+    } 
 
     /**
      * @return string|null
@@ -309,15 +303,29 @@ class Chanson
         $this->_cover = $cover;
     }
 
+    /**
+     * @return int
+     */
+    public function getPublication(): int
+    {
+        return $this->_publication;
+    }
+
+    /**
+     * @param int $publication
+     */
+    public function setPublication(int $publication): void
+    {
+        $this->_publication = $publication;
+    }
+
 
     // Cherche une chanson et la renvoie si elle existe
     public function chercheChanson($id): int
     {
         $maRequete = sprintf("SELECT * FROM chanson WHERE chanson.id = '%s'",
             $id);
-        // pour debug : echo "requete : $maRequete";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
-        // renvoie la ligne sélectionnée : id, nom, interprète, année
         if ($ligne = $result->fetch_row()) {
             $this->mysqlRowVersObjet($ligne);
             return 1;
@@ -341,8 +349,8 @@ class Chanson
         $this->_idUser = $ligne[8];
         $this->_hits = $ligne[9];
         $this->_tonalite = $ligne[10];
-        // Nouvelle colonne cover, supposée être à l'index 11
         $this->_cover = $ligne[11] ?? null;
+        $this->_publication = (int)($ligne[12] ?? 1); // Nouvelle colonne publication
     }
 
     // Cherche un chanson, la charge et renvoie vrai si elle existe
@@ -350,7 +358,6 @@ class Chanson
     {
         $maRequete = sprintf("SELECT * FROM chanson WHERE chanson.nom = '%s'", $nom);
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChansonParLeNom #1 : " . $_SESSION ['mysql']->error);
-        // renvoie la ligne sélectionnée : id, nom, taille, date
         if ($ligne = $result->fetch_row()) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
@@ -358,8 +365,6 @@ class Chanson
             return (0);
         }
     }
-
-    // Créée une chanson en BDD
 
     /**
      *      enregistre l'objet en BDD
@@ -374,10 +379,10 @@ class Chanson
             $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
             $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
             $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
-            $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? ''); // Assurez-vous que c'est une chaîne, même si null
+            $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
             $maRequete = sprintf("UPDATE  chanson SET nom = '%s', interprete = '%s', annee = '%s',
             idUser = %s, tempo = '%s', mesure='%s', pulsation='%s', 
-            hits='%s', tonalite='%s', datePub='%s', cover='%s' WHERE id='%s'", // Ajout de cover='%s'
+            hits='%s', tonalite='%s', datePub='%s', cover='%s', publication=%s WHERE id='%s'", 
                 $this->_nom,
                 $this->_interprete,
                 $this->_annee,
@@ -388,11 +393,9 @@ class Chanson
                 $this->_hits,
                 $this->_tonalite,
                 $this->_datePub,
-                $this->_cover, // Ajout de _cover
+                $this->_cover,
+                $this->_publication,
                 $this->_id);
-            // Chanson::$_logger = init_logger();
-            // Chanson::$_logger->info("Modification d'une chanson $this->_nom - $this->_interprete");
-            // Chanson::$_logger->debug($maRequete);
             $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème modif dans creeModifieChanson #1 : " . $_SESSION [self::MYSQL]->error . " requete : " . $maRequete);
             return $this->_id;
         }
@@ -404,11 +407,11 @@ class Chanson
         $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
         $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
         $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
-        $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? ''); // Assurez-vous que c'est une chaîne, même si null
+        $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
         $this->_datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
-        $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite, cover)
+        $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite, cover, publication)
 	        VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', 
-	        '%s', '%s' ,  '%s', '%s', '%s')", // Ajout de '%s' pour cover
+	        '%s', '%s' ,  '%s', '%s', '%s', %s)", 
             $this->_nom,
             $this->_interprete,
             $this->_annee,
@@ -419,12 +422,9 @@ class Chanson
             $this->_datePub,
             $this->_hits,
             $this->_tonalite,
-            $this->_cover); // Ajout de _cover
-        // Chanson::$_logger = init_logger();
-        // Chanson::$_logger->debug($maRequete);
-        // Chanson::$_logger->info("Création d'une chanson $this->_nom - $this->_interprete");
+            $this->_cover,
+            $this->_publication);
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème creeChansonBDD#1 : " . $_SESSION [self::MYSQL]->error);
-        // On renseigne l'id de l'objet avec l'id créé en BDD
         $this->setId($_SESSION [self::MYSQL]->insert_id);
         return ($this->getId());
     }
@@ -432,13 +432,8 @@ class Chanson
     // Supprime un chanson si elle existe
     public function supprimeChansonBddFile()
     {
-        // On supprime les enregistrements dans chanson
         $maRequete = "DELETE FROM chanson WHERE id='" . $this->getId() . "'";
         $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème #1 dans supprimeChanson : " . $_SESSION [self::MYSQL]->error);
-        // Chanson::$_logger = init_logger();
-        // Chanson::$_logger->debug($maRequete);
-        // Chanson::$_logger->info("Suppression d'une chanson $this->_nom - $this->_interprete");
-        // On supprime ensuite tous les documents de la chanson
         $result = chercheDocumentsTableId("chanson", $this->getId());
         while ($ligne = $result->fetch_row()) {
             $id = $ligne [0];
@@ -451,7 +446,7 @@ class Chanson
     {
         $retour = "Id : " . $this->_id . " Nom : " . $this->_nom . " Interprète : " . $this->_interprete . " Année : " . $this->_annee;
         $retour .= " idUSer : " . $this->_idUser . " tempo : " . $this->_tempo . " mesure : " . $this->_mesure . " pulsation : " . $this->_pulsation;
-        $retour .= " hits : " . $this->_hits . " tonalité : " . $this->_tonalite;
+        $retour .= " hits : " . $this->_hits . " tonalité : " . $this->_tonalite . " publication : " . $this->_publication;
         return $retour . "<BR>\n";
     }
 
@@ -479,28 +474,28 @@ class Chanson
     {
         $rechercheNormalisee = self::normalize($recherche);
         $maRequete = "SELECT id, nom, interprete FROM chanson";
+        // Ajout du filtre publication pour le moteur de recherche si pas admin
+        if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
+            $maRequete .= " WHERE publication = 1";
+        }
+        
         $retour = "";
         $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème chercheChanson #2 : " . $_SESSION[self::MYSQL]->error . " Requete : $maRequete");
         $matches = [];
         if ($result->num_rows > 0) {
-            // Parcourir les résultats et calculer la distance de Levenshtein
             while ($row = $result->fetch_assoc()) {
                 $normalized_titre = self::normalize($row["nom"]);
                 $normalized_interprete = self::normalize($row["interprete"]);
                 $distance_titre = levenshtein($rechercheNormalisee, $normalized_titre);
                 $distance_interprete = levenshtein($rechercheNormalisee, $normalized_interprete);
-                // Choisir la plus petite distance entre le titre et l'interprète
                 $distance = min($distance_titre, $distance_interprete);
-                // Stocker la distance avec le résultat
                 $row['distance'] = $distance;
                 $matches[] = $row;
             }
         }
-        // Trier les résultats par distance
         usort($matches, function ($a, $b) {
             return $a['distance'] <=> $b['distance'];
         });
-        // Garder seulement les 10 meilleurs résultats
         $top_matches = array_slice($matches, 0, 10);
         if (count($top_matches) > 0) {
             $retour .= "Matches : ";
@@ -521,13 +516,26 @@ class Chanson
 
         $maRequete = "SELECT id FROM chanson";
         $_bool_where_defini = false;
-        if ($critere != "" && $critere != "%") {
-            $maRequete .= " WHERE ( nom LIKE '$critere' OR interprete LIKE '$critere' )";
+        
+        // Filtre de publication pour les non-admins
+        if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
+            $maRequete .= " WHERE publication = 1";
             $_bool_where_defini = true;
+        }
+
+        if ($critere != "" && $critere != "%") {
+            if (!$_bool_where_defini) {
+                $maRequete .= " WHERE ";
+                $_bool_where_defini = true;
+            } else {
+                $maRequete .= " AND ";
+            }
+            $maRequete .= "( nom LIKE '$critere' OR interprete LIKE '$critere' )";
         }
         if ($champFiltre <> "" && $valfiltre <> "") {
             if (!$_bool_where_defini) {
                 $maRequete .= " WHERE ";
+                $_bool_where_defini = true;
             } else {
                 $maRequete .= " AND ";
             }
@@ -569,8 +577,12 @@ class Chanson
             if ($_SESSION['privilege'] == $GLOBALS["PRIVILEGE_INVITE"]) {
                 $maRequete = "SELECT chanson.id  FROM chanson 
                 RIGHT JOIN noteUtilisateur on noteUtilisateur.idObjet = chanson.id 
-                WHERE noteUtilisateur.nomObjet = 'chanson' OR noteUtilisateur.nomObjet = NULL
-                GROUP BY chanson.id ORDER BY COALESCE(AVG(noteUtilisateur.note),0) ";
+                WHERE noteUtilisateur.nomObjet = 'chanson' OR noteUtilisateur.nomObjet = NULL";
+                // Ré-ajout du filtre publication ici car la requête est écrasée
+                if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
+                    $maRequete .= " AND publication = 1";
+                }
+                $maRequete .= " GROUP BY chanson.id ORDER BY COALESCE(AVG(noteUtilisateur.note),0) ";
             } else {
                 $maRequete = "SELECT  noteUtilisateur.idObjet FROM noteUtilisateur 
                 WHERE noteUtilisateur.nomObjet = 'chanson' AND noteUtilisateur.idUtilisateur = '" . $_SESSION['id'] . "'
@@ -582,9 +594,6 @@ class Chanson
         } else {
             $maRequete .= " ASC";
         }
-        // Chanson::$_logger = init_logger();
-        // Chanson::$_logger->debug($maRequete);
-        // echo "debug : " . $maRequete;
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChanson #2 : " . $_SESSION [self::MYSQL]->error . "Requete : $maRequete");
         $tableau = [];
         while ($idChanson = $result->fetch_row()) {
@@ -593,13 +602,6 @@ class Chanson
         return $tableau;
     }
 
-// Cherche la présence d'une chanson dans des songbooks
-//idSongbook	nomSongBook
-//24            Madelon 2017
-//28        	Les Face A
-//32        	Vergers de l îlot
-//33        	Fête de Printemps
-//33         	Fête de Printemps
     /**
      * Cherche les songbooks associés aux documents de cette chanson
      * @return mysqli_result|bool
@@ -609,10 +611,7 @@ class Chanson
         $maRequete = "SELECT DISTINCT songbook.id, songbook.nom from songbook, liendocsongbook , document ,
         chanson WHERE liendocsongbook.idDocument = document.id AND document.nomTable='chanson'
         AND document.idTable = chanson.id AND chanson.id = " . $this->_id . "  AND songbook.id = liendocsongbook.idSongbook";
-        // Chanson::$_logger = init_logger();
-        // Chanson::$_logger->debug($maRequete);
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheSongbooksDocuments #1 : " . $_SESSION [self::MYSQL]->error);
-        // Chanson::$_logger->warning(var_dump($result));
         return $result;
     }
 
@@ -624,17 +623,13 @@ class Chanson
     {
         $maRequete = sprintf("SELECT * from lienurl WHERE lienurl.nomtable = 'chanson' AND lienurl.idtable = %s",
             $this->_id);
-        // Chanson::$_logger = init_logger();
-        // Chanson::$_logger->debug($maRequete);
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheLiensChanson #1 : " . $_SESSION [self::MYSQL]->error);
-        // Chanson::$_logger->warning(var_dump($result));
         return $result;
     }
 // Fonction pour normaliser les chaînes de caractères
     public
     static function normalize($string)
     {
-        echo "Normalize $string ;";
         $string = strtolower($string); // Convertir en minuscules
         $string = preg_replace('/[áàâãäå]/u', 'a', $string);
         $string = preg_replace('/[éèêë]/u', 'e', $string);
@@ -646,7 +641,6 @@ class Chanson
         $string = preg_replace('/ñ/u', 'n', $string);
         $string = preg_replace('/[^a-z0-9\s]/', '', $string); // Supprimer les caractères non-alphanumériques
         $string = preg_replace('/\s+/', ' ', $string); // Réduire les espaces multiples
-        echo " devient $string ;";
         return trim($string); // Supprimer les espaces au début et à la fin
     }
 }
@@ -656,14 +650,17 @@ class Chanson
 // Cherche les chansons correspondant à un critère
 function chercheChansons($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
 {
-    $maRequete = "SELECT * FROM chanson WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
+    $maRequete = "SELECT * FROM chanson WHERE $critere LIKE '$valeur'";
+    // Ajout filtre publication si pas admin
+    if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
+        $maRequete .= " AND publication = 1";
+    }
+    $maRequete .= " ORDER BY $critereTri";
     if (!$bTriAscendant) {
         $maRequete .= " DESC";
     } else {
         $maRequete .= " ASC";
     }
-    // Chanson::$_logger = init_logger();
-    // Chanson::$_logger->debug($maRequete);
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #3 : " . $_SESSION ['mysql']->error);
     return $result;
 }

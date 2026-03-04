@@ -330,6 +330,11 @@ function formulaireChanson(Chanson $_chanson, string $mode): string
                     <input class= 'col-sm-7' type='text' name='ftonalite' VALUE='" . $_chanson->getTonalite() . "' SIZE='10' placeholder='ex :Am ou C ou F#'>
                 </div>
                 <div class = 'row'>
+                    <label class='inline col-sm-3'> Publication :</label>
+                    <input class= 'col-sm-1' type='checkbox' name='fpublication' value='1' " . ($_chanson->getPublication() == 1 ? "checked" : "") . ">
+                    <span class='text-muted'>(coché = visible par tous, décoché = brouillon admin)</span>
+                </div>
+                <div class = 'row'>
                     <label class='inline col-sm-3'> Date publication :</label>
                     <input class= 'col-sm-7' type='text' name='fdate' VALUE='" . dateMysqlVersTexte($_chanson->getDatePub()) . "' SIZE='10' MAXLENGTH='128'>
                  </div>

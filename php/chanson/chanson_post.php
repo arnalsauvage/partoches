@@ -97,6 +97,8 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     $fdate = dateTexteVersMysql($fdate);
     // NOUVEAU : Récupérer le champ cover
     $fcover = $_POST['fcover'] ?? null;
+    // NOUVEAU : Récupérer le champ publication
+    $fpublication = isset($_POST['fpublication']) ? 1 : 0;
 }
 
 $chaine = "Mode  : " . $mode;
@@ -117,6 +119,8 @@ if ($mode == "INS") {
     $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
     // NOUVEAU : Définir la cover après la construction de l'objet
     $_chanson->setCover($fcover);
+    // NOUVEAU : Définir la publication
+    $_chanson->setPublication($fpublication);
     $id = $_chanson->creeChansonBDD();
     $repertoire = "../". $_DOSSIER_CHANSONS . $id . "/";
     if (!file_exists($repertoire)) {
@@ -135,6 +139,8 @@ if ($mode == "MAJ") {
     $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
     // NOUVEAU : Définir la cover après la construction de l'objet
     $_chanson->setCover($fcover);
+    // NOUVEAU : Définir la publication
+    $_chanson->setPublication($fpublication);
     $_chanson->creeModifieChansonBDD();
 }
 
