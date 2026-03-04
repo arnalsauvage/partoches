@@ -1,0 +1,224 @@
+/* === PALETTE CANOPÉE === */
+:root {
+    --c-noir: #000000;
+    --c-blanc: #FFFFFF;
+    --c-marron-fonce: #2b1d1a;
+    --c-marron-moyen: #3E2723;
+    --c-marron-clair: #D2B48C;
+    --c-beige: #F5F5DC;
+    --c-accent: #8B4513;
+}
+
+body {
+    background-color: var(--c-noir);
+    color: var(--c-beige);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Le centre en marron, les bords en noir */
+.container {
+    background-color: var(--c-marron-fonce);
+    border-left: 1px solid var(--c-marron-moyen);
+    border-right: 1px solid var(--c-marron-moyen);
+    min-height: 100vh;
+    padding-bottom: 40px;
+}
+
+/* Header avec bords noirs et centre marron clair */
+.header-global {
+    background-color: var(--c-noir); /* Bords noirs */
+    padding: 0; 
+}
+
+.header-global .container {
+    background-color: var(--c-marron-clair); /* Centre marron clair */
+    min-height: auto;
+    padding: 20px;
+    border-bottom: 5px solid var(--c-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centre le titre par défaut */
+    position: relative; /* Indispensable pour caler le bouton Entrer */
+}
+
+.logo {
+    width: 128px !important;
+    height: auto !important;
+    max-width: 128px;
+}
+
+.header-global h1 {
+    color: var(--c-marron-fonce) !important;
+    font-weight: 900;
+    margin: 0;
+    margin-left: 20px;
+    text-shadow: 1px 1px 0px rgba(255,255,255,0.3);
+}
+
+.titre-gauche {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centre le contenu (logo + texte) */
+    flex: 1; /* Prend toute la place pour assurer le centrage */
+}
+
+.titre-droite {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%); /* Centrage vertical du bouton */
+}
+
+h2 {
+    color: var(--c-marron-clair);
+    border-bottom: 2px solid var(--c-marron-moyen);
+    padding-bottom: 15px;
+    margin-top: 40px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-align: center;
+}
+
+/* Cartes média */
+.media-card {
+    background-color: #1a110f !important;
+    border: 1px solid var(--c-marron-moyen) !important;
+    transition: all 0.4s ease;
+    color: var(--c-beige) !important;
+    border-radius: 15px !important;
+}
+
+.media-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8) !important;
+    border-color: var(--c-marron-clair) !important;
+}
+
+.media-card .card-title {
+    color: var(--c-blanc) !important;
+    font-weight: bold;
+}
+
+.media-card .meta-pub {
+    color: #9e8d8a !important;
+    border-top: 1px solid #33221f;
+}
+
+/* Badges */
+.badge.bg-primary { 
+    background-color: var(--c-marron-clair) !important; 
+    color: var(--c-marron-fonce) !important;
+}
+.badge.bg-danger { 
+    background-color: var(--c-accent) !important; 
+    color: var(--c-blanc) !important;
+}
+
+/* Bouton Entrer */
+.entrer-btn {
+    background-color: var(--c-marron-fonce) !important;
+    border: 2px solid var(--c-marron-moyen) !important;
+    color: var(--c-marron-clair) !important;
+    padding: 10px 35px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.entrer-btn:hover {
+    background-color: var(--c-accent) !important;
+    color: var(--c-blanc) !important;
+    transform: translateY(-3px);
+}
+
+footer {
+    background-color: var(--c-noir);
+    color: #444 !important;
+    border-top: 1px solid var(--c-marron-moyen);
+    margin-top: 0 !important;
+}
+
+/* === STYLES INFO COOKIES (Écrase styles-communs.css) === */
+.info-cookies {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    text-align: right; /* Pour que le bouton reste calé à droite */
+}
+
+#cookieToggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+#cookieToggle:hover {
+    transform: scale(1.1);
+}
+
+#cookieToggle img {
+    width: 60px;
+    height: auto;
+}
+
+.cookie-popup {
+    display: none;
+    background: rgba(255, 255, 255, 0.98);
+    color: #000;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    max-width: 300px;
+    position: absolute; /* Ne déplace plus le bouton */
+    top: 70px;
+    right: 0;
+    text-align: left;
+    z-index: 1001;
+}
+
+/* === CORRECTIF MOBILE === */
+@media (max-width: 768px) {
+    .header-global .container {
+        flex-direction: column;
+        align-items: center;
+        padding-top: 70px; /* Espace pour le cookie fixed */
+        height: auto !important;
+    }
+
+    .titre-gauche {
+        flex-direction: column;
+        margin-bottom: 20px;
+        text-align: center;
+        flex: none !important; /* Libère l'espace pour le bouton en dessous */
+    }
+
+    .header-global h1 {
+        margin-left: 0;
+        font-size: 20px; 
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .titre-droite {
+        position: static !important; /* Annule le position absolute */
+        transform: none !important;  /* Annule le centrage vertical du laptop */
+        top: auto !important;
+        width: 100%;
+        text-align: center;
+    }
+
+    .entrer-btn {
+        display: inline-block;
+        width: 80%;
+        margin-bottom: 20px;
+    }
+
+    .info-cookies {
+        top: 5px;
+        right: 5px;
+    }
+}

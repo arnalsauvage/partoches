@@ -13,3 +13,13 @@ composer.phar
 Dockerfile
 /html/diagrammes/Accords/
 conf/params.ini
+/.phpunit.result.cache
+/html/diagrammes/pageDiagrammes.htm
+/html/diagrammes/petite-info-bulle.png
+/phpunit-10.4.1.phar
+/php/utilisateur/test.html
+/html/diagrammes/accords.js
+/php/chanson/logRecherche.txt
+/html/diagrammes/diagrammes.js
+/html/diagrammes/pageAccords.htm
+/html/diagrammes/style.css

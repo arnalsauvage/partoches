@@ -3,7 +3,6 @@ require_once "../lib/utilssi.php";
 require_once "../lib/Pagination.php";
 require_once "../chanson/chanson.php";
 require_once "../document/document.php";
-//require_once "../navigation/menu.php";
 require_once "../note/UtilisateurNote.php";
 require_once 'Media.php';
 
@@ -22,7 +21,7 @@ $textes = [
     'filtre' => 'filtre',
     'siteTitle' => $_SESSION['titreSite'] ?? 'Partoches Ukulélé',
     'siteSubtitle' => $_SESSION['sousTitreSite'] ?? 'Le meilleur du ukulélé',
-    'ogUrl' => $_SESSION['urlSite'] ,
+    'ogUrl' => $_SESSION['urlSite'],
     'ogImage' => $_SESSION['urlSite'] . 'apple-touch-icon-152x152-precomposed.png',
     'cookieMessage' => "Ce site utilise un cookie pour vous identifier comme visiteur ou contributeur. En poursuivant votre navigation, vous acceptez ce cookie et offrez votre cœur et votre âme au ukulélé !",
     'enterBtn' => 'Entrer',
@@ -45,7 +44,10 @@ $totalMedias = count($idsMedias);
     <title><?= "{$textes['siteTitle']} – Dernières publications" ?></title>
     <meta name="description" content="<?= htmlspecialchars($textes['siteSubtitle']) ?>">
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../css/styles-communs.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/css/styles-communs.css') ?>">
+    <link rel="stylesheet"
+          href="../../css/styles-communs.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/css/styles-communs.css') ?>">
+    <link rel="stylesheet"
+          href="../../css/canopee-medias.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/css/canopee-medias.css') ?>">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
 
@@ -63,9 +65,10 @@ $totalMedias = count($idsMedias);
         </div>
     </div>
 
-    <div class="titre-container">
+    <div class="titre-container container">
         <div class="titre-gauche">
-            <img src="../../images/navigation/<?= $_SESSION['logoSite'] ?? 'logo.png' ?>" width="128" class="logo" alt="Logo du site">
+            <img src="../../images/navigation/<?= $_SESSION['logoSite'] ?? 'logo.png' ?>" width="128" class="logo"
+                 alt="Logo du site">
             <h1><?= htmlspecialchars($textes['siteTitle']) ?></h1>
         </div>
         <div class="titre-droite">
@@ -115,8 +118,6 @@ $totalMedias = count($idsMedias);
     </p>
 </main>
 
-
-
 <footer class="text-center py-3 mt-4 text-muted">
     &copy; <?= date('Y') ?> – <?= htmlspecialchars($textes['siteTitle']) ?>
 </footer>
@@ -125,10 +126,28 @@ $totalMedias = count($idsMedias);
 
 <script>
     document.getElementById('cookieToggle').addEventListener('click', () => {
-        document.getElementById('cookiePopup').classList.add('active');
+        const popup = document.getElementById('cookiePopup');
+        const banner = document.getElementById('cookieBanner');
+
+        // Affichage de la popup
+        popup.style.display = 'block';
+
+        // Disparition automatique après 10 secondes
+        setTimeout(() => {
+            banner.style.transition = 'opacity 1s ease-out, transform 1s ease-out';
+            banner.style.opacity = '0';
+            banner.style.transform = 'translateY(-20px)';
+
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 1000);
+        }, 10000);
     });
+
+    // Fermeture manuelle au clic sur la popup
     document.getElementById('cookiePopup').addEventListener('click', () => {
-        document.getElementById('cookiePopup').classList.remove('active');
+        const banner = document.getElementById('cookieBanner');
+        banner.style.display = 'none';
     });
 </script>
 </body>

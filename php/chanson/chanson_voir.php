@@ -262,7 +262,7 @@ $contenuHtml .= "
   <div class='modal-dialog modal-lg'>
     <div class='modal-content text-center' style='background:transparent; border:none; box-shadow:none;'>
         <button type='button' class='close' data-dismiss='modal' style='color:white; font-size:40px; opacity:1;'>&times;</button>
-        <img id='lightboxImg' src='' class='img-responsive center-block' style='max-height: 90vh; border: 5px solid white;'>
+        <img id='lightboxImg' src='' alt='' class='img-responsive center-block' style='max-height: 90vh; border: 5px solid white;'>
     </div>
   </div>
 </div>
@@ -347,7 +347,9 @@ function renderStrumsSection($idChanson, $tempo, $isTernaire) {
             $html .= "<div class='well well-sm'>";
             $html .= "  <h3>" . str_replace(" ", "-", $monStrum->getStrum()) . " <small>(" . $monStrum->getLongueur() . " " . $monStrum->renvoieUniteEnFrancais() . ")</small></h3>";
             $urlStrum = "$urlBoiteAstrum?strum=" . str_replace(" ", "-", $monStrum->getStrum()) . "&tempo=$tempo";
-            if ($isTernaire) $urlStrum .= "&ternaire=true";
+            if ($isTernaire) {
+                $urlStrum .= "&ternaire=true";
+            }
             $html .= "  <a class='btn btn-info btn-sm' title='Boîte à strum' href='$urlStrum'><img src='$imageBoiteAstrum' alt='Strum' height='20'> Boîte à Strum</a>";
             $html .= "  <p style='margin-top:10px;'>" . $monStrum->getDescription() . "</p>";
             $html .= $monStrum->chansonsDuStrum();
