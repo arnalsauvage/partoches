@@ -51,7 +51,12 @@ function chercheDocumentNomTableId($nom, $table, $id)
     }
 }
 
-// Cherche les documents d'une entree d'une table et les renvoie s'ils existent
+/**
+ * Cherche les documents d'une entree d'une table et les renvoie s'ils existent
+ * @param string $table
+ * @param int $id
+ * @return mysqli_result|bool
+ */
 function chercheDocumentsTableId($table, $id)
 {
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$id' AND document.nomTable = '$table' ORDER BY document.id ASC";
@@ -277,7 +282,7 @@ function testeDocument()
 function imageTableId($table, $id)
 {
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$id' AND document.nomTable='$table' ";
-    $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
+    $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg' OR document.nom LIKE '%.webp')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imageSongbook #1 : " . $_SESSION ['mysql']->error);
     if (empty ($result)) {
         return ("");

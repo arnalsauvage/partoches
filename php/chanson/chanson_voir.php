@@ -1,12 +1,11 @@
 <?php
 /** @noinspection PhpUndefinedMethodInspection */
-const CHANSON = "chanson";
-const DIV_CLASS_ROW = "<div class='row'>";
-const FIN_DIV = "</div>";
-const FIN_SECTION = "</section>";
-global $_DOSSIER_CHANSONS;
-global $iconeEdit;
-global $cheminImages;
+
+/**
+ * PAGE : chanson_voir.php
+ * Affiche le détail d'une chanson avec une UX moderne (badges, boutons d'action, lightbox).
+ */
+
 require_once "../lib/utilssi.php";
 require_once "../chanson/chanson.php";
 require_once "../document/document.php";
@@ -18,252 +17,309 @@ require_once "../note/UtilisateurNote.php";
 require_once "../songbook/songbook.php";
 require_once "../strum/strum.php";
 
-$_strumForm = "strum_form.php";
-$_strumPost = "strum_post.php";
-$_lienStrumChansonPost = "lienStrumChanson_post.php";
-global $iconePoubelle;
+// --- CONSTANTES ET GLOBALES ---
+const CHANSON = "chanson";
+const DIV_ROW = "<div class='row'>";
+const FIN_DIV = "</div>";
+const FIN_SECTION = "</section>";
 
-$urlBoiteAstrum = "../../html/boiteAstrum/index.html";
-$imageBoiteAstrum = "../../html/boiteAstrum/medias/img/boiteAstrum.png";
+global $_DOSSIER_CHANSONS, $iconeEdit, $cheminImages, $iconePoubelle;
 
-$table = CHANSON;
-$contenuHtml = "<div class='container'>
-  <div class='starter-template'> \n";
-$monImage = "";
-
-if (!is_numeric($_GET['id'])) {
-    echo "Erreur #1 dans chanson_voir.php";
-    return;
+// --- INITIALISATION ET RÉCUPÉRATION DES DONNÉES ---
+if (empty($_GET['id']) || !is_numeric($_GET['id'])) {
+    die("Erreur : Identifiant de chanson invalide.");
 }
 
-$idChanson = $_GET['id'];
-$_chanson = new Chanson ($idChanson);
-$fichiersDuSongbook = $_chanson->fichiersChanson($_DOSSIER_CHANSONS);
+$idChanson = (int)$_GET['id'];
+$_chanson = new Chanson($idChanson);
 
-// On choisit une des images du songbook
+// Augmenter le compteur de vues
+augmenteHits(CHANSON, $idChanson);
+
+// Données de base
+$datePub = dateMysqlVersTexte($_chanson->getDatePub());
+$utilisateur = chercheUtilisateur($_chanson->getIdUser())[1];
+$hits = $_chanson->getHits() + 1;
 $monImage = imageTableId(CHANSON, $idChanson);
 
-$datePub = dateMysqlVersTexte($_chanson->getDatePub()); // datePub
-$utilisateur = chercheUtilisateur($_chanson->getIdUser())[1];
-$hits = $_chanson->getHits() + 1; // hits
+// Récupération et filtrage des documents
+$resultDocs = chercheDocumentsTableId(CHANSON, $idChanson);
+$documents = [];
+$nbImages = 0;
 
+if (!empty($resultDocs)) {
+    while ($ligne = $resultDocs->fetch_row()) {
+        $documents[] = $ligne;
+        $ext = strtolower(substr(strrchr($ligne[1], '.'), 1));
+        if (in_array($ext, ['jpg', 'png', 'webp'])) {
+            $nbImages++;
+        }
+    }
+}
 
-$contenuHtml .= DIV_CLASS_ROW;
+// --- CONSTRUCTION DU CONTENU HTML ---
+$contenuHtml = "
+<style>
+    .badge-tech { font-size: 1.2em; padding: 8px 12px; margin-right: 5px; margin-bottom: 10px; display: inline-block; text-decoration: none !important; color: white !important; }
+    .badge-tech:hover { opacity: 0.8; }
+    .btn-action { margin-bottom: 15px; }
+    .pochette-container { cursor: zoom-in; transition: transform 0.2s; }
+    .pochette-container:hover { transform: scale(1.02); }
+    #copy-success { display: none; margin-left: 10px; color: #5cb85c; font-weight: bold; }
+    .tempo-label { font-size: 0.7em; display: block; margin-top: 2px; font-weight: normal; font-style: italic; }
+</style>
+
+<div class='container'>
+    <div class='starter-template'>\n";
+
+// --- BOUTONS D'ACTION (RETOUR / EDIT) ---
+$contenuHtml .= DIV_ROW;
+$contenuHtml .= "  <div class='col-xs-12 text-left btn-action'>";
+$contenuHtml .= "    <a href='chanson_liste.php' class='btn btn-default'><i class='glyphicon glyphicon-arrow-left'></i> Retour à la liste</a>";
+if (!empty($_SESSION['privilege']) && $_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
+    $contenuHtml .= "    <a href='chanson_form.php?id=$idChanson' class='btn btn-primary'><i class='glyphicon glyphicon-pencil'></i> Modifier</a>";
+}
+$contenuHtml .= "  </div>";
+$contenuHtml .= FIN_DIV;
+
+// 1. ENTÊTE
+$contenuHtml .= DIV_ROW;
+
+// Colonne Gauche : Infos
 $contenuHtml .= "<section class='col-sm-8'>";
+$contenuHtml .= "  <h2>" . htmlentities($_chanson->getNom());
+// Bouton Copier URL
+$contenuHtml .= "    <button class='btn btn-xs btn-link' onclick='copyUrlToClipboard()' title='Copier le lien'>
+                        <i class='glyphicon glyphicon-link'></i>
+                     </button>
+                     <span id='copy-success'><i class='glyphicon glyphicon-ok'></i> Copié !</span>
+                   </h2>";
 
-$contenuHtml .= DIV_CLASS_ROW;
-$contenuHtml .= " <div class='col-sm-10'><h2>" . htmlentities($_chanson->getNom()) . "</h2>" . FIN_DIV; // Titre
-$contenuHtml .= "<div class='col-sm-2'>";
+$urlChercheAn = "chanson_liste.php?filtre=annee&valFiltre=" . $_chanson->getAnnee();
+$contenuHtml .= "  <h3>" . htmlentities($_chanson->getInterprete()) . " <small><a href='$urlChercheAn'>" . $_chanson->getAnnee() . "</a></small></h3>";
 
-if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-    $contenuHtml .= ancre("chanson_form.php?id=" . $idChanson, image($cheminImages . $iconeEdit, 32, 32)); // Nom));
-}
-$contenuHtml .= "</div>" . FIN_DIV;
+// Badges Techniques
+$tonalite = !empty($_chanson->getTonalite()) ? $_chanson->getTonalite() : '?';
+$urlTona = "chanson_liste.php?filtre=tonalite&valFiltre=" . urlencode($tonalite);
+$tempoBpm = $_chanson->getTempo();
+$tempoName = getTempoName($tempoBpm);
 
-$contenuHtml .= DIV_CLASS_ROW;
-$urlChercheAnChanson = "chanson_liste.php?filtre=annee&valFiltre=". $_chanson->getAnnee()."'>" . $_chanson->getAnnee();
-$contenuHtml .= "<div class='col-sm-11'><h3> " . htmlentities($_chanson->getInterprete())  . " </h3>" . FIN_DIV .
-    " - <a href='" . $urlChercheAnChanson . "</a>\n";
-$contenuHtml .= FIN_DIV;
-$contenuHtml .= DIV_CLASS_ROW;
-$contenuHtml .= " <div class='col-sm-6'>Tonalité : " . $_chanson->getTonalite() . ", Tempo : " . $_chanson->getTempo();
-$contenuHtml .= ", mesure : " . $_chanson->getMesure() . ", pulsation : " . $_chanson->getPulsation() . " <br>\n";
-$contenuHtml .= " Publiée le  :$datePub, par $utilisateur, affichée $hits fois. <br>\n" . FIN_DIV . "\n";
+$contenuHtml .= "  <div style='margin: 20px 0;'>";
+// Badge Tonalité (Lien vers filtre)
+$contenuHtml .= "    <a href='$urlTona' class='label label-primary badge-tech' title='Voir toutes les chansons en $tonalite'>
+                        <i class='glyphicon glyphicon-music'></i> $tonalite
+                     </a>";
 
-$ICONEWIIKIPEDIA = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/";
-$ICONEWIIKIPEDIA.="YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png";
-// Propose des recherches sur la chanson
-$contenuHtml .= "<div class='col-sm-6'><a href='https://www.youtube.com/results?search_query=" .
-    urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank'>
-<img src='$ICONEWIIKIPEDIA' alt = 'recherche youtube' width='64'></a>\n";
-$rechercheWikipedia = "https://fr.wikipedia.org/w/index.php?search=" .
-    urlencode(($_chanson->getNom() . " " . $_chanson->getInterprete()));
-$contenuHtml .= "<a href='$rechercheWikipedia' target='_blank'>
-    <img src='https://fr.wikipedia.org/static/images/project-logos/frwiki.png'
-    alt='recherche wikipedia' width='64'></a>\n" ;
+// Badge Tempo (avec catégorie)
+$contenuHtml .= "    <span class='label label-info badge-tech' title='Tempo'>
+                        <i class='glyphicon glyphicon-time'></i> $tempoBpm bpm
+                        <span class='tempo-label'>$tempoName</span>
+                     </span>";
 
-$urlPageEnCours = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-$contenuHtml .= generateQRCode ($urlPageEnCours, 128);
-$contenuHtml .= FIN_DIV;
+$contenuHtml .= "    <span class='label label-default badge-tech' title='Mesure'><i class='glyphicon glyphicon-equalizer'></i> " . $_chanson->getMesure() . "</span>";
+$pulsationIcon = ($_chanson->getPulsation() === "ternaire") ? "glyphicon-refresh" : "glyphicon-option-vertical";
+$contenuHtml .= "    <span class='label label-warning badge-tech' title='Pulsation'><i class='glyphicon $pulsationIcon'></i> " . $_chanson->getPulsation() . "</span>";
+$contenuHtml .= "  </div>";
+
+$contenuHtml .= "  <p class='text-muted'>Publiée le $datePub par <strong>$utilisateur</strong> &bull; Vue $hits fois</p>";
+
+// Liens externes (YouTube, Wikipedia, QR Code)
+$ICONE_YT = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png";
+$ICONE_WIKI = "https://fr.wikipedia.org/static/images/project-logos/frwiki.png";
+
+$contenuHtml .= "  <div class='row' style='margin-top: 20px;'>";
+$contenuHtml .= "    <div class='col-sm-12'>";
+$contenuHtml .= "      <a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank' class='btn btn-link'><img src='$ICONE_YT' alt='YouTube' width='64'></a>";
+$rechercheWiki = "https://fr.wikipedia.org/w/index.php?search=" . urlencode($_chanson->getNom() . " " . $_chanson->getInterprete());
+$contenuHtml .= "      <a href='$rechercheWiki' target='_blank' class='btn btn-link'><img src='$ICONE_WIKI' alt='Wikipedia' width='64'></a>";
+$contenuHtml .= "      <div class='pull-right'>" . generateQRCode("http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], 100) . "</div>";
+$contenuHtml .= "    </div>";
+$contenuHtml .= "  </div>";
 $contenuHtml .= FIN_SECTION;
-$contenuHtml .= "<section class='col-sm-4'>";
 
-if ("" != $monImage) {
+// Colonne Droite : Image Couverture & Notes
+$contenuHtml .= "<section class='col-sm-4 text-center'>";
+if (!empty($monImage)) {
     $urlImage = "../../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $monImage;
-    $contenuHtml .= image($urlImage, 200, "", "pochette", "img-thumbnail");
+    $contenuHtml .= "  <div class='pochette-container' onclick='openLightbox(\"$urlImage\")'>";
+    $contenuHtml .= "    " . image($urlImage, 250, "", "pochette", "img-thumbnail img-responsive center-block");
+    $contenuHtml .= "  </div>";
 }
-
-if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
+$contenuHtml .= "  <div style='margin-top: 15px;'>";
+if (!empty($_SESSION['privilege']) && $_SESSION['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
     $contenuHtml .= UtilisateurNote::starBarUtilisateur(CHANSON, $idChanson, 5, 25);
-} // 5 stars, Media ID 201, 25px star image
-$contenuHtml .= UtilisateurNote::starBar(CHANSON, $idChanson, 5, 25); // 5 stars, Media ID 201, 25px star image
-
+}
+$contenuHtml .= "    <div style='margin-top: 5px;'>" . UtilisateurNote::starBar(CHANSON, $idChanson, 5, 25) . "</div>";
+$contenuHtml .= "  </div>";
 $contenuHtml .= FIN_SECTION;
-$contenuHtml .= FIN_DIV;
 
-augmenteHits($table, $idChanson);
-// Cherche un document et le renvoie s'il existe
-$result = chercheDocumentsTableId(CHANSON, $idChanson);
+$contenuHtml .= FIN_DIV; // Fin Entête
 
-if ($result->num_rows > 0) {
-    $contenuHtml .= "<h2> Documents attachés à cette chanson</h2>";
-    $contenuHtml .= "<section class='row'>\n";
 
-// Pour chaque document
-    /** @noinspection PhpUndefinedMethodInspection */
-    /** @noinspection PhpUndefinedMethodInspection */
-    while ($ligne = $result->fetch_row()) {
-        $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
-        $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
-        $extension = substr(strrchr($ligne [1], '.'), 1);
-        if ($extension <> "mp3" && $extension <> "m4a" && $extension <> "mp4" && $extension <> "aac") {
-            $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 centrer'>\n";
-            // $fichier = "../".$_DOSSIER_CHANSONS" . $idChanson . "/" . composeNomVersion ( $ligne [1], $ligne [4] );
-            $icone = image(ICONES . $extension . ".png", 32, 32, "icone");
-            if (!file_exists(ICONES . $extension . ".png")) {
-                $icone = image("../images/icones/fichier.png", 32, 32, "icone");
-            }
-            $contenuHtml .= "<a href= '" . lienUrlAffichageDocument($ligne [0]) . "' target='_blank'> $icone  <br>" .
-                htmlentities($fichierSec) . "</a> <br>\n";
-            $contenuHtml .= FIN_DIV;
+// 2. DOCUMENTS ATTACHÉS
+if (!empty($documents)) {
+    $sectionDocs = "";
+    foreach ($documents as $ligne) {
+        $extension = strtolower(substr(strrchr($ligne[1], '.'), 1));
+        if (in_array($extension, ['mp3', 'm4a', 'aac', 'mp4'])) continue;
+        if ($nbImages === 1 && in_array($extension, ['jpg', 'png', 'webp'])) continue;
+
+        $fichierSec = substr($ligne[1], 0, strrpos($ligne[1], '.'));
+        $icone = image(ICONES . $extension . ".png", 32, 32, "icone");
+        if (!file_exists(ICONES . $extension . ".png")) {
+            $icone = image("../images/icones/fichier.png", 32, 32, "icone");
         }
+
+        $sectionDocs .= "<div class='col-xs-6 col-sm-3 col-md-2 centrer' style='margin-bottom: 20px;'>";
+        $sectionDocs .= "  <a href='" . lienUrlAffichageDocument($ligne[0]) . "' target='_blank' class='thumbnail' style='text-decoration:none; padding:10px;'>$icone<br><small>" . htmlentities($fichierSec) . "</small></a>";
+        $sectionDocs .= "</div>";
     }
-    $contenuHtml .= FIN_SECTION . "\n";
 
-/// Affichage des audios mp3 avec un outil de lecture audio
-
-    $contenuHtml .= "<br><section class='row'>\n";
-    $result = chercheDocumentsTableId(CHANSON, $idChanson);
-
-// Pour chaque fichier audio ou vidéo
-    while ($ligne = $result->fetch_row()) {
-        $fichierCourt = composeNomVersion($ligne [1], $ligne [4]);
-        $fichierSec = substr($ligne [1], 0, strrpos($ligne [1], '.'));
-        $extension = substr(strrchr($ligne [1], '.'), 1);
-        if (($extension == "mp3") || ($extension == "m4a")|| ($extension == "aac")) {
-            $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
-            $baliseAudio = htmlentities($fichierSec) . "<br><audio controls='controls'>
-                <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='";
-            if ($extension == "aac") {
-                $baliseAudio .= "audio/mpeg";
-            }
-
-            else{
-                $baliseAudio .= "audio/mp3";
-            }
-                $baliseAudio .= "'>
-            Votre navigateur ne prend pas en charge l'élément <code>audio</code></audio>";
-            $contenuHtml .= $baliseAudio . "\n";
-            $contenuHtml .= FIN_DIV;
-        }
-        elseif ($extension == "mp4"){
-            $contenuHtml .= "<div class='col-xs-12 col-sm-6 col-md-4 centrer'>\n";
-            $baliseVideo = htmlentities($fichierSec) . "<br><video width='320' controls='controls'>
-            <source src='" . lienUrlAffichageDocument($ligne [0]) . "' type='video/ogg'>
-            Votre navigateur ne prend pas en charge l'élément <code>audio</code></video>";
-            $contenuHtml .= $baliseVideo . "\n";
-            $contenuHtml .= FIN_DIV;
-        }
+    if (!empty($sectionDocs)) {
+        $contenuHtml .= "<hr><h2><i class='glyphicon glyphicon-file'></i> Documents attachés</h2><section class='row'>$sectionDocs</section>";
     }
-    $contenuHtml .= FIN_SECTION . " \n";
 }
 
-$contenuHtml .= afficheStrums($idChanson, $_chanson->getTempo(), $_chanson->getPulsation()=="ternaire");
 
-//Voir les liens associés à cette chanson
-//  id	table	idtable	url	type	description
+// 3. MÉDIAS (Audio & Vidéo)
+$sectionMedias = "";
+if (!empty($documents)) {
+    foreach ($documents as $ligne) {
+        $extension = strtolower(substr(strrchr($ligne[1], '.'), 1));
+        $fichierSec = substr($ligne[1], 0, strrpos($ligne[1], '.'));
+        $urlDoc = lienUrlAffichageDocument($ligne[0]);
+
+        if (in_array($extension, ['mp3', 'm4a', 'aac'])) {
+            $typeAudio = ($extension === "aac") ? "audio/mpeg" : "audio/mp3";
+            $sectionMedias .= "<div class='col-xs-12 col-sm-6 col-md-4 text-center' style='margin-bottom: 20px;'>";
+            $sectionMedias .= "  <div class='well well-sm'><strong>" . htmlentities($fichierSec) . "</strong><br>";
+            $sectionMedias .= "  <audio controls style='width:100%; margin-top:10px;'><source src='$urlDoc' type='$typeAudio'></audio></div>";
+            $sectionMedias .= "</div>";
+        } elseif ($extension === "mp4") {
+            $sectionMedias .= "<div class='col-xs-12 col-sm-6 col-md-4 text-center' style='margin-bottom: 20px;'>";
+            $sectionMedias .= "  <div class='well well-sm'><strong>" . htmlentities($fichierSec) . "</strong><br>";
+            $sectionMedias .= "  <video width='100%' controls style='margin-top:10px;'><source src='$urlDoc' type='video/ogg'></video></div>";
+            $sectionMedias .= "</div>";
+        }
+    }
+}
+if (!empty($sectionMedias)) {
+    $contenuHtml .= "<hr><section class='row'>$sectionMedias</section>";
+}
+
+
+// 4. STRUMS
+$contenuHtml .= renderStrumsSection($idChanson, $_chanson->getTempo(), $_chanson->getPulsation() === "ternaire");
+
+
+// 5. LIENS ASSOCIÉS
 $liens = $_chanson->chercheLiensChanson();
-
-// Voir les songbooks associés à cette chanson
-
-if ($liens->num_rows > 0) {
-    $contenuHtml .= "<h2> Liens associés à cette chanson</h2>";
-    $contenuHtml .= "<br><section class='row'>";
-
+if (!empty($liens) && $liens->num_rows > 0) {
+    $contenuHtml .= "<hr><h2><i class='glyphicon glyphicon-link'></i> Liens associés</h2><section class='row'>";
     while ($lien = $liens->fetch_row()) {
-        $contenuHtml .= afficheLien($lien);
+        $contenuHtml .= "<div class='col-sm-6'>" . afficheLien($lien) . "</div>";
         ajouteUnHit($lien[0]);
     }
-
     $contenuHtml .= FIN_SECTION;
 }
 
+
+// 6. SONGBOOKS ASSOCIÉS
 $songbooks = $_chanson->chercheSongbooksDocuments();
-
-if ($songbooks->num_rows > 0) {
-
-    $contenuHtml .= "<h2> Songbooks associés à cette chanson</h2>";
-    $contenuHtml .= "<br><section class='row'>";
-
+if (!empty($songbooks) && $songbooks->num_rows > 0) {
+    $contenuHtml .= "<hr><h2><i class='glyphicon glyphicon-book'></i> Songbooks associés</h2><section class='row'>";
     while ($songbook = $songbooks->fetch_row()) {
-        $nom = $songbook[1];
-        $id = $songbook[0];
-        $image = imageSongbook($id);
-        $contenuHtml .= "
-
-        <div class=\"col-xs-4 col-sm-3 col-md-2 centrer\">
-        <a href = '../songbook/songbook_voir.php?id=$id'>
-        <img src = '../../data/songbooks/$id/$image' height='128' alt = 'couverture songbook'>
-        <p>  $nom</p>
-        </a>
-        </div>
-        ";
-
+        $idSb = $songbook[0];
+        $nomSb = $songbook[1];
+        $imgSb = imageSongbook($idSb);
+        $urlImgSb = "../../data/songbooks/$idSb/$imgSb";
+        $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 text-center'>";
+        $contenuHtml .= "  <a href='../songbook/songbook_voir.php?id=$idSb' class='thumbnail'>";
+        $contenuHtml .= "    <img src='$urlImgSb' style='height:120px;' alt='Couverture Songbook'><div class='caption'><small>$nomSb</small></div>";
+        $contenuHtml .= "  </a>";
+        $contenuHtml .= "</div>";
     }
-    $contenuHtml .= "</section>";
+    $contenuHtml .= FIN_SECTION;
 }
-/**
- * @param int $idChanson
- * @return string
- */
-function afficheStrums(int $idChanson, int $tempo, bool $ternaire): string
-{
-    global $urlBoiteAstrum;
-    global $imageBoiteAstrum;
-    $contenuHtml = "";
-// Affiche les strums de la chanson
-    $_listeDesLiensStrums = chercheLiensStrumChanson("idChanson", $idChanson);
-    // Chargement de la liste des strums
-    $marequete = "SELECT strum.id, 
-        lienstrumchanson.strum, 
-        strum.longueur , 
-        strum.unite, 
-        strum.description 
-FROM lienstrumchanson    JOIN 
-        strum ON lienstrumchanson.strum = strum.strum
-    WHERE 
-        lienstrumchanson.idChanson = $idChanson
+
+$contenuHtml .= FIN_DIV . "</div>";
+
+// --- MODALE LIGHTBOX ---
+$contenuHtml .= "
+<div id='lightboxModal' class='modal fade' tabindex='-1' role='dialog'>
+  <div class='modal-dialog modal-lg' role='document'>
+    <div class='modal-content text-center' style='background:transparent; border:none; box-shadow:none;'>
+        <button type='button' class='close' data-dismiss='modal' aria-label='Close' style='color:white; font-size:40px; opacity:1;'>&times;</button>
+        <img id='lightboxImg' src='' class='img-responsive center-block' style='max-height: 90vh; border: 5px solid white;'>
+    </div>
+  </div>
+</div>
 ";
-    $_SESSION ['mysql']->query($marequete);
-    if ($_listeDesLiensStrums->num_rows > 0) {
-        $titre = "Strum";
-        if ($_listeDesLiensStrums->num_rows > 1) {
-            $titre .= "s";
-        }
-        $contenuHtml .= "<h2>$titre</h2>";
+
+// --- SCRIPTS JS ---
+$contenuHtml .= "
+<script>
+    function copyUrlToClipboard() {
+        const dummy = document.createElement('input');
+        document.body.appendChild(dummy);
+        dummy.value = window.location.href;
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+        
+        $('#copy-success').fadeIn().delay(2000).fadeOut();
+    }
+
+    function openLightbox(url) {
+        $('#lightboxImg').attr('src', url);
+        $('#lightboxModal').modal('show');
+    }
+</script>
+";
+
+$contenuHtml .= envoieFooter();
+
+echo $contenuHtml;
+
+// --- FONCTIONS DE RENDU (HELPERS) ---
+
+/**
+ * Retourne le nom classique du tempo en fonction des BPM
+ */
+function getTempoName($bpm) {
+    if ($bpm < 60) return "Largo (très lent)";
+    if ($bpm < 76) return "Adagio (lent)";
+    if ($bpm < 108) return "Andante (modéré)";
+    if ($bpm < 120) return "Moderato (modéré vif)";
+    if ($bpm < 156) return "Allegro (vif)";
+    if ($bpm < 176) return "Vivace (rapide)";
+    return "Presto (très rapide)";
+}
+
+function renderStrumsSection($idChanson, $tempo, $isTernaire) {
+    $urlBoiteAstrum = "../../html/boiteAstrum/index.html";
+    $imageBoiteAstrum = "../../html/boiteAstrum/medias/img/boiteAstrum.png";
+    $html = "";
+
+    $_listeDesLiensStrums = chercheLiensStrumChanson("idChanson", $idChanson);
+    if (!empty($_listeDesLiensStrums) && $_listeDesLiensStrums->num_rows > 0) {
+        $titre = ($_listeDesLiensStrums->num_rows > 1) ? "Strums" : "Strum";
+        $html .= "<hr><h2><i class='glyphicon glyphicon-music'></i> $titre</h2>";
         $monStrum = new Strum();
+        
         while ($lienStrum = $_listeDesLiensStrums->fetch_row()) {
             $monStrum->chercheStrumParChaine($lienStrum[1]);
-            $contenuHtml .= entreBalise(str_replace(" ", "-", $monStrum->getStrum()), "H3"); // Login
+            $html .= "<div class='well well-sm'>";
+            $html .= "  <h3>" . str_replace(" ", "-", $monStrum->getStrum()) . " <small>(" . $monStrum->getLongueur() . " " . $monStrum->renvoieUniteEnFrancais() . ")</small></h3>";
 
-            $contenuHtml .= $monStrum->getLongueur() . " " . $monStrum->renvoieUniteEnFrancais(); //  longueur / unité
+            $urlStrum = "$urlBoiteAstrum?strum=" . str_replace(" ", "-", $monStrum->getStrum()) . "&tempo=$tempo";
+            if ($isTernaire) $urlStrum .= "&ternaire=true";
 
-            $urlDuStrum = $urlBoiteAstrum . "?strum=";
-            $urlDuStrum .= str_replace(" ", "-",$monStrum->getStrum()) . "&tempo=" . $tempo;
-            if ($ternaire){
-                $urlDuStrum .= "&ternaire=true";
-            }
-            $contenuHtml .= "<a title='ouvrir dans la boîte à strum' href='$urlDuStrum'>
-            <img src='$imageBoiteAstrum' alt='Ouvrir dans la boite a strum' height='50vw'>  </a>";
-
-            $contenuHtml .= " - " . $monStrum->getDescription(); // description
-            $contenuHtml .= $monStrum->chansonsDuStrum();
+            $html .= "  <a class='btn btn-info' title='Boîte à strum' href='$urlStrum'><img src='$imageBoiteAstrum' alt='Strum' height='30'> Ouvrir dans la Boîte à Strum</a>";
+            $html .= "  <p style='margin-top:10px;'>" . $monStrum->getDescription() . "</p>";
+            $html .= $monStrum->chansonsDuStrum();
+            $html .= "</div>";
         }
     }
-    return $contenuHtml;
+    return $html;
 }
-
-$contenuHtml .= FIN_DIV . "<!-- /.starter-template -->\n
-</div><!-- /.container -->\n";
-$contenuHtml .= envoieFooter();
-echo $contenuHtml;

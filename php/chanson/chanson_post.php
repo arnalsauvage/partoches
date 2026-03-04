@@ -40,6 +40,12 @@ function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest)
         $cheminFichier = $repertoire . $nomFichier;
     }
 
+    $isImageWebp = (substr($file, 0, 4) == 'RIFF' && substr($file, 8, 4) == 'WEBP');
+    if ($isImageWebp){
+        $nomFichier .= ".webp";
+        $cheminFichier = $repertoire . $nomFichier;
+    }
+
     if ($cheminFichier <> "vide")
     {
         // On  enregistre le fichier sur disque

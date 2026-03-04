@@ -4,14 +4,23 @@ include_once("../lib/configMysql.php");
 
 // Fonctions de gestion de la lienStrumChanson
 
-// Cherche les lienStrumChansons correspondant à un critère
+/**
+ * Cherche les lienStrumChansons correspondant à un critère
+ * @param string $critere
+ * @param mixed $valeur
+ * @param string $critereTri
+ * @param bool $bTriAscendant
+ * @return mysqli_result|bool
+ */
 function chercheLiensStrumChanson($critere, $valeur, $critereTri = 'ordre', $bTriAscendant = true)
 {
     $maRequete = "SELECT * FROM lienstrumchanson WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
-    if ($bTriAscendant == false)
+    if ($bTriAscendant == false) {
         $maRequete .= " DESC";
-    else
+    }
+    else {
         $maRequete .= " ASC";
+    }
     // echo "ma requete : " . $maRequete;
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheliensStrumChanson #1 : " . $_SESSION ['mysql']->error);
     return $result;

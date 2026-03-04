@@ -574,10 +574,14 @@ class Chanson
 //32        	Vergers de l îlot
 //33        	Fête de Printemps
 //33         	Fête de Printemps
+    /**
+     * Cherche les songbooks associés aux documents de cette chanson
+     * @return mysqli_result|bool
+     */
     public function chercheSongbooksDocuments()
     {
         $maRequete = "SELECT DISTINCT songbook.id, songbook.nom from songbook, liendocsongbook , document ,
-        chanson WHERE liendocsongbook.idDocument = document.id AND document.nomTable='chanson' 
+        chanson WHERE liendocsongbook.idDocument = document.id AND document.nomTable='chanson'
         AND document.idTable = chanson.id AND chanson.id = " . $this->_id . "  AND songbook.id = liendocsongbook.idSongbook";
         // Chanson::$_logger = init_logger();
         // Chanson::$_logger->debug($maRequete);
@@ -585,9 +589,11 @@ class Chanson
         // Chanson::$_logger->warning(var_dump($result));
         return $result;
     }
-    
-// Cherche les liens associés à cette chanson
 
+    /**
+     * Cherche les liens URL associés à cette chanson
+     * @return mysqli_result|bool
+     */
     public function chercheLiensChanson()
     {
         $maRequete = sprintf("SELECT * from lienurl WHERE lienurl.nomtable = 'chanson' AND lienurl.idtable = %s",
@@ -598,7 +604,6 @@ class Chanson
         // Chanson::$_logger->warning(var_dump($result));
         return $result;
     }
-
 // Fonction pour normaliser les chaînes de caractères
     public
     static function normalize($string)

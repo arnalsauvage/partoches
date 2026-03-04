@@ -80,7 +80,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
     }
     // On verifie que l'extention du fichier est bien une image jpg,jpeg ou gif
     $ext = strtolower(strrchr($image, '.'));
-    if ($ext != ".jpg" && $ext != ".jpeg" && $ext != ".gif" && $ext != ".png") {
+    if ($ext != ".jpg" && $ext != ".jpeg" && $ext != ".gif" && $ext != ".png" && $ext != ".webp") {
         return false;
     }
     $size = getimagesize($source . $image);
@@ -96,6 +96,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
     // 1 = GIF ,
     // 2 = JPG ,
     // 3 = PNG ,
+    // 18 = WEBP
 
     switch ($size[2])
     {
@@ -107,6 +108,9 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
             break;
         case 3: // format png
             $image_src = imagecreatefrompng($source . $image);
+            break;
+        case 18: // format webp
+            $image_src = imagecreatefromwebp($source . $image);
             break;
         default :
             return 0;
