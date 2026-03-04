@@ -129,8 +129,8 @@ $totalMedias = count($idsMedias);
         const popup = document.getElementById('cookiePopup');
         const banner = document.getElementById('cookieBanner');
 
-        // Affichage de la popup
-        popup.style.display = 'block';
+        // Affichage de la popup via la classe active
+        popup.classList.add('active');
 
         // Disparition automatique après 10 secondes
         setTimeout(() => {

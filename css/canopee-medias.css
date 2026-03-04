@@ -166,18 +166,30 @@ footer {
 }
 
 .cookie-popup {
-    display: none;
+    display: none; /* Cachée par défaut */
     background: rgba(255, 255, 255, 0.98);
     color: #000;
-    padding: 16px;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-    max-width: 300px;
-    position: absolute; /* Ne déplace plus le bouton */
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 90vw;
+    max-width: 250px;
+    aspect-ratio: 16 / 9;
+    position: absolute;
     top: 70px;
     right: 0;
-    text-align: left;
     z-index: 1001;
+    
+    /* Préparation du centrage du texte */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.cookie-popup.active {
+    display: flex !important; /* Affichée en flex seulement si active */
 }
 
 /* === CORRECTIF MOBILE === */

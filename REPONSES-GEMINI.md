@@ -16,4 +16,5 @@
     - Utilisation de `flex: 1` et `justify-content: center` sur `.titre-gauche` pour centrer le logo et le titre.
     - Fixation du bouton "Entrer" à `right: 20px` par rapport au cadre.
 - **Amélioration Structurelle** : Externalisation de tout le style spécifique dans un nouveau fichier `css/canopee-medias.css`.
-- **Résultat** : Code plus propre, maintenance facilitée et chargement optimisé avec gestion du cache via `filemtime`.
+- **Amélioration UX** : Passage de la popup de cookie au format 16/9 avec centrage vertical et horizontal du texte.
+- **Résultat** : Une interface plus moderne et aérée.
