@@ -317,14 +317,20 @@ echo $contenuHtml;
 
 // --- FONCTIONS DE RENDU ---
 
-function getTempoInfo($bpm) {
-    if ($bpm < 60) return ['name' => 'Largo', 'label' => 'Largo'];
-    if ($bpm < 76) return ['name' => 'Adagio', 'label' => 'Adagio'];
-    if ($bpm < 108) return ['name' => 'Andante', 'label' => 'Andante'];
-    if ($bpm < 120) return ['name' => 'Moderato', 'label' => 'Moderato'];
-    if ($bpm < 156) return ['name' => 'Allegro', 'label' => 'Allegro'];
-    if ($bpm < 176) return ['name' => 'Vivace', 'label' => 'Vivace'];
-    return ['name' => 'Presto', 'label' => 'Presto'];
+/**
+ * Retourne les informations sur la famille de tempo en fonction des BPM
+ */
+function getTempoInfo(int $bpm): array
+{
+    return match(true) {
+        $bpm < 60  => ['name' => 'Largo',    'label' => 'Largo'],
+        $bpm < 76  => ['name' => 'Adagio',   'label' => 'Adagio'],
+        $bpm < 108 => ['name' => 'Andante',  'label' => 'Andante'],
+        $bpm < 120 => ['name' => 'Moderato', 'label' => 'Moderato'],
+        $bpm < 156 => ['name' => 'Allegro',  'label' => 'Allegro'],
+        $bpm < 176 => ['name' => 'Vivace',   'label' => 'Vivace'],
+        default    => ['name' => 'Presto',   'label' => 'Presto'],
+    };
 }
 
 function renderStrumsSection($idChanson, $tempo, $isTernaire) {
