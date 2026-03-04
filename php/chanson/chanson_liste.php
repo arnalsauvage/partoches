@@ -102,7 +102,7 @@ if (isset ($_GET [FILTRE])) {
     $filtre = null;
     $valeur_filtre = null;
 
-    $filtres_valides = ['contributeur', 'tempo', 'mesure', 'tonalite', 'pulsation', 'annee', 'interprete'];
+    $filtres_valides = ['contributeur', 'tempo', 'tempo_famille', 'mesure', 'tonalite', 'pulsation', 'annee', 'interprete'];
 
     if ($filtreGet !== null && in_array($filtreGet, $filtres_valides, true)) {
         $filtre = $filtreGet;

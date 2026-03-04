@@ -96,25 +96,32 @@ $contenuHtml .= "    <button class='btn btn-xs btn-link' onclick='copyUrlToClipb
                    </h2>";
 
 $urlChercheAn = "chanson_liste.php?filtre=annee&valFiltre=" . $_chanson->getAnnee();
-$contenuHtml .= "  <h3>" . htmlentities($_chanson->getInterprete()) . " <small><a href='$urlChercheAn'>" . $_chanson->getAnnee() . "</a></small></h3>";
+$contenuHtml .= "  <h3>" . htmlentities($_chanson->getInterprete()) . "</h3>";
 
 // Badges Techniques
 $tonalite = !empty($_chanson->getTonalite()) ? $_chanson->getTonalite() : '?';
 $urlTona = "chanson_liste.php?filtre=tonalite&valFiltre=" . urlencode($tonalite);
 $tempoBpm = $_chanson->getTempo();
-$tempoName = getTempoName($tempoBpm);
+$tempoInfo = getTempoInfo($tempoBpm);
+$urlTempo = "chanson_liste.php?filtre=tempo_famille&valFiltre=" . urlencode($tempoInfo['name']);
+$annee = $_chanson->getAnnee();
 
 $contenuHtml .= "  <div style='margin: 20px 0;'>";
+// Badge Année (Lien vers filtre)
+$contenuHtml .= "    <a href='$urlChercheAn' class='label label-success badge-tech' title='Voir toutes les chansons de $annee'>
+                        <i class='glyphicon glyphicon-calendar'></i> $annee
+                     </a>";
+
 // Badge Tonalité (Lien vers filtre)
 $contenuHtml .= "    <a href='$urlTona' class='label label-primary badge-tech' title='Voir toutes les chansons en $tonalite'>
                         <i class='glyphicon glyphicon-music'></i> $tonalite
                      </a>";
 
-// Badge Tempo (avec catégorie)
-$contenuHtml .= "    <span class='label label-info badge-tech' title='Tempo'>
+// Badge Tempo (Lien vers filtre famille)
+$contenuHtml .= "    <a href='$urlTempo' class='label label-info badge-tech' title='Voir toutes les chansons de tempo {$tempoInfo['name']}'>
                         <i class='glyphicon glyphicon-time'></i> $tempoBpm bpm
-                        <span class='tempo-label'>$tempoName</span>
-                     </span>";
+                        <span class='tempo-label'>{$tempoInfo['label']}</span>
+                     </a>";
 
 $contenuHtml .= "    <span class='label label-default badge-tech' title='Mesure'><i class='glyphicon glyphicon-equalizer'></i> " . $_chanson->getMesure() . "</span>";
 $pulsationIcon = ($_chanson->getPulsation() === "ternaire") ? "glyphicon-refresh" : "glyphicon-option-vertical";
@@ -284,16 +291,16 @@ echo $contenuHtml;
 // --- FONCTIONS DE RENDU (HELPERS) ---
 
 /**
- * Retourne le nom classique du tempo en fonction des BPM
+ * Retourne les informations sur la famille de tempo en fonction des BPM
  */
-function getTempoName($bpm) {
-    if ($bpm < 60) return "Largo (très lent)";
-    if ($bpm < 76) return "Adagio (lent)";
-    if ($bpm < 108) return "Andante (modéré)";
-    if ($bpm < 120) return "Moderato (modéré vif)";
-    if ($bpm < 156) return "Allegro (vif)";
-    if ($bpm < 176) return "Vivace (rapide)";
-    return "Presto (très rapide)";
+function getTempoInfo($bpm) {
+    if ($bpm < 60) return ['name' => 'Largo', 'label' => 'Largo (très lent)'];
+    if ($bpm < 76) return ['name' => 'Adagio', 'label' => 'Adagio (lent)'];
+    if ($bpm < 108) return ['name' => 'Andante', 'label' => 'Andante (modéré)'];
+    if ($bpm < 120) return ['name' => 'Moderato', 'label' => 'Moderato (modéré vif)'];
+    if ($bpm < 156) return ['name' => 'Allegro', 'label' => 'Allegro (vif)'];
+    if ($bpm < 176) return ['name' => 'Vivace', 'label' => 'Vivace (rapide)'];
+    return ['name' => 'Presto', 'label' => 'Presto (très rapide)'];
 }
 
 function renderStrumsSection($idChanson, $tempo, $isTernaire) {

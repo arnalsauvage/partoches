@@ -534,6 +534,32 @@ class Chanson
             if ($champFiltre == "contributeur") {
                 $maRequete .= " iduser =  " . $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
             }
+            if ($champFiltre == "tempo_famille") {
+                $valfiltre = $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
+                switch ($valfiltre) {
+                    case "Largo":
+                        $maRequete .= " tempo < 60";
+                        break;
+                    case "Adagio":
+                        $maRequete .= " tempo BETWEEN 60 AND 75";
+                        break;
+                    case "Andante":
+                        $maRequete .= " tempo BETWEEN 76 AND 107";
+                        break;
+                    case "Moderato":
+                        $maRequete .= " tempo BETWEEN 108 AND 119";
+                        break;
+                    case "Allegro":
+                        $maRequete .= " tempo BETWEEN 120 AND 155";
+                        break;
+                    case "Vivace":
+                        $maRequete .= " tempo BETWEEN 156 AND 175";
+                        break;
+                    case "Presto":
+                        $maRequete .= " tempo >= 176";
+                        break;
+                }
+            }
             if ($champFiltre == 'tempo' || $champFiltre == 'mesure' || $champFiltre == 'tonalite' || $champFiltre == 'pulsation' || $champFiltre == 'annee' || $champFiltre == 'interprete') {
                 $maRequete .= $champFiltre . " =  '" . $_SESSION[self::MYSQL]->real_escape_string($valfiltre) . "'";
             }
