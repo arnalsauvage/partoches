@@ -3,7 +3,7 @@
 
 /**
  * PAGE : chanson_voir.php
- * Affiche le détail d'une chanson avec une UX moderne (badges, boutons d'action, lightbox).
+ * Affiche le détail d'une chanson avec une UX moderne (badges, barre d'outils, lightbox).
  */
 
 require_once "../lib/utilssi.php";
@@ -60,24 +60,34 @@ if (!empty($resultDocs)) {
 // --- CONSTRUCTION DU CONTENU HTML ---
 $contenuHtml = "
 <style>
-    .badge-tech { font-size: 1.2em; padding: 8px 12px; margin-right: 5px; margin-bottom: 10px; display: inline-block; text-decoration: none !important; color: white !important; }
+    .badge-tech { font-size: 1.1em; padding: 6px 10px; margin-right: 5px; margin-bottom: 10px; display: inline-block; text-decoration: none !important; color: white !important; }
     .badge-tech:hover { opacity: 0.8; }
-    .btn-action { margin-bottom: 15px; }
+    .tempo-label { font-size: 0.7em; display: block; margin-top: 2px; font-weight: normal; font-style: italic; }
+    
+    .action-bar { margin-top: 15px; display: flex; align-items: center; flex-wrap: wrap; gap: 15px; background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
+    .action-item { display: flex; align-items: center; text-decoration: none; color: #333; transition: transform 0.2s; cursor: pointer; border: none; background: transparent; padding: 0; }
+    .action-item:hover { transform: translateY(-2px); text-decoration: none; color: #000; }
+    .action-icon { height: 32px; width: auto; }
+    .qr-icon { font-size: 28px; color: #333; }
+    
     .pochette-container { cursor: zoom-in; transition: transform 0.2s; }
     .pochette-container:hover { transform: scale(1.02); }
-    #copy-success { display: none; margin-left: 10px; color: #5cb85c; font-weight: bold; }
-    .tempo-label { font-size: 0.7em; display: block; margin-top: 2px; font-weight: normal; font-style: italic; }
+    #copy-success { display: none; margin-left: 10px; color: #5cb85c; font-weight: bold; font-size: 0.8em; }
+    
+    /* Fix pour les modales qui restent bloquées sous le voile noir */
+    .modal { z-index: 2000 !important; }
+    .modal-backdrop { z-index: 1040 !important; }
 </style>
 
 <div class='container'>
     <div class='starter-template'>\n";
 
-// --- BOUTONS D'ACTION (RETOUR / EDIT) ---
+// --- BOUTONS NAVIGATION ---
 $contenuHtml .= DIV_ROW;
-$contenuHtml .= "  <div class='col-xs-12 text-left btn-action'>";
-$contenuHtml .= "    <a href='chanson_liste.php' class='btn btn-default'><i class='glyphicon glyphicon-arrow-left'></i> Retour à la liste</a>";
+$contenuHtml .= "  <div class='col-xs-12 text-left' style='margin-bottom: 15px;'>";
+$contenuHtml .= "    <a href='chanson_liste.php' class='btn btn-default btn-sm'><i class='glyphicon glyphicon-arrow-left'></i> Retour</a>";
 if (!empty($_SESSION['privilege']) && $_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-    $contenuHtml .= "    <a href='chanson_form.php?id=$idChanson' class='btn btn-primary'><i class='glyphicon glyphicon-pencil'></i> Modifier</a>";
+    $contenuHtml .= "    <a href='chanson_form.php?id=$idChanson' class='btn btn-primary btn-sm'><i class='glyphicon glyphicon-pencil'></i> Modifier</a>";
 }
 $contenuHtml .= "  </div>";
 $contenuHtml .= FIN_DIV;
@@ -85,9 +95,9 @@ $contenuHtml .= FIN_DIV;
 // 1. ENTÊTE
 $contenuHtml .= DIV_ROW;
 
-// Colonne Gauche : Infos
+// Colonne Gauche : Titre, Badges, Barre d'outils
 $contenuHtml .= "<section class='col-sm-8'>";
-$contenuHtml .= "  <h2>" . htmlentities($_chanson->getNom());
+$contenuHtml .= "  <h2 style='margin-top:0;'>" . htmlentities($_chanson->getNom());
 // Bouton Copier URL
 $contenuHtml .= "    <button class='btn btn-xs btn-link' onclick='copyUrlToClipboard()' title='Copier le lien'>
                         <i class='glyphicon glyphicon-link'></i>
@@ -96,7 +106,7 @@ $contenuHtml .= "    <button class='btn btn-xs btn-link' onclick='copyUrlToClipb
                    </h2>";
 
 $urlChercheAn = "chanson_liste.php?filtre=annee&valFiltre=" . $_chanson->getAnnee();
-$contenuHtml .= "  <h3>" . htmlentities($_chanson->getInterprete()) . "</h3>";
+$contenuHtml .= "  <h3 style='margin-top:0;'>" . htmlentities($_chanson->getInterprete()) . "</h3>";
 
 // Badges Techniques
 $tonalite = !empty($_chanson->getTonalite()) ? $_chanson->getTonalite() : '?';
@@ -106,61 +116,56 @@ $tempoInfo = getTempoInfo($tempoBpm);
 $urlTempo = "chanson_liste.php?filtre=tempo_famille&valFiltre=" . urlencode($tempoInfo['name']);
 $annee = $_chanson->getAnnee();
 
-$contenuHtml .= "  <div style='margin: 20px 0;'>";
-// Badge Année (Lien vers filtre)
-$contenuHtml .= "    <a href='$urlChercheAn' class='label label-success badge-tech' title='Voir toutes les chansons de $annee'>
-                        <i class='glyphicon glyphicon-calendar'></i> $annee
-                     </a>";
-
-// Badge Tonalité (Lien vers filtre)
-$contenuHtml .= "    <a href='$urlTona' class='label label-primary badge-tech' title='Voir toutes les chansons en $tonalite'>
-                        <i class='glyphicon glyphicon-music'></i> $tonalite
-                     </a>";
-
-// Badge Tempo (Lien vers filtre famille)
-$contenuHtml .= "    <a href='$urlTempo' class='label label-info badge-tech' title='Voir toutes les chansons de tempo {$tempoInfo['name']}'>
-                        <i class='glyphicon glyphicon-time'></i> $tempoBpm bpm
-                        <span class='tempo-label'>{$tempoInfo['label']}</span>
-                     </a>";
-
-$contenuHtml .= "    <span class='label label-default badge-tech' title='Mesure'><i class='glyphicon glyphicon-equalizer'></i> " . $_chanson->getMesure() . "</span>";
+$contenuHtml .= "  <div style='margin-top: 15px;'>";
+$contenuHtml .= "    <a href='$urlChercheAn' class='label label-success badge-tech'><i class='glyphicon glyphicon-calendar'></i> $annee</a>";
+$contenuHtml .= "    <a href='$urlTona' class='label label-primary badge-tech'><i class='glyphicon glyphicon-music'></i> $tonalite</a>";
+$contenuHtml .= "    <a href='$urlTempo' class='label label-info badge-tech'><i class='glyphicon glyphicon-time'></i> $tempoBpm <span class='tempo-label'>{$tempoInfo['label']}</span></a>";
+$contenuHtml .= "    <span class='label label-default badge-tech'><i class='glyphicon glyphicon-equalizer'></i> " . $_chanson->getMesure() . "</span>";
 $pulsationIcon = ($_chanson->getPulsation() === "ternaire") ? "glyphicon-refresh" : "glyphicon-option-vertical";
-$contenuHtml .= "    <span class='label label-warning badge-tech' title='Pulsation'><i class='glyphicon $pulsationIcon'></i> " . $_chanson->getPulsation() . "</span>";
+$contenuHtml .= "    <span class='label label-warning badge-tech'><i class='glyphicon $pulsationIcon'></i> " . $_chanson->getPulsation() . "</span>";
 $contenuHtml .= "  </div>";
 
-$contenuHtml .= "  <p class='text-muted'>Publiée le $datePub par <strong>$utilisateur</strong> &bull; Vue $hits fois</p>";
+// --- BARRE D'ACTIONS HARMONISÉE ---
+$contenuHtml .= "  <div class='action-bar'>";
+// YouTube
+$contenuHtml .= "    <a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank' class='action-item' title='Rechercher sur YouTube'>";
+$contenuHtml .= "       <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png' class='action-icon' alt='YouTube'>";
+$contenuHtml .= "    </a>";
 
-// Liens externes (YouTube, Wikipedia, QR Code)
-$ICONE_YT = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/YouTube_Logo_2017.svg/280px-YouTube_Logo_2017.svg.png";
-$ICONE_WIKI = "https://fr.wikipedia.org/static/images/project-logos/frwiki.png";
-
-$contenuHtml .= "  <div class='row' style='margin-top: 20px;'>";
-$contenuHtml .= "    <div class='col-sm-12'>";
-$contenuHtml .= "      <a href='https://www.youtube.com/results?search_query=" . urlencode($_chanson->getNom() . " " . $_chanson->getInterprete()) . "' target='_blank' class='btn btn-link'><img src='$ICONE_YT' alt='YouTube' width='64'></a>";
+// Wikipedia
 $rechercheWiki = "https://fr.wikipedia.org/w/index.php?search=" . urlencode($_chanson->getNom() . " " . $_chanson->getInterprete());
-$contenuHtml .= "      <a href='$rechercheWiki' target='_blank' class='btn btn-link'><img src='$ICONE_WIKI' alt='Wikipedia' width='64'></a>";
-$contenuHtml .= "      <div class='pull-right'>" . generateQRCode("http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], 100) . "</div>";
+$contenuHtml .= "    <a href='$rechercheWiki' target='_blank' class='action-item' title='Rechercher sur Wikipedia'>";
+$contenuHtml .= "       <img src='https://fr.wikipedia.org/static/images/project-logos/frwiki.png' class='action-icon' alt='Wikipedia'>";
+$contenuHtml .= "    </a>";
+
+// QR Code
+$contenuHtml .= "    <button class='action-item' title='Afficher le QR Code' onclick='openQRModal()'>";
+$contenuHtml .= "       <i class='glyphicon glyphicon-qrcode qr-icon'></i>";
+$contenuHtml .= "    </button>";
+
+// Votes (Espace réservé)
+$contenuHtml .= "    <div class='action-item' style='flex-grow: 1; justify-content: flex-end; cursor: default;'>";
+if (!empty($_SESSION['privilege']) && $_SESSION['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
+    $contenuHtml .= UtilisateurNote::starBarUtilisateur(CHANSON, $idChanson, 5, 25);
+}
+$contenuHtml .= "       <div style='margin-left:10px;'>" . UtilisateurNote::starBar(CHANSON, $idChanson, 5, 25) . "</div>";
 $contenuHtml .= "    </div>";
 $contenuHtml .= "  </div>";
+
+$contenuHtml .= "  <p class='text-muted' style='margin-top:10px;'>Publiée le $datePub par $utilisateur &bull; Vue $hits fois</p>";
 $contenuHtml .= FIN_SECTION;
 
-// Colonne Droite : Image Couverture & Notes
+// Colonne Droite : Image Couverture
 $contenuHtml .= "<section class='col-sm-4 text-center'>";
 if (!empty($monImage)) {
     $urlImage = "../../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $monImage;
     $contenuHtml .= "  <div class='pochette-container' onclick='openLightbox(\"$urlImage\")'>";
-    $contenuHtml .= "    " . image($urlImage, 250, "", "pochette", "img-thumbnail img-responsive center-block");
+    $contenuHtml .= "    " . image($urlImage, 200, "", "pochette", "img-thumbnail img-responsive center-block");
     $contenuHtml .= "  </div>";
 }
-$contenuHtml .= "  <div style='margin-top: 15px;'>";
-if (!empty($_SESSION['privilege']) && $_SESSION['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
-    $contenuHtml .= UtilisateurNote::starBarUtilisateur(CHANSON, $idChanson, 5, 25);
-}
-$contenuHtml .= "    <div style='margin-top: 5px;'>" . UtilisateurNote::starBar(CHANSON, $idChanson, 5, 25) . "</div>";
-$contenuHtml .= "  </div>";
 $contenuHtml .= FIN_SECTION;
 
-$contenuHtml .= FIN_DIV; // Fin Entête
+$contenuHtml .= FIN_DIV;
 
 
 // 2. DOCUMENTS ATTACHÉS
@@ -249,15 +254,35 @@ if (!empty($songbooks) && $songbooks->num_rows > 0) {
     $contenuHtml .= FIN_SECTION;
 }
 
-$contenuHtml .= FIN_DIV . "</div>";
+$contenuHtml .= FIN_DIV . "</div>"; // Fin starter-template et container
 
-// --- MODALE LIGHTBOX ---
+// --- MODALES (PLACÉES À LA FIN POUR ÉVITER LES CONFLITS DE Z-INDEX) ---
 $contenuHtml .= "
-<div id='lightboxModal' class='modal fade' tabindex='-1' role='dialog'>
-  <div class='modal-dialog modal-lg' role='document'>
+<div id='lightboxModal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>
+  <div class='modal-dialog modal-lg'>
     <div class='modal-content text-center' style='background:transparent; border:none; box-shadow:none;'>
-        <button type='button' class='close' data-dismiss='modal' aria-label='Close' style='color:white; font-size:40px; opacity:1;'>&times;</button>
+        <button type='button' class='close' data-dismiss='modal' style='color:white; font-size:40px; opacity:1;'>&times;</button>
         <img id='lightboxImg' src='' class='img-responsive center-block' style='max-height: 90vh; border: 5px solid white;'>
+    </div>
+  </div>
+</div>
+
+<div id='qrModal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>
+  <div class='modal-dialog'>
+    <div class='modal-content'>
+      <div class='modal-header'>
+        <button type='button' class='close' data-dismiss='modal'>&times;</button>
+        <h4 class='modal-title'>Partager la chanson</h4>
+      </div>
+      <div class='modal-body text-center'>
+        <p>Scannez ce code pour ouvrir la chanson sur votre smartphone :</p>
+        <div style='padding: 20px; background: white; display: inline-block; border-radius: 10px;'>
+            " . generateQRCode("http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], 250) . "
+        </div>
+      </div>
+      <div class='modal-footer'>
+        <button type='button' class='btn btn-default' data-dismiss='modal'>Fermer</button>
+      </div>
     </div>
   </div>
 </div>
@@ -273,7 +298,6 @@ $contenuHtml .= "
         dummy.select();
         document.execCommand('copy');
         document.body.removeChild(dummy);
-        
         $('#copy-success').fadeIn().delay(2000).fadeOut();
     }
 
@@ -281,48 +305,44 @@ $contenuHtml .= "
         $('#lightboxImg').attr('src', url);
         $('#lightboxModal').modal('show');
     }
+
+    function openQRModal() {
+        $('#qrModal').modal('show');
+    }
 </script>
 ";
 
 $contenuHtml .= envoieFooter();
-
 echo $contenuHtml;
 
-// --- FONCTIONS DE RENDU (HELPERS) ---
+// --- FONCTIONS DE RENDU ---
 
-/**
- * Retourne les informations sur la famille de tempo en fonction des BPM
- */
 function getTempoInfo($bpm) {
-    if ($bpm < 60) return ['name' => 'Largo', 'label' => 'Largo (très lent)'];
-    if ($bpm < 76) return ['name' => 'Adagio', 'label' => 'Adagio (lent)'];
-    if ($bpm < 108) return ['name' => 'Andante', 'label' => 'Andante (modéré)'];
-    if ($bpm < 120) return ['name' => 'Moderato', 'label' => 'Moderato (modéré vif)'];
-    if ($bpm < 156) return ['name' => 'Allegro', 'label' => 'Allegro (vif)'];
-    if ($bpm < 176) return ['name' => 'Vivace', 'label' => 'Vivace (rapide)'];
-    return ['name' => 'Presto', 'label' => 'Presto (très rapide)'];
+    if ($bpm < 60) return ['name' => 'Largo', 'label' => 'Largo'];
+    if ($bpm < 76) return ['name' => 'Adagio', 'label' => 'Adagio'];
+    if ($bpm < 108) return ['name' => 'Andante', 'label' => 'Andante'];
+    if ($bpm < 120) return ['name' => 'Moderato', 'label' => 'Moderato'];
+    if ($bpm < 156) return ['name' => 'Allegro', 'label' => 'Allegro'];
+    if ($bpm < 176) return ['name' => 'Vivace', 'label' => 'Vivace'];
+    return ['name' => 'Presto', 'label' => 'Presto'];
 }
 
 function renderStrumsSection($idChanson, $tempo, $isTernaire) {
     $urlBoiteAstrum = "../../html/boiteAstrum/index.html";
     $imageBoiteAstrum = "../../html/boiteAstrum/medias/img/boiteAstrum.png";
     $html = "";
-
     $_listeDesLiensStrums = chercheLiensStrumChanson("idChanson", $idChanson);
     if (!empty($_listeDesLiensStrums) && $_listeDesLiensStrums->num_rows > 0) {
         $titre = ($_listeDesLiensStrums->num_rows > 1) ? "Strums" : "Strum";
         $html .= "<hr><h2><i class='glyphicon glyphicon-music'></i> $titre</h2>";
         $monStrum = new Strum();
-        
         while ($lienStrum = $_listeDesLiensStrums->fetch_row()) {
             $monStrum->chercheStrumParChaine($lienStrum[1]);
             $html .= "<div class='well well-sm'>";
             $html .= "  <h3>" . str_replace(" ", "-", $monStrum->getStrum()) . " <small>(" . $monStrum->getLongueur() . " " . $monStrum->renvoieUniteEnFrancais() . ")</small></h3>";
-
             $urlStrum = "$urlBoiteAstrum?strum=" . str_replace(" ", "-", $monStrum->getStrum()) . "&tempo=$tempo";
             if ($isTernaire) $urlStrum .= "&ternaire=true";
-
-            $html .= "  <a class='btn btn-info' title='Boîte à strum' href='$urlStrum'><img src='$imageBoiteAstrum' alt='Strum' height='30'> Ouvrir dans la Boîte à Strum</a>";
+            $html .= "  <a class='btn btn-info btn-sm' title='Boîte à strum' href='$urlStrum'><img src='$imageBoiteAstrum' alt='Strum' height='20'> Boîte à Strum</a>";
             $html .= "  <p style='margin-top:10px;'>" . $monStrum->getDescription() . "</p>";
             $html .= $monStrum->chansonsDuStrum();
             $html .= "</div>";
