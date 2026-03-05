@@ -30,6 +30,7 @@ if (isset($_POST['id']) && isset($_POST['publication'])) {
     $maRequete = "UPDATE chanson SET publication = $publication WHERE id = $idChanson";
     
     if ($db->query($maRequete)) {
+        actualiseMedias();
         echo json_encode(['status' => 'success', 'publication' => $publication]);
     } else {
         echo json_encode(['status' => 'error', 'message' => $db->error]);

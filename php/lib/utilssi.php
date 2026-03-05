@@ -202,6 +202,17 @@ if (!isset ($FichierUtilsSi)) {
         return $d && $d->format($format) == $date;
     }
 
+    /**
+     * Reconstruit la table des médias (utilisé après ajout/modif de fichiers ou liens)
+     */
+    function actualiseMedias(): void
+    {
+        // On évite les inclusions multiples si on est déjà dans un processus complexe
+        require_once $_SERVER['DOCUMENT_ROOT'] . "/php/media/Media.php";
+        $media = new Media();
+        $media->resetMediaTable();
+    }
+
     // Fonction pour filtrer les données venant de POST et GET
     function filtreGetPost($source, $cle, $type = 'string', $options = []) {
         $valeur = null;

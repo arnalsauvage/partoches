@@ -144,6 +144,9 @@ if ($mode == "MAJ") {
     $_chanson->creeModifieChansonBDD();
 }
 
+// On actualise la table des médias automatiquement
+actualiseMedias();
+
 //  3 - suppression chanson
 // Gestion de la demande de suppression
 if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {

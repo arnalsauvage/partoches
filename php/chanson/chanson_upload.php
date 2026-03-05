@@ -121,5 +121,7 @@ function handleFileUpload()
 }
 
 // Appel de la fonction principale
-handleFileUpload();
+if (handleFileUpload()) {
+    actualiseMedias();
+}
 header('Location: ./chanson_form.php?id=' . $_POST ['id']);

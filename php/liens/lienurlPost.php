@@ -43,6 +43,9 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
         //echo "Update";
         modifieLienurl($id, $url, $type, $description, $nomtable, $idtable, $date, $idUser, $hits);
     }
+
+    // On actualise la table des médias automatiquement
+    actualiseMedias();
 }
 //header('Location: ./chanson_form.php?id=' . $_POST['idTable']);
 
