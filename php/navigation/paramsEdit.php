@@ -1,33 +1,99 @@
 <?php
 
-// Si c'est un appel Ajax pour récupérer la date
-if (isset($_POST['action']) && $_POST['action'] === 'derniere_date_modif') {
-    function trouverDerniereDateModif($dossier, $extensions = ['php', 'js', 'css', 'html']) {
-        $derniereDate = 0;
-        $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dossier));
-        foreach ($it as $fichier) {
-            if ($fichier->isFile()) {
-                $ext = strtolower(pathinfo($fichier->getFilename(), PATHINFO_EXTENSION));
-                if (in_array($ext, $extensions)) {
-                    $filemtime = $fichier->getMTime();
-                    if ($filemtime > $derniereDate) {
-                        $derniereDate = $filemtime;
+// === ACTIONS AJAX RÉCENTES ===
+if (isset($_POST['action'])) {
+    if ($_POST['action'] === 'lecture_log' && isset($_POST['fichier'])) {
+        $fichierLog = "../../logs/" . basename($_POST['fichier']);
+        if (file_exists($fichierLog)) {
+            echo "<pre style='max-height: 400px; overflow: auto; background: #f8f9fa; padding: 10px; border: 1px solid #ddd;'>";
+            echo htmlspecialchars(file_get_contents($fichierLog));
+            echo "</pre>";
+        } else {
+            echo "Fichier non trouvé.";
+        }
+        exit;
+    }
+    
+    if ($_POST['action'] === 'execute_sql' && isset($_POST['sql'])) {
+        require_once "../lib/configMysql.php";
+        $sql = $_POST['sql'];
+        $res = $mysqli->query($sql);
+        if (!$res) {
+            echo "<div class='alert alert-danger'>Erreur : " . $mysqli->error . "</div>";
+        } elseif ($res === true) {
+            echo "<div class='alert alert-success'>Requête exécutée avec succès (" . $mysqli->affected_rows . " lignes affectées).</div>";
+        } else {
+            echo "<div class='table-responsive'><table class='table table-condensed table-striped table-bordered'>";
+            echo "<thead><tr class='info'>";
+            while ($finfo = $res->fetch_field()) {
+                echo "<th>" . $finfo->name . "</th>";
+            }
+            echo "</tr></thead><tbody>";
+            while ($row = $res->fetch_assoc()) {
+                echo "<tr>";
+                foreach ($row as $val) echo "<td>" . htmlspecialchars($val) . "</td>";
+                echo "</tr>";
+            }
+            echo "</tbody></table></div>";
+        }
+        exit;
+    }
+
+    if ($_POST['action'] === 'infos_systeme') {
+        require_once "../lib/configMysql.php";
+        
+        // Version PHP
+        echo "<h4><i class='glyphicon glyphicon-info-sign'></i> Environnement</h4>";
+        echo "<ul>";
+        echo "<li><strong>Version PHP :</strong> " . phpversion() . "</li>";
+        echo "<li><strong>Version MySQL :</strong> " . $mysqli->server_info . "</li>";
+        
+        // Taille BDD
+        $res = $mysqli->query("SELECT SUM(data_length + index_length) / 1024 / 1024 AS size FROM information_schema.TABLES WHERE table_schema = '$mabase'");
+        $row = $res->fetch_assoc();
+        echo "<li><strong>Taille Base de données :</strong> " . round($row['size'], 2) . " Mo</li>";
+
+        // Taille Chansons
+        function get_dir_size($directory) {
+            $size = 0;
+            foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory)) as $file) {
+                $size += $file->getSize();
+            }
+            return $size;
+        }
+        $dataSize = get_dir_size("../../data/chansons/");
+        echo "<li><strong>Taille Dossier Chansons :</strong> " . round($dataSize / 1024 / 1024, 2) . " Mo</li>";
+        echo "</ul>";
+        exit;
+    }
+
+    if ($_POST['action'] === 'derniere_date_modif') {
+        function trouverDerniereDateModif($dossier, $extensions = ['php', 'js', 'css', 'html']) {
+            $derniereDate = 0;
+            $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dossier));
+            foreach ($it as $fichier) {
+                if ($fichier->isFile()) {
+                    $ext = strtolower(pathinfo($fichier->getFilename(), PATHINFO_EXTENSION));
+                    if (in_array($ext, $extensions)) {
+                        $filemtime = $fichier->getMTime();
+                        if ($filemtime > $derniereDate) {
+                            $derniereDate = $filemtime;
+                        }
                     }
                 }
             }
+            return $derniereDate;
         }
-        return $derniereDate;
+        $repertoire = "../../php"; 
+        $timestampDerniereModif = trouverDerniereDateModif($repertoire);
+        if ($timestampDerniereModif > 0) {
+            echo date("d/m/Y H:i:s", $timestampDerniereModif);
+        } else {
+            echo "Aucun fichier trouvé.";
+        }
+        exit;
     }
-    $repertoire = __DIR__; // changer selon dossier à analyser
-    $timestampDerniereModif = trouverDerniereDateModif($repertoire);
-    if ($timestampDerniereModif > 0) {
-        echo date("d/m/Y H:i:s", $timestampDerniereModif);
-    } else {
-        echo "Aucun fichier trouvé.";
-    }
-    exit; // Terminer pour ajax uniquement
 }
-
 // Fin ajax
 
 include_once "../lib/utilssi.php";
@@ -44,30 +110,13 @@ if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_AD
 }
 
 /// Traitement de la reinitialisation des medias
-
-// Vérifie si le paramètre resetmedias est présent dans l’URL
 if (isset($_GET['resetmedias'])) {
-    // Récupère la valeur du paramètre (par exemple 125)
     $nombreMedias = (int) $_GET['resetmedias'];
-
-    // Appelle la fonction de réinitialisation
-    resetMediasPartoches($nombreMedias);
-
-    echo "<p>Les médias ont été réinitialisés avec succès ($nombreMedias éléments).</p>";
-}
-
-// Fonction pour lancer le reset
-function resetMediasPartoches(int $nombreMedias) {
     require_once("../media/Media.php");
     $medias = new Media();
     $medias->resetMediasDistribues($nombreMedias);
+    $sortie .= "<div class='alert alert-info'>Les médias ont été réinitialisés avec succès ($nombreMedias éléments).</div>";
 }
-
-///
-/// Fin traitement reinitialisation medias
-///
-
-
 
 // Charge le fichier ini
 $ini_objet = new FichierIni();
@@ -96,41 +145,43 @@ $itemsMysql = [
     "motDePasse" => "Mot de passe MySQL"
 ];
 
+$itemsAdmin = [
+    "display_errors" => "Afficher les erreurs PHP (Debug)",
+    "log_level" => "Niveau de log (0=off, 1=errors, 2=full)"
+];
+
 // Création de l'objet Footer
 $footer = new Footer();
-$bModif = false;
 
 // Traiter POST
-foreach (array_merge(array_keys($itemsGeneral), array_keys($itemsMysql)) as $item) {
+foreach (array_merge(array_keys($itemsGeneral), array_keys($itemsMysql), array_keys($itemsAdmin)) as $item) {
     if (isset($_POST[$item])) {
-        $groupe = array_key_exists($item, $itemsGeneral) ? "general" : "mysql";
+        if (array_key_exists($item, $itemsGeneral)) $groupe = "general";
+        elseif (array_key_exists($item, $itemsMysql)) $groupe = "mysql";
+        else $groupe = "admin";
+        
         $ini_objet->m_put($_POST[$item], $item, $groupe);
         $bModif = true;
     }
-    // Traitement du pied de page
-    if (isset($_POST['footerHtml'])) {
-        // Autoriser un petit sous-ensemble de balises HTML
-        $footerHtml = strip_tags($_POST['footerHtml'], '<a><br><img><strong><em><p>');
-        $ini_objet->m_put($footerHtml, 'footerHtml', 'footer');
-        $bModif = true;
-    }
 }
-// Traitement POST pour le footer
+
+// Traitement du pied de page
 if (isset($_POST['footerHtml'])) {
-    // Autoriser un petit sous-ensemble de balises HTML
     $footerHtml = strip_tags($_POST['footerHtml'], '<a><br><img><strong><em><p>');
+    $ini_objet->m_put($footerHtml, 'footerHtml', 'footer');
     $footer->setHtml($footerHtml);
     $bModif = true;
 }
 
 // Sauvegarde si modifié
 if ($bModif) {
-    $footer->sauveBdd(); // Enregistre dans l'ini via la classe Footer
+    $footer->sauveBdd();
+    $ini_objet->save();
+    $sortie .= "<div class='alert alert-success'>Paramètres mis à jour avec succès !</div>";
 }
 
 // Récupération du contenu HTML pour le formulaire
 $footerHtml = htmlspecialchars($footer->getHtml());
-
 
 // Upload logo
 $logoActuel = $ini_objet->m_valeur('logoSite', 'general');
@@ -156,14 +207,12 @@ if (isset($_FILES['logoSite']) && $_FILES['logoSite']['error'] === UPLOAD_ERR_OK
         }
 
         if ($srcImage) {
-            // 1) Logo 300x300
             $dstImage = imagecreatetruecolor(300, 300);
             if ($ext === 'png' || $ext === 'webp') {
                 imagealphablending($dstImage, false);
                 imagesavealpha($dstImage, true);
             }
             imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, 300, 300, $width, $height);
-
             switch ($ext) {
                 case 'jpg':
                 case 'jpeg': imagejpeg($dstImage, $destination, 90); break;
@@ -171,160 +220,182 @@ if (isset($_FILES['logoSite']) && $_FILES['logoSite']['error'] === UPLOAD_ERR_OK
                 case 'webp': imagewebp($dstImage, $destination); break;
             }
             imagedestroy($dstImage);
-
-            // 2) favicon.ico (simple ICO: un seul PNG renommé)
-            $faviconSize = 32;
-            $faviconImage = imagecreatetruecolor($faviconSize, $faviconSize);
-            imagealphablending($faviconImage, false);
-            imagesavealpha($faviconImage, true);
-            imagecopyresampled($faviconImage, $srcImage, 0, 0, 0, 0, $faviconSize, $faviconSize, $width, $height);
-
-            // On génère un PNG puis on le renomme en .ico (suffisant pour la plupart des navigateurs).
-            $faviconPngPath = $uploadDir . "favicon_tmp.png";
-            imagepng($faviconImage, $faviconPngPath);
+            
+            // Icônes & favicon
+            $faviconImage = imagecreatetruecolor(32, 32);
+            imagealphablending($faviconImage, false); imagesavealpha($faviconImage, true);
+            imagecopyresampled($faviconImage, $srcImage, 0, 0, 0, 0, 32, 32, $width, $height);
+            imagepng($faviconImage, $racineDir . "favicon.ico"); // Simple rename
             imagedestroy($faviconImage);
 
-            // Renommage en .ico
-            $faviconIcoPath = $racineDir . "favicon.ico";
-            @unlink($faviconIcoPath);
-            rename($faviconPngPath, $faviconIcoPath);
-
-            // 3) Apple touch icon 120x120
-            $apple120Size = 120;
-            $apple120 = imagecreatetruecolor($apple120Size, $apple120Size);
-            imagealphablending($apple120, false);
-            imagesavealpha($apple120, true);
-            imagecopyresampled($apple120, $srcImage, 0, 0, 0, 0, $apple120Size, $apple120Size, $width, $height);
+            $apple120 = imagecreatetruecolor(120, 120);
+            imagealphablending($apple120, false); imagesavealpha($apple120, true);
+            imagecopyresampled($apple120, $srcImage, 0, 0, 0, 0, 120, 120, $width, $height);
             imagepng($apple120, $racineDir . "apple-touch-icon-120x120-precomposed.png");
             imagedestroy($apple120);
 
-            // 4) Apple touch icon 152x152
-            $apple152Size = 152;
-            $apple152 = imagecreatetruecolor($apple152Size, $apple152Size);
-            imagealphablending($apple152, false);
-            imagesavealpha($apple152, true);
-            imagecopyresampled($apple152, $srcImage, 0, 0, 0, 0, $apple152Size, $apple152Size, $width, $height);
-            imagepng($apple152, $racineDir . "apple-touch-icon-152x152-precomposed.png");
-            imagedestroy($apple152);
-
-            // Nettoyage source
             imagedestroy($srcImage);
-
-            // MAJ ini / message
             $ini_objet->m_put($newFilename, 'logoSite', 'general');
-            $bModif = true;
+            $ini_objet->save();
             $logoActuel = $newFilename;
-            $sortie .= "<div class='alert alert-success'>Logo téléchargé, redimensionné et icônes générées avec succès !</div>";
+            $sortie .= "<div class='alert alert-success'>Logo et icônes mis à jour !</div>";
         }
-    } else {
-        $sortie .= "<div class='alert alert-danger'>Format invalide. Autorisé : jpg, jpeg, png, webp</div>";
     }
-
 }
-
-if ($bModif) $ini_objet->save();
 
 // Helper pour les champs
 function champInput(FichierIni $ini, $name, $label, $type, $groupe) {
     $val = htmlspecialchars($ini->m_valeur($name, $groupe));
-    return "<div class='mb-3'>
-        <label for='$name' class='form-label'>$label</label>
+    if ($type === "checkbox") {
+        $checked = ($val == "1") ? "checked" : "";
+        return "<div class='checkbox'><label><input type='checkbox' name='$name' value='1' $checked> $label</label></div>";
+    }
+    return "<div class='form-group'>
+        <label for='$name'>$label</label>
         <input type='$type' class='form-control' name='$name' id='$name' value='$val'>
     </div>";
 }
 
-// Formulaire avec onglets
+// Formulaire
 $sortie .= "<form method='post' enctype='multipart/form-data'>";
-
 $sortie .= <<<HTML
 <ul class="nav nav-tabs" role="tablist">
   <li class="active"><a href="#general" role="tab" data-toggle="tab">Général</a></li>
   <li><a href="#mysql" role="tab" data-toggle="tab">MySQL</a></li>
   <li><a href="#footer" role="tab" data-toggle="tab">Pied de page</a></li>
+  <li><a href="#tabLogs" role="tab" data-toggle="tab">Logs</a></li>
+  <li><a href="#tabSql" role="tab" data-toggle="tab">Console SQL</a></li>
+  <li><a href="#tabSysteme" role="tab" data-toggle="tab">Système</a></li>
 </ul>
 
-
-<div class="tab-content" style="margin-top:20px;">
+<div class="tab-content" style="margin-top:20px; border: 1px solid #ddd; border-top: none; padding: 20px; background: #fff;">
   <div class="tab-pane fade in active" id="general">
 HTML;
 
-// Champs général
 foreach ($itemsGeneral as $item => $label) $sortie .= champInput($ini_objet, $item, $label, "text", "general");
+$sortie .= champInput($ini_objet, "display_errors", "Activer l'affichage des erreurs PHP (display_errors)", "checkbox", "admin");
 
-// Upload logo
 $sortie .= <<<HTML
-<div class="mb-3">
-    <label for="logoSite" class="form-label">Logo du site (300x300 px, jpg/png/webp)</label>
-    <input type="file" id="logoSite" name="logoSite" class="form-control">
-</div>
+    <div class="form-group">
+        <label for="logoSite">Logo du site</label>
+        <input type="file" id="logoSite" name="logoSite" class="form-control">
+        <small class="text-muted">Logo actuel :</small><br>
+        <img src='../../images/navigation/$logoActuel' width='48' style='border:1px solid #ccc; padding:2px;'>
+    </div>
+  </div>
+
+  <div class='tab-pane fade' id='mysql'>
 HTML;
-
-if ($logoActuel) {
-    $sortie .= "<p>Logo actuel :</p><img src='../../images/navigation/$logoActuel' width='64' height='64'>";
-}
-
-$sortie .= "</div> <!-- fin onglet général -->";
-
-$sortie .= "<div class='tab-pane fade' id='mysql'>";
 foreach ($itemsMysql as $item => $label) {
     $type = ($item === "motDePasse") ? "password" : "text";
     $sortie .= champInput($ini_objet, $item, $label, $type, "mysql");
 }
-$sortie .= "</div> <!-- fin onglet mysql -->";
+$sortie .= "</div>";
 
 $sortie .= <<<HTML
-<div class='tab-pane fade' id="footer">
-    <div class="mb-3">
-        <label for="footerHtml" class="form-label">Contenu du pied de page</label>
-        <textarea class="form-control" name="footerHtml" id="footerHtml" rows="10" style="font-family: monospace;">$footerHtml</textarea>
-        <small class="text-muted d-block mt-2">
-            Vous pouvez insérer des liens, des images et du texte (balises autorisées : &lt;a&gt;, &lt;br&gt;, &lt;img&gt;, &lt;strong&gt;, &lt;em&gt;).
-        </small>
+  <div class='tab-pane fade' id="footer">
+    <div class="form-group">
+        <label for="footerHtml">HTML du pied de page</label>
+        <textarea class="form-control" name="footerHtml" id="footerHtml" rows="8" style="font-family: monospace;">$footerHtml</textarea>
     </div>
-</div> <!-- fin onglet footer -->
+  </div>
+
+  <div class='tab-pane fade' id="tabLogs">
+    <div class="form-group">
+        <label>Choisir un fichier de log :</label>
+        <select id="selectLog" class="form-control">
+            <option value="">-- Sélectionner --</option>
 HTML;
 
-$sortie .= "</div> <!-- fin tab-content -->";
+$logs = glob("../../logs/*.{txt,htm,log,html}", GLOB_BRACE);
+foreach ($logs as $l) {
+    $basename = basename($l);
+    $sortie .= "<option value='$basename'>$basename</option>";
+}
 
-$sortie .= "<button type='submit' class='btn btn-primary mt-3'>Valider</button>";
-$sortie .= "</form>";
-
-// Medias
-$sortie .= "<h2>Medias</h2>
-<a href='../media/listeMedias.php'>Voir les médias</a> |
-<a href='paramsEdit.php?resetmedias=125'>Réinitialiser les médias</a>";
-
-// Bouton dernière modif AJAX
-$sortie.= <<<HTML
-<button id="btnDerniereModif">Voir dernière modif</button>
-<div id="resultatDerniereModif" style="margin-top:10px; font-weight:bold;"></div>
-
-<script>
-$('#btnDerniereModif').click(function() {
-    $('#resultatDerniereModif').text('Chargement...');
-    $.post('', {action: 'derniere_date_modif'}, function(data) {
-        $('#resultatDerniereModif').text('Dernière date de modification (ajouter 2h): ' + data);
-    }).fail(function() {
-        $('#resultatDerniereModif').text('Erreur lors de la récupération.');
-    });
-});
-</script>
-HTML;
-
-
-// Script onglets Bootstrap
 $sortie .= <<<HTML
+        </select>
+    </div>
+    <div id="resultatLog" style="margin-top:15px;"></div>
+    <button type="button" class="btn btn-default btn-sm" onclick="$('#resultatLog').empty();">Vider l'affichage</button>
+  </div>
+
+  <div class='tab-pane fade' id="tabSql">
+    <div class="alert alert-warning"><strong>Attention :</strong> Les requêtes sont exécutées directement sur la base.</div>
+    <div class="form-group">
+        <textarea id="sqlQuery" class="form-control" rows="5" placeholder="SELECT * FROM chanson LIMIT 10;"></textarea>
+    </div>
+    <button type="button" id="btnRunSql" class="btn btn-danger">Exécuter la requête</button>
+    <div id="resultatSql" style="margin-top:20px;"></div>
+  </div>
+
+  <div class='tab-pane fade' id="tabSysteme">
+    <div id="resultatSysteme">Chargement...</div>
+    <hr>
+    <button type="button" id="btnRefreshSysteme" class="btn btn-info btn-sm">Rafraîchir les infos</button>
+  </div>
+</div>
+
+<div style="margin-top:20px;">
+    <button type='submit' class='btn btn-primary btn-lg'>Enregistrer les paramètres</button>
+    <button type="button" id="btnDerniereModif" class="btn btn-link">Voir dernière modif php/</button>
+    <span id="resultatDerniereModif" class="text-muted small"></span>
+</div>
+</form>
+
+<hr>
+<h3>Outils</h3>
+<a href='../media/listeMedias.php' class='btn btn-default'>Voir les médias</a>
+<a href='paramsEdit.php?resetmedias=125' class='btn btn-warning' onclick='return confirm("Réinitialiser ?");'>Réinitialiser les médias</a>
+
 <script>
 $(document).ready(function(){
-    $('.nav-tabs a').click(function (e) {
-      e.preventDefault();
-      $(this).tab('show');
+    // Gestion des onglets
+    $('.nav-tabs a').click(function (e) { e.preventDefault(); $(this).tab('show'); });
+    
+    // Chargement auto du système quand on clique sur l'onglet
+    $('a[href="#tabSysteme"]').on('shown.bs.tab', function (e) { loadSysteme(); });
+
+    // AJAX Logs
+    $('#selectLog').change(function() {
+        var f = $(this).val();
+        if (!f) return;
+        $('#resultatLog').html('Chargement...');
+        $.post('', {action: 'lecture_log', fichier: f}, function(data) {
+            $('#resultatLog').html(data);
+        });
+    });
+
+    // AJAX SQL
+    $('#btnRunSql').click(function() {
+        var query = $('#sqlQuery').val();
+        if (!query) return;
+        $('#resultatSql').html('Exécution...');
+        $.post('', {action: 'execute_sql', sql: query}, function(data) {
+            $('#resultatSql').html(data);
+        });
+    });
+
+    // AJAX Système
+    function loadSysteme() {
+        $('#resultatSysteme').html('Récupération des données...');
+        $.post('', {action: 'infos_systeme'}, function(data) {
+            $('#resultatSysteme').html(data);
+        });
+    }
+    $('#btnRefreshSysteme').click(function() { loadSysteme(); });
+
+    // AJAX Date Modif
+    $('#btnDerniereModif').click(function() {
+        $('#resultatDerniereModif').text('(Chargement...)');
+        $.post('', {action: 'derniere_date_modif'}, function(data) {
+            $('#resultatDerniereModif').text('Dernière modif : ' + data);
+        });
     });
 });
 </script>
 HTML;
 
-
-// Footer
+$sortie .= "</div> <!-- container -->";
 $sortie .= envoieFooter();
 echo $sortie;
