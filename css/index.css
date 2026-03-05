@@ -309,15 +309,15 @@ span.selected {
 	width: 66%; /* Largeur du modal */
 }
 
-.close {
+.close-modal {
 	color: #FF0000; /* Couleur de la croix */
 	float: right; /* Aligne à droite */
-	font-size: 56px; /* Taille de la croix */
+	font-size: 28px; /* Taille plus raisonnable */
 	font-weight: bold; /* Gras */
 }
 
-.close:hover,
-.close:focus {
+.close-modal:hover,
+.close-modal:focus {
 	color: black; /* Change la couleur au survol */
 	text-decoration: none; /* Pas de soulignement */
 	cursor: pointer; /* Curseur en forme de main */

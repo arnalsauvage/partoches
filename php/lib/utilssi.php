@@ -145,6 +145,23 @@ if (!isset ($FichierUtilsSi)) {
     }
 
     /**
+     * Vérifie si l'utilisateur a au moins le privilège demandé
+     */
+    function aDroits(int $privilegeMin): bool
+    {
+        if (!isset($_SESSION['privilege'])) return false;
+        return (int)$_SESSION['privilege'] >= $privilegeMin;
+    }
+
+    /**
+     * Raccourci pour vérifier si l'utilisateur est Admin
+     */
+    function estAdmin(): bool
+    {
+        return aDroits($GLOBALS["PRIVILEGE_ADMIN"]);
+    }
+
+    /**
      * renverra un Logger
      * @param $date
      * @param string $format
