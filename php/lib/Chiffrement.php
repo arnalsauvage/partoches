@@ -16,12 +16,16 @@ class Chiffrement
 
     public static function decrypt($data)
     {
+        if (empty($data)) {
+            return "Erreur";
+        }
         try {
-            $data = base64_decode($data);
+            $data = base64_decode((string)$data);
             $data = Cryptor::Decrypt($data, self::$_key);
             return ($data);
         } catch (Exception $e) {
-            echo "Votre clé n'est plus valide, faites une demande d'oubli de mot de passe. ",  $e->getMessage(), "\n";
+            // On ne fait pas d'echo ici pour ne pas casser les redirections (headers)
+            error_log("Erreur de déchiffrement : " . $e->getMessage());
             return ("Erreur");
         }
     }

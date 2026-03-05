@@ -52,41 +52,53 @@ class Pagination
     public function barrePagination()
     {
         $_monUrlSansParamPage = $this->retirerParametreUrl("page");
-        // echo "url sans page : " . $_monUrlSansParamPage;
-        $chaine = "<div class = nav> Pages :  ";
-        if ($this->getPageEnCours() > 1) {
-            $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=1"), "<< ");
+        $total = $this->getNombreDePages();
+        $actuelle = $this->getPageEnCours();
+        
+        if ($total <= 1) return ""; // Pas besoin de pagination pour une seule page
+
+        $chaine = "<span class='pagination-container' style='margin-left: 15px; font-family: sans-serif;'>";
+        $chaine .= "<span style='margin-right: 10px; font-weight: bold;'>Pages :</span> ";
+
+        // --- BOUTON PRÉCÉDENT ---
+        if ($actuelle > 1) {
+            $prev = $actuelle - 1;
+            $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=1"), "&laquo; Prems", -1, -1, "Première page") . " ";
+            $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$prev"), "&lsaquo; Préc.", -1, -1, "Page précédente") . " ";
         }
-        else {
-            $chaine .= " &lt;&lt; ";
-        }
-        $pagePrecedente = $this->getPageEnCours() - 1;
-        if ($pagePrecedente == 0) {
-            $pagePrecedente = 1;
-        }
-        $chaine = $this->getPageEnCours() > 1 ? $chaine . ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$pagePrecedente"), " préc. ") : $chaine . " préc. ";
-        for ($compteur = 1; $compteur <= ($this->getNombreDePages()); $compteur++) {
-            if ($compteur > 1) {
-                $chaine .= " - ";
+
+        // --- LOGIQUE FENÊTRE GLISSANTE ---
+        $range = 2; // Nombre de pages à afficher autour de la page actuelle
+        $show_dots_start = false;
+        $show_dots_end = false;
+
+        for ($i = 1; $i <= $total; $i++) {
+            // Toujours afficher la première, la dernière et celles autour de l'actuelle
+            if ($i == 1 || $i == $total || ($i >= $actuelle - $range && $i <= $actuelle + $range)) {
+                if ($i == $actuelle) {
+                    $chaine .= "<strong style='background: #337ab7; color: #fff; padding: 2px 8px; border-radius: 3px; margin: 0 2px;'>$i</strong>";
+                } else {
+                    $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$i"), " $i ", -1, -1, "Aller à la page $i") . " ";
+                }
             }
-            if ($compteur == $this->getPageEnCours()) {
-                $chaine .= $compteur;
+            // Afficher des points de suspension si on saute des pages
+            elseif ($i < $actuelle - $range && !$show_dots_start) {
+                $chaine .= " ... ";
+                $show_dots_start = true;
+            } elseif ($i > $actuelle + $range && !$show_dots_end) {
+                $chaine .= " ... ";
+                $show_dots_end = true;
             }
-            else {
-                $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=" . $compteur), $compteur);
-            }
         }
-        $pageSuivante = $this->getPageEnCours() + 1;
-        if ($pageSuivante > $this->getNombreDePages()) {
-            $pageSuivante = $this->getNombreDePages();
+
+        // --- BOUTON SUIVANT ---
+        if ($actuelle < $total) {
+            $next = $actuelle + 1;
+            $chaine .= " " . ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$next"), "Suiv. &rsaquo;", -1, -1, "Page suivante");
+            $chaine .= " " . ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$total"), "Der. &raquo;", -1, -1, "Dernière page");
         }
-        if ($this->getPageEnCours() < $this->getNombreDePages()) {
-            $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$pageSuivante"), " suiv. ");
-            $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage,  "page=".$this->getNombreDePages()), " >>");
-        } else {
-            $chaine .= " suiv. >>";
-        }
-        $chaine .= "</div>";
+
+        $chaine .= "</span>";
         return $chaine;
     }
 
@@ -204,18 +216,26 @@ class Pagination
     }
 
     public function urlAjouteParam($url, $_leparam){
-
-        // Gérer ce lessage d'alerte : Deprecated: parse_url(): Passing null to parameter #1 ($url) of type string is deprecated in C:\Users\medin\PhpstormProjects\partoches\php\lib\Pagination.php on line 207
         if (empty($url)) {
             $url = $_SERVER['REQUEST_URI'];
+        }
 
-        }
         $parsedUrl = parse_url($url);
-        if (isset($parsedUrl['query'])) {
-            $url .= "&" . $_leparam;
-        } else {
-            $url .= "?" . $_leparam;
-        }
-        return $url;
+        $path = $parsedUrl['path'] ?? '';
+        $query = $parsedUrl['query'] ?? '';
+
+        parse_str($query, $params);
+        parse_str($_leparam, $newParams);
+
+        // On fusionne les paramètres
+        $mergedParams = array_merge($params, $newParams);
+
+        // ON NETTOIE les paramètres de reset pour éviter les conflits
+        unset($mergedParams['razFiltres']);
+        unset($mergedParams['raz-recherche']);
+
+        $newQuery = http_build_query($mergedParams);
+        
+        return $path . ($newQuery ? "?" . $newQuery : "");
     }
 }

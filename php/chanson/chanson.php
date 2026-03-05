@@ -510,98 +510,135 @@ class Chanson
     }
 
 // Cherche les chansons sur le titre ou l'interprete, renvoie le tableau des identifiants
-    public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true, $champFiltre = "", $valfiltre = ""): array
+    public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true, $champFiltre = "", $valfiltre = "", $limit = -1, $offset = 0): array
     {
         $critere = $_SESSION [self::MYSQL]->real_escape_string($critere);
 
-        $maRequete = "SELECT id FROM chanson";
+        // Si on trie par votes, on doit faire une jointure
+        if ($critereTri == "votes") {
+            if ($_SESSION['privilege'] == $GLOBALS["PRIVILEGE_INVITE"]) {
+                $maRequete = "SELECT chanson.id, COALESCE(AVG(noteUtilisateur.note), 0) as moy_note FROM chanson 
+                              LEFT JOIN noteUtilisateur ON (noteUtilisateur.idObjet = chanson.id AND noteUtilisateur.nomObjet = 'chanson')";
+            } else {
+                $maRequete = "SELECT chanson.id, COALESCE(noteUtilisateur.note, 0) as ma_note FROM chanson 
+                              LEFT JOIN noteUtilisateur ON (noteUtilisateur.idObjet = chanson.id AND noteUtilisateur.nomObjet = 'chanson' AND noteUtilisateur.idUtilisateur = '" . $_SESSION['id'] . "')";
+            }
+        } else {
+            $maRequete = "SELECT chanson.id FROM chanson";
+        }
+
         $_bool_where_defini = false;
-        
+
         // Filtre de publication pour les non-admins
         if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-            $maRequete .= " WHERE publication = 1";
+            $maRequete .= " WHERE chanson.publication = 1";
             $_bool_where_defini = true;
         }
 
         if ($critere != "" && $critere != "%") {
-            if (!$_bool_where_defini) {
-                $maRequete .= " WHERE ";
-                $_bool_where_defini = true;
-            } else {
-                $maRequete .= " AND ";
-            }
-            $maRequete .= "( nom LIKE '$critere' OR interprete LIKE '$critere' )";
+            $maRequete .= ($_bool_where_defini ? " AND " : " WHERE ") . "( chanson.nom LIKE '$critere' OR chanson.interprete LIKE '$critere' )";
+            $_bool_where_defini = true;
         }
-        if ($champFiltre <> "" && $valfiltre <> "") {
-            if (!$_bool_where_defini) {
-                $maRequete .= " WHERE ";
-                $_bool_where_defini = true;
-            } else {
-                $maRequete .= " AND ";
-            }
+
+        if ($champFiltre != "" && $valfiltre != "") {
+            $maRequete .= ($_bool_where_defini ? " AND " : " WHERE ");
+            $valEscaped = $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
+            
             if ($champFiltre == "contributeur") {
-                $maRequete .= " iduser =  " . $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
-            }
-            if ($champFiltre == "tempo_famille") {
-                $valfiltre = $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
-                switch ($valfiltre) {
-                    case "Largo":
-                        $maRequete .= " tempo < 60";
-                        break;
-                    case "Adagio":
-                        $maRequete .= " tempo BETWEEN 60 AND 75";
-                        break;
-                    case "Andante":
-                        $maRequete .= " tempo BETWEEN 76 AND 107";
-                        break;
-                    case "Moderato":
-                        $maRequete .= " tempo BETWEEN 108 AND 119";
-                        break;
-                    case "Allegro":
-                        $maRequete .= " tempo BETWEEN 120 AND 155";
-                        break;
-                    case "Vivace":
-                        $maRequete .= " tempo BETWEEN 156 AND 175";
-                        break;
-                    case "Presto":
-                        $maRequete .= " tempo >= 176";
-                        break;
-                }
-            }
-            if ($champFiltre == 'tempo' || $champFiltre == 'mesure' || $champFiltre == 'tonalite' || $champFiltre == 'pulsation' || $champFiltre == 'annee' || $champFiltre == 'interprete') {
-                $maRequete .= $champFiltre . " =  '" . $_SESSION[self::MYSQL]->real_escape_string($valfiltre) . "'";
-            }
-        }
-        $maRequete .= " ORDER BY $critereTri";
-        if ($critereTri == "votes") {
-            if ($_SESSION['privilege'] == $GLOBALS["PRIVILEGE_INVITE"]) {
-                $maRequete = "SELECT chanson.id  FROM chanson 
-                RIGHT JOIN noteUtilisateur on noteUtilisateur.idObjet = chanson.id 
-                WHERE noteUtilisateur.nomObjet = 'chanson' OR noteUtilisateur.nomObjet = NULL";
-                // Ré-ajout du filtre publication ici car la requête est écrasée
-                if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-                    $maRequete .= " AND publication = 1";
-                }
-                $maRequete .= " GROUP BY chanson.id ORDER BY COALESCE(AVG(noteUtilisateur.note),0) ";
+                $maRequete .= " chanson.iduser =  " . $valEscaped;
+            } elseif ($champFiltre == "tempo_famille") {
+                $maRequete .= match ($valEscaped) {
+                    "Largo" => " chanson.tempo < 60",
+                    "Adagio" => " chanson.tempo BETWEEN 60 AND 75",
+                    "Andante" => " chanson.tempo BETWEEN 76 AND 107",
+                    "Moderato" => " chanson.tempo BETWEEN 108 AND 119",
+                    "Allegro" => " chanson.tempo BETWEEN 120 AND 155",
+                    "Vivace" => " chanson.tempo BETWEEN 156 AND 175",
+                    "Presto" => " chanson.tempo >= 176",
+                    default => " 1=1"
+                };
+            } elseif ($champFiltre == "annee" || $champFiltre == "tempo") {
+                 // Pour les nombres, on peut utiliser = au lieu de LIKE
+                 $maRequete .= "chanson." . $champFiltre . " = '" . $valEscaped . "'";
             } else {
-                $maRequete = "SELECT  noteUtilisateur.idObjet FROM noteUtilisateur 
-                WHERE noteUtilisateur.nomObjet = 'chanson' AND noteUtilisateur.idUtilisateur = '" . $_SESSION['id'] . "'
-                ORDER BY noteUtilisateur.note";
+                $maRequete .= "chanson." . $champFiltre . " LIKE '" . $valEscaped . "'";
             }
+            $_bool_where_defini = true;
         }
-        if (!$bTriAscendant) {
-            $maRequete .= " DESC";
+
+        // Group by si tri par votes (pour l'AVG)
+        if ($critereTri == "votes" && $_SESSION['privilege'] == $GLOBALS["PRIVILEGE_INVITE"]) {
+            $maRequete .= " GROUP BY chanson.id";
+        }
+
+        // Gestion du tri
+        if ($critereTri == "votes") {
+            $colTri = ($_SESSION['privilege'] == $GLOBALS["PRIVILEGE_INVITE"]) ? "moy_note" : "ma_note";
+            $maRequete .= " ORDER BY $colTri " . ($bTriAscendant ? "ASC" : "DESC");
         } else {
-            $maRequete .= " ASC";
+            $maRequete .= " ORDER BY chanson.$critereTri " . ($bTriAscendant ? "ASC" : "DESC");
         }
+
+        if ($limit > 0) {
+            $maRequete .= " LIMIT $limit OFFSET $offset";
+        }
+
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChanson #2 : " . $_SESSION [self::MYSQL]->error . "Requete : $maRequete");
         $tableau = [];
-        while ($idChanson = $result->fetch_row()) {
-            array_push($tableau, $idChanson[0]);
+        while ($row = $result->fetch_row()) {
+            array_push($tableau, $row[0]);
         }
         return $tableau;
     }
 
+    /**
+     * Compte le nombre de chansons correspondant aux critères (pour la pagination)
+     */
+    public static function compteChansons($critere, $champFiltre = "", $valfiltre = ""): int
+    {
+        $critere = $_SESSION [self::MYSQL]->real_escape_string($critere);
+        $maRequete = "SELECT COUNT(chanson.id) FROM chanson";
+        $_bool_where_defini = false;
+
+        if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
+            $maRequete .= " WHERE chanson.publication = 1";
+            $_bool_where_defini = true;
+        }
+
+        if ($critere != "" && $critere != "%") {
+            $maRequete .= ($_bool_where_defini ? " AND " : " WHERE ") . "( chanson.nom LIKE '$critere' OR chanson.interprete LIKE '$critere' )";
+            $_bool_where_defini = true;
+        }
+
+        if ($champFiltre != "" && $valfiltre != "") {
+            $maRequete .= ($_bool_where_defini ? " AND " : " WHERE ");
+            $valEscaped = $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
+
+            if ($champFiltre == "contributeur") {
+                $maRequete .= " chanson.iduser =  " . $valEscaped;
+            } elseif ($champFiltre == "tempo_famille") {
+                $maRequete .= match ($valEscaped) {
+                    "Largo" => " chanson.tempo < 60",
+                    "Adagio" => " chanson.tempo BETWEEN 60 AND 75",
+                    "Andante" => " chanson.tempo BETWEEN 76 AND 107",
+                    "Moderato" => " chanson.tempo BETWEEN 108 AND 119",
+                    "Allegro" => " chanson.tempo BETWEEN 120 AND 155",
+                    "Vivace" => " chanson.tempo BETWEEN 156 AND 175",
+                    "Presto" => " chanson.tempo >= 176",
+                    default => " 1=1"
+                };
+            } elseif ($champFiltre == "annee" || $champFiltre == "tempo") {
+                $maRequete .= "chanson." . $champFiltre . " = '" . $valEscaped . "'";
+            } else {
+                $maRequete .= "chanson." . $champFiltre . " LIKE '" . $valEscaped . "'";
+            }
+            $_bool_where_defini = true;
+        }
+
+        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème compteChansons : " . $_SESSION [self::MYSQL]->error . " Requete : $maRequete");
+        $row = $result->fetch_row();
+        return (int) $row[0];
+    }
     /**
      * Cherche les songbooks associés aux documents de cette chanson
      * @return mysqli_result|bool

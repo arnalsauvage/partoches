@@ -31,6 +31,14 @@ if (!isset($configMysql)) {
         die(' Erreur #1 configMysql : Impossible de créer une connexion persistante ! ' . $mysqli->connect_errno . ') '
             . $mysqli->connect_error);
     }
+
+    // === AUTO-MIGRATION BY DJANGO (Correctif colonne manquante) ===
+    $res_django = $mysqli->query("SHOW COLUMNS FROM chanson LIKE 'publication'");
+    if ($res_django && $res_django->num_rows == 0) {
+        $mysqli->query("ALTER TABLE chanson ADD COLUMN publication TINYINT(1) DEFAULT 1 AFTER cover");
+    }
+    // ==============================================================
+
     if ($mysqli->select_db($mabase) == false) {
         $error = "Erreur #2 configMysql : Impossible de selectionner la base !";
         return (0);
