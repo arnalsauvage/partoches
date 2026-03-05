@@ -47,12 +47,16 @@ if (isset($_SESSION['login'])&&($_SESSION['login'] == "logout")){
     $_SESSION['login'] = "";
 }
 
+$contenu = envoieHead($_SESSION ['titreSite'], "../../css/index.css?v=26.3.05");
+
 if (isset($_SESSION['login'])&&($_SESSION['login'] == "ko")){
-    $infoLogin = "<p class='ko'> erreur de login/mot de passe...</p>";
+    $contenu .= "<script>$(function() { 
+        toastr.options = { 'positionClass': 'toast-top-center', 'closeButton': true };
+        toastr.error('Erreur de login ou mot de passe !'); 
+    });</script>";
     $_SESSION['login'] = "";
 }
 
-$contenu = envoieHead($_SESSION ['titreSite'], "../../css/index.css?v=25.3.28");
 $contenu .= "<body>";
 $contenu .= "<script> if (window.innerWidth !== " . $_SESSION['largeur-fenetre'] . ") {
     const donnees = 'largeur_fenetre=' + window.innerWidth;
@@ -102,7 +106,7 @@ if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
 else{
     $contenu .= "<li><a href='../songbook/songbook-portfolio.php'>Songbooks</a></li>\n";
 }
-$contenu .= "<li><a href='../chanson/chanson_liste.php'>Chansons</a></li>\n
+$contenu .= "<li><a href='../chanson/chanson_liste.php?razFiltres'>Chansons</a></li>\n
             <li><a href='../strum/strum_liste.php'>Strums</a></li>\n
             <li><a href='../liens/lienurl_liste.php'>Liens</a></li>\n";
 //            <li><a href='../php/playlist_liste.php'>Playlists</a></li>\n";
@@ -131,7 +135,8 @@ $contenu .= "<div class='container'>\n
 
 $contenu .= "<br><br><br> ".$_SESSION ['sousTitreSite'] . " <br>\n";
 
-$contenu .= image("{$cheminVignettes}" . $_SESSION ['image'], 64, 64, $_SESSION['user']) . "\n";
+$imageUser = !empty($_SESSION['image']) ? $_SESSION['image'] : "utilisateur/defaut.png";
+$contenu .= image("{$cheminVignettes}" . $imageUser, 64, 64, $_SESSION['user']) . "\n";
 
 $date = date("d/m/Y");
 $heure = date("H:i");
@@ -142,7 +147,7 @@ if ($_SESSION ['user'] != "invite") {
 } else {
     $msgLogin = "se connecter";
     $contenu .= file_get_contents('../../html/menuLogin.html');
-    $contenu .= "<a id='afficherPopup'>$msgLogin</a> <script src='../../js/utilsJquery.js'></script>";
+    $contenu .= "<a id='afficherPopup'>$msgLogin</a>";
 }
 if (isset($infoLogin)) {
     $contenu .= $infoLogin . "<br>\n";

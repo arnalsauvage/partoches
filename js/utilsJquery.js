@@ -18,12 +18,14 @@ $(function () {
             deselect($(this));
         } else {
             $(this).addClass('selected');
-            $('.contenu_popup').slideFadeToggle();
+            $('.contenu_popup').slideFadeToggle(function() {
+                $('#login').focus();
+            });
         }
         return false;
     });
     //Fonction appelée lorsque l'on clique sur le lien Fermer la fenêtre
-    $('.close').on('click', function () {
+    $(document).on('click', '.btn-fermer-popup', function () {
         deselect($('#afficherPopup'));
         return false;
     });

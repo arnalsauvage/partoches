@@ -2,7 +2,10 @@
 require_once("../lib/utilssi.php");
 require_once("../utilisateur/utilisateur.php");
 
-$sortie = envoieHead("Partoches", "../../css/index.css?v=25.3.28");
+$donnee = null;
+$_login = "";
+
+$sortie = envoieHead("Partoches", "../../css/index.css?v=26.3.05");
 $sortie .= "<body>";
 // Si l'utilisateur a demandé la déconnexion, on efface les infos de la session
 if (isset ($_GET ['logoff'])) {
@@ -43,10 +46,18 @@ if ($donnee) {
     }
 }
 else {
-
-    // erreur de login/mot de passe...
-    $_login = "ko";
+    // Si on n'était pas en train de se déconnecter, alors c'est une vraie erreur de login
+    if ($_login != "logout") {
+        $_login = "ko";
+    }
+    // Par sécurité, on s'assure que la session contient au moins l'invité par défaut si le login échoue
+    if (!isset($_SESSION['user'])) {
+        $_SESSION['id'] = 1;
+        $_SESSION['user'] = "invite";
+        $_SESSION['privilege'] = 0;
+    }
 }
 
     $_SESSION['login'] = $_login;
-    header('Location: ' . $_SERVER['HTTP_REFERER']);
+    $url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "../../index.php";
+    header('Location: ' . $url);

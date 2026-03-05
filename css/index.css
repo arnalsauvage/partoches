@@ -157,15 +157,67 @@ li.fichiers {
 /* Gestion de popin jquery */
 .contenu_popup {
 	background-color: #FFFFFF;
-	border: 1px solid #DF3333;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 	cursor: default;
 	display: none;
-	margin-top: 15px;
+	margin-top: 10px;
 	position: absolute;
 	text-align: left;
-	width: 400px;
-	z-index: 50;
-	padding: 2px 2px;
+	width: 280px;
+	z-index: 1000;
+	padding: 20px;
+}
+
+.contenu_popup form.login {
+	width: 100%;
+	background: none;
+	padding: 0;
+	border: none;
+	border-radius: 0;
+}
+
+.contenu_popup form.login label {
+	display: block;
+	float: none;
+	margin-bottom: 5px;
+	color: #333;
+	font-weight: bold;
+}
+
+.contenu_popup form.login input {
+	width: 100%;
+	margin-bottom: 15px;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box; /* Pour que le padding n'augmente pas la largeur */
+}
+
+.contenu_popup input[type="submit"] {
+	background-color: #1F75CC;
+	color: white;
+	border: none;
+	padding: 10px;
+	width: 100%;
+	cursor: pointer;
+	border-radius: 4px;
+	font-weight: bold;
+}
+
+.contenu_popup input[type="submit"]:hover {
+	background-color: #155ea8;
+}
+
+.btn-fermer-popup {
+	display: block;
+	margin-top: 15px;
+	text-align: center;
+	color: #999;
+	cursor: pointer;
+	font-size: 0.9em;
+	text-decoration: underline;
 }
 
 span.selected {
@@ -210,7 +262,7 @@ span.selected {
 }
 
 .ko {
-    font-size: 2em;
+    font-size: 1.2em;
     color: #992211;
 }
 

@@ -174,13 +174,15 @@ function creeModifieUtilisateur($id, $login, $mdp, $prenom, $nom, $image, $site,
 function login_utilisateur($login, $mdp)
 {
     $donnee = chercheUtilisateurParLeLogin($login);
-    if ($mdp == Chiffrement::decrypt($donnee [2])) {
-        $donnee [10] = $donnee [10] + 1;
-        // echo "login ok";
-        modifieUtilisateur($donnee [0], $donnee [1], $mdp, $donnee [3], $donnee [4], $donnee [5], $donnee [6], $donnee [7], $donnee [8], $donnee [10], $donnee [11]);
-        return $donnee;
-    } else
-        echo "Erreur de mot de passe : $mdp";
+    // On vérifie que $donnee est bien un tableau (utilisateur trouvé)
+    if (is_array($donnee) && isset($donnee[2])) {
+        if ($mdp == Chiffrement::decrypt($donnee [2])) {
+            $donnee [10] = $donnee [10] + 1;
+            // echo "login ok";
+            modifieUtilisateur($donnee [0], $donnee [1], $mdp, $donnee [3], $donnee [4], $donnee [5], $donnee [6], $donnee [7], $donnee [8], $donnee [10], $donnee [11]);
+            return $donnee;
+        }
+    }
     return false;
 }
 

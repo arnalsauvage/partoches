@@ -46,6 +46,28 @@ if (!isset ($FichierHtml)) {
         return "<img src='".$urlImage."' " . $attrLargeur . $attrHauteur . " alt='$alt' class ='$class'>\n";
     }
 
+    /**
+     * Affiche la pochette d'une chanson ou une icône par défaut
+     */
+    function affichePochette($nomFichier, $id, $largeur = 48, $hauteur = 48)
+    {
+        // On récupère le dossier des chansons (par défaut ../../data/chansons/)
+        $dossierChansons = $GLOBALS['_DOSSIER_CHANSONS'] ?? "../../data/chansons/";
+        
+        $cheminSysteme = $dossierChansons . $id . "/" . $nomFichier;
+        $cheminHtml = $dossierChansons . $id . "/" . rawurlencode($nomFichier);
+
+        if (!empty($nomFichier) && file_exists($cheminSysteme)) {
+            return image($cheminHtml, $largeur, $hauteur, "couverture", "img-thumbnail");
+        } else {
+            // Si pas d'image, on affiche une icône Bootstrap "CD" dans un cadre
+            $fontSize = floor($largeur / 2);
+            return "<div class='text-center img-thumbnail' style='width:{$largeur}px; height:{$hauteur}px; display:flex; align-items:center; justify-content:center; background:#f9f9f9; border:1px solid #ddd;'>
+                        <span class='glyphicon glyphicon-cd' style='font-size:{$fontSize}px; color:#ccc;' title='Pochette 45t absente'></span>
+                    </div>";
+        }
+    }
+
     // Fin de la fonction Image____________________________________________
 
     // Fonction créant un champ SELECT
@@ -202,8 +224,11 @@ if (!isset ($FichierHtml)) {
         <link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
 		<script src='..//lib/javascript.js'></script>
 		<!-- Jquery --- source : https://code.jquery.com/jquery-1.12.4.js -->
-		<script src=\"../../js/jquery-1.12.4.min.js\"></script>
-        <!-- jquery-ui --- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
+		<script src='../../js/jquery-1.12.4.min.js'></script>
+		<!-- Nos fonctions personnalisées -->
+		<script src='../../js/utilsJquery.js'></script>
+		<!-- jquery-ui --- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
+
 		<script src='../../js/jquery-ui.1.12.1.min.js'></script>
         
 		<!-- Pour bootstrap         -->
@@ -211,9 +236,9 @@ if (!isset ($FichierHtml)) {
 		
 		<!-- Pour Toaster, les petites infos instantanées         -->
 		<link href='../../css/toastr.min.css' rel='stylesheet' type='text/css'>
-		
-		<!-- Pour Select2, le combo amélioré         -->
-		<link href='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' rel='stylesheet' />
+		<script src='../../js/toastr.min.js'></script>
+
+		<!-- Pour Select2, le combo amélioré         -->		<link href='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' rel='stylesheet' />
         <script src='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'></script>
 		
 		<title>$titrePage</title>
