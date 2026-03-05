@@ -245,14 +245,20 @@ if (isset($_FILES['logoSite']) && $_FILES['logoSite']['error'] === UPLOAD_ERR_OK
 
 // Helper pour les champs
 function champInput(FichierIni $ini, $name, $label, $type, $groupe) {
-    $val = htmlspecialchars($ini->m_valeur($name, $groupe));
+    $val = htmlspecialchars($ini->m_valeur($name, $groupe) ?? '');
     if ($type === "checkbox") {
         $checked = ($val == "1") ? "checked" : "";
-        return "<div class='checkbox'><label><input type='checkbox' name='$name' value='1' $checked> $label</label></div>";
+        return "<div class='form-group' style='clear: both; margin-bottom: 15px; overflow: hidden;'>
+                    <div class='checkbox' style='margin-left: 0;'>
+                        <label style='float: none; width: auto; font-weight: bold;'>
+                            <input type='checkbox' name='$name' value='1' $checked style='float: none; width: auto; margin-right: 10px;'> $label
+                        </label>
+                    </div>
+                </div>";
     }
-    return "<div class='form-group'>
-        <label for='$name'>$label</label>
-        <input type='$type' class='form-control' name='$name' id='$name' value='$val'>
+    return "<div class='form-group' style='clear: both; margin-bottom: 15px; overflow: hidden;'>
+        <label for='$name' style='width: 250px;'>$label</label>
+        <input type='$type' class='form-control' name='$name' id='$name' value='$val' style='width: 300px;'>
     </div>";
 }
 
@@ -276,11 +282,13 @@ foreach ($itemsGeneral as $item => $label) $sortie .= champInput($ini_objet, $it
 $sortie .= champInput($ini_objet, "display_errors", "Activer l'affichage des erreurs PHP (display_errors)", "checkbox", "admin");
 
 $sortie .= <<<HTML
-    <div class="form-group">
-        <label for="logoSite">Logo du site</label>
-        <input type="file" id="logoSite" name="logoSite" class="form-control">
-        <small class="text-muted">Logo actuel :</small><br>
-        <img src='../../images/navigation/$logoActuel' width='48' style='border:1px solid #ccc; padding:2px;'>
+    <div class="form-group" style="clear: both; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
+        <label for="logoSite" style="width: 250px;">Logo du site</label>
+        <input type="file" id="logoSite" name="logoSite" class="form-control" style="width: 300px; display: inline-block;">
+        <div style="margin-left: 250px; margin-top: 10px;">
+            <small class="text-muted">Logo actuel :</small><br>
+            <img src='../../images/navigation/$logoActuel' width='48' style='border:1px solid #ccc; padding:2px;'>
+        </div>
     </div>
   </div>
 
