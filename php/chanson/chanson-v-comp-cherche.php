@@ -9,18 +9,21 @@ else {
 global $pagination;
 global $url;
 $contenuHtmlCompCherche = "
-<FORM  METHOD='POST' ACTION='chanson_liste.php' NAME='Form'>
-<label class='labelTitreInterprete' for='rechercheChanson'>Titre ou interprète:</label>
-<INPUT id='rechercheChanson' TYPE='TEXT' NAME='cherche' class='rechercheChanson' VALUE='$nom' SIZE='100' MAXLENGTH='128' placeholder=\"recherche chanson par titre ou nom de l'interprete\">
-<a class='inline' title='effacer le critère de recherche'
-
- href='" . $pagination->urlAjouteParam($url,"raz-recherche") . "'> 
-<svg xmlns='http://www.w3.org/2000/svg' 
-    width='16' height='16' fill='red' class='bi bi-x-circle-fill' viewBox='0 0 16 16'>
-  <path d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z'/>
-</svg>
-</a>
-<br>
-<input type='submit' title='chercher' name='chercher' value=' chercher ' >
-<br>
-</FORM>";
+<div class='row' style='margin-bottom: 20px;'>
+    <div class='col-xs-12'>
+        <form method='POST' action='chanson_liste.php' name='formRecherche' id='formRecherche' class='form-inline' style='background: none; border: none; width: 100%; padding: 0;'>
+            <div class='input-group' style='width: 100%; max-width: 600px;'>
+                <input id='rechercheChanson' type='text' name='cherche' class='form-control input-lg' value='$nom' maxlength='128' placeholder=\"Titre ou interprète...\" style='border-radius: 25px 0 0 25px; border: 2px solid #D2B48C; border-right: none; background-color: #fdfaf5; box-shadow: none;'>
+                " . ($nom != "" ? "
+                <span class='input-group-addon' style='background-color: #fdfaf5; border: 2px solid #D2B48C; border-left: none; border-right: none; padding: 0;'>
+                    <a title='Effacer la recherche' href='?raz-recherche' style='color: #8B4513; padding: 0 10px; font-size: 20px; text-decoration: none; display: block; line-height: 40px;'>&times;</a>
+                </span>" : "") . "
+                <span class='input-group-btn'>
+                    <button class='btn btn-lg' type='submit' title='Chercher' style='border-radius: 0 25px 25px 0; background-color: #D2B48C; color: #2b1d1a; border: 2px solid #D2B48C; border-left: none; font-weight: bold; height: 46px;'>
+                        <span class='glyphicon glyphicon-search'></span>
+                    </button>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>";

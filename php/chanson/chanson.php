@@ -680,6 +680,79 @@ class Chanson
         $string = preg_replace('/\s+/', ' ', $string); // Réduire les espaces multiples
         return trim($string); // Supprimer les espaces au début et à la fin
     }
+
+    /**
+     * Affiche une carte moderne (thumbnail Bootstrap 3) pour la chanson
+     * @return string HTML de la carte
+     */
+    public function afficheCarteChanson(): string
+    {
+        $_id = $this->getId();
+        $nomImage = imageTableId("chanson", $_id);
+        $imagePochette = affichePochette($nomImage, $_id, 200, 200);
+        $titre = htmlspecialchars(limiteLongueur($this->getNom(), 25));
+        $interpreteFull = $this->getInterprete();
+        $interpreteAffiche = htmlspecialchars(limiteLongueur($interpreteFull, 25));
+        $annee = $this->getAnnee();
+        $tempo = $this->getTempo();
+        $tonalite = $this->getTonalite();
+
+        // Palette Canopée
+        $c_marron_fonce = "#2b1d1a";
+        $c_marron_clair = "#D2B48C"; // Bois clair
+        $c_accent = "#8B4513";
+        $c_beige = "#F5F5DC";
+
+        // Construction des liens de filtrage
+        $urlInterprete = "?filtre=interprete&valFiltre=" . urlencode($interpreteFull);
+        $urlAnnee = "?filtre=annee&valFiltre=" . urlencode($annee);
+        $urlTempo = "?filtre=tempo&valFiltre=" . urlencode($tempo);
+        $urlTonalite = "?filtre=tonalite&valFiltre=" . urlencode($tonalite);
+
+        $html = "
+        <div class='col-sm-6 col-md-4 col-lg-3' style='margin-bottom: 25px;'>
+            <div class='thumbnail shadow-hover' style='height: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; padding: 0; border: 1px solid $c_marron_clair; background-color: $c_marron_fonce;'>
+                <a href='chanson_voir.php?id=$_id' style='text-decoration: none;'>
+                    <div style='height: 180px; overflow: hidden; background-color: $c_marron_clair; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid $c_accent;'>
+                        $imagePochette
+                    </div>
+                </a>
+                <div class='caption' style='padding: 15px; text-align: center; color: $c_beige;'>
+                    <h4 style='margin-top: 0; margin-bottom: 5px; color: $c_marron_clair; height: 44px; overflow: hidden; font-weight: bold;'>$titre</h4>
+                    <p style='height: 20px; overflow: hidden; margin-bottom: 10px; font-style: italic;'>
+                        <a href='$urlInterprete' title='Filtrer par cet interprète' style='color: #9e8d8a; text-decoration: none;'>$interpreteAffiche</a>
+                    </p>
+                    <div style='margin-bottom: 15px; height: 25px;'>
+                        <a href='$urlAnnee' title='Filtrer par cette année' style='text-decoration: none;'>
+                            <span class='label' style='background-color: $c_marron_clair; color: $c_marron_fonce; cursor: pointer;'>$annee</span>
+                        </a>
+                        <a href='$urlTempo' title='Filtrer par ce tempo' style='text-decoration: none;'>
+                            <span class='label' style='background-color: #777; color: white; cursor: pointer;'>$tempo BPM</span>
+                        </a>
+                        <a href='$urlTonalite' title='Filtrer par cette tonalité' style='text-decoration: none;'>
+                            <span class='label' style='background-color: $c_accent; color: white; cursor: pointer;'>$tonalite</span>
+                        </a>
+                    </div>
+                    <div class='btn-group btn-group-justified' role='group'>
+                        <div class='btn-group' role='group'>
+                            <a href='chanson_voir.php?id=$_id' class='btn' style='background-color: $c_marron_clair; color: $c_marron_fonce; font-weight: bold; border-radius: 0;'>Voir</a>
+                        </div>";
+        
+        if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
+            $html .= "
+                        <div class='btn-group' role='group'>
+                            <a href='chanson_form.php?id=$_id' class='btn' style='background-color: $c_accent; color: white; border-radius: 0; border: none;'>Editer</a>
+                        </div>";
+        }
+        
+        $html .= "
+                    </div>
+                </div>
+            </div>
+        </div>";
+        
+        return $html;
+    }
 }
 
 /// TODO fonctions à supprimer

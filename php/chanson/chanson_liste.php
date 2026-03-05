@@ -31,7 +31,7 @@ global $contenuHtmlCompCherche;
 function logueRecherche($critereCherche): void
 {
     $date = new DateTime();
-    $myfile = fopen("logRecherche.txt", "a");
+    $myfile = fopen("../../data/logRecherche.txt", "a");
     $txt = $date->format('Y-m-d--H-i') . " : " . $critereCherche . "\n";
     fwrite($myfile, $txt);
     fclose($myfile);
@@ -46,6 +46,14 @@ $contenuHtml .= entreBalise("Chansons", "H1");
 if (!isset($_SESSION[TRI])) $_SESSION[TRI] = DATE_PUB;
 if (!isset($_SESSION[ORDRE_ASC])) $_SESSION[ORDRE_ASC] = false;
 if (!isset($_SESSION[CHERCHE])) $_SESSION[CHERCHE] = '';
+
+// Gestion de la vue (Cartes ou Liste)
+if (isset($_GET['vue'])) {
+    $_SESSION['vue'] = $_GET['vue'];
+}
+if (!isset($_SESSION['vue'])) {
+    $_SESSION['vue'] = 'cartes'; // Par défaut
+}
 
 // 2. Gestion du tri (Bascule automatique)
 if (isset($_GET[TRI])) {
@@ -90,17 +98,6 @@ if (isset($_GET[FILTRE])) {
     }
 }
 
-// Récupération des filtres depuis la session (pour persistance)
-$filtre = $_SESSION[FILTRE];
-$valeur_filtre = $_SESSION[VAL_FILTRE];
-
-if ($filtre <> "" && $valeur_filtre <> "") {
-    $contenuHtml .= "<div class='alert alert-info alert-dismissible' role='alert'>
-        <a href='?razFiltres' class='close' aria-label='Close' style='text-decoration: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 24px;'>&times;</a>
-        Filtre actif : <strong>" . htmlspecialchars($filtre) . "</strong> = <strong>" . htmlspecialchars($valeur_filtre) . "</strong>
-    </div>";
-}
-
 // 5. Remise à zéro totale
 if (isset($_GET['razFiltres'])) {
     $_SESSION[TRI] = DATE_PUB;
@@ -112,6 +109,18 @@ if (isset($_GET['razFiltres'])) {
     $filtre = "";
     $valeur_filtre = "";
 }
+
+// Récupération des filtres depuis la session (pour persistance)
+$filtre = $_SESSION[FILTRE];
+$valeur_filtre = $_SESSION[VAL_FILTRE];
+
+if ($filtre <> "" && $valeur_filtre <> "") {
+    $contenuHtml .= "<div class='alert alert-info' role='alert' style='margin: 10px auto; width: 300px; padding: 10px; position: relative;'>
+        <a href='?razFiltres' style='float: right; margin-top: -5px; font-size: 24px; text-decoration: none; color: #31708f; line-height: 1;'>&times;</a>
+        Filtre actif : <strong>" . htmlspecialchars($filtre) . "</strong> = <strong>" . htmlspecialchars($valeur_filtre) . "</strong>
+    </div>";
+}
+
 
 // 6. Pagination et Chargement des données
 if (isset($_GET['debug']) && estAdmin()) {
@@ -136,101 +145,129 @@ $contenuHtml .= $contenuHtmlCompCherche;
 
 $largeur_ecran = $_SESSION['largeur-fenetre'];
 
+// Barre d'outils (Ajout + Switch de vue)
+$contenuHtml .= "<div class='row' style='margin-bottom: 20px;'>";
+$contenuHtml .= "  <div class='col-sm-8'>";
 if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
-    $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'></span> Ajouter une chanson</a>\n";
+    $contenuHtml .= "    <a href='$chansonForm' class='btn btn-primary'><span class='glyphicon glyphicon-plus'></span> Ajouter une chanson</a>\n";
 }
-
-$contenuHtml .= TblDebut();
-$contenuHtml .= TblEnteteDebut() . TblDebutLigne();
-$contenuHtml .= TblEntete("  -  ") . TblEntete("  Pochette  ");
-$contenuHtml .= titreColonne("Nom", "nom");
-$contenuHtml .= titreColonne("Interprète", "interprete");
-
-if ($largeur_ecran > 700) {
-    if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) $contenuHtml .= titreColonne("  Votes  ", "votes");
-    $contenuHtml .= titreColonne("Année", "annee");
-}
-if ($largeur_ecran > 1200) {
-    $contenuHtml .= titreColonne("Tempo", "tempo");
-    $contenuHtml .= titreColonne("Mesure", "mesure");
-    $contenuHtml .= titreColonne("Pulsation", "pulsation");
-    $contenuHtml .= titreColonne("Tonalité", "tonalite");
-}
-if ($largeur_ecran > 700) {
-    $contenuHtml .= titreColonne("Date pub.", DATE_PUB);
-    $contenuHtml .= titreColonne("Publié par", "idUser");
-    $contenuHtml .= titreColonne("Vues", "hits");
-}
-if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) $contenuHtml .= tblEntete("action");
-
-$contenuHtml .= TblFinLigne() . TblEnteteFin() . TblCorpsDebut();
+$contenuHtml .= "  </div>";
+$contenuHtml .= "  <div class='col-sm-4 text-right'>";
+$contenuHtml .= "    <div class='btn-group' role='group' aria-label='Type de vue'>";
+$activeCartes = ($_SESSION['vue'] == 'cartes') ? 'active' : '';
+$activeListe = ($_SESSION['vue'] == 'liste') ? 'active' : '';
+$contenuHtml .= "      <a href='?vue=cartes' class='btn btn-default $activeCartes' title='Vue Cartes'><span class='glyphicon glyphicon-th'></span></a>";
+$contenuHtml .= "      <a href='?vue=liste' class='btn btn-default $activeListe' title='Vue Liste'><span class='glyphicon glyphicon-th-list'></span></a>";
+$contenuHtml .= "    </div>";
+$contenuHtml .= "  </div>";
+$contenuHtml .= "</div>";
 
 $_RACINE = "../../";
 $cheminImagesChanson = $_DOSSIER_CHANSONS;
 $_chanson = new Chanson();
 
-function celluleFiltrable($libelle, $cle, $valeur, $alignement = '', $longueurMax = null)
-{
-    global $pagination;
-    $url = $_SERVER['REQUEST_URI'];
-    $texte = $longueurMax ? limiteLongueur($libelle, $longueurMax) : $libelle;
-    
-    // On repart à la page 1 quand on change de filtre
-    $urlSansPage = $pagination->retirerParametreUrl("page");
-    $urlFiltre = $pagination->urlAjouteParam($urlSansPage, FILTRE . "=$cle&" . VAL_FILTRE . "=" . urlencode($valeur));
-    
-    return TblCellule(ancre($urlFiltre, $texte), 1, 1, $alignement);
-}
-
-foreach ($resultatIds as $idChanson) {
-    $contenuHtml .= TblDebutLigne();
-    $_chanson->chercheChanson($idChanson);
-    $_id = $_chanson->getId();
-
-    if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
-        $_image = image($cheminImages . $iconeEdit, 32, 32);
-        $contenuHtml .= TblCellule(ancre("$chansonForm?id=" . $_id, $_image, -1, -1, "modifier la chanson"));
+if ($_SESSION['vue'] == 'cartes') {
+    // AFFICHAGE EN CARTES (MODERNE)
+    $contenuHtml .= "<div class='row'>";
+    if (count($resultatIds) == 0) {
+        $contenuHtml .= "<div class='col-xs-12 text-center'><p class='lead'>Aucune chanson trouvée...</p></div>";
     } else {
-        $contenuHtml .= TblCellule(" ");
-    }
-    
-    $nomImage = imageTableId(CHANSON, $_id);
-    $imagePochette = affichePochette($nomImage, $_id, 48, 48);
-    $contenuHtml .= TblCellule(ancre("$chansonVoir?id=$_id", $imagePochette));
-    $contenuHtml .= TblCellule(ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"), -1, -1, $_chanson->getNom()));
-    $contenuHtml .= celluleFiltrable($_chanson->getInterprete(), "interprete", $_chanson->getInterprete(), '', 21);
-
-    if ($largeur_ecran > 700) {
-        if (estAdmin()) {
-            $contenuHtml .= TblCellule(UtilisateurNote::starBar(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
-        } elseif (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
-            $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
+        foreach ($resultatIds as $idChanson) {
+            $_chanson->chercheChanson($idChanson);
+            $contenuHtml .= $_chanson->afficheCarteChanson();
         }
     }
-
-    if ($largeur_ecran > 700) $contenuHtml .= celluleFiltrable($_chanson->getAnnee(), "annee", $_chanson->getAnnee(), CENTRER);
-
-    if ($largeur_ecran > 1200) {
-        $contenuHtml .= celluleFiltrable($_chanson->getTempo(), "tempo", $_chanson->getTempo(), "alignerAdroite");
-        $contenuHtml .= celluleFiltrable($_chanson->getMesure(), "mesure", $_chanson->getMesure(), CENTRER);
-        $contenuHtml .= celluleFiltrable($_chanson->getPulsation(), "pulsation", $_chanson->getPulsation(), CENTRER);
-        $contenuHtml .= celluleFiltrable($_chanson->getTonalite(), "tonalite", $_chanson->getTonalite(), CENTRER);
-    }
+    $contenuHtml .= "</div>";
+} else {
+    // AFFICHAGE EN LISTE (EXCEL)
+    $contenuHtml .= TblDebut();
+    $contenuHtml .= TblEnteteDebut() . TblDebutLigne();
+    $contenuHtml .= TblEntete("  -  ") . TblEntete("  Pochette  ");
+    $contenuHtml .= titreColonne("Nom", "nom");
+    $contenuHtml .= titreColonne("Interprète", "interprete");
 
     if ($largeur_ecran > 700) {
-        $contenuHtml .= TblCellule(dateMysqlVersTexte($_chanson->getDatePub()));
-        $nomAuteur = chercheUtilisateur($_chanson->getIdUser());
-        $contenuHtml .= celluleFiltrable($nomAuteur[3], "contributeur", $_chanson->getIdUser(), CENTRER);
-        $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite");
+        if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) $contenuHtml .= titreColonne("  Votes  ", "votes");
+        $contenuHtml .= titreColonne("Année", "annee");
+    }
+    if ($largeur_ecran > 1200) {
+        $contenuHtml .= titreColonne("Tempo", "tempo");
+        $contenuHtml .= titreColonne("Mesure", "mesure");
+        $contenuHtml .= titreColonne("Pulsation", "pulsation");
+        $contenuHtml .= titreColonne("Tonalité", "tonalite");
+    }
+    if ($largeur_ecran > 700) {
+        $contenuHtml .= titreColonne("Date pub.", DATE_PUB);
+        $contenuHtml .= titreColonne("Publié par", "idUser");
+        $contenuHtml .= titreColonne("Vues", "hits");
+    }
+    if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) $contenuHtml .= tblEntete("action");
+
+    $contenuHtml .= TblFinLigne() . TblEnteteFin() . TblCorpsDebut();
+
+    function celluleFiltrable($libelle, $cle, $valeur, $alignement = '', $longueurMax = null)
+    {
+        global $pagination;
+        $url = $_SERVER['REQUEST_URI'];
+        $texte = $longueurMax ? limiteLongueur($libelle, $longueurMax) : $libelle;
+        
+        // On repart à la page 1 quand on change de filtre
+        $urlSansPage = $pagination->retirerParametreUrl("page");
+        $urlFiltre = $pagination->urlAjouteParam($urlSansPage, FILTRE . "=$cle&" . VAL_FILTRE . "=" . urlencode($valeur));
+        
+        return TblCellule(ancre($urlFiltre, $texte), 1, 1, $alignement);
     }
 
-    if (estAdmin()) {
-        $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages));
+    foreach ($resultatIds as $idChanson) {
+        $contenuHtml .= TblDebutLigne();
+        $_chanson->chercheChanson($idChanson);
+        $_id = $_chanson->getId();
+
+        if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
+            $_image = image($cheminImages . $iconeEdit, 32, 32);
+            $contenuHtml .= TblCellule(ancre("$chansonForm?id=" . $_id, $_image, -1, -1, "modifier la chanson"));
+        } else {
+            $contenuHtml .= TblCellule(" ");
+        }
+        
+        $nomImage = imageTableId(CHANSON, $_id);
+        $imagePochette = affichePochette($nomImage, $_id, 48, 48);
+        $contenuHtml .= TblCellule(ancre("$chansonVoir?id=$_id", $imagePochette));
+        $contenuHtml .= TblCellule(ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"), -1, -1, $_chanson->getNom()));
+        $contenuHtml .= celluleFiltrable($_chanson->getInterprete(), "interprete", $_chanson->getInterprete(), '', 21);
+
+        if ($largeur_ecran > 700) {
+            if (estAdmin()) {
+                $contenuHtml .= TblCellule(UtilisateurNote::starBar(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
+            } elseif (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
+                $contenuHtml .= TblCellule(UtilisateurNote::starBarUtilisateur(CHANSON, $_id, 5, 25), 1, 1, CENTRER);
+            }
+        }
+
+        if ($largeur_ecran > 700) $contenuHtml .= celluleFiltrable($_chanson->getAnnee(), "annee", $_chanson->getAnnee(), CENTRER);
+
+        if ($largeur_ecran > 1200) {
+            $contenuHtml .= celluleFiltrable($_chanson->getTempo(), "tempo", $_chanson->getTempo(), "alignerAdroite");
+            $contenuHtml .= celluleFiltrable($_chanson->getMesure(), "mesure", $_chanson->getMesure(), CENTRER);
+            $contenuHtml .= celluleFiltrable($_chanson->getPulsation(), "pulsation", $_chanson->getPulsation(), CENTRER);
+            $contenuHtml .= celluleFiltrable($_chanson->getTonalite(), "tonalite", $_chanson->getTonalite(), CENTRER);
+        }
+
+        if ($largeur_ecran > 700) {
+            $contenuHtml .= TblCellule(dateMysqlVersTexte($_chanson->getDatePub()));
+            $nomAuteur = chercheUtilisateur($_chanson->getIdUser());
+            $contenuHtml .= celluleFiltrable($nomAuteur[3], "contributeur", $_chanson->getIdUser(), CENTRER);
+            $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite");
+        }
+
+        if (estAdmin()) {
+            $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages));
+        }
+        $contenuHtml .= TblFinLigne();
     }
-    $contenuHtml .= TblFinLigne();
+
+    $contenuHtml .= TblCorpsFin() . TblFin();
 }
-
-$contenuHtml .= TblCorpsFin() . TblFin();
 
 // Affichage du compteur et de la pagination sur la même ligne
 $contenuHtml .= "<div style='margin: 20px 0;'>";
@@ -240,10 +277,6 @@ $contenuHtml .= "</div>";
 
 if ($nbreChansonsTotal == 0) {
     $contenuHtml .= "Pas de résultat ... <BR><a href='?razFiltres' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Supprimer les filtres et tris</a>\n";
-}
-
-if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
-    $contenuHtml .= "<BR><a href='$chansonForm' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Ajouter une chanson</a>\n";
 }
 
 $contenuHtml .= "</div></div>\n";
