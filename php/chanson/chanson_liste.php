@@ -115,9 +115,52 @@ $filtre = $_SESSION[FILTRE];
 $valeur_filtre = $_SESSION[VAL_FILTRE];
 
 if ($filtre <> "" && $valeur_filtre <> "") {
-    $contenuHtml .= "<div class='alert alert-info' role='alert' style='margin: 10px auto; width: 300px; padding: 10px; position: relative;'>
-        <a href='?razFiltres' style='float: right; margin-top: -5px; font-size: 24px; text-decoration: none; color: #31708f; line-height: 1;'>&times;</a>
-        Filtre actif : <strong>" . htmlspecialchars($filtre) . "</strong> = <strong>" . htmlspecialchars($valeur_filtre) . "</strong>
+    $valPlus = $valeur_filtre;
+    $valMoins = $valeur_filtre;
+    $showButtons = false;
+
+    if ($filtre == "annee" || $filtre == "tempo") {
+        $valPlus = (int)$valeur_filtre + 1;
+        $valMoins = (int)$valeur_filtre - 1;
+        $showButtons = true;
+    } elseif ($filtre == "tonalite") {
+        $isMinor = (substr($valeur_filtre, -1) == 'm');
+        $root = $isMinor ? substr($valeur_filtre, 0, -1) : $valeur_filtre;
+        
+        $chromatic = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        $mapFlats = ['Db'=>'C#', 'Eb'=>'D#', 'Gb'=>'F#', 'Ab'=>'G#', 'Bb'=>'A#'];
+        $reverseMap = ['C#'=>'C#', 'D#'=>'D#', 'F#'=>'F#', 'G#'=>'G#', 'A#'=>'A#'];
+        
+        // On normalise vers les dièses pour le calcul
+        $lookupRoot = $mapFlats[$root] ?? $root;
+        $idx = array_search($lookupRoot, $chromatic);
+        
+        if ($idx !== false) {
+            $idxNext = ($idx + 1) % 12;
+            $idxPrev = ($idx + 11) % 12;
+            $valPlus = $chromatic[$idxNext] . ($isMinor ? 'm' : '');
+            $valMoins = $chromatic[$idxPrev] . ($isMinor ? 'm' : '');
+            $showButtons = true;
+        }
+    }
+
+    $contenuHtml .= "<div class='alert alert-info' role='alert' style='margin: 10px auto; width: 380px; padding: 10px; position: relative; display: flex; align-items: center; justify-content: center;'>";
+    
+    if ($showButtons) {
+        $urlMoins = "?filtre=$filtre&valFiltre=" . urlencode($valMoins);
+        $urlPlus = "?filtre=$filtre&valFiltre=" . urlencode($valPlus);
+        $contenuHtml .= "
+        <div class='btn-group btn-group-xs' style='margin-right: 15px;'>
+            <a href='$urlMoins' class='btn btn-default' title='Diminuer' style='padding: 2px 8px; border-radius: 10px 0 0 10px;'><i class='glyphicon glyphicon-minus'></i></a>
+            <a href='$urlPlus' class='btn btn-default' title='Augmenter' style='padding: 2px 8px; border-radius: 0 10px 10px 0;'><i class='glyphicon glyphicon-plus'></i></a>
+        </div>";
+    }
+
+    $contenuHtml .= "
+        <div style='flex-grow: 1; text-align: center;'>
+            Filtre : <strong>" . htmlspecialchars($filtre) . "</strong> = <strong>" . htmlspecialchars($valeur_filtre) . "</strong>
+        </div>
+        <a href='?razFiltres' style='text-decoration: none; color: #31708f; font-size: 24px; line-height: 1; margin-left: 10px;'>&times;</a>
     </div>";
 }
 

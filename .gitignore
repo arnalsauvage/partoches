@@ -23,3 +23,7 @@ conf/params.ini
 /html/diagrammes/diagrammes.js
 /html/diagrammes/pageAccords.htm
 /html/diagrammes/style.css
+*.sql
+temp_*.php
+php/api/tunebat_scraper.php
+merci.html

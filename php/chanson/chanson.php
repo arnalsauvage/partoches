@@ -546,6 +546,14 @@ class Chanson
             
             if ($champFiltre == "contributeur") {
                 $maRequete .= " chanson.iduser =  " . $valEscaped;
+            } elseif ($champFiltre == "tonalite") {
+                $equivalents = self::getTonaliteEquivalents($valfiltre);
+                $conditions = [];
+                foreach ($equivalents as $eq) {
+                    $eqEscaped = $_SESSION[self::MYSQL]->real_escape_string($eq);
+                    $conditions[] = "chanson.tonalite = '$eqEscaped'";
+                }
+                $maRequete .= "(" . implode(" OR ", $conditions) . ")";
             } elseif ($champFiltre == "tempo_famille") {
                 $maRequete .= match ($valEscaped) {
                     "Largo" => " chanson.tempo < 60",
@@ -616,6 +624,14 @@ class Chanson
 
             if ($champFiltre == "contributeur") {
                 $maRequete .= " chanson.iduser =  " . $valEscaped;
+            } elseif ($champFiltre == "tonalite") {
+                $equivalents = self::getTonaliteEquivalents($valfiltre);
+                $conditions = [];
+                foreach ($equivalents as $eq) {
+                    $eqEscaped = $_SESSION[self::MYSQL]->real_escape_string($eq);
+                    $conditions[] = "chanson.tonalite = '$eqEscaped'";
+                }
+                $maRequete .= "(" . implode(" OR ", $conditions) . ")";
             } elseif ($champFiltre == "tempo_famille") {
                 $maRequete .= match ($valEscaped) {
                     "Largo" => " chanson.tempo < 60",
@@ -663,8 +679,38 @@ class Chanson
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheLiensChanson #1 : " . $_SESSION [self::MYSQL]->error);
         return $result;
     }
-// Fonction pour normaliser les chaînes de caractères
-    public
+/**
+ * Retourne les tonalités équivalentes (enharmoniques et majeur/mineur)
+ * @param string $tonalite
+ * @return array
+ */
+public static function getTonaliteEquivalents(string $tonalite): array
+{
+    $isMinor = (substr($tonalite, -1) == 'm');
+    $root = $isMinor ? substr($tonalite, 0, -1) : $tonalite;
+
+    $map = [
+        'A#' => 'Bb', 'Bb' => 'A#',
+        'C#' => 'Db', 'Db' => 'C#',
+        'D#' => 'Eb', 'Eb' => 'D#',
+        'F#' => 'Gb', 'Gb' => 'F#',
+        'G#' => 'Ab', 'Ab' => 'G#',
+        'B#' => 'C',  'C'  => 'B#',
+        'E#' => 'F',  'F'  => 'E#',
+        'Cb' => 'B',  'B'  => 'Cb',
+        'Fb' => 'E',  'E'  => 'Fb'
+    ];
+
+    $suffix = $isMinor ? 'm' : '';
+    $equivalents = [$root . $suffix];
+
+    if (isset($map[$root])) {
+        $equivalents[] = $map[$root] . $suffix;
+    }
+
+    return array_unique($equivalents);
+}
+// Fonction pour normaliser les chaînes de caractères    public
     static function normalize($string)
     {
         $string = strtolower($string); // Convertir en minuscules
