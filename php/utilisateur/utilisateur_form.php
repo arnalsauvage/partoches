@@ -36,7 +36,7 @@ if (isset ($_GET ['id']) && $_GET ['id'] != "") {
 }
 
 if ($mode == "MAJ"){
-    $sortie .= "<H1> Mise à jour - " . $table . "</H1>";
+    $sortie .= "<H1> Mise à jour - " . $table . " : " . $donnee[1] . "</H1>";
 }
 else
 {
@@ -49,8 +49,21 @@ else
         return;
     }
 }
-// Création du formulaire
-$f = new Formulaire ("POST", $table . "_get.php", $sortie);
+
+// --- STRUCTURE DES ONGLETS BOOTSTRAP ---
+$sortie .= "
+<ul class='nav nav-tabs' role='tablist' style='margin-bottom: 20px;'>
+    <li role='presentation' class='active'><a href='#general' aria-controls='general' role='tab' data-toggle='tab'>Général</a></li>
+    " . ($mode == 'MAJ' ? "<li role='presentation'><a href='#publications' aria-controls='publications' role='tab' data-toggle='tab'>Publications</a></li>" : "") . "
+</ul>
+
+<div class='tab-content'>
+    <!-- ONGLET GÉNÉRAL -->
+    <div role='tabpanel' class='tab-pane active' id='general'>";
+
+// Création du formulaire (Contenu actuel)
+$dummy = "";
+$f = new Formulaire ("POST", $table . "_get.php", $dummy);
 $f->champCache("id", $donnee [0]);
 $listeImages = listeImages("/utilisateur");
 $f->champListeImages("Image : ", "fimage", str_replace("/utilisateur/", "", $donnee [5]), 1, $listeImages);
@@ -74,7 +87,35 @@ $f->champListe("Privileges :", "fprivilege", $donnee [11], 1, $pListe);
 
 $f->champCache("mode", $mode);
 $f->champValider("Valider la saisie", "valider");
-$sortie .= $f->fin();
+$sortie .= $f->getHtml(); // On ne fait PLUS .= $f->fin() ici car fin() retourne tout le HTML accumulé !
+// On va juste fermer la balise FORM manuellement pour éviter le doublement.
+$sortie .= "</FORM>";
+
+// Messages Toastr
+if (isset($_GET['msg'])) {
+    $msg = $_GET['msg'];
+    $script = "<script>$(function() { toastr.options = { 'positionClass': 'toast-top-center', 'closeButton': true };";
+    
+    if ($msg == 'depub_ok') {
+        $script .= "toastr.success('Toutes les partoches de cet utilisateur ont été dépubliées.');";
+    } elseif ($msg == 'error_rights') {
+        $script .= "toastr.error('Erreur : Vous n\'avez pas les droits nécessaires.');";
+    } elseif ($msg == 'error_db') {
+        $script .= "toastr.error('Erreur lors de la mise à jour en base de données.');";
+    }
+    
+    $script .= "});</script>";
+    $sortie .= $script;
+}
+
+// Bouton Admin pour dépublier toutes les chansons d'un utilisateur
+if (estAdmin() && $donnee[0] > 0) {
+    $sortie .= "<div style='margin-top: 20px; padding: 15px; border: 1px solid #d9534f; border-radius: 8px; background-color: #f9f2f2;'>";
+    $sortie .= "  <h4 style='color: #d9534f; margin-top: 0;'>Actions d'administration</h4>";
+    $sortie .= "  <p>Voulez-vous masquer toutes les chansons publiées par cet utilisateur ?</p>";
+    $sortie .= "  <a href='../chanson/chanson_depublier_tout.php?idUser=" . $donnee[0] . "' class='btn btn-danger' onclick='return confirm(\"Voulez-vous vraiment dépublier TOUTES les chansons de cet utilisateur ?\")'>Dépublier toutes les partoches</a>";
+    $sortie .= "</div>";
+}
 
 $sortie .= "<h2>Envoyer une image sur le serveur</h2>
 	<form action='utilisateur_upload.php' method='post'
@@ -84,6 +125,114 @@ $sortie .= "<h2>Envoyer une image sur le serveur</h2>
 		<label	class='inline' for='fichier'> </label> <input type='file' id='fichier'
 														  name='fichierUploade' size='40'> <input type='submit' value='Envoyer'>
 	</form>";
+
+$sortie .= "</div> <!-- Fin Tab Général -->";
+
+if ($mode == 'MAJ') {
+    // ONGLET PUBLICATIONS
+    $sortie .= "<div role='tabpanel' class='tab-pane' id='publications' style='padding-top: 20px;'>";
+    $sortie .= "<h3>Chansons de cet utilisateur</h3>";
+    
+    require_once("../chanson/chanson.php");
+    $db = $_SESSION['mysql'];
+    $idUser = $donnee[0];
+    $reqChansons = "SELECT id, nom, interprete, publication FROM chanson WHERE idUser = $idUser ORDER BY nom ASC";
+    $resChansons = $db->query($reqChansons);
+    
+    if ($resChansons && $resChansons->num_rows > 0) {
+        $sortie .= "<div class='row'>";
+        while ($c = $resChansons->fetch_assoc()) {
+            $idC = $c['id'];
+            $nomImage = imageTableId("chanson", $idC);
+            
+            // Utilisation de la vignette légère via la fonction dédiée
+            if ($nomImage != "") {
+                require_once("../lib/vignette.php");
+                $largeur_max_vignette = 64;
+                $hauteur_max_vignette = 64;
+                $cheminImagesChanson = "../../data/chansons/" . $idC . "/";
+                $cheminDesVignettes = "../../vignettes/";
+                $pochette = afficheVignette($nomImage, $cheminImagesChanson, $cheminDesVignettes, "pochette");
+                // On s'assure que l'image a les bonnes dimensions CSS
+                $pochette = str_replace("<img ", "<img style='width:64px; height:64px; object-fit:cover;' class='img-rounded' ", $pochette);
+            } else {
+                $pochette = "<div class='text-center img-rounded' style='width:64px; height:64px; display:flex; align-items:center; justify-content:center; background:#f5f5f5; border:1px solid #ddd;'>
+                                <span class='glyphicon glyphicon-cd' style='font-size:32px; color:#ccc;'></span>
+                             </div>";
+            }
+            
+            $styleBrouillon = ($c['publication'] == 0) ? "border-left: 5px solid #d9534f; background-color: #f9f2f2;" : "";
+            $badgeBrouillon = ($c['publication'] == 0) ? " <span id='badge-$idC' class='label label-danger'>BROUILLON</span>" : " <span id='badge-$idC' class='label label-danger' style='display:none;'>BROUILLON</span>";
+            $checked = ($c['publication'] == 1) ? "checked" : "";
+            
+            $sortie .= "
+            <div class='col-sm-6 col-md-4' style='margin-bottom: 10px;'>
+                <div id='card-$idC' class='media' style='padding: 10px; border: 1px solid #ddd; border-radius: 8px; min-height: 100px; $styleBrouillon'>
+                    <div class='media-left'>
+                        <a href='../chanson/chanson_voir.php?id=$idC'>$pochette</a>
+                    </div>
+                    <div class='media-body'>
+                        <h4 class='media-heading' style='font-size: 14px; font-weight: bold;'>
+                            <a href='../chanson/chanson_voir.php?id=$idC'>" . htmlspecialchars($c['nom']) . "</a>$badgeBrouillon
+                        </h4>
+                        <p style='font-size: 12px; color: #666; margin: 0;'>" . htmlspecialchars($c['interprete']) . "</p>
+                        <div style='margin-top: 5px;'>
+                            <label style='font-size: 11px; font-weight: normal; cursor: pointer;'>
+                                <input type='checkbox' class='pub-toggle' data-id='$idC' $checked> Publié
+                            </label>
+                            <a href='../chanson/chanson_form.php?id=$idC' class='btn btn-xs btn-default' style='margin-left: 10px;'><i class='glyphicon glyphicon-pencil'></i> Éditer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>";
+        }
+        $sortie .= "</div>";
+        
+        // Script Ajax pour la bascule
+        $sortie .= "
+        <script>
+        $(function() {
+            $('.pub-toggle').on('change', function() {
+                var checkbox = $(this);
+                var id = checkbox.data('id');
+                var isPublished = checkbox.is(':checked') ? 1 : 0;
+                
+                $.ajax({
+                    url: '../chanson/chanson_publication_ajax.php',
+                    method: 'POST',
+                    data: { id: id, publication: isPublished },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            toastr.success('Visibilité mise à jour !');
+                            if (isPublished) {
+                                $('#badge-' + id).hide();
+                                $('#card-' + id).css({'border-left': '1px solid #ddd', 'background-color': 'transparent'});
+                            } else {
+                                $('#badge-' + id).show();
+                                $('#card-' + id).css({'border-left': '5px solid #d9534f', 'background-color': '#f9f2f2'});
+                            }
+                        } else {
+                            toastr.error('Erreur : ' + response.message);
+                            checkbox.prop('checked', !isPublished); // Reset
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Erreur réseau.');
+                        checkbox.prop('checked', !isPublished); // Reset
+                    }
+                });
+            });
+        });
+        </script>";
+    } else {
+        $sortie .= "<p class='text-muted'>Aucune chanson publiée par cet utilisateur.</p>";
+    }
+    
+    $sortie .= "</div> <!-- Fin Tab Publications -->";
+}
+
+$sortie .= "</div> <!-- Fin Tab Content -->";
 
 // Si l'utilisateur n'est pas Admin
 if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {

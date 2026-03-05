@@ -709,9 +709,18 @@ class Chanson
         $urlTempo = "?filtre=tempo&valFiltre=" . urlencode($tempo);
         $urlTonalite = "?filtre=tonalite&valFiltre=" . urlencode($tonalite);
 
+        // Badge Non Publié (visible pour admin et auteur)
+        $badgeNonPublie = "";
+        if ($this->getPublication() == 0) {
+            if (estAdmin() || (isset($_SESSION['id']) && $_SESSION['id'] == $this->getIdUser())) {
+                $badgeNonPublie = "<div style='position: absolute; top: 10px; left: 10px; z-index: 10; background-color: #d9534f; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; text-transform: uppercase;'>Brouillon</div>";
+            }
+        }
+
         $html = "
         <div class='col-sm-6 col-md-4 col-lg-3' style='margin-bottom: 25px;'>
-            <div class='thumbnail shadow-hover' style='height: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; padding: 0; border: 1px solid $c_marron_clair; background-color: $c_marron_fonce;'>
+            <div class='thumbnail shadow-hover' style='height: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; padding: 0; border: 1px solid $c_marron_clair; background-color: $c_marron_fonce; position: relative;'>
+                $badgeNonPublie
                 <a href='chanson_voir.php?id=$_id' style='text-decoration: none;'>
                     <div style='height: 180px; overflow: hidden; background-color: $c_marron_clair; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid $c_accent;'>
                         $imagePochette

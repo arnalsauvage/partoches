@@ -117,6 +117,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
     }
 
     // on verifie que l'image source ne soit pas plus petite que l'image de destination
+    $ratio = 1;
     if ($hauteur_max_vignette=="") {
         $ratio = $largeur_src / $largeur_max_vignette;
         $hauteur = round ( $hauteur_src / $ratio);
@@ -132,7 +133,7 @@ function creation_vignette($image, $largeur = "", $hauteur = "", $source = "", $
     $image_dest = imagecreatetruecolor($largeur, $hauteur);
     imagecopyresized($image_dest, $image_src, 0, 0, 0, 0, $largeur, $hauteur, $largeur_src, $hauteur_src);
 
-    $log = "vignette.php Image : $image, largeur : " . round($largeur_src * $ratio) . ", $hauteur : " . round($hauteur_src * $ratio) . ", source : $source, destination : $destination";
+    $log = "vignette.php Image : $image, largeur_src : $largeur_src, hauteur_src : $hauteur_src, largeur_vignette : $largeur, hauteur_vignette : $hauteur, source : $source, destination : $destination";
     // ecritFichierLog(LOGS_FICHIERLOG_HTM, $log);
     if (!imagejpeg($image_dest, $destination . $prefixe . $image)) {
         $log = "la création de la vignette a echoué pour l'image $destination$prefixe$image";

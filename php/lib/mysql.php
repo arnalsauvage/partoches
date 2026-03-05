@@ -5,9 +5,13 @@
 // - JJ/MM si mode = 1
 function dateMysqlVersTexte($dateMysql, $mode = 0)
 {
+    if (!$dateMysql || $dateMysql == "0000-00-00") {
+        return "";
+    }
     $an = substr($dateMysql, 0, 4);
     $mois = substr($dateMysql, 5, 2);
     $jour = substr($dateMysql, 8, 2);
+    $retour = "";
     if ($mode == 0)
         $retour = $jour . "/" . $mois . "/" . "$an";
     if ($mode == 1)

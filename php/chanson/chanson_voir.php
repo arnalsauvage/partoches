@@ -33,6 +33,15 @@ if (empty($_GET['id']) || !is_numeric($_GET['id'])) {
 $idChanson = (int)$_GET['id'];
 $_chanson = new Chanson($idChanson);
 
+// --- SÉCURITÉ PUBLICATION ---
+// Si la chanson n'est pas publiée, seuls l'admin et l'auteur peuvent la voir
+if ($_chanson->getPublication() == 0 && !estAdmin()) {
+    if (!isset($_SESSION['id']) || $_SESSION['id'] != $_chanson->getIdUser()) {
+        header('Location: chanson_liste.php');
+        exit();
+    }
+}
+
 // Augmenter le compteur de vues
 augmenteHits(CHANSON, $idChanson);
 
