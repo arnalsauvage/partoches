@@ -1,6 +1,10 @@
 <?php
-const IMAGES = "../../images";
-const ICONES = IMAGES . "/icones/";
+if (!defined('IMAGES')) {
+    define('IMAGES', "../../images");
+}
+if (!defined('ICONES')) {
+    define('ICONES', IMAGES . "/icones/");
+}
 
 $a = session_id();
 if (empty ($a)) {

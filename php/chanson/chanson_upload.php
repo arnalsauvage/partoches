@@ -98,8 +98,9 @@ function handleFileUpload()
     }
 
     // Si le fichier est pour mise à jour, on recherche son nom dans la bdd d'après son id
-    if ($_POST['oldFile'] !== null && $_POST['oldFile'] !== 0) {
-        $doc = chercheDocument($_POST['oldFile']);
+    $oldFileId = $_POST['oldFile'] ?? 0;
+    if ($oldFileId > 0) {
+        $doc = chercheDocument($oldFileId);
         $name_file = $doc[1];
     } else {
         // Simplification du nom de fichier

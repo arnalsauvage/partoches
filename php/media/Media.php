@@ -183,7 +183,7 @@ class Media
     // Méthode pour créer ou modifier un média en BDD
     public function persist()
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
+        $this->checkDbConnection();
         $idExistant = self::verifieExistenceMedia($this->_lien);
         if ($idExistant !== null) {
             $this->setId($idExistant);
@@ -195,7 +195,6 @@ class Media
 
     private static function verifieExistenceMedia(string $lienurl): ?int
     {
-        // Étant une méthode statique, elle doit aussi s'assurer de la connexion
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
             require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
         }
@@ -209,177 +208,124 @@ class Media
         return null;
     }
 
-    // Crée un média et renvoie l'id du média créé
     private function creeMediaBDD(): bool|int
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        // Conversion de la date au format MySQL avant l'insertion
-        // Bug ? Doublon ?
-        $this->_titre = $_SESSION[self::MYSQL]->real_escape_string($this->_titre);
-        $this->_image = $_SESSION[self::MYSQL]->real_escape_string($this->_image);
-        $this->_lien = $_SESSION[self::MYSQL]->real_escape_string($this->_lien);
-        $this->_description = $_SESSION[self::MYSQL]->real_escape_string($this->_description);
-        $this->_tags = $_SESSION[self::MYSQL]->real_escape_string($this->_tags);
-        $this->_datePub = $_SESSION[self::MYSQL]->real_escape_string($this->_datePub);
-        $maRequete = sprintf("INSERT INTO media (id, type, titre, image, auteur, lien, description, tags, datePub, hits)
-            VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
-            $this->_type,
-            $this->_titre,
-            $this->_image,
-            $this->_auteur,
-            $this->_lien,
-            $this->_description,
-            $this->_tags,
-            $this->_datePub,
-            $this->_hits);
+        $this->checkDbConnection();
+        $db = $_SESSION[self::MYSQL];
+        $maRequete = sprintf("INSERT INTO media (type, titre, image, auteur, lien, description, tags, datePub, hits)
+            VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+            $db->real_escape_string($this->_type),
+            $db->real_escape_string($this->_titre),
+            $db->real_escape_string($this->_image),
+            $db->real_escape_string((string)$this->_auteur),
+            $db->real_escape_string($this->_lien),
+            $db->real_escape_string($this->_description),
+            $db->real_escape_string($this->_tags),
+            $db->real_escape_string($this->_datePub),
+            $db->real_escape_string((string)$this->_hits));
 
-        $result = $_SESSION[self::MYSQL]->query($maRequete);
+        $result = $db->query($maRequete);
         if (!$result) {
-            $this->_lastError = $_SESSION[self::MYSQL]->error;
-            return false; // Erreur lors de l'insertion
+            $this->_lastError = $db->error;
+            return false;
         }
 
-
-        $this->setId($_SESSION[self::MYSQL]->insert_id);
+        $this->setId($db->insert_id);
         return $this->getId();
     }
 
     private function modifieMediaBDD() : bool
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        // Échappement des chaînes
-        $this->_titre = $_SESSION[self::MYSQL]->real_escape_string($this->_titre);
-        $this->_image = $_SESSION[self::MYSQL]->real_escape_string($this->_image);
-        $this->_lien = $_SESSION[self::MYSQL]->real_escape_string($this->_lien);
-        $this->_description = $_SESSION[self::MYSQL]->real_escape_string($this->_description);
-        $this->_tags = $_SESSION[self::MYSQL]->real_escape_string($this->_tags);
-
-        $id = (int)$this->getId();
-
+        $this->checkDbConnection();
+        $db = $_SESSION[self::MYSQL];
         $maRequete = sprintf(
             "UPDATE media SET type='%s', titre='%s', image='%s', auteur='%s', lien='%s', description='%s', tags='%s', datePub='%s', hits='%s' WHERE id=%d",
-            $this->_type,
-            $this->_titre,
-            $this->_image,
-            $this->_auteur,
-            $this->_lien,
-            $this->_description,
-            $this->_tags,
-            $this->_datePub,
-            $this->_hits,
-            $id
+            $db->real_escape_string($this->_type),
+            $db->real_escape_string($this->_titre),
+            $db->real_escape_string($this->_image),
+            $db->real_escape_string((string)$this->_auteur),
+            $db->real_escape_string($this->_lien),
+            $db->real_escape_string($this->_description),
+            $db->real_escape_string($this->_tags),
+            $db->real_escape_string($this->_datePub),
+            $db->real_escape_string((string)$this->_hits),
+            (int)$this->getId()
         );
 
-        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans modifieMediaBDD : " . $_SESSION[self::MYSQL]->error);
-
-        return $result; // true si ok, false sinon
+        return $db->query($maRequete);
     }
 
-
-    // Supprime un média si il existe
     public function supprimeMediaBDD()
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        $maRequete = "DELETE FROM media WHERE id = '" . $this->getId() . "'";
-        $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans supprimeMediaBDD : " . $_SESSION[self::MYSQL]->error);
+        $this->checkDbConnection();
+        $maRequete = "DELETE FROM media WHERE id = " . (int)$this->getId();
+        $_SESSION[self::MYSQL]->query($maRequete);
     }
 
-    // Renvoie une chaîne de description du média
     public function infosMedia(): string
     {
-        return "Id : " . $this->_id . " Type : " . $this->_type . " Titre : " . $this->_titre .
-            " Image : " . $this->_image . " Auteur : " . $this->_auteur .
-            " Lien : " . $this->_lien . " Description : " . $this->_description .
-            " Tags : " . $this->_tags . " Date de publication : " . $this->_datePub .
-            " Hits : " . $this->_hits . "<br>\n";
+        return "Id : " . $this->_id . " Titre : " . $this->_titre . "<br>\n";
     }
 
-    // Cherche un média par ID
     public function chercheMedia($id): int
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        $maRequete = sprintf("SELECT * FROM media WHERE id = '%s'", $id);
-        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans chercheMedia : " . $_SESSION[self::MYSQL]->error);
+        $this->checkDbConnection();
+        $maRequete = sprintf("SELECT * FROM media WHERE id = %d", (int)$id);
+        $result = $_SESSION[self::MYSQL]->query($maRequete);
         if ($ligne = $result->fetch_row()) {
             $this->mysqlRowVersObjet($ligne);
             return 1;
-        } else {
-            return 0;
         }
+        return 0;
     }
 
-    // Charge une ligne MySQL vers un objet
     private function mysqlRowVersObjet($ligne)
     {
-        $this->_id = $ligne[0];
-        $this->_type = $ligne[1];
-        $this->_titre = $ligne[2];
-        $this->_image = $ligne[3];
-        $this->_auteur = $ligne[4];
-        $this->_lien = $ligne[5];
-        $this->_description = $ligne[6];
-        $this->_tags = $ligne[7];
-        $this->_datePub = $ligne[8];
-        $this->_hits = $ligne[9];
+        $this->_id = (int)$ligne[0];
+        $this->_type = (string)$ligne[1];
+        $this->_titre = (string)$ligne[2];
+        $this->_image = (string)$ligne[3];
+        $this->_auteur = (int)$ligne[4];
+        $this->_lien = (string)$ligne[5];
+        $this->_description = (string)$ligne[6];
+        $this->_tags = (string)$ligne[7];
+        $this->_datePub = (string)$ligne[8];
+        $this->_hits = (int)$ligne[9];
     }
 
-    // Cherche des médias par type
     public static function chercheMediasParType($type): array
     {
-        // Pour une méthode statique, il faut s'assurer que la connexion est active
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
             require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
         }
-        $type = $_SESSION[self::MYSQL]->real_escape_string($type);
+        $db = $_SESSION[self::MYSQL];
+        $type = $db->real_escape_string($type);
         $maRequete = "SELECT id FROM media WHERE type = '$type'";
-        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans chercheMediasParType : " . $_SESSION[self::MYSQL]->error);
+        $result = $db->query($maRequete);
         $tableau = [];
-        while ($idMedia = $result->fetch_row()) {
-            array_push($tableau, $idMedia[0]);
+        while ($row = $result->fetch_row()) {
+            $tableau[] = $row[0];
         }
         return $tableau;
     }
 
-    // Cherche tos les medias
     public static function chercheTousLesMedias(): array
     {
-        // Pour une méthode statique, il faut s'assurer que la connexion est active
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
             require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
         }
         $maRequete = "SELECT id FROM media ORDER BY datePub DESC";
-        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans chercheMediasParType : " . $_SESSION[self::MYSQL]->error);
+        $result = $_SESSION[self::MYSQL]->query($maRequete);
         $tableau = [];
-        while ($idMedia = $result->fetch_row()) {
-            array_push($tableau, $idMedia[0]);
-        }
-        return $tableau;
-    }
-
-    // Cherche des médias par titre
-    public static function chercheMediasParTitre($titre): array
-    {
-        // Pour une méthode statique, il faut s'assurer que la connexion est active
-        if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
-        }
-        $titre = $_SESSION[self::MYSQL]->real_escape_string($titre);
-        $maRequete = "SELECT id FROM media WHERE titre LIKE '%$titre%'";
-        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans chercheMediasParTitre : " . $_SESSION[self::MYSQL]->error);
-        $tableau = [];
-        while ($idMedia = $result->fetch_row()) {
-            array_push($tableau, $idMedia[0]);
+        while ($row = $result->fetch_row()) {
+            $tableau[] = $row[0];
         }
         return $tableau;
     }
 
     public static function normalize($string): string
     {
-        // Convertir en minuscules
         $string = mb_strtolower($string);
-        echo $string;
-
-        // Remplacer les caractères accentués par leurs équivalents non accentués
         $string = preg_replace('/[áàâãäå]/u', 'a', $string);
         $string = preg_replace('/[éèêë]/u', 'e', $string);
         $string = preg_replace('/[íìîï]/u', 'i', $string);
@@ -388,50 +334,19 @@ class Media
         $string = preg_replace('/[ýÿ]/u', 'y', $string);
         $string = preg_replace('/ç/u', 'c', $string);
         $string = preg_replace('/ñ/u', 'n', $string);
-
-        // Supprimer les caractères non alphanumériques (sauf les espaces)
         $string = preg_replace('/[^a-z0-9\s]/', ' ', $string);
-
-        // Réduire les espaces multiples à un seul espace
         $string = preg_replace('/\s+/', ' ', $string);
-
-        // Supprimer les espaces au début et à la fin
         return trim($string);
-    }
-
-    public static function moteurRecherche($recherche): string
-    {
-        // Pour une méthode statique, il faut s'assurer que la connexion est active
-        if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
-        }
-        $rechercheNormalisee = self::normalize($recherche);
-        $maRequete = "SELECT id, titre FROM media WHERE titre LIKE '%$rechercheNormalisee%'";
-        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème dans moteurRecherche : " . $_SESSION[self::MYSQL]->error);
-
-        $retour = "";
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $retour .= "Titre: " . $row["titre"] . " - ID: " . $row["id"] . "<br>\n";
-            }
-        } else {
-            $retour = "0 résultats";
-        }
-        return $retour;
     }
 
     public function chercheNdernieresPartoches($nombrePartoches = 100): void
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
+        $this->checkDbConnection();
         $compteur = 0;
-        // lance la requete cherche documents avec tableNom = chanson
         $documents = chercheDocuments("nomTable", "chanson", "date", false);
-        while ($compteur < $nombrePartoches) {
-            $document = $documents->fetch_row();
-            // On ne garde que les documents de type partoche
-            if (str_ends_with($document[1], ".pdf")) {
+        while ($compteur < $nombrePartoches && $document = $documents->fetch_row()) {
+            if (str_ends_with(strtolower($document[1]), ".pdf")) {
                 $this->ajoutePartoche($document[0]);
-                // TODO n'ajouter le media que de la dernière version du doc !
                 $compteur++;
             }
         }
@@ -439,259 +354,98 @@ class Media
 
     public function chercheNdernieresVideos($nombreVideos = 50): void
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
+        $this->checkDbConnection();
         $compteur = 0;
-        // lance la requete cherche documents avec tableNom = chanson
         $nderniersLiens = chercheNderniersLiens("vidéo");
-        while ($compteur < $nombreVideos) {
-            $liensUrl = $nderniersLiens->fetch_row();
-
+        while ($compteur < $nombreVideos && $liensUrl = $nderniersLiens->fetch_row()) {
             $this->ajouteLienurl($liensUrl[0]);
-            // TODO n'ajouter le media que de la dernière version du doc !
             $compteur++;
         }
     }
 
-    public
-    function transformePartocheEnMedia($idDocPartoche): void
+    public function transformePartocheEnMedia($idDocPartoche): void
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        // partant de l'id du document de partoche, on cherche la chanson
+        $this->checkDbConnection();
         $document = chercheDocument($idDocPartoche);
         $idChanson = $document[6];
-
-        $chanson = new Chanson();
-        $chanson->chercheChanson($idChanson);
+        $chanson = new Chanson($idChanson);
+        
         $this->setTitre($chanson->getNom());
         $this->setDescription("Partoche pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
-        $this->setAuteur($document[7]); // Identifiant de l'utilisateur
-        $this->setDatePub($document[3]); // Date de publication du document
+        $this->setAuteur((int)$document[7]);
+        $this->setDatePub($document[3]);
         $this->setType("partoche");
         $this->setTags("partoche " . $chanson->getAnnee());
-
         $this->setImage("./data/chansons/$idChanson/" . rawurlencode(imageTableId(self::TABLE_CHANSON, $idChanson)));
         $this->setLien("./php/document/" . lienUrlTelechargeDocument($idDocPartoche));
     }
 
-    public
-    function transformeLienUrlEnMedia($idLienurl): void
+    public function transformeLienUrlEnMedia($idLienurl): void
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        // partant de l'id du document de partoche, on cherche la chanson
+        $this->checkDbConnection();
         $lienUrl = chercheLienurlId($idLienurl);
         $idChanson = $lienUrl[2];
-        echo $lienUrl;
-        var_dump($lienUrl);
-        $chanson = new Chanson();
-        $chanson->chercheChanson($idChanson);
+        $chanson = new Chanson($idChanson);
+        
         $this->setTitre($chanson->getNom());
         $this->setDescription("Vidéo pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
-        $this->setAuteur(intval($lienUrl[7])); // Identifiant de l'utilisateur
-        $this->setDatePub($lienUrl[6]); // Date de publication du document
-        $this->setType($lienUrl[4]);
+        $this->setAuteur((int)($lienUrl[7] ?? 1));
+        $this->setDatePub($lienUrl[6]);
+        $this->setType((string)$lienUrl[4]);
         $this->setTags($lienUrl[4] . " " . $chanson->getAnnee());
-
         $this->setImage("./data/chansons/$idChanson/" . rawurlencode(imageTableId(self::TABLE_CHANSON, $idChanson)));
-        $this->setLien($lienUrl[3]);
+        $this->setLien((string)$lienUrl[3]);
     }
 
-// Ajoute une partoche par l'id de son document rattaché à la chanson
-    public
-    function ajoutePartoche($idPartoche): void
+    public function ajoutePartoche($idPartoche): void
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        // Transformer la partoche en média
-        $this->transformePartocheEnMedia($idPartoche); // Méthode fictive pour transformer
-        $this->persist(); // Utilisation de la méthode existante pour créer le média
+        $this->checkDbConnection();
+        $this->transformePartocheEnMedia($idPartoche);
+        $this->persist();
     }
 
-// Ajoute ue vidéo par l'id de son lienurl rattaché
-    public
-    function ajouteLienurl($idPartoche): void
+    public function ajouteLienurl($idPartoche): void
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        // Transformer le lien url en média
-        $this->transformeLienUrlEnMedia($idPartoche); // Méthode fictive pour transformer
-        $this->persist(); // Utilisation de la méthode existante pour créer le média
+        $this->checkDbConnection();
+        $this->transformeLienUrlEnMedia($idPartoche);
+        $this->persist();
     }
 
-
-    public
-    function resetAvecDernieresPartoches(int $nb = 50) :bool
+    public function resetAvecDernieresPartoches(int $nb = 50) :bool
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        // Suppression de toutes les entrées
-        $deleteQuery = "DELETE  FROM media";
-        $resultDelete = $_SESSION[self::MYSQL]->query($deleteQuery);
-        if (!$resultDelete) {
-            die("Erreur lors de la suppression des médias : " . $_SESSION[self::MYSQL]->error);
-        }
-
-        // Création des $nb dernières partoches
+        $this->checkDbConnection();
         $this->chercheNdernieresPartoches($nb);
         return true;
     }
 
-    public
-    function resetAvecDernieresVideos(int $nb = 50) :bool
+    public function resetAvecDernieresVideos(int $nb = 50) :bool
     {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        // Suppression de toutes les entrées
-        $deleteQuery = "DELETE FROM media WHERE type LIKE 'video' COLLATE utf8mb4_general_ci";
-        $resultDelete = $_SESSION[self::MYSQL]->query($deleteQuery);
-        if (!$resultDelete) {
-            die("Erreur lors de la suppression des médias vidéos : " . $_SESSION[self::MYSQL]->error);
-        }
-
-        // Création des $nb dernières videos
+        $this->checkDbConnection();
         $this->chercheNdernieresVideos($nb);
         return true;
     }
 
-    public function afficheComposantMedia(): string
+    public function resetMediaTable(int $totalMedias = 50): void
     {
-        $data = $this->prepareData();
-        
-        $songLinkHtml = '';
-        if (!empty($data['id_chanson'])) {
-            // Utilisation des classes Bootstrap pour un look de bouton, placé après les infos de publication.
-            $songLinkHtml = <<<HTML
-<a href="../../php/chanson/chanson_voir.php?id={$data['id_chanson']}" class="btn btn-sm btn-primary mt-2">Voir la fiche chanson</a>
-HTML;
-        }
-
-
-        return <<<HTML
-            <a href="{$data['lien']}" target="_blank" class="text-decoration-none media-link">
-                <article class="card media-card shadow-sm border m-2" style="width:220px;">
-                    <div class="card-body d-flex flex-column align-items-center text-center">
-                        <span class="badge bg-{$data['couleurBadge']} mb-2 fs-5">{$data['emoji']} {$data['type']}</span>
-                        <h5 class="card-title mb-1 text-dark">{$data['titre']}</h5>
-                        <img src="{$data['imageUrl']}{$data['imageCacheTag']}" alt="Illustration : {$data['titre']}"
-                             class="card-img-top my-2"
-                             loading="lazy"
-                             style="height:140px;width:100%;object-fit:cover;max-width:200px;">
-                        <p class="card-text small mt-2 mb-1">{$data['description']}</p>
-                        <p class="meta-pub mb-1">Publié le {$data['datePub']} par <strong>{$data['auteurNom']}</strong></p>
-                        {$songLinkHtml}
-                    </div>
-                </article>
-            </a>
-            HTML;
+        $this->checkDbConnection();
+        $db = $_SESSION[self::MYSQL];
+        $db->query("DELETE FROM media"); // On vide TOUT avant de reconstruire
+        $this->resetMediasDistribues($totalMedias);
     }
-
-    /**
-     * Prépare toutes les données nécessaires à l'affichage d'un média.
-     */
-    private function prepareData(): array
-    {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        // Initialisation des données de la chanson
-        $idChanson = null;
-        $chansonTitre = '';
-
-        $retrievedIdChanson = $this->getIdChansonAssocie();
-        if ($retrievedIdChanson > 0) { // Only try to find chanson if we have a valid ID
-            $chanson = new Chanson();
-            if ($chanson->chercheChanson($retrievedIdChanson)) { // chercheChanson returns 1 on success
-                $idChanson = $retrievedIdChanson;
-                $chansonTitre = $chanson->getNom();
-            }
-        }
-
-
-        $type = strtolower($this->_type);
-        $titre = htmlspecialchars($this->_titre);
-        $imageRelative = htmlspecialchars($this->_image);
-        $imagePath = "../../" . $imageRelative;
-        $imageUrl = "../../" . $imageRelative;
-
-        // Gestion du cache-busting
-        $imageCacheTag = "";
-        if (file_exists($imagePath)) {
-            $mtime = filemtime($imagePath);
-            $imageCacheTag = "?v={$mtime}";
-        }
-
-        // Lien
-        $lien = ($type === "partoche")
-            ? "../../" . htmlspecialchars($this->_lien)
-            : htmlspecialchars($this->_lien);
-
-        // Auteur
-        $auteur = chercheUtilisateur($this->_auteur);
-        $auteurNom = htmlspecialchars($auteur[3] ?? "Auteur inconnu");
-
-        // Attributs vidéo / partoche
-        $isVideo = in_array($type, ["vidéo", "video"]);
-        $couleurBadge = $isVideo ? "primary" : "danger";
-        $emoji = $isVideo ? "🎬" : "🎵";
-
-        return [
-            'type' => $type,
-            'titre' => $titre,
-            'imageUrl' => $imageUrl,
-            'id_chanson' => $idChanson,
-            'chanson_titre' => $chansonTitre,
-            'imageCacheTag' => $imageCacheTag,
-            'lien' => $lien,
-            'description' => htmlspecialchars($this->_description),
-            'datePub' => htmlspecialchars($this->_datePub),
-            'auteurNom' => $auteurNom,
-            'couleurBadge' => $couleurBadge,
-            'emoji' => $emoji
-        ];
-    }
-
-    private function getIdChansonAssocie(): ?int
-    {
-        $this->checkDbConnection(); // Assurer que la connexion DB est active
-        $requete = "";
-        if ($this->getType() === 'partoche') {
-            // Pour une partoche, le lien est du type './php/document/getdoc.php?doc=XXX'
-            if (preg_match('/getdoc.php\?doc=(\d+)/', $this->getLien(), $matches)) {
-                $idDocument = (int)$matches[1];
-                $requete = "SELECT idTable FROM document WHERE id = $idDocument AND nomTable = 'chanson' LIMIT 1";
-            }
-        } else {
-            // Pour une vidéo ou autre, le lien est direct
-            $lien = $_SESSION[self::MYSQL]->real_escape_string($this->getLien());
-            $requete = "SELECT idtable FROM lienurl WHERE nomtable = 'chanson' AND url = '$lien' LIMIT 1";
-        }
-
-        if (!empty($requete)) {
-            $result = $_SESSION[self::MYSQL]
-                ->query($requete);
-            if ($result && $row = $result->fetch_row()) {
-                return (int)$row[0];
-            }
-        }
-        return null;
-    }
-
-
-
-
 
     public function resetMediasDistribues(int $totalMedias): array
     {
-        // Pour une méthode statique, il faut s'assurer que la connexion est active
-        if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
-        }
-        $medias = new Media();
+        $this->checkDbConnection();
+        $db = $_SESSION[self::MYSQL];
 
-        $mysqli = $_SESSION[Media::MYSQL];
-
-        $resultVideos = $_SESSION[self::MYSQL]->query("SELECT COUNT(*) AS nb FROM lienurl WHERE type LIKE 'vidéo' OR type LIKE 'video' COLLATE utf8mb4_general_ci");
+        $resultVideos = $db->query("SELECT COUNT(*) AS nb FROM lienurl WHERE type LIKE 'vid%'");
         $nbVideos = $resultVideos ? (int) $resultVideos->fetch_assoc()["nb"] : 0;
 
-        $resultPartoches = $_SESSION[self::MYSQL]->query("SELECT COUNT(*) AS nb FROM document WHERE nomTable='chanson' AND (nom LIKE '%.pdf' OR nom LIKE '%.PDF')");
+        $resultPartoches = $db->query("SELECT COUNT(*) AS nb FROM document WHERE nomTable='chanson' AND nom LIKE '%.pdf'");
         $nbPartoches = $resultPartoches ? (int) $resultPartoches->fetch_assoc()["nb"] : 0;
 
         $totalExistants = $nbVideos + $nbPartoches;
         if ($totalExistants === 0) {
-            // Évite division par zéro, traite par défaut moitié/moitié
             $nbVideosATraiter = (int) round($totalMedias / 2);
         } else {
             $pctVideos = $nbVideos / $totalExistants;
@@ -699,27 +453,16 @@ HTML;
         }
         $nbPartochesATraiter = $totalMedias - $nbVideosATraiter;
 
-        // Appels aux fonctions reset
-        $medias->resetAvecDernieresPartoches($nbPartochesATraiter);
-        $medias->resetAvecDernieresVideos($nbVideosATraiter);
+        $this->resetAvecDernieresPartoches($nbPartochesATraiter);
+        $this->resetAvecDernieresVideos($nbVideosATraiter);
 
         return [$nbVideosATraiter, $nbPartochesATraiter];
     }
 
     private function checkDbConnection(): void
     {
-        // Vérifie si $_SESSION['mysql'] existe, est un objet mysqli, et est connecté
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            // Force la réinitialisation de la connexion DB en réincluant configMysql.php
-            // Ceci repose sur la logique interne de configMysql.php pour rétablir
-            // la connexion et la stocker dans $_SESSION['mysql'] si elle est manquante ou invalide.
             require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
-            // Après la réinclusion, nous devrions avoir une connexion valide. Si ce n'est pas le cas, configMysql.php aurait déjà appelé die().
         }
     }
 }
-
-// TODO
-// - ne pas pouvoir de créer de media ayant déjà un lien existant !
-// - un media peut être un doc pdf, mp3, lien vidéo yt, une partoche, un songbook
-
