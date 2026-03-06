@@ -1,105 +1,191 @@
 <?php
-const IMAGES_ICONES = "../../images/icones/";
-const RACINE = "../../";
-const VIGNETTES = "../../vignettes/";
-require_once("../lib/utilssi.php");
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/utilssi.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/songbook/songbook.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/document/document.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/chanson/chanson.php";
 
-require_once("songbook.php");
+// Palette Canopée
+$c_marron_fonce = "#2b1d1a";
+$c_marron_clair = "#D2B48C"; 
+$c_accent = "#8B4513";
+$c_ivoire = "#fcfaf2"; 
+$c_orange = "#e67e22";
 
-require_once ("../chanson/chansonListe.php");
-require_once("../document/document.php");
-require_once("../liens/lienDocSongbook.php");
-require_once("../navigation/menu.php");
-require_once("../utilisateur/utilisateur.php");
-
-global $songbookForm;
-global $cheminImages;
-global $iconeEdit;
-global $_DOSSIER_CHANSONS;
-
-$table = "songbook";
-$sortie = "";
-$monImage = "";
-
-if (isset($_GET ['id']) && is_numeric($_GET ['id'])) {
-    $idSongbook = $_GET ['id'];
-} else {
-    echo "erreur #1 dans songbook_voir.php";
-    return;
+$id = $_GET['id'] ?? 0;
+if ($id == 0) {
+    header("Location: songbook_liste.php");
+    exit();
 }
 
-// On augmente le compteur de vues du songbook
-augmenteHits($table, $idSongbook);
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/navigation/menu.php";
 
-// On choisit une des images du songbook
-$monImage = imageTableId("songbook", $idSongbook);
-
-// On charge le tableau des utilisateurs
-$tabUsers = portraitDesUtilisateurs();
-
-// On charge la liste des chansons
-$listeChansons = new ChansonListe();
-$listeChansons->chargeListeChansons();
-
-$donnee = chercheSongbook($idSongbook);
-$sortie .= "<h2>$donnee[1]</h2>"; // Titre
-
-if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-    $sortie .= ancre($songbookForm . "?id=" . $idSongbook, image(($cheminImages . $iconeEdit), 32, 32, "modifier"));
+$sb = new Songbook((int)$id);
+if ($sb->getId() == 0) {
+    die("Songbook introuvable !");
 }
 
-if ("" != $monImage) {
-    $repertoire = "../data/songbooks/" . $idSongbook . "/";
-    $sortie .= image($repertoire . $monImage, 200, "", "pochette");
-}
+// On augmente le compteur de hits
+augmenteHits("songbook", $id);
 
-$sortie .= $donnee [2] . "-" . $donnee [3] . "-" . $donnee [5] . " hit(s)<br>\n";
+// --- DONNÉES DU SONGBOOK ---
+$nom = htmlspecialchars($sb->getNom());
+$description = nl2br(htmlspecialchars($sb->getDescription()));
+$date = dateMysqlVersTexte($sb->getDate());
+$hits = $sb->getHits();
+$typeLabel = $sb->getLabelType();
+$badgeColor = match($sb->getType()) {
+    1 => "#e67e22", // Orange (Anthologie)
+    2 => "#d35400", // Orange Foncé (Concert)
+    3 => "#27ae60", // Vert (Thème)
+    default => "#777"
+};
 
-$sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
+// Image de couverture
+$imageFile = imageTableId("songbook", $id);
+$imgUrl = $imageFile ? "../../data/songbooks/$id/" . urlencode($imageFile) : "";
+$imgTag = $imgUrl ? "<img src='$imgUrl' alt='$nom' class='img-responsive img-thumbnail shadow' style='border-radius: 10px;'>" : "<div style='width:100%; height:300px; background:#eee; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#ccc;'><i class='glyphicon glyphicon-book' style='font-size:100px;'></i></div>";
 
-// On récupère les fichiers du Songbook
-$fichiersDuSongbook = fichiersSongbook($idSongbook);
-
-foreach ($fichiersDuSongbook as $fichier) {
-    $icone = image(IMAGES_ICONES . $fichier [2] . ".png", 32, 32, "icone");
-    if (!file_exists(IMAGES_ICONES . $fichier [2] . ".png")) {
-        $icone = image(IMAGES_ICONES . "fichier.png", 32, 32, "icone");
-    }
-    $sortie .= "$icone <a href= '" . htmlentities($fichier [0] . $fichier [1]) . "' target='_blank'> " . htmlentities($fichier[1]) . "</a> ";
-    $sortie .= intval(filesize(($fichier [0] . $fichier [1])) / 1024) . " (ko) <br>\n";
-}
-
-$sortie .= "<h2>Liste des documents dans ce songbook</h2>";
-
-$lignes = chercheLiensDocSongbook('idSongbook', $idSongbook, "ordre");
-$listeDocs = "";
-$nbChansons = 0;
+// --- RÉCUPÉRATION DES CHANSONS ---
+$lignes = chercheLiensDocSongbook('idSongbook', $id, "ordre");
+$chansons = [];
 while ($ligne = $lignes->fetch_row()) {
-    $ligneDoc = chercheDocument($ligne [1]);
-    $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    $maChanson = $listeChansons->recupereChanson($ligneDoc[6]);
-    $idPublicateurChanson = $maChanson->getIdUser();
-    $lienChanson = "../chanson/chanson_voir.php?id=" . $ligneDoc [6];
-    $fichier = RACINE .$_DOSSIER_CHANSONS. "/" . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    $extension = substr(strrchr($ligneDoc [1], '.'), 1);
-    $icone = image(IMAGES_ICONES . $extension . ".png", 32, 32, "icone");
-
-    if (!file_exists(IMAGES_ICONES . $extension . ".png")) {
-        $icone = image("../images/icones/fichier.png", 32, 32, "icone");
+    $ligneDoc = chercheDocument($ligne[1]);
+    if ($ligneDoc) {
+        $chansonId = $ligneDoc[6];
+        if (!isset($chansons[$chansonId])) {
+            $chansons[$chansonId] = new Chanson((int)$chansonId);
+        }
     }
-    $vignetteChanson = image(RACINE .$_DOSSIER_CHANSONS. "/" . $ligneDoc[6] . "/" . imageTableId("chanson", $ligneDoc [6]), 64, 64, "chanson");
-    $vignetteChanson = ancre($lienChanson,$vignetteChanson);
-    $vignettePublicateur = image(VIGNETTES . $tabUsers[$idPublicateurChanson][1], 48, 48, $tabUsers[$idPublicateurChanson][0]);
-    $sortie .= $vignettePublicateur . $vignetteChanson . $icone;
-    $sortie .= "<a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a>";
-    $sortie .= " (" . intval($ligneDoc[2] / 1024) . " ko)";
-    // echo "chanson " . $ligneDoc[6];
-    if ($maChanson != null) {
-        $sortie .= " - " . $maChanson->getNom() . " - " . $maChanson->getTonalite() . " - " . $maChanson->getAnnee() . " - " . $maChanson->getTempo() . " bpm";
-    }
-    $sortie .= " <br>\n";
-    $nbChansons++;
 }
-$sortie .= "$nbChansons chansons dans le songbook !";
-$sortie .= envoieFooter();
-echo $sortie;
+
+// --- RENDU HTML ---
+
+$html = <<<HTML
+<style>
+    body { background-color: $c_ivoire !important; }
+    .sb-header { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; }
+    .sb-title { color: $c_marron_fonce; font-weight: 900; font-size: 36px; margin-top: 0; margin-bottom: 15px; }
+    .sb-meta { font-size: 13px; color: #999; margin-bottom: 20px; }
+    .sb-meta span { margin-right: 20px; }
+    .sb-desc { font-size: 16px; color: #555; line-height: 1.6; margin-bottom: 30px; border-left: 4px solid $c_marron_clair; padding-left: 20px; }
+    .chanson-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; transition: all 0.2s; border: 1px solid transparent; }
+    .chanson-item:hover { transform: translateX(10px); border-color: $c_marron_clair; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+    .chanson-num { font-family: serif; font-style: italic; color: $c_marron_clair; font-size: 20px; margin-right: 20px; width: 30px; display: inline-block; }
+    .btn-sb-action { border-radius: 20px; padding: 8px 25px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+</style>
+
+<div class="container" style="padding-top: 30px; padding-bottom: 100px;">
+    
+    <!-- BARRE DE RETOUR -->
+    <div style="margin-bottom: 20px;">
+        <a href="songbook_liste.php" class="btn btn-link" style="color: $c_marron_fonce; text-decoration: none; font-weight: bold;">
+            <i class="glyphicon glyphicon-menu-left"></i> RETOUR À LA BIBLIOTHÈQUE
+        </a>
+    </div>
+
+    <!-- EN-TÊTE DU SONGBOOK -->
+    <div class="sb-header row">
+        <div class="col-md-4">
+            $imgTag
+        </div>
+        <div class="col-md-8">
+            <span class="label" style="background-color: $badgeColor; padding: 6px 15px; font-size: 12px; margin-bottom: 15px; display: inline-block; border-radius: 4px;">$typeLabel</span>
+            <h1 class="sb-title">$nom</h1>
+            
+            <div class="sb-meta">
+                <span><i class="glyphicon glyphicon-calendar"></i> $date</span>
+                <span><i class="glyphicon glyphicon-eye-open"></i> $hits lectures</span>
+                <span><i class="glyphicon glyphicon-music"></i> @NB_CHANSONS@ morceaux</span>
+            </div>
+
+            <div class="sb-desc">$description</div>
+
+            <div class="sb-actions">
+HTML;
+
+// On cherche s'il existe un PDF déjà généré pour ce songbook
+$docsPdf = chercheDocumentsTableId("songbook", $id);
+$dernierPdf = null;
+while ($doc = $docsPdf->fetch_row()) {
+    if (strpos(strtolower($doc[1]), '.pdf') !== false) {
+        $dernierPdf = $doc; 
+    }
+}
+
+if ($dernierPdf) {
+    $nomFichier = composeNomVersion($dernierPdf[1], $dernierPdf[4]);
+    $urlPdf = "../../data/songbooks/$id/" . urlencode($nomFichier);
+    $html .= <<<HTML
+                <a href="$urlPdf" target="_blank" class="btn btn-sb-action btn-orange-sb shadow" style="background-color: $c_orange; border: none; color: white; text-decoration: none;">
+                    <i class="glyphicon glyphicon-download-alt"></i> TÉLÉCHARGER LE PDF
+                </a>
+HTML;
+}
+
+if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
+    $html .= <<<HTML
+                <a href="songbook_form.php?id=$id" class="btn btn-sb-action btn-default" style="border: 2px solid $c_marron_fonce; color: $c_marron_fonce; margin-left: 10px;">
+                    <i class="glyphicon glyphicon-pencil"></i> ÉDITER
+                </a>
+HTML;
+}
+
+$html .= <<<HTML
+            </div>
+        </div>
+    </div>
+
+    <!-- LISTE DES MORCEAUX -->
+    <h2 style="color: $c_marron_fonce; font-weight: bold; margin-bottom: 25px; margin-left: 10px;">
+        <i class="glyphicon glyphicon-list" style="color: $c_marron_clair;"></i> SOMMAIRE
+    </h2>
+
+    <div class="row">
+        <div class="col-xs-12">
+HTML;
+
+if (empty($chansons)) {
+    $html .= '<div class="alert alert-info" style="border-radius: 15px;">Ce recueil ne contient pas encore de chansons.</div>';
+} else {
+    $i = 1;
+    foreach ($chansons as $c) {
+        $c_id = $c->getId();
+        $c_nom = htmlspecialchars($c->getNom());
+        $c_interprete = htmlspecialchars($c->getInterprete());
+        $c_tonalite = $c->getTonalite();
+        
+        $c_img_name = imageTableId("chanson", $c_id);
+        $c_pochette = affichePochette($c_img_name, $c_id, 50, 50);
+
+        $html .= <<<HTML
+            <div class="chanson-item d-flex align-items-center" style="display: flex; align-items: center;">
+                <span class="chanson-num">$i.</span>
+                <div style="width: 50px; height: 50px; margin-right: 20px;">$c_pochette</div>
+                <div style="flex-grow: 1;">
+                    <h4 style="margin: 0; font-weight: bold;"><a href="../chanson/chanson_voir.php?id=$c_id" style="color: $c_marron_fonce; text-decoration: none;">$c_nom</a></h4>
+                    <small class="text-muted">$c_interprete</small>
+                </div>
+                <div class="text-right">
+                    <span class="label" style="background: transparent; color: $c_accent; border: 1px solid $c_marron_clair;">$c_tonalite</span>
+                    <a href="../chanson/chanson_voir.php?id=$c_id" class="btn btn-link" style="color: $c_marron_fonce;"><i class="glyphicon glyphicon-chevron-right"></i></a>
+                </div>
+            </div>
+HTML;
+        $i++;
+    }
+}
+
+$nbChansons = count($chansons);
+$html = str_replace('@NB_CHANSONS@', (string)$nbChansons, $html);
+
+$html .= <<<HTML
+        </div>
+    </div>
+
+    <div id="div1" style="margin-top: 30px;"></div>
+
+</div>
+HTML;
+
+echo $html;
+echo envoieFooter();

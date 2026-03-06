@@ -65,10 +65,18 @@
 
 ## Refonte du module Songbook
 - **Architecture Objet** : Création de la classe `Songbook` pour remplacer les fonctions procédurales.
-- **Vue "Canopée"** : Refonte de `songbook_liste.php` utilisant un affichage par cartes (Thumbnails) avec badges de couleur selon le genre (Anthologie, Concert, Thème).
-- **Compatibilité** : Mise en place de wrappers pour assurer la compatibilité avec les pages existantes.
+- **Vue "Canopée"** : Refonte de `songbook_liste.php` (cartes portrait 22:30), `songbook_voir.php` (vitrine premium) et `songbook_form.php`.
+- **Modernisation Technique** :
+    - Découplage complet : `css/songbookform.css` et `js/songbookform.js`.
+    - Recherche dynamique Ajax pour lier des chansons aux recueils.
+    - Respect des standards W3C (labels, alts, sémantique).
+- **Stabilité** : Suite de **Smoke Tests** validant 10 pages critiques (y compris en mode Admin).
+- **Correctifs** : Suppression des Magic Quotes (doubles slashes), fix des erreurs de headers et des warnings Heredoc.
 
-## Maintenance & Fixes
-- **paramsEdit.php** : Correction du layout (retour à la ligne des labels, suppression des flottants gênants) et sécurisation contre les warnings PHP 8.1+.
-- **Nettoyage du dépôt** : Suppression du doublon `merci.html` et rangement des scripts de migration dans le dossier `/scripts`.
-- **Tests unitaires** : Ajout de `tests/TonaliteEquivalenceTest.php` pour valider la logique enharmonique.
+
+## Maintenance & Fixes (Suite)
+- **Erreur 500 Prod** : Correction d'une erreur fatale "Cannot redeclare limiteLongueur()". La fonction a été centralisée dans `utilssi.php` et supprimée de `chanson.php`.
+- **Réécriture de sécurité** : Nettoyage complet de `chanson.php` pour éliminer toute ligne redondante ou mal positionnée.
+- **Compatibilité** : Passage de `limiteLongueur()` en mode flexible (sans types stricts en signature) pour assurer une compatibilité maximale.
+- **Smoke Tests** : Validation finale des 10 pages principales via Docker.
+

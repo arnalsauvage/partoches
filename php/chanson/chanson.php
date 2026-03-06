@@ -591,7 +591,7 @@ class Chanson
             $maRequete .= " LIMIT $limit OFFSET $offset";
         }
 
-        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChanson #2 : " . $_SESSION [self::MYSQL]->error . "Requete : $maRequete");
+        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChansons #2 : " . $_SESSION [self::MYSQL]->error . "Requete : $maRequete");
         $tableau = [];
         while ($row = $result->fetch_row()) {
             array_push($tableau, $row[0]);

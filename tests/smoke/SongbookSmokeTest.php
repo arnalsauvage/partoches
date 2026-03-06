@@ -10,10 +10,11 @@ class SongbookSmokeTest extends TestCase
     {
         $ports = ['80', '8080'];
         foreach ($ports as $port) {
+            $url = "http://localhost:$port";
             $fp = @fsockopen('localhost', (int)$port, $errno, $errstr, 0.1);
             if ($fp) {
                 fclose($fp);
-                return "http://localhost:$port";
+                return $url;
             }
         }
         return 'http://localhost:8080';
@@ -25,6 +26,8 @@ class SongbookSmokeTest extends TestCase
     public function testPagesDoNotSmoke(string $path, array $params = [])
     {
         $baseUrl = $this->getBaseUrl();
+        // On force le mode smoke_test pour avoir les privilèges admin
+        $params['smoke_test'] = '1';
         $queryString = http_build_query($params);
         $url = $baseUrl . $path . ($queryString ? '?' . $queryString : '');
         
@@ -39,7 +42,7 @@ class SongbookSmokeTest extends TestCase
             'Fatal error',
             'Parse error',
             'Warning:',
-            // 'Notice:', // On peut être plus souple sur les notices si besoin
+            'Notice:',
             'Deprecated:',
             'Uncaught Error'
         ];
@@ -55,15 +58,15 @@ class SongbookSmokeTest extends TestCase
     public static function pageProvider(): array
     {
         return [
+            'Accueil (Medias)' => ['/php/media/listeMedias.php', []],
             'Liste Songbooks' => ['/php/songbook/songbook_liste.php', ['vue' => 'cartes']],
-            'Voir Songbook (ID 1)' => ['/php/songbook/songbook_voir.php', ['id' => 1]],
+            'Voir Songbook (ID 40)' => ['/php/songbook/songbook_voir.php', ['id' => 40]],
             'Form Songbook (New)' => ['/php/songbook/songbook_form.php', []],
-            'Form Songbook (Edit ID 1)' => ['/php/songbook/songbook_form.php', ['id' => 1]],
+            'Form Songbook (Edit ID 40)' => ['/php/songbook/songbook_form.php', ['id' => 40]],
             'Portfolio Songbook' => ['/php/songbook/songbook-portfolio.php', []],
             'Chanson Voir (ID 1)' => ['/php/chanson/chanson_voir.php', ['id' => 1]],
             'Chanson Chercher (Songbook)' => ['/php/chanson/chanson_chercher.php', ['idSongbook' => 1]],
             'Document Voir (Table ID 1)' => ['/php/document/documents_voir.php', ['idTable' => 1, 'nomTable' => 'songbook']],
-            // Les scripts d'action (GET) renvoient souvent des redirections ou du texte brut
             'Songbook Get (Mode Test)' => ['/php/songbook/songbook_get.php', ['mode' => 'TEST']],
         ];
     }

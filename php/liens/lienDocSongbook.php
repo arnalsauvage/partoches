@@ -69,10 +69,15 @@ function chercheLienParIdSongbookOrdre($idSongbook, $ordre)
 // Crée un lienDocSongbook
 function creelienDocSongbook($idDocument, $idSongbook)
 {
-    chercheLiensDocSongbook("idSongbook", $idSongbook, "id");
-    $nb = $_SESSION ['mysql']->affected_rows + 1;
+    // Vérification de l'existence du lien pour éviter les erreurs Duplicate Entry
+    $existant = chercheLienParIdSongbookIdDoc($idSongbook, $idDocument);
+    if ($existant !== 0) {
+        return; // Le lien existe déjà, on ne fait rien
+    }
+
+    $nb = nombreDeLiensDuSongbook($idSongbook) + 1;
     $maRequete = "INSERT INTO liendocsongbook VALUES (NULL, '$idDocument', '$idSongbook', '$nb')";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creelienDocSongbook#1 : " . $_SESSION ['mysql']->error);
+    $_SESSION ['mysql']->query($maRequete) or die ("Problème creelienDocSongbook#1 : " . $_SESSION ['mysql']->error);
 }
 
 // Modifie en base la lienDocSongbook

@@ -35,18 +35,28 @@ if (!isset ($FichierUtilsSi)) {
         $_SESSION ["privilege"] = 0;
     }
 
+    // MODE SMOKE TEST : On force l'admin si on est en local et qu'on le demande
+    if (isset($_GET['smoke_test']) && $_GET['smoke_test'] == '1') {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        if ($ip == '127.0.0.1' || $ip == '::1' || strpos($ip, '172.') === 0) { // Localhost ou réseau Docker
+            $_SESSION['privilege'] = 3; // ADMIN
+            $_SESSION['id'] = 1;        // Utilisateur par défaut
+            $_SESSION['user'] = 'SmokeTest';
+        }
+    }
+
     /**
      * Limite la longueur d'une chaine à x caractères
      * @param string $chaine
      * @param int $tailleMax
      * @return string
      */
-    function limiteLongueur(string $chaine, int $tailleMax): string
+    function limiteLongueur($chaine, $tailleMax)
     {
-        if (strlen($chaine) > $tailleMax) {
-            return mb_substr($chaine, 0, $tailleMax - 4) . "...";
+        if (strlen((string)$chaine) > $tailleMax) {
+            return mb_substr((string)$chaine, 0, $tailleMax - 4) . "...";
         } else {
-            return $chaine;
+            return (string)$chaine;
         }
     }
 

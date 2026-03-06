@@ -154,7 +154,7 @@ class Songbook
     {
         $_id = $this->getId();
         $nom = htmlspecialchars($this->getNom());
-        $desc = htmlspecialchars(limiteLongueur($this->getDescription(), 60));
+        $desc = htmlspecialchars(limiteLongueur($this->getDescription(), 50));
         $typeLabel = $this->getLabelType();
         $hits = $this->getHits();
         $date = dateMysqlVersTexte($this->getDate());
@@ -169,9 +169,9 @@ class Songbook
         $imageFile = imageTableId("songbook", $_id);
         if ($imageFile) {
             $srcImage = "../../data/songbooks/$_id/" . urlencode($imageFile);
-            $imgHtml = "<a href='songbook_voir.php?id=$_id'><img src='$srcImage' alt='$nom' style='max-width: 100%; max-height: 100%; object-fit: cover;'></a>";
+            $imgHtml = "<a href='songbook_voir.php?id=$_id'><img src='$srcImage' alt='$nom' style='width: 100%; height: 100%; object-fit: cover;'></a>";
         } else {
-            $imgHtml = "<a href='songbook_voir.php?id=$_id' style='text-decoration:none;'><span class='glyphicon glyphicon-book' style='font-size: 60px; color: $c_marron_fonce; opacity: 0.3;'></span></a>";
+            $imgHtml = "<a href='songbook_voir.php?id=$_id' style='text-decoration:none;'><span class='glyphicon glyphicon-book' style='font-size: 50px; color: $c_marron_fonce; opacity: 0.3;'></span></a>";
         }
 
         // Couleur selon le type
@@ -183,32 +183,26 @@ class Songbook
         };
 
         $html = "
-        <div class='col-sm-6 col-md-4 col-lg-3' style='margin-bottom: 25px;'>
-            <div class='thumbnail shadow-hover' style='height: 420px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; padding: 0; border: 1px solid $c_marron_clair; background-color: $c_marron_fonce;'>
-                <a href='songbook_voir.php?id=$_id' style='text-decoration: none;'>
-                    <div style='height: 200px; overflow: hidden; background-color: $c_marron_clair; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid $c_accent;'>
-                        $imgHtml
-                    </div>
-                </a>
-                <div class='caption' style='padding: 15px; text-align: center; color: $c_beige;'>
-                    <h4 style='margin-top: 0; margin-bottom: 10px; color: $c_marron_clair; height: 44px; overflow: hidden; font-weight: bold;'>$nom</h4>
-                    <p style='height: 40px; overflow: hidden; font-size: 12px; color: #bbb; margin-bottom: 10px;'>$desc</p>
-                    <div style='margin-bottom: 15px; height: 25px;'>
-                        <span class='label' style='background-color: $badgeColor; color: white;'>$typeLabel</span>
-                        <span class='label' style='background-color: #444; color: #ddd; margin-left: 5px;'>$date</span>
-                    </div>
-                    <p style='font-size: 11px; margin-bottom: 15px;'><span class='glyphicon glyphicon-eye-open'></span> $hits lectures</p>
+        <div class='col-sm-6 col-md-4 col-lg-3' style='margin-bottom: 30px;'>
+            <div class='thumbnail shadow-hover' style='height: 450px; width: 100%; max-width: 280px; margin: 0 auto; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s ease; padding: 0; border: 1px solid #ddd; background-color: white;'>
+                <div style='height: 280px; overflow: hidden; background-color: #f9f9f9; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #eee; position: relative;'>
+                    $imgHtml
+                    <span class='label' style='position: absolute; bottom: 10px; right: 10px; background-color: $badgeColor; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);'>$typeLabel</span>
+                </div>
+                <div class='caption' style='padding: 12px; text-align: center;'>
+                    <h4 style='margin-top: 5px; margin-bottom: 8px; color: $c_marron_fonce; height: 40px; overflow: hidden; font-weight: bold; font-size: 16px;'>$nom</h4>
+                    <p style='height: 35px; overflow: hidden; font-size: 11px; color: #888; margin-bottom: 10px;'>$desc</p>
                     
-                    <div class='btn-group btn-group-justified' role='group'>
-                        <div class='btn-group' role='group'>
-                            <a href='songbook_voir.php?id=$_id' class='btn' style='background-color: $c_marron_clair; color: $c_marron_fonce; font-weight: bold; border-radius: 0;'>Ouvrir</a>
-                        </div>";
+                    <div style='display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f5f5f5; padding-top: 10px;'>
+                        <span style='font-size: 10px; color: #bbb;'><i class='glyphicon glyphicon-calendar'></i> $date</span>
+                        <span style='font-size: 10px; color: #bbb;'><i class='glyphicon glyphicon-eye-open'></i> $hits</span>
+                    </div>
+                    
+                    <div style='margin-top: 15px;'>
+                        <a href='songbook_voir.php?id=$_id' class='btn btn-xs' style='background-color: $c_marron_fonce; color: white; padding: 5px 20px; border-radius: 15px;'>OUVRIR</a>";
         
         if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
-            $html .= "
-                        <div class='btn-group' role='group'>
-                            <a href='songbook_form.php?id=$_id' class='btn' style='background-color: $c_accent; color: white; border-radius: 0; border: none;'>Editer</a>
-                        </div>";
+            $html .= " <a href='songbook_form.php?id=$_id' class='btn btn-xs btn-link' style='color: $c_accent;'><i class='glyphicon glyphicon-pencil'></i></a>";
         }
         
         return $html . "
@@ -285,24 +279,24 @@ function chercheSongbookParLeNom($nom): array
 function creeSongbook($nom, $description, $date, $image, $hits, $type)
 {
     $sb = new Songbook();
-    $sb->setNom($nom);
-    $sb->setDescription($description);
-    $sb->setDate($date);
-    $sb->setImage($image);
-    $sb->setHits((int)$hits);
-    $sb->setType((int)$type);
+    $sb->setNom((string)($nom ?? ''));
+    $sb->setDescription((string)($description ?? ''));
+    $sb->setDate((string)($date ?? date('d/m/Y')));
+    $sb->setImage((string)($image ?? ''));
+    $sb->setHits((int)($hits ?? 0));
+    $sb->setType((int)($type ?? 1));
     return $sb->enregistreBDD();
 }
 
 function modifiesSongbook($id, $nom, $description, $date, $image, $hits, $type)
 {
     $sb = new Songbook((int)$id);
-    $sb->setNom($nom);
-    $sb->setDescription($description);
-    $sb->setDate($date);
-    $sb->setImage($image);
-    $sb->setHits((int)$hits);
-    $sb->setType((int)$type);
+    $sb->setNom((string)($nom ?? ''));
+    $sb->setDescription((string)($description ?? ''));
+    $sb->setDate((string)($date ?? date('d/m/Y')));
+    $sb->setImage((string)($image ?? ''));
+    $sb->setHits((int)($hits ?? 0));
+    $sb->setType((int)($type ?? 1));
     return $sb->enregistreBDD();
 }
 

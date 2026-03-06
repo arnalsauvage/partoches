@@ -9,35 +9,26 @@ include_once("songbook.php");
 include_once("../liens/lienDocSongbook.php");
 $nomTable = "songbook";
 
+$id = (int)($_POST[ID_SONGBOOK] ?? ($_GET[ID_SONGBOOK] ?? 0));
+$mode = $_POST['mode'] ?? ($_GET['mode'] ?? '');
+
 // Les modifs sont réservées aux utilisateurs authentifiés et habilités
-if ($_SESSION [PRIVILEGE] <= $GLOBALS["PRIVILEGE_INVITE"]) {
+if (($_SESSION[PRIVILEGE] ?? 0) <= $GLOBALS["PRIVILEGE_INVITE"]) {
     redirection($nomTable . "_liste.php");
 }
+
+if ($mode !== '' && strlen($mode) > 12) {
+    echo "Erreur n#1 dans songbook_get.php";
+    return;
+}
+
 // On gère 6 cas : création d'une songbook, modif, suppression, ou suppression d'un docJoint, duplication songbook, liste songbooks
-if (isset($_POST ['mode'])) {
-    $mode = $_POST ['mode'];
-} elseif (isset($_GET ['mode'])) {
-    $mode = $_GET ['mode'];
-    if (strlen($mode) > 12) {
-        echo "Erreur n#1 dans songbook_get.php";
-        return;
-    }
-}
-
-// On récupère l'identifiant du songbook passé par POST ou GET
-if (isset ($_GET [ID_SONGBOOK])) {
-    $id = $_GET [ID_SONGBOOK];
-}
-if (isset ($_POST [ID_SONGBOOK])) {
-    $id = $_POST [ID_SONGBOOK];
-}
-
 // En mode création ou mise à jour, on récupère les données du formulaire
 if (($mode == "MAJ") || ($mode == "INS")) {
 
     $id = $_POST [ID_SONGBOOK];
-    $fnom = $_SESSION ['mysql']->real_escape_string($_POST ['fnom']);
-    $fdescription = $_SESSION ['mysql']->real_escape_string($_POST ['fdescription']);
+    $fnom = $_POST ['fnom'];
+    $fdescription = $_POST ['fdescription'];
     $fimage = $_POST ['fimage'];
     $ftype = $_POST['ftype'];
 

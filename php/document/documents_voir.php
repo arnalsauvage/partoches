@@ -123,11 +123,23 @@ while ($ligneDoc = $lignes->fetch_row()) {
         $icone = image("../images/icones/fichier.png", 32, 32, "icone");
     }
         $precedenteVignette = $vignetteChanson;
-        $vignettePublicateur = image("../vignettes/" . urlencode($tabUsers [$ligneDoc [7]] [1]), 48, 48, $tabUsers [$ligneDoc [7]] [0]);
+        
+        $idUserDoc = $ligneDoc[7] ?? 0;
+        $userPseudo = $tabUsers[$idUserDoc][1] ?? 'defaut.png';
+        $userNom = $tabUsers[$idUserDoc][0] ?? 'Inconnu';
+        
+        $vignettePublicateur = image("../vignettes/" . urlencode($userPseudo), 48, 48, $userNom);
         $sortie .= "<td> $vignettePublicateur </td>\n";
-        $vignetteChanson = image(C_RACINE .$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . rawurlencode(imageTableId(CHANSON, $ligneDoc [6])), 128, 128, CHANSON);
-        if ($precedenteVignette != $vignetteChanson) {
-            $sortie .= "<td><a href='../chanson/chanson_voir.php?id=".$ligneDoc[6]. "'> $vignetteChanson </a> </td>\n";
+        
+        $idChansonDoc = $ligneDoc[6] ?? 0;
+        if ($idChansonDoc > 0) {
+            $vignetteChanson = image(C_RACINE .$_DOSSIER_CHANSONS . $idChansonDoc . "/" . rawurlencode(imageTableId(CHANSON, $idChansonDoc)), 128, 128, CHANSON);
+        } else {
+            $vignetteChanson = "";
+        }
+        
+        if ($precedenteVignette != $vignetteChanson && $vignetteChanson != "") {
+            $sortie .= "<td><a href='../chanson/chanson_voir.php?id=".$idChansonDoc. "'> $vignetteChanson </a> </td>\n";
         } else {
             $sortie .= "<td>  </td>\n ";
         }

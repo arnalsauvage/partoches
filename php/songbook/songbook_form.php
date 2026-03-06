@@ -1,259 +1,276 @@
 <?php
-const RACINE = "../../";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/utilssi.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/songbook/songbook.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/document/document.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/liens/lienDocSongbook.php";
 
-require_once("../lib/utilssi.php");
-require_once("songbook.php");
-require_once("../document/document.php");
-require_once("../liens/lienDocSongbook.php");
-require_once("../navigation/menu.php");
+/**
+ * Fonctions Helpers de rendu (Clean Code / DRY)
+ */
 
-global $iconePoubelle;
-global $_DOSSIER_CHANSONS;
-global $cheminImages;
-global $songbookGet;
+function renderDocumentRow($doc, $idSongbook): string {
+    $idDoc = (int)$doc[0];
+    $taille = (int)$doc[2];
+    $fichierCourt = composeNomVersion($doc[1], $doc[4]);
+    $url = "../../data/songbooks/$idSongbook/" . urlencode($fichierCourt);
+    $ext = strtolower(pathinfo($doc[1], PATHINFO_EXTENSION));
+    $iconePath = "../../images/icones/$ext.png";
+    $icone = file_exists($iconePath) ? $iconePath : "../../images/icones/fichier.png";
+    $poids = intval($taille/1024);
+    
+    return <<<HTML
+        <div class="list-group-item sb-list-item">
+            <div>
+                <img src="$icone" width="24" alt="Icône $ext" style="margin-right: 10px;">
+                <a href="$url" target="_blank" rel="noopener"><strong>$fichierCourt</strong></a>
+                <span class="text-muted small">($poids ko)</span>
+            </div>
+            <a href="songbook_get.php?id=$idSongbook&idDoc=$idDoc&nomFic=$fichierCourt&mode=SUPPRFIC"
+               class="btn btn-xs btn-danger"
+               title="Supprimer ce fichier"
+               aria-label="Supprimer le fichier $fichierCourt"
+               onclick="return confirm('Supprimer ce fichier ?')">
+                <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+            </a>
+        </div>
+HTML;
+}
 
-const ICONE = "icone";
-$table = "songbook";
-$sortie = "";
+function renderSommaireRow($docLien, $idSongbook, $index): string {
+    $idDoc = (int)$docLien[0];
+    $nomFic = composeNomVersion($docLien[1], $docLien[4]);
+    return <<<HTML
+        <li class="ui-state-default sb-sortable-item" data-index="$idDoc" data-position="$index">
+            <span>
+                <i class="glyphicon glyphicon-menu-hamburger text-muted" style="margin-right: 15px;" aria-hidden="true"></i>
+                <strong>$index.</strong> $nomFic
+            </span>
+            <a href="songbook_get.php?id=$idSongbook&idDoc=$idDoc&mode=SUPPRDOC"
+               class="btn btn-link btn-xs text-danger"
+               title="Retirer du recueil"
+               aria-label="Retirer $nomFic du recueil"
+               style="margin-left: auto;">
+                <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
+            </a>
+        </li>
+HTML;
+}
 
-// Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
-if (($_SESSION ['privilege'] ?? 0) < $GLOBALS["PRIVILEGE_EDITEUR"]) {
-    $urlRedirection = $table . "_voir.php";
-    if (isset ($_GET ['id'])) {
-        $urlRedirection .= "?id=" . $_GET ['id'];
-        redirection($urlRedirection);
-    } else {
-        echo "Erreur n°1 dans Songbook_form.php, merci de contacter notre numéro vert.";
+// 1. SÉCURITÉ ET DROITS
+$privilege = $_SESSION['privilege'] ?? 0;
+$lvlEditeur = $GLOBALS["PRIVILEGE_EDITEUR"] ?? 2;
+
+if ($privilege < $lvlEditeur) {
+    $idRedirect = (int)($_GET['id'] ?? 0);
+    $url = "songbook_voir.php" . ($idRedirect ? "?id=$idRedirect" : "");
+    header("Location: $url");
+    exit();
+}
+
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/navigation/menu.php";
+
+// 2. TRAITEMENT DES ACTIONS (POST)
+$id = (int)($_POST['id'] ?? ($_GET['id'] ?? 0));
+
+if (isset($_POST['documentJoint']) && $id > 0) {
+    ordonneLiensSongbook($id);
+    creeLienDocSongbook($_POST['documentJoint'], $id);
+    if (($_POST['ajax'] ?? 0) == 11) {
+        echo "succes";
         exit();
     }
 }
 
-// Traitement de l'ajout de document
-if (isset ($_POST ['id']) && is_numeric($_POST ['id']) && (isset ($_POST ['documentJoint']))) {
-    $id = $_POST ['id'];
-    ordonneLiensSongbook($id);
-    creeLienDocSongbook($_POST ['documentJoint'], $_POST ['id']);
-    $id = $_POST ['id'];
-    if ($_POST ['ajax']==11) {
-        echo"succes";
-        exit();
-    }
-}
-
-// Chargement des donnees du songbook si l'identifiant est fourni
-if (isset ($_POST ['id']) || (isset ($_GET ['id']) && (is_numeric($_GET ['id'])))) {
-    if (isset ($_GET ['id'])) {
-        $id = $_GET ['id'];
-    }
-    $donnee = chercheSongbook($id);
-    $donnee [1] = htmlspecialchars($donnee [1]);
-    $donnee [2] = htmlspecialchars($donnee [2]);
-    $donnee [3] = dateMysqlVersTexte($donnee [3]);
-    $mode = "MAJ";
-    ordonneLiensSongbook($id);
-} else {
-    $mode = "INS";
-    $donnee [0] = 0;
-    $donnee [1] = "";
-    $donnee [2] = "";
-    $donnee [3] = "01/01/1970";
-    $donnee [4] = "";
-    $donnee [5] = 0;
-    $donnee [7] = 1;
-}
+// 3. CHARGEMENT DES DONNÉES
+$sb = new Songbook($id);
+$mode = ($sb->getId() > 0) ? "MAJ" : "INS";
+$liens = null;
 
 if ($mode == "MAJ") {
-    $sortie .= "<H1> Mise à jour - " . $table . "</H1>";
-    $sortie .= " <p> Vous êtes sur le point de modifier un Songbook !</p>
-                <a href='songbook_voir.php?id=$id'> voir le songbook</a>";
-}
-if ($mode == "INS") {
-    $sortie .= "<H1> Création - " . $table . "</H1>";
-    $sortie .= "<p>Vous êtes sur le point de créer un nouveau Songbook !</p>";
-}
-$sortie .= "<Div class = 'centrer'>";
-// Création du formulaire
-$f = new Formulaire ("POST", $table . "_get.php", $sortie);
-$f->champCache("id", $donnee [0]);
-// TODO : La longueur du champ n'est pas prise en compte dans formulaire!
-$f->champTexte("Nom :", "fnom", $donnee [1], 64, 128);
-$f->champTexte("Description :", "fdescription", $donnee [2], 64, 128);
-$f->champTexte("Date :", "fdate", $donnee [3], 10, 10);
-$f->champTexte("Image :", "fimage", $donnee [4], 64, 64);
-$f->champTexte("Hits :", "fhits", $donnee [5], 10, 10);
-$f->champTexte("Type :", "ftype", $donnee [7], 10, 10);
-$f->champCache("mode", $mode);
-$f->champValider(" Valider ", "valider");
-$sortie .= $f->fin();
-$sortie .= "</div>\n";
-
-if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-    // On verrouille le champ hits, date
-    // $sortie = str_replace("NAME='fdate'", "NAME='fdate' disabled='disabled' ", $sortie);
-    $sortie = str_replace("NAME='fhits'", "NAME='fhits' disabled='disabled' ", $sortie);
+    ordonneLiensSongbook($id);
+    $liens = chercheLiensDocSongbook('idSongbook', $id, "ordre");
 }
 
-$sortie .= "<h2>Liste des fichiers rattachés à ce songbook</h2>";
-$sortie .= "<p>Les fichiers à rattacher ici seront relatifs au songbook lui-même : illustration de couverture, pdf contenant toutes les chansons...</p>";
+// Préparation des variables
+$pageTitle = ($mode === 'MAJ') ? 'Modifier le recueil' : 'Créer un nouveau recueil';
+$nomSongbook = htmlspecialchars($sb->getNom());
+$nom = $nomSongbook;
+$desc = htmlspecialchars($sb->getDescription());
+$date = dateMysqlVersTexte($sb->getDate());
+$type = $sb->getType();
+$image = htmlspecialchars($sb->getImage());
+$hits = $sb->getHits();
 
-// Cherche un document et le renvoie s'il existe
+$opt1 = ($type == 1) ? 'selected' : '';
+$opt2 = ($type == 2) ? 'selected' : '';
+$opt3 = ($type == 3) ? 'selected' : '';
 
-if ($mode=="MAJ") {
-    $lignes = chercheDocumentsTableId("songbook", $id);
-    $listeDocs = "";
-    // Pour chaque document
-    while ($ligneDoc = $lignes->fetch_row()) {
-        // var_dump( $ligneDoc);
-        // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-        $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-        // echo "Chanson id : $id fichier court : $fichierCourt";
-        $fichier =  RACINE . "data/songbooks/$id/" . urlencode($fichierCourt);
-        $extension = substr(strrchr($ligneDoc[1], '.'), 1);
-        $icone = image(RACINE ."images/icones/$extension.png", 32, 32, ICONE);
-        if (!file_exists(RACINE . "images/icones/$extension.png")) {
-            $icone = image(RACINE . "images/icones/fichier.png", 32, 32, ICONE);
-        }
-        $listeDocs .= "$icone <a href= '" . $fichier . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
-        $listeDocs .= "(" . intval($ligneDoc [2] / 1024) . " ko )";
-        $listeDocs .= boutonSuppression("songbook_get.php" . "?id=$id&idDoc=$ligneDoc[0]&nomFic=$fichierCourt&mode=SUPPRFIC", $iconePoubelle, $cheminImages) . "<br>\n";
-    }
-    $sortie .= $listeDocs;
-}
-echo $sortie;
+// --- RENDU HTML ---
 
-require('songbook_corbeille.php');
+$html = <<<HTML
+<link rel="stylesheet" href="../../css/songbookform.css">
+
+<div class="container sb-form-container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h1 class="sb-header-title">
+                <i class="glyphicon glyphicon-edit" aria-hidden="true"></i>
+                $pageTitle
+            </h1>
+HTML;
 
 if ($mode == "MAJ") {
-    ?>
-    <h2>Envoyer un fichier pour ce songbook sur le serveur</h2>
-    <form action="songbook_upload.php" method="post"
-          enctype="multipart/form-data">
-        <input type="hidden" name="MAX_FILE_SIZE" value="10000000">
-        <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
-        <label class="inline" for="fichier"> </label>
-        <input type="file" id="fichier" name="fichierUploade" size="40">
-        <input type="submit" value="Envoyer">
-    </form>
-
-    <h2>Liste des documents dans ce songbook</h2>
-    <p>Voici la liste des documents rattachés au songbook :grilles, partoches, partitions...</p>
-    <p>Il est possible de changer l'ordre des documents en déplaçant les titres dans la liste à la souris (drag'n drop)</p>
-    <?php
-    $lignes = chercheLiensDocSongbook('idSongbook', $id, "ordre" );
-    $listeDocs = "<ul id='sortable'>";
-    $numero = 0;
-    while ($ligne = $lignes->fetch_row()) {
-        $numero++;
-        $ligneDoc = chercheDocument($ligne [1]);
-        $idDoc = $ligneDoc[0];
-        $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-        $fichier = RACINE .$_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . urlencode($fichierCourt);
-        $listeDocs .= "<li class='ui-state-default' data-index='$idDoc' data-position='$numero'>";
-        $icone = image(RACINE ."images/icones/" . $fichier [2] . ".png", 32, 32, ICONE);
-        if (!file_exists(RACINE . "images/icones/" . $fichier [2] . ".png")) {
-            $icone = image(RACINE . "images/icones/fichier.png", 32, 32, ICONE);
-        }
-        $listeDocs .= "<a href= '" . htmlentities($fichier) . "' target='_blank'> " . htmlentities($fichierCourt) . "</a> ";
-        $listeDocs .= boutonSuppression($songbookGet . "?id=$id&idDoc=$ligneDoc[0]&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
-        $listeDocs .= "</li>\n";
-    }
-    echo $listeDocs . "</ul>";
-    ?>
-
-    <h2>Lier un document existant à ce songbook</h2>
-    <p>Ici on rattache des documents au songbook. Ce seront des documents rattachés à une chanson. </p>
-    <p>Par exemple, grille, partoche, partition... Pour uploader sur le site des documents, il faut d'abord créer une
-        chanson, et lui rattacher des documents. </p>
-    <p>Dans la liste combo ci-dessous, vous trouverez les derniers documents uploadés sur le site au format pdf.</p>
-
-    <form action="songbook_form.php" method="post" name="form2">
-        <?php
-        // echo selectDocument("nomTable", "chanson", "id", false);
-        require "../document/documentCherche.php";
-        ?>
-        <input type="hidden" name="id" value="<?php echo $donnee[0]; ?>">
-        <input id="envoyer" type="submit" value="Envoyer" style="display: none;">
-    </form>
-    <button onclick='genereUnPdf()'>Génère le songbook en pdf</button>
-
-    <div id="div1"></div>
-    <script>
-        // bouton valider masqué par défaut
-        $(document).ready(function () {
-            $("#valider").hide();
-        });
-        // bouton validé montré après une recherche
-        $(document).on("change", "input[type='radio']", function() {
-            if ($("input[type='radio']:checked").length > 0) {
-                $("#valider").show();
-            } else {
-                $("#valider").hide();
-            }
-        });
-        // entrée ayu clavier lance la recherche
-        // Ajoutez l'attribut autofocus à l'élément de recherche
-        $("#nomCherche").attr("autofocus", true);
-
-        // Ajoutez un événement keydown à l'élément de recherche
-        $("#nomCherche").on("keydown", function(event) {
-            if (event.which === 13) { // La touche Entrée a été appuyée
-                $("#btnChercheDocuments").click(); // Déclenche le clic sur le bouton de recherche
-                return false; // Empêche la soumission du formulaire
-            }
-        });
-
-        function genereUnPdf() {
-            $.ajax({
-                type: "POST",
-                url: "songbook_get.php",
-                data: "id=" + <?=$id?> +"&mode=GENEREPDF",
-                datatype: 'html', // type de la donnée à recevoir
-                success: function (code_html, statut) { // success est toujours en place, bien sûr !
-                    if (code_html.search("n'a pas été traité.") === -1)
-                        toastr.success("La génération du pdf a abouti ! <br> Un nouveau pdf a été rajouté aux fichiers du songbook. <br> Vous pouvez raffraîchir la page pour le voir.");
-                    else {
-                        toastr.warning("Erreur dans la génération du pdf... un des pdf à assembler n'est pas pris en compte par nos outils .<br>Message d'erreur en bas de la page.");
-                        $("#div1").html(code_html);
-                    }
-                },
-                error: function (resultat, statut, erreur) {
-                    $("#div1").html(resultat);
-                }
-            });
-        }
-
-        function formSuccess() {
-            $("#msgSubmit").removeClass("hidden");
-        }
-
-        // Gestion de l'ordre dans le songbook
-        // On va renvoyer à la page traiteOrdre.php l'identifiant du songbook, et un tableau avec
-        // positions[idDoc,ancienRang]
-        // ex : si le 1er élément est passé en 2 :
-        // positions[387,2][366,1][167,3][274,4]
-
-         //   $('#sortable').sortable();
-        $('#sortable').sortable({
-            axis: 'y',
-            update: function (index) {
-                let positions = [];
-                $(this).children().each(function (index) {
-                    // console.log('déplacement du ' + $(this).attr('data-index'));
-                    positions.push([$(this).attr('data-index'), $(this).attr('data-position')]);
-                });
-                $.ajax({
-                    data: {
-                        idSongbook: <?=$id?>,
-                        positions: positions
-                    },
-                    type: 'POST',
-                    url: 'traiteOrdre.php'
-                });
-            }
-        });
-        $('#sortable').disableSelection();
-    </script>
-    <?php
-    echo envoieFooter();
+    $html .= "<p class='text-muted'>Vous modifiez : <strong>$nomSongbook</strong> &bull; <a href='songbook_voir.php?id=$id' class='btn btn-xs btn-default'>Voir le rendu public</a></p>";
 }
-?>
+
+$html .= <<<HTML
+            <section class="well sb-well-custom">
+                <form action="songbook_get.php" method="POST" class="form-horizontal">
+                    <input type="hidden" name="id" id="idSongbook" value="$id">
+                    <input type="hidden" name="mode" value="$mode">
+                    <input type="hidden" name="fimage" value="$image">
+                    <input type="hidden" name="fhits" value="$hits">
+                    
+                    <div class="form-group">
+                        <label for="fnom" class="col-sm-2 control-label">Titre :</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="fnom" name="fnom" class="form-control" value="$nom" required placeholder="Nom du songbook">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fdescription" class="col-sm-2 control-label">Description :</label>
+                        <div class="col-sm-10">
+                            <textarea id="fdescription" name="fdescription" class="form-control" rows="3" placeholder="Petit texte de présentation...">$desc</textarea>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="ftype" class="col-sm-4 control-label">Genre :</label>
+                                <div class="col-sm-8">
+                                    <select id="ftype" name="ftype" class="form-control">
+                                        <option value="1" $opt1>Anthologie</option>
+                                        <option value="2" $opt2>Concert</option>
+                                        <option value="3" $opt3>Thématique</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="fdate" class="col-sm-4 control-label">Date :</label>
+                                <div class="col-sm-8">
+                                    <input type="text" id="fdate" name="fdate" class="form-control" value="$date" placeholder="JJ/MM/AAAA">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-primary sb-btn-save">
+                                <i class="glyphicon glyphicon-save" aria-hidden="true"></i> ENREGISTRER LES INFORMATIONS
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+HTML;
+
+if ($mode == "MAJ") {
+    // --- DOCUMENTS RATTACHÉS ---
+    $html .= <<<HTML
+    <section>
+        <h3 class="sb-section-title"><i class="glyphicon glyphicon-paperclip" aria-hidden="true"></i> Documents du recueil</h3>
+        <p class="text-muted small">Fichiers propres au recueil (Couverture, Index, PDF complet...)</p>
+        <div class="list-group" style="margin-bottom: 20px;">
+HTML;
+    
+    $docsRecueil = chercheDocumentsTableId("songbook", $id);
+    while ($doc = $docsRecueil->fetch_row()) {
+        $html .= renderDocumentRow($doc, $id);
+    }
+    $html .= "</div>";
+
+    // UPLOAD
+    $html .= <<<HTML
+        <div class="well well-sm">
+            <form action="songbook_upload.php" method="POST" enctype="multipart/form-data" class="form-inline">
+                <input type="hidden" name="id" value="$id">
+                <div class="form-group">
+                    <label for="fichierUploade">Ajouter un fichier :</label>
+                    <input type="file" id="fichierUploade" name="fichierUploade" class="form-control" style="display: inline-block;">
+                </div>
+                <button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-upload" aria-hidden="true"></i> Envoyer</button>
+            </form>
+        </div>
+    </section>
+HTML;
+
+    // --- SOMMAIRE ---
+    $html .= <<<HTML
+    <section>
+        <h3 class="sb-section-title"><i class="glyphicon glyphicon-list" aria-hidden="true"></i> Sommaire des morceaux</h3>
+        <p class="text-muted small">Faites glisser les titres pour réorganiser l'ordre dans le recueil.</p>
+        <ul id="sortable" class="list-unstyled">
+HTML;
+    
+    $liens = chercheLiensDocSongbook('idSongbook', $id, "ordre");
+    $n = 0;
+    while ($lien = $liens->fetch_row()) {
+        $n++;
+        $docLien = chercheDocument($lien[1]);
+        if ($docLien) {
+            $html .= renderSommaireRow($docLien, $id, $n);
+        }
+    }
+    $html .= <<<HTML
+        </ul>
+    </section>
+HTML;
+
+    // LIAISON AJAX
+    $html .= <<<HTML
+    <section class="sb-add-box">
+        <h4 class="sb-add-title"><i class="glyphicon glyphicon-plus-sign" aria-hidden="true"></i> Ajouter un morceau au recueil</h4>
+        <p class="text-muted small">Cherchez une chanson par son titre (min. 4 car.), puis choisissez le document PDF à inclure.</p>
+        
+        <div class="form-group" style="position: relative;">
+            <div class="input-group">
+                <span class="input-group-addon" id="addon-search"><i class="glyphicon glyphicon-search" aria-hidden="true"></i></span>
+                <input type="text" id="rechercheChansonSB" class="form-control input-lg" placeholder="Nom de la chanson..." autocomplete="off" aria-describedby="addon-search">
+            </div>
+            <div id="resultsChansonSB" class="sb-results-dropdown" role="listbox"></div>
+        </div>
+
+        <div id="selectionPdfSB" class="sb-pdf-selection">
+            <h5 style="font-weight: bold; margin-top: 0; color: #2b1d1a;">Documents PDF trouvés :</h5>
+            <div id="listePdfsSB" class="list-group" style="margin-bottom: 0;"></div>
+        </div>
+
+        <form action="songbook_form.php" method="POST" id="formFinalAjout" style="display: none;">
+            <input type="hidden" name="id" value="$id">
+            <input type="hidden" name="documentJoint" id="inputDocFinal">
+        </form>
+    </section>
+HTML;
+
+    // GÉNÉRATION FINALE
+    $html .= <<<HTML
+    <footer class="sb-footer-actions">
+        <button onclick='genereUnPdf($id)' class="btn btn-lg btn-success sb-btn-generate">
+            <i class="glyphicon glyphicon-refresh" aria-hidden="true"></i> RÉGÉNÉRER LE PDF COMPLET
+        </button>
+    </footer>
+HTML;
+}
+
+$html .= "</div></div></div>";
+
+// JavaScript Spécifique
+$html .= '<script src="../../js/songbookform.js"></script>';
+
+echo $html;
+echo envoieFooter();
