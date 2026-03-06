@@ -1,11 +1,11 @@
 <?php
 const DATA_SONGBOOKS = "../../data/songbooks/";
 
-include_once("../lib/utilssi.php");
-include_once "../lib/configMysql.php";
-include_once("../lib/pdf.php");
-include_once("../liens/lienDocSongbook.php");
-include_once("../document/document.php");
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/utilssi.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/configMysql.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/lib/pdf.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/liens/lienDocSongbook.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . "/php/document/document.php";
 
 $songbookForm = "songbook_form.php";
 $songbookGet = "songbook_get.php";
@@ -13,173 +13,352 @@ $songbookVoir = "songbook_voir.php";
 $songbookListe = "songbook_liste.php";
 $cheminImagesSongbook = "../../data/songbooks/";
 
-// Fonctions de gestion du songbook
-
-// Cherche les songbooks correspondant à un critère
 /**
- * @param $critere
- * @param $valeur
- * @param string $critereTri
- * @param bool $bTriAscendant
- * @return mixed
+ * Classe de gestion des Songbooks (Livres de partitions)
  */
-function chercheSongbooks($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true) :object
+class Songbook
 {
-    $maRequete = "SELECT * FROM songbook WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
-    if (! $bTriAscendant) {
-        $maRequete .= " DESC";
-    }
-    else
+    const MYSQL = 'mysql';
+    private int $_id;
+    private string $_nom;
+    private string $_description;
+    private string $_date;
+    private string $_image;
+    private int $_hits;
+    private int $_idUser;
+    private int $_type; // 1: Anthologie, 2: Concert, 3: Thème
+
+    public function __construct()
     {
-        $maRequete .= " ASC";
+        $a = func_get_args();
+        $i = func_num_args();
+        if (method_exists($this, $f = '__construct' . $i)) {
+            call_user_func_array(array($this, $f), $a);
+        }
     }
-//    echo "ma requete : " . $maRequete;
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchesongbook #1 : " . $_SESSION ['mysql']->error);
-  //  echo "mon resultat : " . var_dump($result);
-    return $result;
+
+    public function __construct0()
+    {
+        $this->_id = 0;
+        $this->setNom("");
+        $this->setDescription("");
+        $this->setDate(date("Y-m-d"));
+        $this->setImage("");
+        $this->setHits(0);
+        $this->setIdUser($_SESSION['id'] ?? 1);
+        $this->setType(1);
+    }
+
+    public function __construct1(int $id)
+    {
+        $this->__construct0();
+        $this->chercheSongbook($id);
+    }
+
+    // Getters & Setters
+    public function getId(): int { return $this->_id; }
+    public function setId(int $id): void { $this->_id = $id; }
+
+    public function getNom(): string { return $this->_nom; }
+    public function setNom(string $nom): void { $this->_nom = $nom; }
+
+    public function getDescription(): string { return $this->_description; }
+    public function setDescription(string $description): void { $this->_description = $description; }
+
+    public function getDate(): string { return $this->_date; }
+    public function setDate(string $date): void { $this->_date = $date; }
+
+    public function getImage(): string { return $this->_image; }
+    public function setImage(string $image): void { $this->_image = $image; }
+
+    public function getHits(): int { return $this->_hits; }
+    public function setHits(int $hits): void { $this->_hits = $hits; }
+
+    public function getIdUser(): int { return $this->_idUser; }
+    public function setIdUser(int $idUser): void { $this->_idUser = $idUser; }
+
+    public function getType(): int { return $this->_type; }
+    public function setType(int $type): void { $this->_type = $type; }
+
+    /**
+     * Retourne le libellé du type de songbook
+     */
+    public function getLabelType(): string
+    {
+        return match($this->_type) {
+            1 => "Anthologie",
+            2 => "Concert",
+            3 => "Thématique",
+            default => "Inconnu"
+        };
+    }
+
+    /**
+     * Charge les données depuis la BDD
+     */
+    public function chercheSongbook(int $id): bool
+    {
+        $maRequete = sprintf("SELECT * FROM songbook WHERE id = '%s'", $id);
+        $result = $_SESSION[self::MYSQL]->query($maRequete);
+        if ($ligne = $result->fetch_row()) {
+            $this->mysqlRowVersObjet($ligne);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Hydrate l'objet depuis une ligne MySQL
+     */
+    public function mysqlRowVersObjet(array $ligne): void
+    {
+        $this->_id = (int)$ligne[0];
+        $this->_nom = $ligne[1];
+        $this->_description = $ligne[2];
+        $this->_date = $ligne[3];
+        $this->_image = $ligne[4] ?? "";
+        $this->_hits = (int)$ligne[5];
+        $this->_idUser = (int)$ligne[6];
+        $this->_type = (int)($ligne[7] ?? 1);
+    }
+
+    /**
+     * Sauvegarde ou met à jour en BDD
+     */
+    public function enregistreBDD(): int
+    {
+        $db = $_SESSION[self::MYSQL];
+        $nom = $db->real_escape_string($this->_nom);
+        $desc = $db->real_escape_string($this->_description);
+        $date = convertitDateJJMMAAAAversMySql($this->_date);
+        $image = $db->real_escape_string($this->_image);
+
+        if ($this->_id == 0) {
+            $maRequete = sprintf("INSERT INTO songbook (nom, description, date, image, hits, idUser, type) 
+                VALUES ('%s', '%s', '%s', '%s', %d, %d, %d)",
+                $nom, $desc, $date, $image, $this->_hits, $this->_idUser, $this->_type);
+            $db->query($maRequete) or die($db->error);
+            $this->_id = $db->insert_id;
+        } else {
+            $maRequete = sprintf("UPDATE songbook SET nom='%s', description='%s', date='%s', image='%s', hits=%d, type=%d WHERE id=%d",
+                $nom, $desc, $date, $image, $this->_hits, $this->_type, $this->_id);
+            $db->query($maRequete) or die($db->error);
+        }
+        return $this->_id;
+    }
+
+    /**
+     * Affiche une carte moderne (style Canopée) pour le songbook
+     */
+    public function afficheCarteSongbook(): string
+    {
+        $_id = $this->getId();
+        $nom = htmlspecialchars($this->getNom());
+        $desc = htmlspecialchars(limiteLongueur($this->getDescription(), 60));
+        $typeLabel = $this->getLabelType();
+        $hits = $this->getHits();
+        $date = dateMysqlVersTexte($this->getDate());
+
+        // Palette Canopée
+        $c_marron_fonce = "#2b1d1a";
+        $c_marron_clair = "#D2B48C"; 
+        $c_accent = "#8B4513";
+        $c_beige = "#F5F5DC";
+
+        // Image de couverture
+        $imageFile = imageTableId("songbook", $_id);
+        if ($imageFile) {
+            $srcImage = "../../data/songbooks/$_id/" . urlencode($imageFile);
+            $imgHtml = "<a href='songbook_voir.php?id=$_id'><img src='$srcImage' alt='$nom' style='max-width: 100%; max-height: 100%; object-fit: cover;'></a>";
+        } else {
+            $imgHtml = "<a href='songbook_voir.php?id=$_id' style='text-decoration:none;'><span class='glyphicon glyphicon-book' style='font-size: 60px; color: $c_marron_fonce; opacity: 0.3;'></span></a>";
+        }
+
+        // Couleur selon le type
+        $badgeColor = match($this->getType()) {
+            1 => "#e67e22", // Orange (Anthologie)
+            2 => "#d35400", // Orange Foncé (Concert)
+            3 => "#27ae60", // Vert (Thème)
+            default => "#777"
+        };
+
+        $html = "
+        <div class='col-sm-6 col-md-4 col-lg-3' style='margin-bottom: 25px;'>
+            <div class='thumbnail shadow-hover' style='height: 420px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; padding: 0; border: 1px solid $c_marron_clair; background-color: $c_marron_fonce;'>
+                <a href='songbook_voir.php?id=$_id' style='text-decoration: none;'>
+                    <div style='height: 200px; overflow: hidden; background-color: $c_marron_clair; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid $c_accent;'>
+                        $imgHtml
+                    </div>
+                </a>
+                <div class='caption' style='padding: 15px; text-align: center; color: $c_beige;'>
+                    <h4 style='margin-top: 0; margin-bottom: 10px; color: $c_marron_clair; height: 44px; overflow: hidden; font-weight: bold;'>$nom</h4>
+                    <p style='height: 40px; overflow: hidden; font-size: 12px; color: #bbb; margin-bottom: 10px;'>$desc</p>
+                    <div style='margin-bottom: 15px; height: 25px;'>
+                        <span class='label' style='background-color: $badgeColor; color: white;'>$typeLabel</span>
+                        <span class='label' style='background-color: #444; color: #ddd; margin-left: 5px;'>$date</span>
+                    </div>
+                    <p style='font-size: 11px; margin-bottom: 15px;'><span class='glyphicon glyphicon-eye-open'></span> $hits lectures</p>
+                    
+                    <div class='btn-group btn-group-justified' role='group'>
+                        <div class='btn-group' role='group'>
+                            <a href='songbook_voir.php?id=$_id' class='btn' style='background-color: $c_marron_clair; color: $c_marron_fonce; font-weight: bold; border-radius: 0;'>Ouvrir</a>
+                        </div>";
+        
+        if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
+            $html .= "
+                        <div class='btn-group' role='group'>
+                            <a href='songbook_form.php?id=$_id' class='btn' style='background-color: $c_accent; color: white; border-radius: 0; border: none;'>Editer</a>
+                        </div>";
+        }
+        
+        return $html . "
+                    </div>
+                </div>
+            </div>
+        </div>";
+    }
+
+    /**
+     * Recherche statique de songbooks avec multi-critères
+     */
+    public static function chercheSongbooks(string $recherche = "%", string $type = "", string $tri = 'nom', bool $asc = true): array
+    {
+        $db = $_SESSION[self::MYSQL];
+        $recherche = $db->real_escape_string($recherche);
+        $order = $asc ? "ASC" : "DESC";
+        
+        $conditions = [];
+        if ($recherche !== "%" && $recherche !== "") {
+            $conditions[] = "(nom LIKE '%$recherche%' OR description LIKE '%$recherche%')";
+        }
+        if ($type !== "") {
+            $type = (int)$type;
+            $conditions[] = "type = $type";
+        }
+        
+        $where = count($conditions) > 0 ? "WHERE " . implode(" AND ", $conditions) : "";
+        
+        $maRequete = "SELECT * FROM songbook $where ORDER BY $tri $order";
+        $result = $db->query($maRequete) or die($db->error);
+        
+        $liste = [];
+        while ($row = $result->fetch_row()) {
+            $sb = new Songbook();
+            $sb->mysqlRowVersObjet($row);
+            $liste[] = $sb;
+        }
+        return $liste;
+    }
 }
 
-// Cherche un songbook et le renvoie s'il existe
-function chercheSongbook($id) :array
+// --- FONCTIONS WRAPPERS (POUR COMPATIBILITÉ) ---
+
+function chercheSongbooks($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true): object
 {
-    $maRequete = "SELECT * FROM songbook WHERE songbook.id = '$id'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchesongbook #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, nom, description, date , image, hits
-    $ligne = $result->fetch_row();
-    return ($ligne);
+    // On simule l'ancien retour (mysqli_result) pour ne pas tout casser d'un coup
+    $order = $bTriAscendant ? "ASC" : "DESC";
+    $maRequete = "SELECT * FROM songbook WHERE $critere LIKE '$valeur' ORDER BY $critereTri $order";
+    return $_SESSION['mysql']->query($maRequete);
 }
 
-// Cherche un songbook et la renvoie si elle existe
-function chercheSongbookParLeNom($nom) :array
+function chercheSongbook($id): array
 {
-    $maRequete = "SELECT * FROM songbook WHERE songbook.nom = '$nom'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchesongbookParLeNom #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, nom, description, date , image, hits
-    $ligne = $result->fetch_row();
-    return ($ligne);
+    $sb = new Songbook((int)$id);
+    // On simule l'ancien retour (tableau indexé)
+    return [
+        $sb->getId(), $sb->getNom(), $sb->getDescription(), $sb->getDate(), 
+        $sb->getImage(), $sb->getHits(), $sb->getIdUser(), $sb->getType()
+    ];
 }
 
-// Crée un songbook
+function chercheSongbookParLeNom($nom): array
+{
+    $db = $_SESSION['mysql'];
+    $nomEsc = $db->real_escape_string($nom);
+    $result = $db->query("SELECT id FROM songbook WHERE nom = '$nomEsc'");
+    if ($row = $result->fetch_row()) {
+        return chercheSongbook($row[0]);
+    }
+    return [];
+}
+
 function creeSongbook($nom, $description, $date, $image, $hits, $type)
 {
-    $date = convertitDateJJMMAAAAversMySql($date);
-    $idUSer = $_SESSION ['id'];
-    $maRequete = "INSERT INTO songbook VALUES (NULL, '$nom', '$description', '$date', '$image', '$hits', '$idUSer', '$type')";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creesongbook#1 : " . $_SESSION ['mysql']->error);
-    return $result;
+    $sb = new Songbook();
+    $sb->setNom($nom);
+    $sb->setDescription($description);
+    $sb->setDate($date);
+    $sb->setImage($image);
+    $sb->setHits((int)$hits);
+    $sb->setType((int)$type);
+    return $sb->enregistreBDD();
 }
 
-// Modifie en base la songbook
 function modifiesSongbook($id, $nom, $description, $date, $image, $hits, $type)
 {
-    $date = convertitDateJJMMAAAAversMySql($date);
-    $maRequete = "UPDATE  songbook
-	SET nom = '$nom', description = '$description', date = '$date' , image = '$image', hits = '$hits', type = '$type'
-	WHERE id='$id'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiesongbook #1 : " . $_SESSION ['mysql']->error);
-    return $result;
+    $sb = new Songbook((int)$id);
+    $sb->setNom($nom);
+    $sb->setDescription($description);
+    $sb->setDate($date);
+    $sb->setImage($image);
+    $sb->setHits((int)$hits);
+    $sb->setType((int)$type);
+    return $sb->enregistreBDD();
 }
 
-// Cette fonction supprime un songbook si il existe
 function supprimeSongbook($idsongbook)
 {
-    // On supprime les enregistrements dans songbook
-    $maRequete = "DELETE FROM songbook
-	WHERE id='$idsongbook'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimesongbook : " . $_SESSION ['mysql']->error);
+    $db = $_SESSION['mysql'];
+    $maRequete = "DELETE FROM songbook WHERE id='$idsongbook'";
+    $db->query($maRequete);
     supprimeliensDocSongbookDuSongbook($idsongbook);
-    return $result;
-    // TODO : supprimer également le dossier et les fichiers
+    return true;
 }
 
-// Cette fonction duplique un songbook si il existe
-function dupliqueSongbook($idSongbook) :bool
+function dupliqueSongbook($idSongbook): bool
 {
-    //   echo " Duplication du songbook $idSongbook";
+    $mod = new Songbook((int)$idSongbook);
+    if ($mod->getId() == 0) return false;
 
-    // On charge le songbook demandé
-    $songbookModele = chercheSongbook($idSongbook);
-    if ($songbookModele == 0) {
-        return (false);
-    }
+    $new = new Songbook();
+    $new->setNom("Copie de " . $mod->getNom());
+    $new->setDescription("Songbook créé par copie");
+    $new->setType($mod->getType());
+    $newId = $new->enregistreBDD();
 
-    // On duplique les enregistrements dans songbook
-    $nomModele = $_SESSION ['mysql']->real_escape_string($songbookModele[1]);
-
-    // On crée un nouveau songbook nommé "copie de $nomModele"
-    creeSongbook("copie de " . $nomModele, "songbook créé par copie", date("d/m/Y"), "", 0, $songbookModele[7]);
-    $idDoublon = $_SESSION ['mysql']->insert_id;
-
-    // En suite, on va recopier tous les liens BDD songbook-document
     $result = chercheLiensDocSongbook("idSongbook", $idSongbook, "ordre", true);
-    $tabIdDocs = array();
-    $indice = 0;
     while ($ligne = mysqli_fetch_assoc($result)) {
-        $tabIdDocs[$indice] = $ligne["idDocument"]; // idDocument
-        $indice++;
-        //     echo "Ajout de l'iddoc " . var_dump($ligne) . " à l'indice $indice";
+        creelienDocSongbook($ligne["idDocument"], $newId);
     }
-
-    // Boucle, insérer tout $tabIddoc dans le nouvel IDSongbook !
-    $parcours = 0;
-    while ($parcours < $indice) {
-        creelienDocSongbook($tabIdDocs[$parcours], $idDoublon);
-        $parcours++;
-    }
-    return (true);
+    return true;
 }
 
-// Cette fonction modifie ou crée un songbook si besoin
-function creeModifieSongbook($id, $nom, $description, $date, $image, $hits, $type)
+function imageSongbook($idSongbook): string
 {
-    if (chercheSongbook($id)) {
-        modifiesSongbook($id, $nom, $description, $date, $image, $hits, $type);
-    }
-    else {
-        creeSongbook($nom, $description, $date, $image, $hits, $type);
-    }
-}
-
-// Cette fonction renvoie l'image vignette d'un songbook
-function imageSongbook($idSongbook) :string
-{
+    $db = $_SESSION['mysql'];
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
-    $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imageSongbook #1 : " . $_SESSION ['mysql']->error);
-    if (empty($result)) {
-        return ("");
-    }
-
-    // Choisit une vignette au hasard parmi les images
-    // renvoie la ligne sélectionnée : id, nom, description, date , image, hits
+    $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg') LIMIT 1";
+    $result = $db->query($maRequete);
     if ($ligne = $result->fetch_row()) {
-        $nom = composeNomVersion($ligne[1], $ligne[4]);
-        return ($nom);
-    } else {
-        return ("");
+        return composeNomVersion($ligne[1], $ligne[4]);
     }
+    return "";
 }
 
-// Cette fonction renvoie une chaine de description du songbook
-function infosSongbook($id) :string
+function infosSongbook($id): string
 {
-    $enr = chercheSongbook($id);
-    // id_journée id_joueur poste statut
-    $retour = "Id : " . $enr [0] . " Nom : " . $enr [1] . " Description : " . $enr [2] . " Date : " . $enr [3] . " image : " . $enr [4] . " Hits : " . $enr [5] . " type = " . $enr [7];
-    return $retour . "<BR>\n";
+    $sb = new Songbook((int)$id);
+    return "Id : " . $sb->getId() . " Nom : " . $sb->getNom() . " Type : " . $sb->getLabelType() . "<BR>\n";
 }
 
-// Cette fonction renvoie la liste des fichiers présents dans le répertoire du songbook
-// Sous forme de tableau [0] répertoire [1] nomFichier [2] extension
-
-function fichiersSongbook($id) :array
+function fichiersSongbook($id): array
 {
-    $retour = array(); // repertoire, nom, extension
+    $retour = [];
     $repertoire = DATA_SONGBOOKS . "$id/";
     if (is_dir($repertoire)) {
         foreach (new DirectoryIterator ($repertoire) as $fileInfo) {
-            if (! $fileInfo->isDot() && strpos($fileInfo->getFilename(), ".") != 0) {
-                array_push($retour, array($repertoire, $fileInfo->getFilename(), $fileInfo->getextension()));
+            if (!$fileInfo->isDot() && strpos($fileInfo->getFilename(), ".") != 0) {
+                $retour[] = [$repertoire, $fileInfo->getFilename(), $fileInfo->getextension()];
             }
         }
     }
@@ -188,95 +367,37 @@ function fichiersSongbook($id) :array
 
 function CreeSongBookPdf($idSongbook)
 {
-    // construit la liste des chansons, des fichiers, des id et des versions pour pouvoir générer un pdf
-    $listeNomsChanson = [];
-    $listeNomsFichier = [];
-    $listeIdChanson = [];
-    $listeVersionsDoc = [];
+    $db = $_SESSION['mysql'];
+    $listeNomsChanson = []; $listeNomsFichier = []; $listeIdChanson = []; $listeVersionsDoc = [];
 
-    $maRequete = "SELECT document.nom as NomFichier, chanson.nom as NomChanson, chanson.id as IdChanson, document.version as VersionDoc from document LEFT JOIN liendocsongbook ON liendocsongbook.idDocument = document.id LEFT JOIN chanson ON document.idTable = chanson.id
-WHERE liendocsongbook.idSongbook =  '$idSongbook' ORDER BY liendocsongbook.ordre ASC";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème CreeSongBookPdf #1 : requete" . $_SESSION ['mysql']->error);
-    if (empty($result)) {
-        $listeNomsFichier = [];
-    } else {
-        while ($ligne = mysqli_fetch_assoc($result)) {
-
-            //print_r($ligne);
-            array_push($listeNomsFichier, $ligne["NomFichier"]);
-            array_push($listeNomsChanson, $ligne["NomChanson"]);
-            array_push($listeIdChanson, $ligne["IdChanson"]);
-            array_push($listeVersionsDoc, $ligne["VersionDoc"]);
-        }
+    $maRequete = "SELECT document.nom, chanson.nom as t, chanson.id, document.version 
+                  FROM document 
+                  LEFT JOIN liendocsongbook ON liendocsongbook.idDocument = document.id 
+                  LEFT JOIN chanson ON document.idTable = chanson.id
+                  WHERE liendocsongbook.idSongbook = '$idSongbook' ORDER BY liendocsongbook.ordre ASC";
+    $result = $db->query($maRequete);
+    while ($ligne = mysqli_fetch_row($result)) {
+        $listeNomsFichier[] = $ligne[0];
+        $listeNomsChanson[] = $ligne[1];
+        $listeIdChanson[] = $ligne[2];
+        $listeVersionsDoc[] = $ligne[3];
     }
-    $imageSongBook = imageSongBook($idSongbook);
-    $ligneSongbook = chercheSongbook($idSongbook);
-    $nom_songbookgenere = make_alias("songbook_".$ligneSongbook[1]) .'.pdf';
-    // echo '$nom de document cherche pour la version : ' . $nom_songbookgenere;
-    $document = chercheDocumentNomTableId($nom_songbookgenere, "songbook", $idSongbook);
-    // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-    $version = $document[4];
-    pdfCreeSongbook($idSongbook, $version, $ligneSongbook[1], $imageSongBook, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
-//     function pdfCreeSongbook($idSongBook, $version, $intitule, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
+    
+    $sb = new Songbook((int)$idSongbook);
+    $image = imageSongbook($idSongbook);
+    $nomGenere = make_alias("songbook_" . $sb->getNom()) . '.pdf';
+    $doc = chercheDocumentNomTableId($nomGenere, "songbook", $idSongbook);
+    pdfCreeSongbook($idSongbook, $doc[4], $sb->getNom(), $image, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
 }
 
-// Renvoie la liste des songbooks en base
-function listeSongbooks($type = 0) :array
+function listeSongbooks($type = 0): array
 {
-    // Cas de demande de liste des songbooks filtrée par type = 1, 2, 3, ou pas (0)
-    if ($type==0){
-        $maListeSongbooks = chercheSongbooks("nom", "%",'id', false);
-    }
-    else{
-        $maListeSongbooks = chercheSongbooks("type", "$type", 'id', false);
-    }
-    $index = 0;
+    $critere = ($type == 0) ? "nom" : "type";
+    $valeur = ($type == 0) ? "%" : $type;
+    $sbs = Songbook::chercheSongbooks($critere, $valeur);
     $liste = [];
-    while ($ligne = $maListeSongbooks->fetch_row()) {
-        // id
-        $liste[$index][0] = $ligne[0];
-        // nom
-        $liste[$index][1] = $ligne[1];
-        $index++;
+    foreach ($sbs as $sb) {
+        $liste[] = [$sb->getId(), $sb->getNom()];
     }
     return $liste;
 }
-
-// Fonction de test
-function testeSongbook()
-{
-    $SONGBOOK_1 = "Songbook #1";
-    $cover = "cover.jpg";
-    creeSongbook($SONGBOOK_1, "Chansons d été", "31/07/2017", $cover, 0, 1);
-    $id = chercheSongbookParLeNom($SONGBOOK_1);
-    $id = $id [0];
-    echo infosSongbook($id);
-
-    chercheSongbook($id);
-    $id = $id [0];
-    echo infosSongbook($id);
-    $SONGBOOK_2 = "Songbook #2";
-    creeSongbook($SONGBOOK_2, "Chansons d automne", "30/11/2017", $cover, 0, 1);
-    $id = chercheSongbookParLeNom($SONGBOOK_2);
-    $id = $id [0];
-    echo infosSongbook($id);
-
-    creeModifieSongbook($id, $SONGBOOK_2, "Chansons d automne !", "28/11/2017", $cover, 0,1);
-    $id = chercheSongbookParLeNom($SONGBOOK_2);
-    $id = $id [0];
-    echo infosSongbook($id);
-
-    $id = chercheSongbookParLeNom($SONGBOOK_2);
-    $id = $id [0];
-    // supprimesongbook($id);
-    echo infosSongbook($id);
-
-    $id = chercheSongbookParLeNom($SONGBOOK_2);
-    supprimeSongbook($id[0]);
-    $id = chercheSongbookParLeNom($SONGBOOK_2);
-    supprimeSongbook($id[0]);
-
-}
-
-// testeSongbook ();
-// TODO ajouter des logs pour tracer l'activité du site

@@ -35,6 +35,21 @@ if (!isset ($FichierUtilsSi)) {
         $_SESSION ["privilege"] = 0;
     }
 
+    /**
+     * Limite la longueur d'une chaine à x caractères
+     * @param string $chaine
+     * @param int $tailleMax
+     * @return string
+     */
+    function limiteLongueur(string $chaine, int $tailleMax): string
+    {
+        if (strlen($chaine) > $tailleMax) {
+            return mb_substr($chaine, 0, $tailleMax - 4) . "...";
+        } else {
+            return $chaine;
+        }
+    }
+
     // Cette fonction, pompée dans "PHP en action", p547, éditions O'Reilly
     // parcourt un sous-répertoire et exporte la liste des fichiers dans un tableau
     function pc_process_dir($nom_rep, $profondeur_max = 10, $profondeur = 0) :array

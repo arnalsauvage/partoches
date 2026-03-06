@@ -120,8 +120,9 @@ function augmenteHits($nomTable, $id)
 {
     $marequete = "select id, hits from $nomTable where id = '$id'";
     $result = $_SESSION ['mysql']->query($marequete) or die ("Problème augmenteHits #1 : table $nomTable, id : $id " . $_SESSION ['mysql']->error);
-    $ligne = $result->fetch_row();
-    $nbHits = $ligne[1] + 1;
-    $marequete = "UPDATE $nomTable SET hits = '$nbHits' where id = '$id'";
-    $result = $_SESSION ['mysql']->query($marequete) or die ("Problème augmenteHits #2 : table $nomTable, id : $id " . $_SESSION ['mysql']->error);
+    if ($ligne = $result->fetch_row()) {
+        $nbHits = $ligne[1] + 1;
+        $marequete = "UPDATE $nomTable SET hits = '$nbHits' where id = '$id'";
+        $_SESSION ['mysql']->query($marequete) or die ("Problème augmenteHits #2 : table $nomTable, id : $id " . $_SESSION ['mysql']->error);
+    }
 }

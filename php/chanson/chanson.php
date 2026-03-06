@@ -829,14 +829,3 @@ function chercheChansons($critere, $valeur, $critereTri = 'nom', $bTriAscendant 
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #3 : " . $_SESSION ['mysql']->error);
     return $result;
 }
-
-// TODO : Mettre cette function dans une bibli ou utiliser une existante
-// Limite la longeur d'une chaine à x caractères
-function limiteLongueur($chaine, $tailleMax): string
-{
-    if (strlen($chaine) > $tailleMax) {
-        return mb_substr($chaine, 0, $tailleMax - 4) . "...";
-    } else {
-        return $chaine;
-    }
-}
