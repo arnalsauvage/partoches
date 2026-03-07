@@ -1,0 +1,47 @@
+/* Styles spécifiques pour le formulaire des Strums */
+
+.strum-form-container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.strum-form-header {
+    color: #2b1d1a;
+    font-weight: bold;
+    border-bottom: 2px solid #D2B48C;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+}
+
+.strum-help-box {
+    background: #fcfaf2;
+    border: 1px solid #D2B48C;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+}
+
+.strum-btn-action {
+    border-radius: 30px;
+    padding: 10px 35px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Neutralisation des vieux styles rouges */
+.strum-form-container fieldset { border: none; padding: 0; margin: 0; }
+.strum-form-container label { float: none; width: auto; display: block; margin-top: 0; font-weight: bold; color: #2b1d1a; margin-bottom: 5px; }
+.strum-form-container input, .strum-form-container select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    height: 45px;
+}

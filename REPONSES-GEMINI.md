@@ -63,15 +63,17 @@
 - **Refonte Look Canopée** : La liste des chansons s'affiche désormais sous forme de cartes élégantes avec effet bois, badges de couleur et ombres portées.
 - **Automatisation** : Actualisation automatique de la galerie des médias lors de l'ajout/modification de chansons ou de liens URL.
 
-## Refonte du module Songbook
-- **Architecture Objet** : Création de la classe `Songbook` pour remplacer les fonctions procédurales.
-- **Vue "Canopée"** : Refonte de `songbook_liste.php` (cartes portrait 22:30), `songbook_voir.php` (vitrine premium) et `songbook_form.php`.
-- **Modernisation Technique** :
-    - Découplage complet : `css/songbookform.css` et `js/songbookform.js`.
-    - Recherche dynamique Ajax pour lier des chansons aux recueils.
-    - Respect des standards W3C (labels, alts, sémantique).
-- **Stabilité** : Suite de **Smoke Tests** validant 10 pages critiques (y compris en mode Admin).
-- **Correctifs** : Suppression des Magic Quotes (doubles slashes), fix des erreurs de headers et des warnings Heredoc.
+## Refonte du module Strum (Rythmiques)
+- **Migration vers l'ID** : Abandon de l'identification par chaîne de caractères au profit de l'ID numérique (`idStrum`) pour les liaisons chansons.
+- **Architecture Objet** : Refonte complète de la classe `Strum` (Propriétés typées, encapsulation, méthodes de persistance).
+- **Mode Swing** : Ajout de la colonne `swing` en BDD, gestion dans la classe et intégration dans les liens vers la Boîte à Strum.
+- **Look Canopée** : 
+    - `strum_liste.php` : Grille de cartes modernes, badges de popularité cliquables, et tableau technique admin.
+    - `strum_form.php` : Formulaire élégant avec aide dynamique et sélecteurs optimisés.
+- **Modale Interactive** : Chargement Ajax des chansons utilisant un strum spécifique directement depuis la liste.
+- **Découplage** : Création de `css/strum_liste.css`, `css/strum_form.css`, `js/strum_form.js`.
+- **Qualité & Stabilité** : Intégration dans la suite de **Smoke Tests** (13 pages validées dans Docker).
+
 
 
 ## Maintenance & Fixes (Suite)

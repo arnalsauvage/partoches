@@ -68,6 +68,9 @@ class SongbookSmokeTest extends TestCase
             'Chanson Chercher (Songbook)' => ['/php/chanson/chanson_chercher.php', ['idSongbook' => 1]],
             'Document Voir (Table ID 1)' => ['/php/document/documents_voir.php', ['idTable' => 1, 'nomTable' => 'songbook']],
             'Songbook Get (Mode Test)' => ['/php/songbook/songbook_get.php', ['mode' => 'TEST']],
+            'Liste Strums' => ['/php/strum/strum_liste.php', []],
+            'Form Strum (New)' => ['/php/strum/strum_form.php', []],
+            'Form Strum (Edit ID 1)' => ['/php/strum/strum_form.php', ['id' => 1]],
         ];
     }
 }
