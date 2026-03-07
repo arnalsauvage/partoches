@@ -411,6 +411,108 @@ class Media
         $this->persist();
     }
 
+    public function afficheComposantMedia(): string
+    {
+        $data = $this->prepareData();
+        
+        $songLinkHtml = '';
+        if (!empty($data['id_chanson'])) {
+            $songLinkHtml = <<<HTML
+<a href="../../php/chanson/chanson_voir.php?id={$data['id_chanson']}" class="btn btn-sm btn-primary mt-2">Voir la fiche chanson</a>
+HTML;
+        }
+
+        return <<<HTML
+            <a href="{$data['lien']}" target="_blank" class="text-decoration-none media-link">
+                <article class="card media-card shadow-sm border m-2" style="width:220px;">
+                    <div class="card-body d-flex flex-column align-items-center text-center">
+                        <span class="badge bg-{$data['couleurBadge']} mb-2 fs-5">{$data['emoji']} {$data['type']}</span>
+                        <h5 class="card-title mb-1 text-dark">{$data['titre']}</h5>
+                        <img src="{$data['imageUrl']}{$data['imageCacheTag']}" alt="Illustration : {$data['titre']}"
+                             class="card-img-top my-2"
+                             loading="lazy"
+                             style="height:140px;width:100%;object-fit:cover;max-width:200px;">
+                        <p class="card-text small mt-2 mb-1">{$data['description']}</p>
+                        <p class="meta-pub mb-1">Publié le {$data['datePub']} par <strong>{$data['auteurNom']}</strong></p>
+                        {$songLinkHtml}
+                    </div>
+                </article>
+            </a>
+HTML;
+    }
+
+    private function prepareData(): array
+    {
+        $this->checkDbConnection();
+        $idChanson = $this->getIdChansonAssocie();
+        $chansonTitre = '';
+
+        if ($idChanson > 0) {
+            $chanson = new Chanson($idChanson);
+            $chansonTitre = $chanson->getNom();
+        }
+
+        $type = strtolower($this->_type);
+        $titre = htmlspecialchars($this->_titre);
+        $imageRelative = htmlspecialchars($this->_image);
+        $imagePath = $_SERVER['DOCUMENT_ROOT'] . "/" . ltrim($imageRelative, './');
+        $imageUrl = "../../" . ltrim($imageRelative, './');
+
+        $imageCacheTag = "";
+        if (file_exists($imagePath)) {
+            $imageCacheTag = "?v=" . filemtime($imagePath);
+        }
+
+        $lien = ($type === "partoche")
+            ? "../../" . ltrim(htmlspecialchars($this->_lien), './')
+            : htmlspecialchars($this->_lien);
+
+        $auteur = chercheUtilisateur($this->_auteur);
+        $auteurNom = htmlspecialchars($auteur[3] ?? "Auteur inconnu");
+
+        $isVideo = in_array($type, ["vidéo", "video"]);
+        $couleurBadge = $isVideo ? "primary" : "danger";
+        $emoji = $isVideo ? "🎬" : "🎵";
+
+        return [
+            'type' => $type,
+            'titre' => $titre,
+            'imageUrl' => $imageUrl,
+            'id_chanson' => $idChanson,
+            'chanson_titre' => $chansonTitre,
+            'imageCacheTag' => $imageCacheTag,
+            'lien' => $lien,
+            'description' => htmlspecialchars($this->_description),
+            'datePub' => htmlspecialchars($this->_datePub),
+            'auteurNom' => $auteurNom,
+            'couleurBadge' => $couleurBadge,
+            'emoji' => $emoji
+        ];
+    }
+
+    private function getIdChansonAssocie(): ?int
+    {
+        $this->checkDbConnection();
+        $requete = "";
+        if ($this->getType() === 'partoche') {
+            if (preg_match('/getdoc.php\?doc=(\d+)/', $this->getLien(), $matches)) {
+                $idDocument = (int)$matches[1];
+                $requete = "SELECT idTable FROM document WHERE id = $idDocument AND nomTable = 'chanson' LIMIT 1";
+            }
+        } else {
+            $lien = $_SESSION[self::MYSQL]->real_escape_string($this->getLien());
+            $requete = "SELECT idtable FROM lienurl WHERE nomtable = 'chanson' AND url = '$lien' LIMIT 1";
+        }
+
+        if (!empty($requete)) {
+            $result = $_SESSION[self::MYSQL]->query($requete);
+            if ($result && $row = $result->fetch_row()) {
+                return (int)$row[0];
+            }
+        }
+        return null;
+    }
+
     public function resetAvecDernieresPartoches(int $nb = 50) :bool
     {
         $this->checkDbConnection();

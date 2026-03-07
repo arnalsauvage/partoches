@@ -71,23 +71,23 @@ $html = <<<HTML
     .label-tool { font-size: 10px; font-weight: bold; color: #999; text-transform: uppercase; display: block; margin-bottom: 3px; }
 </style>
 
-<div class="container-fluid" style="padding: 10px 30px;">
+<div class="container" style="padding: 20px 15px;">
     
     <!-- HEADER -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h2 style="color: $c_marron_fonce; margin: 0; font-weight: 900; font-size: 22px; letter-spacing: 1px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 10px;">
+        <h2 style="color: $c_marron_fonce; margin: 0; font-weight: 900; font-size: 26px; letter-spacing: 2px;">
             <span class="glyphicon glyphicon-book" style="color: $c_accent;"></span> SONGBOOKS
         </h2>
         
         <?php if (aDroits(\$GLOBALS["PRIVILEGE_EDITEUR"])): ?>
-            <a href="songbook_form.php" class="btn btn-xs" style="background: #27ae60; color: white; font-weight: bold; padding: 5px 15px; border-radius: 20px;">
+            <a href="songbook_form.php" class="btn btn-sm" style="background: #27ae60; color: white; font-weight: bold; padding: 8px 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <i class="glyphicon glyphicon-plus"></i> NOUVEAU RECUEIL
             </a>
         <?php endif; ?>
     </div>
 
     <!-- CONSOLE DE FILTRAGE -->
-    <div class="console-bar">
+    <div class="console-bar" style="margin: 0 10px 30px 10px;">
         
         <!-- GAUCHE : TRI -->
         <div class="text-left">
