@@ -204,10 +204,16 @@ li.fichiers {
 	cursor: pointer;
 	border-radius: 4px;
 	font-weight: bold;
+	float: none; /* Annule le float global */
+	display: block;
+	margin-top: 10px;
 }
 
-.contenu_popup input[type="submit"]:hover {
-	background-color: #155ea8;
+.contenu_popup .forgot-link {
+    display: block;
+    margin-top: 15px;
+    font-size: 0.9em;
+    text-align: center;
 }
 
 .btn-fermer-popup {
@@ -321,4 +327,82 @@ span.selected {
 	color: black; /* Change la couleur au survol */
 	text-decoration: none; /* Pas de soulignement */
 	cursor: pointer; /* Curseur en forme de main */
+}
+
+/* --- Menu & Navigation (Canopée) --- */
+
+body {
+    padding-top: 70px; /* Espace pour la barre de navigation fixe */
+}
+
+.navbar-brand .logo {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.starter-template {
+    padding: 20px 15px;
+    text-align: center;
+}
+
+.user-info {
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+#afficherPopup {
+    cursor: pointer;
+    color: #337ab7;
+    text-decoration: none;
+}
+
+#afficherPopup:hover {
+    text-decoration: underline;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+/* --- Avatar & User Nav --- */
+.user-avatar-round {
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+}
+
+.navbar-user-info {
+    display: flex !important;
+    align-items: center;
+    height: 50px;
+    padding: 0 15px;
+    color: #9d9d9d;
+    white-space: nowrap;
+}
+
+.navbar-user-info > * {
+    margin-left: 10px;
+}
+
+.navbar-user-info a.auth-btn {
+    color: #9d9d9d;
+    font-size: 1.4em;
+    text-decoration: none;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-user-info a.auth-btn:hover {
+    color: #fff;
+}
+
+.role-icon {
+    font-size: 1.2em;
 }

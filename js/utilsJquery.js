@@ -29,4 +29,27 @@ $(function () {
         deselect($('#afficherPopup'));
         return false;
     });
+
+    // --- Gestion de la largeur de fenêtre (Ajax) ---
+    let windowWidth = window.innerWidth;
+    $(window).on('resize', function() {
+        // On attend la fin du redimensionnement pour envoyer l'ajax (debounce)
+        clearTimeout(window.resizeTimer);
+        window.resizeTimer = setTimeout(function() {
+            if (window.innerWidth !== windowWidth) {
+                windowWidth = window.innerWidth;
+                $.post('../lib/ajaxappli.php', { largeur_fenetre: windowWidth });
+            }
+        }, 500);
+    });
+
+    // --- Configuration globale Toastr ---
+    if (typeof toastr !== 'undefined') {
+        toastr.options = {
+            "positionClass": "toast-top-center",
+            "closeButton": true,
+            "progressBar": true,
+            "timeOut": "5000"
+        };
+    }
 });

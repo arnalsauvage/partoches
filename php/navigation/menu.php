@@ -2,159 +2,156 @@
 require_once "../lib/utilssi.php";
 require_once "../utilisateur/utilisateur.php";
 
+/**
+ * Gère l'affichage du menu supérieur et l'état de la session utilisateur.
+ */
+
 $cheminVignettes = "../../vignettes/";
 
-// Si l'utilisateur n'est pas logué
-if (!isset ($_SESSION ['largeur-fenetre'])) {
-    // On définit une largeur de fenetre, utile pour décider quel niveau de détail sera affiché
-    $_SESSION ['largeur-fenetre'] = 800;
+// Initialisation de la largeur de fenêtre si absente
+if (!isset($_SESSION['largeur-fenetre'])) {
+    $_SESSION['largeur-fenetre'] = 800;
 }
 
-// Si l'utilisateur n'est pas logué
-if (!isset ($_SESSION ['user'])) {
-    // version précédente : on présente un formulaire de login
-    //header('Location: ./login.php');
-
-    // Nouveauté mars 2018 : On le connecte en tant qu'invite
-
-    // Si oui, on crée une session avec user, idclub, nomClub
+// Gestion automatique du compte invité si non connecté
+if (!isset($_SESSION['user'])) {
     $donnee = login_utilisateur("invite", "invite");
     if ($donnee) {
-        // TODO : 5 lignes dupliquées de login.php
-        $_SESSION ['id'] = $donnee [0];
-        $_SESSION ['user'] = $donnee [1];
-        $_SESSION ['email'] = $donnee [7];
-        $_SESSION ['image'] = $donnee [5];
-        $_SESSION ['privilege'] = $donnee [11];
-    }
-    else {
-        $infoLogin = "<p class='ko'> Compte invité défaillant...</p>";
-        $_SESSION ['id'] = 1;
-        $_SESSION ['user'] = "invite";
-        $_SESSION ['email'] = "test@test.mail";
-        $_SESSION ['image'] = "";
-        $_SESSION ['privilege'] = 0;
+        $_SESSION['id'] = $donnee[0];
+        $_SESSION['user'] = $donnee[1];
+        $_SESSION['email'] = $donnee[7];
+        $_SESSION['image'] = $donnee[5];
+        $_SESSION['privilege'] = $donnee[11];
+    } else {
+        $_SESSION['id'] = 1;
+        $_SESSION['user'] = "invite";
+        $_SESSION['email'] = "test@test.mail";
+        $_SESSION['image'] = "";
+        $_SESSION['privilege'] = 0;
     }
 }
 
-if (isset($_SESSION['login'])&&($_SESSION['login'] == "ok")){
-    $infoLogin = "<p class='ok'>Vous vous êtes bien connecté.e</p>";
+// Messages flash de connexion/déconnexion
+$infoLogin = "";
+if (isset($_SESSION['login'])) {
+    if ($_SESSION['login'] === "ok") {
+        $infoLogin = "<p class='ok'>Vous vous êtes bien connecté.e</p>";
+    } elseif ($_SESSION['login'] === "logout") {
+        $infoLogin = "<p class='info'>Vous vous êtes bien déconnecté.e</p>";
+    }
+    
+    if ($_SESSION['login'] === "ko") {
+        $contenuExtra = "<script>$(function() { toastr.error('Erreur de login ou mot de passe !'); });</script>";
+    }
     $_SESSION['login'] = "";
 }
 
-if (isset($_SESSION['login'])&&($_SESSION['login'] == "logout")){
-    $infoLogin = "<p class='info'>Vous vous êtes bien déconnecté.e</p>";
-    $_SESSION['login'] = "";
+// Construction du Head
+$contenu = envoieHead($_SESSION['titreSite'], "../../css/index.css?v=26.03.08");
+if (isset($contenuExtra)) $contenu .= $contenuExtra;
+
+$logoSite = $_SESSION['logoSite'];
+$titreSite = $_SESSION['titreSite'];
+$privilege = $_SESSION['privilege'];
+$user = $_SESSION['user'];
+
+// --- CONSTRUCTION DU MENU (HEREDOC) ---
+
+$liensSongbook = ($privilege > $GLOBALS["PRIVILEGE_MEMBRE"]) 
+    ? "<li><a href='../songbook/songbook_liste.php'>Songbooks</a></li>"
+    : "<li><a href='../songbook/songbook-portfolio.php'>Songbooks</a></li>";
+
+$liensAdmin = "";
+if ($privilege > $GLOBALS["PRIVILEGE_MEMBRE"]) {
+    $liensAdmin = <<<HTML
+        <li><a href='../utilisateur/utilisateur_liste.php'>Utilisateurs</a></li>
+        <li><a href='../document/documents_voir.php'>Documents</a></li>
+HTML;
 }
 
-$contenu = envoieHead($_SESSION ['titreSite'], "../../css/index.css?v=26.3.05");
-
-if (isset($_SESSION['login'])&&($_SESSION['login'] == "ko")){
-    $contenu .= "<script>$(function() { 
-        toastr.options = { 'positionClass': 'toast-top-center', 'closeButton': true };
-        toastr.error('Erreur de login ou mot de passe !'); 
-    });</script>";
-    $_SESSION['login'] = "";
+$lienParametrage = "";
+if (($user == $_SESSION['loginParam']) || ($privilege > $GLOBALS["PRIVILEGE_EDITEUR"])) {
+    $lienParametrage = "<li><a href='../navigation/paramsEdit.php'>Paramétrage</a></li>";
 }
 
-$contenu .= "<body>";
-$contenu .= "<script> if (window.innerWidth !== " . $_SESSION['largeur-fenetre'] . ") {
-    const donnees = 'largeur_fenetre=' + window.innerWidth;
-        $.ajax({
-                url: '../lib/ajaxappli.php',
-                type: 'POST', // Le type de la requête HTTP, ici devenu POST
-                data: donnees,
-                dataType: 'html'
-            });
-}
-</script>";
-// Affichage du menu
-
-$contenu .= "
-<nav class='navbar navbar-inverse navbar-fixed-top'>\n
-<div class='container'>\n
-	<div class='navbar-header' >\n
-		<button class='navbar-toggle collapsed' data-toggle='collapse' \n
-			data-target='#main-menu' aria-expanded='true'>\n
-			<span class='sr-only'>Menu</span>\n
-			<span class='icon-bar'></span>\n
-			<span class='icon-bar'></span>\n
-			<span class='icon-bar'></span>\n
-			<span class='icon-bar'></span>\n";
-// Le lien paramétrage est limité aux admin et login parametrage
-if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
-    $contenu .= "<span class='icon-bar'></span>";
-}
-
-// Le lien paramétrage est limité aux admin et login parametrage
-if ((($_SESSION ['user']) == $_SESSION ['loginParam']) || ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"])) {
-    $contenu .= "<span class='icon-bar'></span>\n";
-}
-$contenu .= "		</button>\n
-		<a class='navbar-brand' href='../media/listeMedias.php'>
-            <img src='../../images/navigation/".$_SESSION['logoSite']."' width='42' class='logo'>
-    " . $_SESSION['titreSite'] . "
-</a>\n
-	</div> <!--/.navbar-header -->\n
-    <div id='main-menu' class='collapse navbar-collapse'>\n
-          <ul class='nav navbar-nav'>\n
-			<li class='divider' role='separator'></li>\n";
-// Le lien utilisateur est limité aux admin et login parametrage
-if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-    $contenu .= "<li><a href='../songbook/songbook_liste.php'>Songbooks</a></li>\n";
-}
-else{
-    $contenu .= "<li><a href='../songbook/songbook-portfolio.php'>Songbooks</a></li>\n";
-}
-$contenu .= "<li><a href='../chanson/chanson_liste.php?razFiltres'>Chansons</a></li>\n
-            <li><a href='../strum/strum_liste.php'>Strums</a></li>\n
-            <li><a href='../liens/lienurl_liste.php'>Liens</a></li>\n";
-//            <li><a href='../php/playlist_liste.php'>Playlists</a></li>\n";
-// Le lien utilisateur est limité aux admin et login parametrage
-if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-    $contenu .= "<li ><a href='../utilisateur/utilisateur_liste.php'>Utilisateurs</a></li>\n
-            <li><a href='../document/documents_voir.php'>Documents</a></li>\n";
-}
-    $contenu .= "<li><a href='../../html/diagrammes/pageDiagrammes.htm' target='_blank'><img height='32' alt='' src='../../images/icones/diagramme.png'>Outils</a></li>
-<li></li>";
-// Le lien paramétrage est limité aux admin et login parametrage
-if (($_SESSION['user'] == $_SESSION['loginParam'])
-    || ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"])) {
-    $contenu .= "<li><a href='../navigation/paramsEdit.php'>parametrage</a></li>\n";
-}
-
-$contenu .= "
-          </ul>\n
-    </div><!--/.nav-collapse -->\n
-</div><!--/.container -->\n
-</nav>\n\n";
-
-// Sous le menu
-$contenu .= "<div class='container'>\n
-			<div class='starter-template'>\n";
-
-$contenu .= "<br><br><br> ".$_SESSION ['sousTitreSite'] . " <br>\n";
-
+// --- GESTION DE L'AVATAR ET DU ROLE ---
 $imageUser = !empty($_SESSION['image']) ? $_SESSION['image'] : "utilisateur/defaut.png";
-$contenu .= image("{$cheminVignettes}" . $imageUser, 64, 64, $_SESSION['user']) . "\n";
+$avatarPath = $cheminVignettes . $imageUser;
+$statutTexte = statut($privilege);
 
-$date = date("d/m/Y");
-$heure = date("H:i");
+$roleIcon = match(true) {
+    $privilege > $GLOBALS["PRIVILEGE_EDITEUR"] => "glyphicon-king",      // Admin
+    $privilege > $GLOBALS["PRIVILEGE_MEMBRE"]  => "glyphicon-pencil",    // Editeur
+    $privilege > $GLOBALS["PRIVILEGE_INVITE"]  => "glyphicon-user",      // Membre
+    default                                    => "glyphicon-eye-open"   // Invite / Visiteur
+};
 
-if ($_SESSION ['user'] != "invite") {
-    $msgLogin = "se déconnecter";
-    $contenu .= ancre("../navigation/login.php?logoff=1", $msgLogin) . " | \n";
+// Lien connexion / déconnexion
+$extraHtml = "";
+if ($user != "invite") {
+    $authLink = "<a href='../navigation/login.php?logoff=1' title='Se déconnecter' class='auth-btn'><i class='glyphicon glyphicon-off'></i></a>";
 } else {
-    $msgLogin = "se connecter";
-    $contenu .= file_get_contents('../../html/menuLogin.html');
-    $contenu .= "<a id='afficherPopup'>$msgLogin</a>";
-}
-if (isset($infoLogin)) {
-    $contenu .= $infoLogin . "<br>\n";
-}
-$contenu .= "Bienvenue " . $_SESSION ['user'] . ", " . statut($_SESSION ['privilege']) . ", nous sommes le $date et il est $heure<br>\n";
-$contenu .= " </div> <!--/.container --></div><!--/.starter-template -->";
-if (!isset($pasDeMenu) || !$pasDeMenu) {
-    echo $contenu . "\n\n";
+    $extraHtml = file_get_contents('../../html/menuLogin.html');
+    $authLink = "<a id='afficherPopup' title='Se connecter' class='auth-btn' style='cursor:pointer;'><i class='glyphicon glyphicon-log-in'></i></a>";
 }
 
+$userNav = <<<HTML
+    <ul class="nav navbar-nav navbar-right">
+        <li class="navbar-user-info">
+            <span class="glyphicon $roleIcon role-icon" title="$user ($statutTexte)"></span>
+            <img src="$avatarPath" class="user-avatar-round" alt="$user" title="$user">
+            $authLink
+        </li>
+    </ul>
+HTML;
+
+$contenu .= <<<HTML
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu" aria-expanded="false">
+                <span class="sr-only">Menu</span>
+                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="../media/listeMedias.php">
+                <img src="../../images/navigation/$logoSite" width="42" class="logo" alt="logo">
+                $titreSite
+            </a>
+        </div>
+        <div id="main-menu" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="divider" role="separator"></li>
+                $liensSongbook
+                <li><a href="../chanson/chanson_liste.php?razFiltres">Chansons</a></li>
+                <li><a href="../strum/strum_liste.php">Strums</a></li>
+                <li><a href="../liens/lienurl_liste.php">Liens</a></li>
+                $liensAdmin
+                <li>
+                    <a href="../../html/diagrammes/" target="_blank">
+                        <img height="24" alt="outils" src="../../images/icones/diagramme.png"> Outils
+                    </a>
+                </li>
+                $lienParametrage
+            </ul>
+            $userNav
+        </div>
+    </div>
+</nav>
+HTML;
+
+// --- ZONE MESSAGES (SOUS LE MENU) ---
+if (!empty($infoLogin)) {
+    $contenu .= <<<HTML
+<div class="container">
+    <div class="starter-template" style="padding-top: 10px; padding-bottom: 0;">
+        $infoLogin
+    </div>
+</div>
+HTML;
+}
+$contenu .= $extraHtml;
+
+if (!isset($pasDeMenu) || !$pasDeMenu) {
+    echo $contenu;
+}
