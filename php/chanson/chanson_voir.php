@@ -355,10 +355,8 @@ function renderStrumsSection($idChanson, $tempo, $isTernaire) {
             $monStrum->chercheStrumParChaine($lienStrum[1]);
             $html .= "<div class='well well-sm'>";
             $html .= "  <h3>" . str_replace(" ", "-", $monStrum->getStrum()) . " <small>(" . $monStrum->getLongueur() . " " . $monStrum->renvoieUniteEnFrancais() . ")</small></h3>";
-            $urlStrum = "$urlBoiteAstrum?strum=" . str_replace(" ", "-", $monStrum->getStrum()) . "&tempo=$tempo";
-            if ($isTernaire) {
-                $urlStrum .= "&ternaire=true";
-            }
+            $ternaireValue = $isTernaire ? "1" : "0";
+            $urlStrum = "$urlBoiteAstrum?strum=" . str_replace(" ", "-", $monStrum->getStrum()) . "&tempo=$tempo&ternaire=$ternaireValue";
             $html .= "  <a class='btn btn-info btn-sm' title='Boîte à strum' href='$urlStrum'><img src='$imageBoiteAstrum' alt='Strum' height='20'> Boîte à Strum</a>";
             $html .= "  <p style='margin-top:10px;'>" . $monStrum->getDescription() . "</p>";
             $html .= $monStrum->chansonsDuStrum();

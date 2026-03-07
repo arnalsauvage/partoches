@@ -10,9 +10,15 @@ $c_accent = "#8B4513";
 $c_ivoire = "#fcfaf2";
 $c_orange = "#e67e22";
 
-// Chargement de la liste des strums via la méthode statique
-$strums = Strum::chargeStrumsBdd();
+// Gestion du tri
+$tri = $_GET['tri'] ?? 'pop'; // Par défaut : Popularité
+$strums = Strum::chargeStrumsBdd($tri);
 $nbStrums = count($strums);
+
+// Classes actives pour les boutons
+$activePop = ($tri == 'pop') ? 'active' : '';
+$activeNom = ($tri == 'nom') ? 'active' : '';
+$activeDate = ($tri == 'date') ? 'active' : '';
 
 // --- RENDU ---
 
@@ -23,12 +29,29 @@ $html = <<<HTML
 <div class="container strum-container">
     
     <div class="row">
-        <div class="col-xs-12 text-center" style="margin-bottom: 40px;">
+        <div class="col-xs-12 text-center" style="margin-bottom: 20px;">
             <h1 style="color: $c_marron_fonce; font-weight: 900; font-size: 42px; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 10px;">
                 <span class="glyphicon glyphicon-option-vertical"></span> STRUMS
             </h1>
             <p style="color: $c_marron_clair; font-size: 14px; letter-spacing: 3px; font-weight: bold;">DICTIONNAIRE DE $nbStrums RYTHMIQUES</p>
             <div style="width: 80px; height: 4px; background: $c_orange; margin: 15px auto; border-radius: 2px;"></div>
+        </div>
+    </div>
+
+    <!-- CONSOLE DE TRI -->
+    <div class="row" style="margin-bottom: 30px;">
+        <div class="col-xs-12 text-center">
+            <div class="btn-group" role="group">
+                <a href="?tri=pop" class="btn btn-default $activePop" style="border-radius: 20px 0 0 20px; font-weight: bold; color: $c_marron_fonce;">
+                    <i class="glyphicon glyphicon-star"></i> LES PLUS JOUÉS
+                </a>
+                <a href="?tri=nom" class="btn btn-default $activeNom" style="font-weight: bold; color: $c_marron_fonce;">
+                    <i class="glyphicon glyphicon-sort-by-alphabet"></i> ALPHABÉTIQUE
+                </a>
+                <a href="?tri=date" class="btn btn-default $activeDate" style="border-radius: 0 20px 20px 0; font-weight: bold; color: $c_marron_fonce;">
+                    <i class="glyphicon glyphicon-time"></i> NOUVEAUTÉS
+                </a>
+            </div>
         </div>
     </div>
 

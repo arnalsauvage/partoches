@@ -82,3 +82,15 @@
 - **Compatibilité** : Passage de `limiteLongueur()` en mode flexible (sans types stricts en signature) pour assurer une compatibilité maximale.
 - **Smoke Tests** : Validation finale des 10 pages principales via Docker.
 
+# Résumé des interventions de Django - 08/03/2026
+
+## Amélioration de la Boîte à Strum (html/boiteAstrum)
+- **UrlManager JS** : Création d'une classe `UrlManager` pour centraliser la lecture et la mise à jour des paramètres d'URL (`strum`, `tempo`, `ternaire`).
+- **Refactoring main.js** : Utilisation du `UrlManager` pour initialiser la boîte à strum au chargement.
+- **Gestion du Swing** : Passage systématique du paramètre `ternaire=1` (ternaire) ou `ternaire=0` (binaire) dans l'URL.
+- **PHP** : 
+    - Mise à jour de `php/strum/strum.php` pour utiliser `ternaire=0/1` au lieu de `swing=1`.
+    - Mise à jour de `php/chanson/chanson_voir.php` pour envoyer le bon état ternaire de la chanson à la boîte à strum.
+- **Compatibilité** : Le système supporte toujours `ternaire=true` par sécurité.
+
+

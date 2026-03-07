@@ -69,24 +69,24 @@ class Strum
         $db = $_SESSION[self::MYSQL];
         $maRequete = sprintf("SELECT * FROM strum WHERE id = %d", $id);
         $result = $db->query($maRequete);
-        if ($result && $ligne = $result->fetch_row()) {
-            $this->mysqlRowVersObjet($ligne);
+        if ($result && $row = $result->fetch_assoc()) {
+            $this->mysqlRowVersObjet($row);
             return true;
         }
         return false;
     }
 
     /**
-     * Hydrate l'objet depuis une ligne MySQL
+     * Hydrate l'objet depuis un tableau associatif MySQL
      */
-    private function mysqlRowVersObjet(array $ligne): void
+    private function mysqlRowVersObjet(array $row): void
     {
-        $this->_id = (int)$ligne[0];
-        $this->_unite = (int)$ligne[1];
-        $this->_longueur = (int)$ligne[2];
-        $this->_strum = (string)$ligne[3];
-        $this->_description = (string)$ligne[4];
-        $this->_swing = (int)($ligne[5] ?? 0);
+        $this->_id = (int)($row['id'] ?? 0);
+        $this->_unite = (int)($row['unite'] ?? 8);
+        $this->_longueur = (int)($row['longueur'] ?? 8);
+        $this->_strum = (string)($row['strum'] ?? "");
+        $this->_description = (string)($row['description'] ?? "");
+        $this->_swing = (int)($row['swing'] ?? 0);
     }
 
     /**
@@ -145,7 +145,7 @@ class Strum
         $desc = htmlspecialchars(limiteLongueur($this->getDescription(), 80));
         $unite = $this->renvoieUniteEnFrancais();
         $longueur = $this->getLongueur();
-        $swingParam = $this->_swing ? "&swing=1" : "";
+        $swingParam = "&ternaire=" . ($this->_swing ? "1" : "0");
         
         $urlBoiteAstrum = "../../html/boiteAstrum/index.html";
         $imageBoiteAstrum = "../../html/boiteAstrum/medias/img/boiteAstrum.png";
@@ -204,8 +204,8 @@ class Strum
         $chaine = $db->real_escape_string($chaine);
         $maRequete = sprintf("SELECT * FROM strum WHERE BINARY strum = '%s' LIMIT 1", $chaine);
         $result = $db->query($maRequete);
-        if ($result && $ligne = $result->fetch_row()) {
-            $this->mysqlRowVersObjet($ligne);
+        if ($result && $row = $result->fetch_assoc()) {
+            $this->mysqlRowVersObjet($row);
             return true;
         }
         return false;
@@ -258,17 +258,42 @@ class Strum
     }
 
     /**
-     * Charge tous les strums
+     * Charge tous les strums avec option de tri
+     * @param string $tri Mode de tri : 'nom', 'date', 'pop'
      */
-    public static function chargeStrumsBdd(): array
+    public static function chargeStrumsBdd(string $tri = 'nom'): array
     {
         $db = $_SESSION[self::MYSQL];
-        $result = $db->query("SELECT * FROM strum ORDER BY strum");
+        
+        switch ($tri) {
+            case 'date':
+                $ordre = "id DESC";
+                $select = "s.*";
+                $join = "";
+                break;
+            case 'pop':
+                $ordre = "nb_util DESC, s.strum ASC";
+                $select = "s.*, COUNT(l.id) as nb_util";
+                $join = "LEFT JOIN lienstrumchanson l ON s.id = l.idStrum";
+                break;
+            case 'nom':
+            default:
+                $ordre = "s.description ASC, s.strum ASC";
+                $select = "s.*";
+                $join = "";
+                break;
+        }
+
+        $maRequete = "SELECT $select FROM strum s $join GROUP BY s.id ORDER BY $ordre";
+        $result = $db->query($maRequete);
+        
         $liste = [];
-        while ($ligne = $result->fetch_row()) {
-            $s = new Strum();
-            $s->mysqlRowVersObjet($ligne);
-            $liste[] = $s;
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $s = new Strum();
+                $s->mysqlRowVersObjet($row);
+                $liste[] = $s;
+            }
         }
         return $liste;
     }

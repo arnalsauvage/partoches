@@ -46,7 +46,7 @@ $html = <<<HTML
             
             <header class="strum-form-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <h1 style="margin:0;">
-                    <i class="glyphicon glyphicon-music"></i> 
+                    <i class="glyphicon glyphicon-music"></i>
                     $pageTitle
                 </h1>
                 <div style="display:flex; align-items:center;">

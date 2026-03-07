@@ -6,7 +6,7 @@ docker-compose build
 
 # pour lancer le composant docker
 ```
-docker-compose up -d --build
+docker-compose up -d
 ```
 
 # pour arrêter le composant docker
