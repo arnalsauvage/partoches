@@ -51,8 +51,8 @@ $html = <<<HTML
                 </h1>
                 <div style="display:flex; align-items:center;">
                     <div class="checkbox" style="margin:0 20px 0 0; padding-top: 0;">
-                        <label style="font-weight:bold; color:#e67e22; cursor:pointer; font-size: 14px; display: flex; align-items: center;">
-                            <input type="checkbox" id="swing" $swingChecked style="margin: 0 10px 0 0; width: 18px; height: 18px;"> MODE SWING 🎷
+                        <label style="font-weight:bold; color:#e67e22; cursor:pointer; font-size: 14px; display: flex; align-items: center; padding-left: 0;">
+                            <input type="checkbox" id="swing" $swingChecked style="position: relative; margin: 0 12px 0 0; width: 18px; height: 18px;"> MODE SWING 🎷
                         </label>
                     </div>
                     <button id="btnAide" class="btn btn-link" title="Aide au formatage" style="color: #D2B48C; font-size: 24px; padding: 0;">

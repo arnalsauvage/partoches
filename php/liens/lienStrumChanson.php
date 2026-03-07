@@ -88,12 +88,26 @@ function chercheLienParIdchansonOrdre($_idChanson, $ordre)
 }
 
 // Crée un lienStrumChanson
-function creelienStrumChanson($_strum, $idchanson)
+/**
+ * @param string $_strum Motif du strum
+ * @param int $idchanson ID de la chanson
+ * @param int $idStrum ID technique du strum (nouveauté)
+ */
+function creelienStrumChanson($_strum, $idchanson, $idStrum = 0)
 {
-    chercheLiensStrumChanson("idchanson", $idchanson, "ordre");
-    $nb = $_SESSION ['mysql']->affected_rows + 1;
-    $maRequete = "INSERT INTO lienstrumchanson VALUES (NULL, '$_strum', '$idchanson', '$nb')";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creelienStrumChanson #1 : " . $_SESSION ['mysql']->error);
+    $db = $_SESSION['mysql'];
+    $res = $db->query("SELECT MAX(ordre) FROM lienstrumchanson WHERE idchanson = $idchanson");
+    $nb = ($res && $row = $res->fetch_row()) ? (int)$row[0] + 1 : 1;
+    
+    // On spécifie les colonnes pour être robuste aux changements futurs
+    $maRequete = sprintf("INSERT INTO lienstrumchanson (strum, idchanson, ordre, idStrum) 
+                          VALUES ('%s', %d, %d, %d)", 
+                          $db->real_escape_string($_strum), 
+                          $idchanson, 
+                          $nb, 
+                          $idStrum);
+                          
+    $db->query($maRequete) or die ("Problème creelienStrumChanson #1 : " . $db->error);
 }
 
 // Modifie en base la lienStrumChanson

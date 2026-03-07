@@ -372,11 +372,14 @@ function comboAjoutSongbook($listeSongbooks): string
 
 function comboAjoutStrum($listeStrums): string
 {
-    $monCombo = " <br>   <label class='inline col-sm-4'> Ajouter un strum :</label>
-    <select class='js-example-basic-single'  name= 'strum' >";
-    foreach ( $listeStrums as $_strum)
+    $monCombo = "<label style='display:block; margin-bottom:10px;'>Sélectionner une rythmique :</label>
+    <select class='form-control js-example-basic-single' name='idStrum' style='width: 100%; max-width: 400px;'>";
+    foreach ($listeStrums as $_strum)
     {
-        $monCombo .= " <option id= 'strum". $_strum->getId()."' value='".$_strum->getstrum()."'>".$_strum->getstrum()." - ".$_strum->getdescription() . "</option>";
+        $id = $_strum->getId();
+        $motif = str_replace(" ", "-", $_strum->getStrum());
+        $desc = $_strum->getDescription();
+        $monCombo .= " <option value='$id'>$motif ($desc)</option>";
     }
     $monCombo .= "   </select>";
     return $monCombo;
@@ -506,35 +509,65 @@ function afficheFichiersChanson(int $id, string $_dossier_chansons, string $icon
 
 /**
  * @param Chanson $_chanson
- * @return mixed
+ * @return void
  */
 function afficheStrumsChanson(Chanson $_chanson) :void
 {
     $contenuHtml = "<div id='tabs-3' class='col-lg-12 centrer'>";
-// Affiche les strums de la chanson
-    $_listeDesLiensStrums =
-        chercheLiensStrumChanson("idChanson", $_chanson->getId());
+    $contenuHtml .= "<h2> <i class='glyphicon glyphicon-option-vertical'></i> Rythmiques associées</h2>";
+    
+    // Affiche les strums de la chanson
+    $_listeDesLiensStrums = chercheLiensStrumChanson("idChanson", $_chanson->getId());
 
-    $monStrum = new Strum();
-    $contenuHtml .= "<h2> Liste des strums pour cette chanson</h2>";
+    $contenuHtml .= "<div class='list-group' style='max-width: 600px; margin: 20px auto; text-align: left;'>";
+    
+    $nbStrums = 0;
     while ($lienStrum = $_listeDesLiensStrums->fetch_row()) {
-        $monStrum->chercheStrumParChaine($lienStrum[1]);
-        $contenuHtml .= entreBalise(str_replace(" ", "-", $monStrum->getStrum()), "H3"); // Login
-        $contenuHtml .= $monStrum->getLongueur() . " / " . $monStrum->getUnite(); //  longueur / unité
-        $contenuHtml .= " - " . $monStrum->getDescription(); // description
+        $nbStrums++;
         $idLien = $lienStrum[0];
-        $contenuHtml .= "<a href='" . LIENS_LIEN_STRUM_CHANSON_POST_PHP . "?id=$idLien&mode=DEL'> Supprimer</a>";
+        $idStrum = (int)($lienStrum[4] ?? 0); // La nouvelle colonne idStrum
+        
+        $monStrum = new Strum($idStrum);
+        
+        // Fallback si l'ID est manquant (ancienne base)
+        if ($monStrum->getId() == 0 && !empty($lienStrum[1])) {
+            $monStrum->chercheStrumParChaine($lienStrum[1]);
+        }
+
+        $motif = str_replace(" ", "-", $monStrum->getStrum());
+        $desc = $monStrum->getDescription();
+        $unite = $monStrum->renvoieUniteEnFrancais();
+        $longueur = $monStrum->getLongueur();
+        $badgeSwing = $monStrum->getSwing() ? "<span class='label label-warning' style='font-size:10px; margin-left:5px;'>SWING</span>" : "";
+
+        $contenuHtml .= "
+            <div class='list-group-item' style='display:flex; justify-content:space-between; align-items:center;'>
+                <div>
+                    <code style='font-size: 16px; color: #8B4513;'>$motif</code> $badgeSwing<br>
+                    <small class='text-muted'>$longueur $unite - $desc</small>
+                </div>
+                <a href='" . LIENS_LIEN_STRUM_CHANSON_POST_PHP . "?id=$idLien&mode=DEL&idChanson=".$_chanson->getId()."' class='btn btn-xs btn-danger' title='Supprimer le lien'>
+                    <i class='glyphicon glyphicon-trash'></i>
+                </a>
+            </div>";
     }
-    echo $contenuHtml;
+    
+    if ($nbStrums == 0) {
+        $contenuHtml .= "<div class='alert alert-info'>Aucun strum associé à cette chanson.</div>";
+    }
+    
+    $contenuHtml .= "</div>"; // Fin list-group
 
     $listeStrums = Strum::chargeStrumsBdd();
-    echo "<form action='" . LIENS_LIEN_STRUM_CHANSON_POST_PHP . "' method='post'>
+    $contenuHtml .= "<div style='background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #eee; max-width: 600px; margin: 0 auto;'>";
+    $contenuHtml .= "<form action='" . LIENS_LIEN_STRUM_CHANSON_POST_PHP . "' method='post' class='form-inline'>
                <input type='hidden' name='idChanson' value='" . $_chanson->getId() . "'>
                <input type='hidden' name='mode' value='NEW'>";
-    echo comboAjoutStrum($listeStrums);
-    echo "<button> Ajouter le strum </button> </form>
-            </div>";
-    // Fermeture tab 3 Strums
+    $contenuHtml .= comboAjoutStrum($listeStrums);
+    $contenuHtml .= " <button class='btn btn-success' style='margin-top:10px;'> <i class='glyphicon glyphicon-plus'></i> Ajouter </button> </form></div>";
+    
+    $contenuHtml .= "</div>"; // Fin tab-3
+    echo $contenuHtml;
 }
 
 
@@ -617,4 +650,3 @@ function afficheLiensChanson(int $id): void
     echo "</form>
 </div>";
 }
-

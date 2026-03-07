@@ -157,7 +157,7 @@ class Strum
 
         $badgeSwing = $this->_swing ? "<span class='label label-warning' style='background-color: #f39c12; margin-left: 5px;'>SWING</span>" : "";
 
-        return "
+        $html = "
         <div class='col-sm-6 col-md-4 col-lg-3'>
             <div class='thumbnail strum-card'>
                 <div class='strum-card-header'>
@@ -180,18 +180,81 @@ class Strum
                         <div class='btn-group'>";
         
         if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
-            $return .= " <a href='strum_form.php?id=$id' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a>";
+            $html .= " <a href='strum_form.php?id=$id' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a>";
         }
         if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
-            $return .= " <a href='strum_post.php?id=$id&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm(\"Supprimer ce strum ?\")'><i class='glyphicon glyphicon-trash'></i></a>";
+            $html .= " <a href='strum_post.php?id=$id&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm(\"Supprimer ce strum ?\")'><i class='glyphicon glyphicon-trash'></i></a>";
         }
-        
-        return $return . "
-                        </div>
+
+        $html .= "      </div>
                     </div>
                 </div>
             </div>
         </div>";
+        
+        return $html;
+    }
+
+    /**
+     * Cherche un strum par sa chaîne de caractères (pour compatibilité)
+     */
+    public function chercheStrumParChaine(string $chaine): bool
+    {
+        $db = $_SESSION[self::MYSQL];
+        $chaine = $db->real_escape_string($chaine);
+        $maRequete = sprintf("SELECT * FROM strum WHERE BINARY strum = '%s' LIMIT 1", $chaine);
+        $result = $db->query($maRequete);
+        if ($result && $ligne = $result->fetch_row()) {
+            $this->mysqlRowVersObjet($ligne);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Retourne la liste des chansons utilisant ce strum (formatté HTML)
+     */
+    public function chansonsDuStrum(): string
+    {
+        $chaineRetour = " - utilisé dans ";
+        $titresChansons = chargeLibelles("chanson", "nom");
+        $db = $_SESSION[self::MYSQL];
+        $maRequete = sprintf("SELECT idChanson FROM lienstrumchanson WHERE idStrum = %d", $this->_id);
+        $result = $db->query($maRequete);
+        
+        $links = [];
+        if ($result) {
+            while ($ligne = $result->fetch_row()) {
+                $_idChanson = $ligne[0];
+                if (isset($titresChansons[$_idChanson])) {
+                    $links[] = "<a href='../chanson/chanson_voir.php?id=$_idChanson' style='color: inherit;'>" . $titresChansons[$_idChanson] . "</a>";
+                }
+            }
+        }
+        return count($links) > 0 ? $chaineRetour . implode(", ", $links) : " - pas encore utilisé";
+    }
+
+    /**
+     * Retourne la liste des chansons utilisant un strum par son ID (statique)
+     */
+    public static function chansonsDuStrumId(int $idStrum): string
+    {
+        $chaineRetour = " - utilisé dans ";
+        $titresChansons = chargeLibelles("chanson", "nom");
+        $db = $_SESSION[self::MYSQL];
+        $maRequete = sprintf("SELECT idChanson FROM lienstrumchanson WHERE idStrum = %d", $idStrum);
+        $result = $db->query($maRequete);
+        
+        $links = [];
+        if ($result) {
+            while ($ligne = $result->fetch_row()) {
+                $_idChanson = $ligne[0];
+                if (isset($titresChansons[$_idChanson])) {
+                    $links[] = $titresChansons[$_idChanson];
+                }
+            }
+        }
+        return count($links) > 0 ? $chaineRetour . implode(", ", $links) : " - pas encore utilisé";
     }
 
     /**
