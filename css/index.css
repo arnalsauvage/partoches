@@ -378,6 +378,18 @@ body {
     object-fit: cover;
 }
 
+/* Fallback avatar quand l'image est absente */
+span.user-avatar-round {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #555;
+    color: #fff;
+    font-size: 16px;
+    border: none;
+}
+
+
 .navbar-user-info {
     display: flex !important;
     align-items: center;

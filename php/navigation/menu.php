@@ -86,6 +86,15 @@ $roleIcon = match(true) {
     default                                    => "glyphicon-eye-open"   // Invite / Visiteur
 };
 
+// Vérification de l'existence du fichier sur le serveur
+$avatarFileSystemPath = $_SERVER['DOCUMENT_ROOT'] . "/vignettes/" . $imageUser;
+if (file_exists($avatarFileSystemPath) && is_file($avatarFileSystemPath)) {
+    $avatarHtml = "<img src='$avatarPath' class='user-avatar-round' alt='$user' title='$user'>";
+} else {
+    // Fallback : On utilise l'icône bonhomme
+    $avatarHtml = "<span class='user-avatar-round' title='$user ($statutTexte)'><i class='glyphicon glyphicon-user'></i></span>";
+}
+
 // Lien connexion / déconnexion
 $extraHtml = "";
 if ($user != "invite") {
@@ -99,7 +108,7 @@ $userNav = <<<HTML
     <ul class="nav navbar-nav navbar-right">
         <li class="navbar-user-info">
             <span class="glyphicon $roleIcon role-icon" title="$user ($statutTexte)"></span>
-            <img src="$avatarPath" class="user-avatar-round" alt="$user" title="$user">
+            $avatarHtml
             $authLink
         </li>
     </ul>

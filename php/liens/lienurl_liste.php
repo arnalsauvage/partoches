@@ -112,6 +112,9 @@ HTML;
         $actionsHtml .= boutonSuppression($_lienurlPost . "?id=$idLien&mode=SUPPR", $iconePoubelle, $cheminImages);
     }
 
+    // Badge ID (uniquement pour les admins)
+    $badgeId = estAdmin() ? "<span class='label label-default' style='font-weight:normal;'>ID: $idLien</span>" : "<span></span>";
+
     $html .= <<<HTML
     <div class="video-card">
         $thumbHtml
@@ -120,7 +123,7 @@ HTML;
             <p>$desc</p>
         </div>
         <div class="video-card-actions">
-            <span class="label label-default" style="font-weight:normal;">ID: $idLien</span>
+            $badgeId
             <div class="btn-group">
                 $actionsHtml
             </div>
