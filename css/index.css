@@ -162,11 +162,12 @@ li.fichiers {
 	box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 	cursor: default;
 	display: none;
-	margin-top: 10px;
-	position: absolute;
+	position: fixed; /* Changement de absolute à fixed pour le calage navbar */
+	top: 55px;      /* Juste sous la navbar (50px) */
+	right: 20px;    /* Calé à droite */
 	text-align: left;
 	width: 280px;
-	z-index: 1000;
+	z-index: 2000;  /* Doit être au-dessus de tout */
 	padding: 20px;
 }
 
@@ -405,4 +406,198 @@ body {
 
 .role-icon {
     font-size: 1.2em;
+}
+
+/* --- Songbook Portfolio (Canopée Style) --- */
+.portfolio-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.songbook-card {
+    background: #fff;
+    border: 1px solid #D2B48C;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 280px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.songbook-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(43, 29, 26, 0.2);
+}
+
+.songbook-card-header {
+    background: #2b1d1a;
+    color: #F5F5DC;
+    padding: 15px;
+    text-align: center;
+}
+
+.songbook-card-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.songbook-card-header h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.songbook-card-pochette {
+    padding: 15px;
+    text-align: center;
+    background: #fdfaf5;
+}
+
+.songbook-card-pochette img {
+    border-radius: 8px;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.songbook-card-body {
+    padding: 15px;
+    flex-grow: 1;
+    background: #fff;
+    border-top: 1px solid #eee;
+}
+
+.songbook-track-list {
+    font-size: 0.85em;
+    height: 180px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.songbook-track-item {
+    padding: 5px 0;
+    border-bottom: 1px solid #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.songbook-track-item a {
+    color: #8B4513;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.songbook-track-item a:hover {
+    text-decoration: underline;
+}
+
+.songbook-card-footer {
+    padding: 10px 15px;
+    background: #F5F5DC;
+    border-top: 1px solid #D2B48C;
+    font-size: 0.8em;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* --- Video Links (Canopée Style) --- */
+.video-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.video-card {
+    background: #fff;
+    border: 1px solid #D2B48C;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    width: 320px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.video-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(43, 29, 26, 0.15);
+}
+
+.video-card-thumb {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    background: #000;
+    cursor: pointer;
+}
+
+.video-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.video-card-thumb:hover img {
+    opacity: 1;
+}
+
+.video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    pointer-events: none;
+}
+
+.video-card-content {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+.video-card-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2b1d1a;
+    line-height: 1.3;
+}
+
+.video-card-content p {
+    font-size: 0.9em;
+    color: #666;
+    margin: 0;
+}
+
+.video-card-actions {
+    padding: 10px 15px;
+    background: #fdfaf5;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

@@ -1,96 +1,99 @@
 <?php
-require_once("../lib/utilssi.php");
+require_once "../lib/utilssi.php";
+require_once "../navigation/menu.php";
+require_once "songbook.php";
+require_once "../document/document.php";
+require_once "../chanson/chanson.php";
 
-require_once("../navigation/menu.php");
-require_once("songbook.php");
-require_once("../document/document.php");
-require_once("../chanson/chanson.php");
-$table = "songbook";
+/**
+ * Portfolio des Songbooks - Vue moderne type galerie "Canopée"
+ */
 
 global $_DOSSIER_CHANSONS;
 
-?>
+// 1. Logique de récupération des données
+$titresChansons = chargeLibelles("chanson", "nom");
+$listeSongbooks = chercheSongbooks("nom", "%", "date", false);
 
-<div class="content-box">
+$html = "<div class='container'>";
+$html .= "  <h1 class='text-center' style='margin-bottom: 40px;'><i class='glyphicon glyphicon-book'></i> Galerie des Songbooks</h1>";
+$html .= "  <div class='portfolio-grid'>";
 
-    <?php
-    // On se constitue une liste des titres de chansons
-    $titresChansons = chargeLibelles("chanson", "nom");
-
-    // Chargement de la liste des songbooks
-    $listeSongbooks = chercheSongbooks("nom", "%", "date", false);
-    $numligne = 0;
-
-    // Boucle pour tous les songbooks
+if ($listeSongbooks) {
     while ($songbook = $listeSongbooks->fetch_row()) {
-    // Songbook : [0]id [1]nom [2]description [3]date [4]image [5]hits [6]idUser
+        // Songbook : [0]id [1]nom [2]description [3]date [4]image [5]hits [6]idUser
+        $idSb = $songbook[0];
+        $nomSb = htmlspecialchars($songbook[1]);
+        $dateSb = dateMysqlVersTexte($songbook[3]);
+        $imageSb = imageSongbook($idSb);
+        $vignetteSb = afficheVignette($imageSb, "../../data/songbooks/$idSb/", "../../data/songbooks/vignettes/", "vignette du songbook $nomSb");
 
-    $maRequete = "SELECT * FROM document WHERE document.idTable = '$songbook[0]' AND document.nomTable = '$table' ORDER BY document.date ASC";
-
-    $docsSongbook = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheDocumentsTableId #1 : " . $_SESSION ['mysql']->error);
-
-    $pdfSongbook = "vide";
-    // Boucle pour sélectionner le dernier pdf rattaché au songbook
-    while ($docSongbook = $docsSongbook->fetch_row()) {
-        if (strstr(strtolower($docSongbook [1]), "pdf")) {
-            $pdfSongbook = composeNomVersion($docSongbook [1], $docSongbook [4]);
-            // pour debug : echo "fichier trouvé : " . $pdfSongbook ." ";
-        }
-    }
-    $imageSongBook = imageSongbook($songbook [0]);
-    $dateSongbook = dateMysqlVersTexte($songbook [3]);
-    ?>
-
-    <div class="songbook">
-        <div class="madate"><a href='./songbook_voir.php?id=<?= $songbook[0] . "'>" . $songbook[1]; ?></a></div>
-			<div class="pochette">
-
-            <?php
-            // Si on n'a pas de pdf pour le songbook, on affiche juste l'image
-            $largeur_max_vignette = 200;
-            $hauteur_max_vignette = "";
-            $baliseImage = afficheVignette($imageSongBook, "../../data/songbooks/$songbook[0]/" , "../../data/songbooks/vignettes/", "vignette du songbook " . $songbook [1]);
-            if ($pdfSongbook == "vide") {
-                echo $baliseImage;
-            } else {
-                // Sinon, on affiche un lien vers le doc + l'image
-                ?>
-						<a href="../../data/songbooks/<?= myUrlEncode($songbook[0]) ?>/<?= $pdfSongbook ?>" target="_blank">
-			<?php
-                echo $baliseImage;
-            }
-            ?>
-            </a>
-            </div>
-			<div class="titres" style="height: 240px; overflow:hidden">
-                <?php
-            $lignes = chercheLiensDocSongbook('idSongbook', $songbook [0], "ordre");
-            $listeDocs = "";
-            $iconeMusique = "<span class='glyphicon glyphicon-music'></span>";
-            while ($ligne = $lignes->fetch_row()) {
-                $ligneDoc = chercheDocument($ligne [1]);
-                $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-
-                $fichier =  $_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . myUrlEncode(composeNomVersion($ligneDoc [1], $ligneDoc [4]));
-                $icone = image(  ICONES . $fichier [2] . ".png", 32, 32, "icone");
-                if (!file_exists(ICONES . $fichier [2] . ".png")) {
-                    $icone = image(ICONES . "fichier.png", 32, 32, "icone");
+        // Récupération du PDF principal du songbook
+        $pdfSb = "vide";
+        $docsSb = chercheDocumentsTableId("songbook", $idSb);
+        if ($docsSb) {
+            while ($doc = $docsSb->fetch_row()) {
+                if (strstr(strtolower($doc[1]), "pdf")) {
+                    $pdfSb = composeNomVersion($doc[1], $doc[4]);
                 }
-                $titreCourt = htmlspecialchars(limiteLongueur($titresChansons [$ligneDoc [6]], 18), ENT_QUOTES);
-                echo "<a href= '../../" . $fichier . "' target='_blank' title='" . htmlspecialchars($titresChansons [$ligneDoc [6]], ENT_QUOTES) . "'> " . $titreCourt . "</a> \n";
-
-                echo "<a aria-label='ouvrir la chanson " . htmlspecialchars($titresChansons [$ligneDoc [6]]) . "' href= '../chanson/chanson_voir.php?id=" . $ligneDoc [6] . "' > $iconeMusique </a> <br>\n";
-                ?>
-                    <?php
             }
-            ?>
-            </div>
-			<div class="madate"><?= $dateSongbook; ?></div>
-		</div>
+        }
 
-        <?php
-            } // Boucle tous les songbooks
-            ?>
-</div>
-</div>
-</div>	<!-- content box -->
+        // Construction du lien pochette (soit PDF, soit fiche détail)
+        $urlPochette = ($pdfSb !== "vide")
+            ? "../../data/songbooks/" . myUrlEncode($idSb) . "/" . $pdfSb
+            : "./songbook_voir.php?id=$idSb";
+        $target = ($pdfSb !== "vide") ? "target='_blank'" : "";
+
+        // Récupération des chansons liées
+        $trackListHtml = "";
+        $liensChansons = chercheLiensDocSongbook('idSongbook', $idSb, "ordre");
+        if ($liensChansons) {
+            while ($lien = $liensChansons->fetch_row()) {
+                $docInfo = chercheDocument($lien[1]); // [6] est l'idChanson
+                $idChanson = $docInfo[6];
+                if (isset($titresChansons[$idChanson])) {
+                    $nomChanson = htmlspecialchars(limiteLongueur($titresChansons[$idChanson], 25));
+                    $trackListHtml .= <<<HTML
+                    <li class="songbook-track-item">
+                        <a href="../chanson/chanson_voir.php?id=$idChanson" title="Voir la fiche">
+                            <i class="glyphicon glyphicon-music" style="color: #D2B48C; margin-right: 5px;"></i> $nomChanson
+                        </a>
+                    </li>
+HTML;
+                }
+            }
+        }
+
+        // Assemblage de la carte
+        $html .= <<<HTML
+        <div class="songbook-card">
+            <div class="songbook-card-header">
+                <h3><a href="./songbook_voir.php?id=$idSb">$nomSb</a></h3>
+            </div>
+            <div class="songbook-card-pochette">
+                <a href="$urlPochette" $target title="Ouvrir le Songbook">
+                    $vignetteSb
+                </a>
+            </div>
+            <div class="songbook-card-body">
+                <ul class="songbook-track-list">
+                    $trackListHtml
+                </ul>
+            </div>
+            <div class="songbook-card-footer">
+                <span><i class="glyphicon glyphicon-calendar"></i> $dateSb</span>
+                <span><i class="glyphicon glyphicon-eye-open"></i> $songbook[5] vues</span>
+            </div>
+        </div>
+HTML;
+    }
+} else {
+    $html .= "<p class='lead'>Aucun songbook trouvé.</p>";
+}
+
+$html .= "  </div>"; // .portfolio-grid
+$html .= "</div>"; // .container
+
+$html .= envoieFooter();
+echo $html;

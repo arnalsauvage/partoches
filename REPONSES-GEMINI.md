@@ -93,4 +93,34 @@
     - Mise à jour de `php/chanson/chanson_voir.php` pour envoyer le bon état ternaire de la chanson à la boîte à strum.
 - **Compatibilité** : Le système supporte toujours `ternaire=true` par sécurité.
 
+## Refonte UI & Navigation (menu.php)
+- **Menu Modernisé** : 
+    - Déplacement des infos utilisateur (avatar rond, nom, rôle) vers la droite de la barre de navigation.
+    - Utilisation d'icônes monochromes (Glyphicons) pour symboliser le statut (Admin, Editeur, Membre, Invité).
+    - Intégration des boutons de connexion/déconnexion directement dans la navbar.
+- **Optimisation de l'espace** :
+    - Suppression du sous-titre redondant sous le menu pour remonter le contenu principal.
+    - Retrait de l'affichage systématique de la date et de l'heure.
+- **Refactoring Technique** :
+    - Passage systématique à la syntaxe **Heredoc** pour le HTML dans `menu.php`.
+    - Externalisation du CSS vers `index.css` et du JS vers `utilsJquery.js` (détection largeur fenêtre, config Toastr).
+- **Module de Recherche** :
+    - Correction d'un bug d'alignement (espace entre l'input et la loupe).
+    - Ajout d'un label "Recherche :" explicatif à gauche du champ.
+    - Alignement Flexbox pour une interface plus propre.
+
+## Refonte des Portfolios & Galeries
+- **Portfolio Songbook (songbook-portfolio.php)** :
+    - Transformation de la liste brute en une galerie de cartes modernes.
+    - Style "Canopée" avec en-têtes marron, bordures bois et effets de survol.
+    - Intégration d'une "Track List" élégante pour chaque songbook.
+    - Nettoyage du code (suppression du SQL direct, passage au Heredoc).
+- **Galerie des Liens (lienurl_liste.php)** :
+    - Optimisation radicale des performances via le **Lazy Loading YouTube** (chargement de l'iframe uniquement au clic).
+    - Détection intelligente du type de contenu (Vidéo, Audio, Image, Site Web).
+    - Design unifié sous forme de grille de cartes multimédia.
+    - Utilisation d'icônes contextuelles (casque, globe, image) pour les liens non-vidéo.
+
+
+
 

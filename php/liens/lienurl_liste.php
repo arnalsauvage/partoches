@@ -1,86 +1,153 @@
 <?php
 require_once("../lib/Pagination.php");
 require_once("../lib/utilssi.php");
-
 require_once("lienurl.php");
 require_once("lienurl_voir.php");
-
 require_once("../navigation/menu.php");
 
-global $iconeAttention;
-global $cheminImages;
-global $iconePoubelle;
-global $iconeCreer;
-global $iconeEdit;
+/**
+ * Galerie des Liens Multimédia - Vue moderne et polyvalente
+ */
+
+global $cheminImages, $iconePoubelle, $iconeCreer, $iconeEdit;
 
 const LIENSURL_PAGE = 'liensurlPage';
-$nombreLiensParPage = 15;
+$nombreLiensParPage = 12;
 $_lienurlForm = "../chanson/chanson_form.php";
 $_lienurlPost = "lienurl_post.php";
-$_lienurlPost = "lienurl.php";
 
-$_table_lien_url = "lienurl";
-$_renduHtml = "";
-$_renduHtml .= entreBalise("Liens", "H1");
-
-// Chargement de la liste des lienurls
+// 1. Logique de récupération des données
 $_listeDeslienurls = chargeLiensurls("date", false);
 
 if (!$_listeDeslienurls) {
     die ("Problème lienurlsListe #1 : " . $_SESSION ['mysql']->error);
 }
+
+// 2. Gestion de la pagination
+$pagination = new Pagination($_listeDeslienurls->num_rows, $nombreLiensParPage);
+$page = (isset($_GET['page']) && is_numeric($_GET['page'])) ? (int)$_GET['page'] : 1;
+$pagination->setPageEnCours($page);
+
+// 3. Construction du HTML
+$html = "<div class='container'>";
+$html .= "  <h1 class='text-center' style='margin-bottom: 30px;'><i class='glyphicon glyphicon-link'></i> Galerie des Liens</h1>";
+
+// Bouton d'ajout
+if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
+    $html .= "  <div class='text-center' style='margin-bottom: 30px;'>";
+    $html .= "    <a href='$_lienurlForm' class='btn btn-primary'><i class='glyphicon glyphicon-plus'></i> Ajouter un lien</a>";
+    $html .= "  </div>";
+}
+
+$html .= "  <div class='video-grid'>";
+
 $_numLigneParcourue = 0;
-
-// Gestion de la pagination
-$pagination = new Pagination ($_listeDeslienurls->num_rows, $nombreLiensParPage);
-if (isset ($_GET['page']) && is_numeric($_GET['page'])) {
-    $_SESSION[LIENSURL_PAGE] = $_GET['page'];
-} else
-    if (!isset ($_SESSION[$_table_lien_url."_page"])) {
-        $_SESSION[LIENSURL_PAGE] = 1;
-    }
-$pagination->setPageEnCours($_SESSION[LIENSURL_PAGE]);
-
-// Affichage de la liste
-
-while ($_lienurlParcouru = $_listeDeslienurls->fetch_row()) {
+while ($_lienurl = $_listeDeslienurls->fetch_row()) {
     $_numLigneParcourue++;
     if (($_numLigneParcourue < $pagination->getItemDebut()) || $_numLigneParcourue > $pagination->getItemFin()) {
         continue;
     }
-        $_renduHtml .= "<div class=\"col-xs-8 col-sm-6 col-md-4 \">" . entreBalise(str_replace(" ", "-",$_lienurlParcouru [4]), "H2"); // Login
 
-        if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"] ) {
-            $_image = image($cheminImages . $iconeEdit, 32, 32);
-            $_image = str_replace("'>","' loading='lazy'>", $_image);
-            $table_concernee = $_lienurlParcouru[1];
-            $id_concerne = $_lienurlParcouru[2];
-            if ($table_concernee == "chanson"){
-                $_ancre = ancre("$_lienurlForm?id=" . $id_concerne, $_image,-1, -1, "modifier le lienurl" );
-            }
-            $_renduHtml .= $_ancre;
-        }
+    // [0]id [1]table [2]idTable [3]url [4]nom [5]description
+    $idLien = $_lienurl[0];
+    $url = $_lienurl[3];
+    $titre = htmlspecialchars($_lienurl[4]);
+    $desc = htmlspecialchars(limiteLongueur($_lienurl[5], 80));
+    
+    // --- DETECTION DU TYPE DE CONTENU ---
+    $videoId = "";
+    $isAudio = preg_match('/\.(mp3|wav|ogg|m4a)$/i', $url);
+    $isImage = preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $url);
+    
+    if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match)) {
+        $videoId = $match[1];
+    }
+    
+    $thumbHtml = "";
+    if ($videoId) {
+        // CAS YOUTUBE : Vignette + Play (Lazy Loading)
+        $thumbUrl = "https://img.youtube.com/vi/$videoId/hqdefault.jpg";
+        $thumbHtml = <<<HTML
+        <div class="video-card-thumb" onclick="loadVideo(this, '$videoId')">
+            <img src="$thumbUrl" alt="$titre" loading="lazy">
+            <div class="video-play-btn"><i class="glyphicon glyphicon-play"></i></div>
+        </div>
+HTML;
+    } elseif ($isAudio) {
+        // CAS AUDIO : Icône Musique
+        $thumbHtml = <<<HTML
+        <a href="$url" target="_blank" class="video-card-thumb" style="display:flex; align-items:center; justify-content:center; background:#e8f4fd; text-decoration:none;">
+            <i class="glyphicon glyphicon-headphones" style="font-size:64px; color:#31708f;"></i>
+            <div class="video-play-btn" style="font-size:24px; top:75%; color:#31708f;"><i class="glyphicon glyphicon-volume-up"></i></div>
+        </a>
+HTML;
+    } elseif ($isImage) {
+        // CAS IMAGE : Affichage direct
+        $thumbHtml = <<<HTML
+        <a href="$url" target="_blank" class="video-card-thumb">
+            <img src="$url" alt="$titre" style="opacity:1;" loading="lazy">
+        </a>
+HTML;
+    } else {
+        // CAS PAR DEFAUT : Site Web / Lien externe
+        $thumbHtml = <<<HTML
+        <a href="$url" target="_blank" class="video-card-thumb" style="display:flex; align-items:center; justify-content:center; background:#fdfaf5; text-decoration:none;">
+            <i class="glyphicon glyphicon-globe" style="font-size:64px; color:#D2B48C;"></i>
+            <div class="video-play-btn" style="font-size:24px; top:75%; color:#D2B48C;"><i class="glyphicon glyphicon-new-window"></i></div>
+        </a>
+HTML;
+    }
 
-        $_renduHtml .= "<a href='". $_lienurlParcouru[3]."' > lien</a>"; //  url
-        $_renduHtml .= " - "  . $_lienurlParcouru [5]; // description
-        $_renduHtml .= afficheVignetteSiVideoYoutube( $_lienurlParcouru[4], $_lienurlParcouru[3]) ;
-        // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-        if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
-            $_renduHtml .= boutonSuppression($_lienurlPost . "?id=$_lienurlParcouru[0]&mode=SUPPR", $iconePoubelle, $cheminImages);
-        // //////////////////////////////////////////////////////////////////////ADMIN
-        }
-        $_renduHtml .= "</div>";
+    // Boutons d'action
+    $actionsHtml = "";
+    if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
+        $idConcerne = $_lienurl[2];
+        $editUrl = ($_lienurl[1] == "chanson") ? "$_lienurlForm?id=$idConcerne" : "#";
+        $actionsHtml .= "<a href='$editUrl' class='btn btn-xs btn-default' title='Modifier source'><i class='glyphicon glyphicon-pencil'></i></a>";
+    }
+    
+    $actionsHtml .= "<a href='$url' target='_blank' class='btn btn-xs btn-info' title='Ouvrir le lien'><i class='glyphicon glyphicon-new-window'></i></a>";
+    
+    if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
+        $actionsHtml .= boutonSuppression($_lienurlPost . "?id=$idLien&mode=SUPPR", $iconePoubelle, $cheminImages);
+    }
+
+    $html .= <<<HTML
+    <div class="video-card">
+        $thumbHtml
+        <div class="video-card-content">
+            <h3 title="$titre">$titre</h3>
+            <p>$desc</p>
+        </div>
+        <div class="video-card-actions">
+            <span class="label label-default" style="font-weight:normal;">ID: $idLien</span>
+            <div class="btn-group">
+                $actionsHtml
+            </div>
+        </div>
+    </div>
+HTML;
 }
-    $_renduHtml .= "<BR>" . $pagination->barrePagination() . "   ";
-///////////////////////////////  DIV EDITION DE lienurl /////////////////////////////////
 
-// //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
+$html .= "  </div>"; // .video-grid
 
-if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
-    $_renduHtml .= "<BR>" . ancre("$_lienurlForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouveau lienurl");
+// Pagination
+$html .= "<div class='text-center' style='margin-top: 40px;'>";
+$html .= $pagination->barrePagination();
+$html .= "</div>";
+
+$html .= "</div>"; // .container
+
+// Script pour charger la vidéo YouTube au clic
+$html .= <<<JS
+<script>
+function loadVideo(container, videoId) {
+    container.innerHTML = '<iframe width="100%" height="180" src="https://www.youtube.com/embed/' + videoId + '?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    container.onclick = null;
+    container.style.cursor = 'default';
 }
+</script>
+JS;
 
-// //////////////////////////////////////////////////////////////////////ADMIN
-
-$_renduHtml .= envoieFooter();
-echo $_renduHtml;
+$html .= envoieFooter();
+echo $html;
