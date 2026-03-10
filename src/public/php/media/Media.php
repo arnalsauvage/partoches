@@ -5,6 +5,7 @@ require_once PHP_DIR . "/chanson/Chanson.php";
 require_once PHP_DIR . "/utilisateur/Utilisateur.php";
 require_once PHP_DIR . "/lib/utilssi.php";
 require_once PHP_DIR . "/lib/configMysql.php";
+require_once PHP_DIR . "/lib/Image.php";
 
 class Media
 {
@@ -418,26 +419,28 @@ class Media
         $songLinkHtml = '';
         if (!empty($data['id_chanson'])) {
             $songLinkHtml = <<<HTML
-<a href="../../php/chanson/chanson_voir.php?id={$data['id_chanson']}" class="btn btn-sm btn-primary mt-2">Voir la fiche chanson</a>
+<a href="../../php/chanson/chanson_voir.php?id={$data['id_chanson']}" class="btn btn-sm btn-primary mt-2">Fiche chanson</a>
 HTML;
         }
 
         return <<<HTML
-            <a href="{$data['lien']}" target="_blank" class="text-decoration-none media-link">
-                <article class="card media-card shadow-sm border m-2" style="width:220px;">
-                    <div class="card-body d-flex flex-column align-items-center text-center">
-                        <span class="badge bg-{$data['couleurBadge']} mb-2 fs-5">{$data['emoji']} {$data['type']}</span>
-                        <h5 class="card-title mb-1 text-dark">{$data['titre']}</h5>
-                        <img src="{$data['imageUrl']}{$data['imageCacheTag']}" alt="Illustration : {$data['titre']}"
+        <div class="col-sm-6 col-md-4 col-lg-3" style="margin-bottom: 25px;">
+            <a href="{$data['lien']}" target="_blank" class="text-decoration-none media-link" style="display:block;">
+                <article class="media-card shadow-sm border" style="height: 100%; display: flex; flex-direction: column;">
+                    <div class="card-body d-flex flex-column align-items-center text-center" style="padding: 15px; flex-grow: 1;">
+                        <span class="badge bg-{$data['couleurBadge']} mb-2" style="font-size: 12px;">{$data['emoji']} {$data['type']}</span>
+                        <h5 class="card-title mb-1 text-dark" style="font-weight: bold; height: 40px; overflow: hidden;">{$data['titre']}</h5>
+                        <img src="{$data['imageUrl']}" alt="Illustration : {$data['titre']}"
                              class="card-img-top my-2"
                              loading="lazy"
-                             style="height:140px;width:100%;object-fit:cover;max-width:200px;">
-                        <p class="card-text small mt-2 mb-1">{$data['description']}</p>
-                        <p class="meta-pub mb-1">Publié le {$data['datePub']} par <strong>{$data['auteurNom']}</strong></p>
+                             style="height:140px; width:100%; object-fit:cover; border-radius: 8px;">
+                        <p class="card-text small mt-2 mb-1 text-muted" style="height: 40px; overflow: hidden; font-size: 11px;">{$data['description']}</p>
+                        <p class="meta-pub mb-1" style="font-size: 10px; color: #999;">Publié le {$data['datePub']} par <strong>{$data['auteurNom']}</strong></p>
                         {$songLinkHtml}
                     </div>
                 </article>
             </a>
+        </div>
 HTML;
     }
 
@@ -454,14 +457,10 @@ HTML;
 
         $type = strtolower($this->_type);
         $titre = htmlspecialchars($this->_titre);
-        $imageRelative = htmlspecialchars($this->_image);
-        $imagePath = PHP_DIR . "/../" . ltrim($imageRelative, './');
-        $imageUrl = "../../" . ltrim($imageRelative, './');
-
-        $imageCacheTag = "";
-        if (file_exists($imagePath)) {
-            $imageCacheTag = "?v=" . filemtime($imagePath);
-        }
+        
+        // On récupère le chemin relatif propre (ex: 354/cover.jpg)
+        $imageRelative = ltrim($this->_image, './data/chansons/');
+        $imageUrl = Image::getThumbnailUrl($imageRelative, 'sd');
 
         $lien = ($type === "partoche")
             ? "../../" . ltrim(htmlspecialchars($this->_lien), './')
@@ -480,7 +479,6 @@ HTML;
             'imageUrl' => $imageUrl,
             'id_chanson' => $idChanson,
             'chanson_titre' => $chansonTitre,
-            'imageCacheTag' => $imageCacheTag,
             'lien' => $lien,
             'description' => htmlspecialchars($this->_description),
             'datePub' => htmlspecialchars($this->_datePub),

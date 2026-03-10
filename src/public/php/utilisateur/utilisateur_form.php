@@ -2,6 +2,7 @@
 
 require_once("../lib/utilssi.php");
 require_once("../document/Document.php");
+require_once("../lib/Image.php");
 require_once("../navigation/menu.php");
 
 $mode = "";
@@ -66,8 +67,14 @@ $sortie .= "
 $dummy = "";
 $f = new Formulaire ("POST", $table . "_get.php", $dummy);
 $f->champCache("id", $donnee [0]);
+
+// Avatar moderne via Image.php
+$avatarFile = str_replace("/utilisateur/", "", $donnee [5]);
+$avatarUrl = Image::getThumbnailUrl($donnee[0] . "/" . $avatarFile, 'sd', 'utilisateurs');
+$sortie .= "<div class='text-center' style='margin-bottom: 20px;'><img src='$avatarUrl' class='img-circle shadow' style='width:150px; height:150px; object-fit:cover; border: 3px solid white;'></div>";
+
 $listeImages = listeImages("/utilisateur");
-$f->champListeImages("Image : ", "fimage", str_replace("/utilisateur/", "", $donnee [5]), 1, $listeImages);
+$f->champListeImages("Image : ", "fimage", $avatarFile, 1, $listeImages);
 $f->champTexte("Login :", "flogin", $donnee [1], 50, 32);
 $f->champMotDePasse("Mot de passe : ", "fmdp", $donnee [2], 50, 32);
 $f->champTexte("Prénom :", "fprenom", $donnee [3], 50, 64);
@@ -146,16 +153,10 @@ if ($mode == 'MAJ') {
             $idC = $c['id'];
             $nomImage = imageTableId("chanson", $idC);
             
-            // Utilisation de la vignette légère via la fonction dédiée
+            // Utilisation de la vignette moderne via Image.php
             if ($nomImage != "") {
-                require_once("../lib/vignette.php");
-                $largeur_max_vignette = 64;
-                $hauteur_max_vignette = 64;
-                $cheminImagesChanson = "../../data/chansons/" . $idC . "/";
-                $cheminDesVignettes = "../../data/vignettes/";
-                $pochette = afficheVignette($nomImage, $cheminImagesChanson, $cheminDesVignettes, "pochette");
-                // On s'assure que l'image a les bonnes dimensions CSS
-                $pochette = str_replace("<img ", "<img style='width:64px; height:64px; object-fit:cover;' class='img-rounded' ", $pochette);
+                $pochetteUrl = Image::getThumbnailUrl($idC . "/" . $nomImage, 'mini', 'chansons');
+                $pochette = "<img src='$pochetteUrl' style='width:64px; height:64px; object-fit:cover;' class='img-rounded' alt='pochette'>";
             } else {
                 $pochette = "<div class='text-center img-rounded' style='width:64px; height:64px; display:flex; align-items:center; justify-content:center; background:#f5f5f5; border:1px solid #ddd;'>
                                 <span class='glyphicon glyphicon-cd' style='font-size:32px; color:#ccc;'></span>
@@ -245,7 +246,6 @@ if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
 
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"])
     $help = "(". $donnee [2] .")";
-$sortie .= "<img src='../../data/vignettes/upload.png' title=' ".$donnee [2]."'>";
 
 $sortie .= envoieFooter();
 echo $sortie;

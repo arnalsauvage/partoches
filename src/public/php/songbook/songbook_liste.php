@@ -2,6 +2,7 @@
 require_once dirname(__DIR__) . "/lib/utilssi.php";
 require_once PHP_DIR . "/navigation/menu.php";
 require_once PHP_DIR . "/songbook/Songbook.php";
+require_once PHP_DIR . "/lib/Image.php";
 
 // Palette Canopée
 $c_marron_fonce = "#2b1d1a";
@@ -158,14 +159,9 @@ if (empty($songbooks)) {
         foreach ($songbooks as $sb) {
             $_id = $sb->getId();
             $img = imageSongbook($_id);
-            // Utilisation de la vignette optimisée (64x64)
-            if ($img) {
-                $vignettePath = "../../data/vignettes/" . $img;
-                $src = file_exists($vignettePath) ? $vignettePath : "../../data/songbooks/$_id/" . urlencode($img);
-                $imgTag = "<a href='songbook_voir.php?id=$_id'><img src='$src' width='45' height='45' style='object-fit: cover; border-radius: 5px;'></a>";
-            } else {
-                $imgTag = "<a href='songbook_voir.php?id=$_id' style='text-decoration:none;'><div style='width:45px; height:45px; background:#f5f5f5; border-radius:5px; display:flex; align-items:center; justify-content:center; color:#ccc;'><i class='glyphicon glyphicon-book'></i></div></a>";
-            }
+            // Utilisation de la vignette moderne via Image.php
+            $src = Image::getThumbnailUrl($_id . "/" . $img, 'mini', 'songbooks');
+            $imgTag = "<a href='songbook_voir.php?id=$_id'><img src='$src' width='45' height='45' style='object-fit: cover; border-radius: 5px;'></a>";
             
             $actions = "<a href='songbook_voir.php?id=$_id' class='btn btn-link btn-sm' title='Ouvrir' style='color: $c_marron_fonce;'><i class='glyphicon glyphicon-eye-open'></i></a>";
             if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) $actions .= " <a href='songbook_form.php?id=$_id' class='btn btn-link btn-sm' title='Éditer' style='color: $c_orange;'><i class='glyphicon glyphicon-pencil'></i></a>";

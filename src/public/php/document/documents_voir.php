@@ -125,10 +125,13 @@ while ($ligneDoc = $lignes->fetch_row()) {
         $precedenteVignette = $vignetteChanson;
         
         $idUserDoc = $ligneDoc[7] ?? 0;
-        $userPseudo = $tabUsers[$idUserDoc][1] ?? 'defaut.png';
+        $userPseudo = $tabUsers[$idUserDoc][1] ?? 'Inconnu';
+        $userImage = $tabUsers[$idUserDoc][5] ?? 'defaut.png';
         $userNom = $tabUsers[$idUserDoc][0] ?? 'Inconnu';
         
-        $vignettePublicateur = image("../../data/vignettes/" . urlencode($userPseudo), 48, 48, $userNom);
+        require_once PHP_DIR . "/lib/Image.php";
+        $avatarUrl = Image::getThumbnailUrl($idUserDoc . "/" . $userImage, 'mini', 'utilisateurs');
+        $vignettePublicateur = "<img src='$avatarUrl' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='$userNom'>";
         $sortie .= "<td> $vignettePublicateur </td>\n";
         
         $idChansonDoc = $ligneDoc[6] ?? 0;

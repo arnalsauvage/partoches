@@ -17,8 +17,3 @@ $iconePoulet = $cheminIcones . "chicken.png";
 $iconePuce = $cheminIcones . "grib-rouge.jpg";
 $tailleicones = 64;
 
-// Pour les vignettes
-$cheminVignettes = "../../data/vignettes/";
-$largeur_max_vignette = 128;
-$hauteur_max_vignette = 100;
-

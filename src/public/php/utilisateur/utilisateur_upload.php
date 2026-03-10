@@ -66,15 +66,6 @@ if (!move_uploaded_file($tmp_file, $repertoire . $name_file)) {
     return 0;
 }
 
-// Génération d'une vignette
-
-$cheminImages = $repertoire;
-$cheminVignettes = "../../data/vignettes/";
-    afficheVignette($name_file, $cheminImages, $cheminVignettes);
-
-// On récupère l'url du fichier envoyé
-$get_the_file = "<a href=\"http://" . $_SERVER ['SERVER_NAME'] . dirname($_SERVER ['REQUEST_URI']) . "/" . $repertoire . $name_file . "\" target=\"_blank\">Accéder au fichier</a>";
-
 // On redirige vers la liste des songbooks
 header('Location: ./utilisateur_form.php?id=' . $_POST ['id']);
 // }

@@ -4,6 +4,7 @@ require_once "../navigation/menu.php";
 require_once "Songbook.php";
 require_once "../document/Document.php";
 require_once "../chanson/Chanson.php";
+require_once "../lib/Image.php";
 
 /**
  * Portfolio des Songbooks - Vue moderne type galerie "Canopée"
@@ -26,7 +27,10 @@ if ($listeSongbooks) {
         $nomSb = htmlspecialchars($songbook[1]);
         $dateSb = dateMysqlVersTexte($songbook[3]);
         $imageSb = imageSongbook($idSb);
-        $vignetteSb = afficheVignette($imageSb, "../../data/songbooks/$idSb/", "../../data/songbooks/vignettes/", "vignette du songbook $nomSb");
+        
+        // Utilisation de la vignette moderne via Image.php
+        $srcVignette = Image::getThumbnailUrl($idSb . "/" . $imageSb, 'sd', 'songbooks');
+        $vignetteSb = "<img src='$srcVignette' class='img-responsive center-block' style='height:200px; object-fit:cover; border-radius:10px;' alt='vignette'>";
 
         // Récupération du PDF principal du songbook
         $pdfSb = "vide";

@@ -3,6 +3,7 @@ const DATA_SONGBOOKS = "../../data/songbooks/";
 
 require_once dirname(__DIR__) . "/lib/utilssi.php";
 require_once dirname(__DIR__) . "/document/Document.php";
+require_once dirname(__DIR__) . "/lib/Image.php";
 
 $songbookForm = "songbook_form.php";
 $songbookGet = "songbook_get.php";
@@ -162,10 +163,10 @@ class Songbook
         $c_accent = "#8B4513";
         $c_beige = "#F5F5DC";
 
-        // Image de couverture
-        $imageFile = imageTableId("songbook", $_id);
+        // Image de couverture moderne via Image.php
+        $imageFile = imageSongbook($_id);
         if ($imageFile) {
-            $srcImage = "../../data/songbooks/$_id/" . urlencode($imageFile);
+            $srcImage = Image::getThumbnailUrl($_id . "/" . $imageFile, 'sd', 'songbooks');
             $imgHtml = "<a href='songbook_voir.php?id=$_id'><img src='$srcImage' alt='$nom' style='width: 100%; height: 100%; object-fit: cover;'></a>";
         } else {
             $imgHtml = "<a href='songbook_voir.php?id=$_id' style='text-decoration:none;'><span class='glyphicon glyphicon-book' style='font-size: 50px; color: $c_marron_fonce; opacity: 0.3;'></span></a>";

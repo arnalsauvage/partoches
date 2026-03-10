@@ -1,5 +1,7 @@
 <?php
 require_once dirname(__DIR__) . "/lib/utilssi.php";
+require_once dirname(__DIR__) . "/document/Document.php";
+require_once dirname(__DIR__) . "/lib/Image.php";
 
 // Fonctions de gestion de la chanson
 

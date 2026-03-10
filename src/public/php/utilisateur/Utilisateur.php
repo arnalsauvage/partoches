@@ -318,8 +318,8 @@ class Utilisateur
         $dateLogin = dateMysqlVersTexte($this->_dateDernierLogin);
         $nbChansons = $this->getNbChansons();
         
-        $cheminVignettes = $GLOBALS['cheminVignettes'] ?? "../../data/vignettes/";
-        $urlAvatar = $cheminVignettes . $image;
+        require_once dirname(__DIR__, 2) . "/lib/Image.php";
+        $urlAvatar = Image::getThumbnailUrl($id . "/" . str_replace("/utilisateur", "", $image), 'mini', 'utilisateurs');
 
         $classeStatut = match($this->_privilege) {
             3 => "label-danger", // Admin

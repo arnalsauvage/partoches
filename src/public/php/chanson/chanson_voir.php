@@ -6,7 +6,8 @@
  * Affiche le détail d'une chanson avec une UX moderne (badges, barre d'outils, lightbox).
  */
 
-require_once dirname(__DIR__) . "/lib/utilssi.php";
+require_once "../lib/utilssi.php";
+require_once "../lib/Image.php";
 require_once "../chanson/Chanson.php";
 require_once "../document/Document.php";
 require_once "../liens/LienStrumChanson.php";
@@ -171,9 +172,10 @@ $contenuHtml .= FIN_SECTION;
 // Colonne Droite : Image Couverture
 $contenuHtml .= "<section class='col-sm-4 text-center'>";
 if (!empty($monImage)) {
-    $urlImage = "../../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $monImage;
-    $contenuHtml .= "  <div class='pochette-container' onclick='openLightbox(\"$urlImage\")'>";
-    $contenuHtml .= "    " . image($urlImage, 200, "", "pochette", "img-thumbnail img-responsive center-block");
+    $urlOriginale = "../../" . $_DOSSIER_CHANSONS . $idChanson . "/" . $monImage;
+    $urlThumbnail = Image::getThumbnailUrl($idChanson . "/" . $monImage, 'sd');
+    $contenuHtml .= "  <div class='pochette-container' onclick='openLightbox(\"$urlOriginale\")'>";
+    $contenuHtml .= "    <img src='$urlThumbnail' alt='pochette' class='img-thumbnail img-responsive center-block' style='max-width: 300px;'>";
     $contenuHtml .= "  </div>";
 }
 $contenuHtml .= FIN_SECTION;
@@ -257,10 +259,13 @@ if (!empty($songbooks) && $songbooks->num_rows > 0) {
         $idSb = $songbook[0];
         $nomSb = $songbook[1];
         $imgSb = imageSongbook($idSb);
-        $urlImgSb = "../../data/songbooks/$idSb/$imgSb";
+        
+        // Utilisation de la vignette moderne via Image.php
+        $urlImgVignette = Image::getThumbnailUrl($idSb . "/" . $imgSb, 'sd', 'songbooks');
+        
         $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 text-center'>";
         $contenuHtml .= "  <a href='../songbook/songbook_voir.php?id=$idSb' class='thumbnail'>";
-        $contenuHtml .= "    <img src='$urlImgSb' style='height:120px;' alt='Couverture Songbook'><div class='caption'><small>$nomSb</small></div>";
+        $contenuHtml .= "    <img src='$urlImgVignette' style='height:120px; object-fit:cover;' alt='Couverture Songbook'><div class='caption'><small>$nomSb</small></div>";
         $contenuHtml .= "  </a>";
         $contenuHtml .= "</div>";
     }

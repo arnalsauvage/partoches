@@ -33,7 +33,6 @@ if (!isset ($FichierUtilsSi)) {
     require_once("mysql.php");
     include_once("params.php");
     include_once("tableHtml.php");
-    require_once("vignette.php");
     require_once("Chiffrement.php");
     if (!isset ($_SESSION ["privilege"])) {
         $_SESSION ["privilege"] = 0;

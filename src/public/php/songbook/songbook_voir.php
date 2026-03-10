@@ -3,6 +3,7 @@ require_once dirname(__DIR__) . "/lib/utilssi.php";
 require_once PHP_DIR . "/songbook/Songbook.php";
 require_once PHP_DIR . "/document/Document.php";
 require_once PHP_DIR . "/chanson/Chanson.php";
+require_once PHP_DIR . "/lib/Image.php";
 
 // Palette Canopée
 $c_marron_fonce = "#2b1d1a";
@@ -41,9 +42,13 @@ $badgeColor = match($sb->getType()) {
 };
 
 // Image de couverture
-$imageFile = imageTableId("songbook", $id);
-$imgUrl = $imageFile ? "../../data/songbooks/$id/" . urlencode($imageFile) : "";
-$imgTag = $imgUrl ? "<img src='$imgUrl' alt='$nom' class='img-responsive img-thumbnail shadow' style='border-radius: 10px;'>" : "<div style='width:100%; height:300px; background:#eee; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#ccc;'><i class='glyphicon glyphicon-book' style='font-size:100px;'></i></div>";
+$imageFile = imageSongbook($id);
+$imgUrl = "";
+if ($imageFile) {
+    // Utilisation de la vignette moderne via Image.php
+    $imgUrl = Image::getThumbnailUrl($id . "/" . $imageFile, 'sd', 'songbooks');
+}
+$imgTag = $imgUrl ? "<img src='$imgUrl' alt='$nom' class='img-responsive img-thumbnail shadow' style='border-radius: 10px; max-width: 300px;'>" : "<div style='width:100%; height:300px; background:#eee; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#ccc;'><i class='glyphicon glyphicon-book' style='font-size:100px;'></i></div>";
 
 // --- RÉCUPÉRATION DES CHANSONS ---
 $lignes = LienDocSongbook::chercheLiensDocSongbook('idSongbook', $id, "ordre");
