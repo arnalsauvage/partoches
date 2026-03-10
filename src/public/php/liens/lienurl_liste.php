@@ -31,6 +31,9 @@ $pagination->setPageEnCours($page);
 
 // 3. Construction du HTML
 $headHtml = envoieHead("Galerie des Liens", "../../css/galerie_liens.css");
+$pasDeMenu = true;
+require_once("../navigation/menu.php");
+
 echo $headHtml;
 echo $MENU_HTML;
 
@@ -152,7 +155,6 @@ $html .= "</div>"; // .container
 
 // Script pour charger la vidéo YouTube au clic et gérer la suppression AJAX
 $html .= <<<JS
-<script src="../lib/javascript.js"></script>
 <script>
 function loadVideo(container, videoId) {
     container.innerHTML = '<iframe width="100%" height="180" src="https://www.youtube.com/embed/' + videoId + '?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen><\/iframe>';
