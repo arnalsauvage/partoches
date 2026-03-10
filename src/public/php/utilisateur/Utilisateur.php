@@ -304,6 +304,24 @@ class Utilisateur
     }
 
     /**
+     * Retourne le rendu HTML de l'avatar
+     */
+    public function getAvatarHtml(int $size = 48): string
+    {
+        require_once dirname(__DIR__) . "/lib/Image.php";
+        // Nettoyage du nom de fichier
+        $cleanImage = str_replace("utilisateur/", "", $this->_image);
+        $avatarUrl = Image::getThumbnailUrl($cleanImage, ($size > 100 ? 'sd' : 'mini'), 'utilisateurs');
+        
+        if (str_contains($avatarUrl, 'icone_arnal.png')) {
+            $fontSize = floor($size / 2);
+            return "<span class='user-avatar-round' style='width:{$size}px; height:{$size}px; line-height:{$size}px; display:inline-block; text-align:center; background:#eee; border-radius:50%;' title='{$this->_user}'><i class='glyphicon glyphicon-user' style='font-size:{$fontSize}px; color:#ccc; vertical-align:middle;'></i></span>";
+        }
+        
+        return "<img src='$avatarUrl' width='$size' height='$size' class='img-circle' style='object-fit:cover;' alt='{$this->_user}'>";
+    }
+
+    /**
      * Affiche une carte utilisateur moderne
      */
     public function afficheCarte(): string
@@ -319,7 +337,9 @@ class Utilisateur
         $nbChansons = $this->getNbChansons();
         
         require_once dirname(__DIR__) . "/lib/Image.php";
-        $urlAvatar = Image::getThumbnailUrl($id . "/" . str_replace("/utilisateur", "", $image), 'mini', 'utilisateurs');
+        // Nettoyage du nom de fichier (on enlève le préfixe utilisateur/ s'il existe)
+        $cleanImage = str_replace("utilisateur/", "", $image);
+        $urlAvatar = Image::getThumbnailUrl($cleanImage, 'mini', 'utilisateurs');
 
         $classeStatut = match($this->_privilege) {
             3 => "label-danger", // Admin
