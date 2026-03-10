@@ -97,8 +97,11 @@ if (isset($_POST['action'])) {
 // Fin ajax
 
 require_once dirname(__DIR__) . "/lib/utilssi.php";
-include_once("menu.php");
-include_once "../navigation/Footer.php";
+$headHtml = envoieHead("Paramétrage du site", "../../css/index.css");
+echo $headHtml;
+$pasDeMenu = true;
+require_once "menu.php";
+echo $MENU_HTML;
 
 $fichier = "../../../data/conf/params.ini";
 $sortie = "<div class='container' style='padding:20px;'>";

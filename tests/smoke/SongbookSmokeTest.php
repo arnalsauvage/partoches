@@ -51,24 +51,24 @@ class SongbookSmokeTest extends TestCase
     {
         return [
             // --- PAGES DU MENU ---
-            'Accueil (Medias)' => ['/src/public/php/media/listeMedias.php', []],
-            'Songbooks (Liste)' => ['/src/public/php/songbook/songbook_liste.php', []],
-            'Songbooks (Portfolio)' => ['/src/public/php/songbook/songbook-portfolio.php', []],
-            'Chansons' => ['/src/public/php/chanson/chanson_liste.php', ['razFiltres' => '1']],
-            'Strums' => ['/src/public/php/strum/strum_liste.php', []],
-            'Liens' => ['/src/public/php/liens/lienurl_liste.php', []],
-            'Utilisateurs' => ['/src/public/php/utilisateur/utilisateur_liste.php', []],
-            'Documents' => ['/src/public/php/document/documents_voir.php', []],
-            'Paramétrage' => ['/src/public/php/navigation/paramsEdit.php', []],
-            'Connexion' => ['/src/public/php/navigation/login.php', []],
+            'Accueil (Medias)' => ['/php/media/listeMedias.php', []],
+            'Songbooks (Liste)' => ['/php/songbook/songbook_liste.php', []],
+            'Songbooks (Portfolio)' => ['/php/songbook/songbook-portfolio.php', []],
+            'Chansons' => ['/php/chanson/chanson_liste.php', ['razFiltres' => '1']],
+            'Strums' => ['/php/strum/strum_liste.php', []],
+            'Liens' => ['/php/liens/lienurl_liste.php', []],
+            'Utilisateurs' => ['/php/utilisateur/utilisateur_liste.php', []],
+            'Documents' => ['/php/document/documents_voir.php', []],
+            'Paramétrage' => ['/php/navigation/paramsEdit.php', []],
+            'Connexion' => ['/php/navigation/login.php', []],
 
             // --- PAGES ADMIN / FORMULAIRES ---
-            'Form Chanson (New)' => ['/src/public/php/chanson/chanson_form.php', []],
-            'Form Chanson (Edit ID 728)' => ['/src/public/php/chanson/chanson_form.php', ['id' => 728]],
-            'Upload Chanson' => ['/src/public/php/chanson/chanson_upload.php', []],
-            'Form Utilisateur (Edit ID 1)' => ['/src/public/php/utilisateur/utilisateur_form.php', ['id' => 1]],
-            'Form Songbook (Edit ID 40)' => ['/src/public/php/songbook/songbook_form.php', ['id' => 40]],
-            'Liste Documents Admin' => ['/src/public/php/document/documents_voir.php', []],
+            'Form Chanson (New)' => ['/php/chanson/chanson_form.php', []],
+            'Form Chanson (Edit ID 728)' => ['/php/chanson/chanson_form.php', ['id' => 728]],
+            'Upload Chanson' => ['/php/chanson/chanson_upload.php', []],
+            'Form Utilisateur (Edit ID 1)' => ['/php/utilisateur/utilisateur_form.php', ['id' => 1]],
+            'Form Songbook (Edit ID 40)' => ['/php/songbook/songbook_form.php', ['id' => 40]],
+            'Liste Documents Admin' => ['/php/document/documents_voir.php', []],
 
             // --- PAGES HTML ET OUTILS ---
             'Mentions Légales' => ['/html/mentionsLegales.html', []],
@@ -76,10 +76,10 @@ class SongbookSmokeTest extends TestCase
             'Boîte à Strum' => ['/html/boiteAstrum/index.html', []],
 
             // --- PAGES DE DÉTAIL / FORMULAIRES ---
-            'Voir Songbook (ID 40)' => ['/src/public/php/songbook/songbook_voir.php', ['id' => 40]],
-            'Form Songbook (Edit ID 40)' => ['/src/public/php/songbook/songbook_form.php', ['id' => 40]],
-            'Chanson Voir (ID 1)' => ['/src/public/php/chanson/chanson_voir.php', ['id' => 1]],
-            'Form Strum (Edit ID 1)' => ['/src/public/php/strum/strum_form.php', ['id' => 1]],
+            'Voir Songbook (ID 40)' => ['/php/songbook/songbook_voir.php', ['id' => 40]],
+            'Form Songbook (Edit ID 40)' => ['/php/songbook/songbook_form.php', ['id' => 40]],
+            'Chanson Voir (ID 1)' => ['/php/chanson/chanson_voir.php', ['id' => 1]],
+            'Form Strum (Edit ID 1)' => ['/php/strum/strum_form.php', ['id' => 1]],
         ];
     }
 }

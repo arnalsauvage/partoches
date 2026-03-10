@@ -13,6 +13,7 @@ require_once "../document/Document.php";
 require_once "../liens/LienStrumChanson.php";
 require_once "../liens/LienUrl.php";
 require_once "../liens/lienurl_voir.php";
+$pasDeMenu = true;
 require_once "../navigation/menu.php";
 require_once "../note/UtilisateurNote.php";
 require_once "../songbook/Songbook.php";
@@ -364,7 +365,10 @@ $contenuHtml .= "
 </script>
 ";
 
+$headHtml = envoieHead("Partoches - " . $_chanson->getNom(), "../../css/index.css");
 $contenuHtml .= envoieFooter();
+echo $headHtml;
+echo $MENU_HTML;
 echo $contenuHtml;
 
 // --- FONCTIONS DE RENDU ---

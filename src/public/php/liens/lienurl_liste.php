@@ -3,6 +3,7 @@ require_once("../lib/Pagination.php");
 require_once dirname(__DIR__) . "/lib/utilssi.php";
 require_once("LienUrl.php");
 require_once("lienurl_voir.php");
+$pasDeMenu = true;
 require_once("../navigation/menu.php");
 
 /**
@@ -14,7 +15,7 @@ global $cheminImages, $iconePoubelle, $iconeCreer, $iconeEdit;
 const LIENSURL_PAGE = 'liensurlPage';
 $nombreLiensParPage = 12;
 $_lienurlForm = "../chanson/chanson_form.php";
-$_lienurlPost = "lienurl_post.php";
+$_lienurlPost = "lienurlPost.php";
 
 // 1. Logique de récupération des données
 $_listeDeslienurls = chargeLiensurls("date", false);
@@ -29,6 +30,10 @@ $page = (isset($_GET['page']) && is_numeric($_GET['page'])) ? (int)$_GET['page']
 $pagination->setPageEnCours($page);
 
 // 3. Construction du HTML
+$headHtml = envoieHead("Galerie des Liens", "../../css/galerie_liens.css");
+echo $headHtml;
+echo $MENU_HTML;
+
 $html = "<div class='container'>";
 $html .= "  <h1 class='text-center' style='margin-bottom: 30px;'><i class='glyphicon glyphicon-link'></i> Galerie des Liens</h1>";
 
@@ -111,16 +116,15 @@ HTML;
     }
     
     $actionsHtml .= "<a href='$url' target='_blank' class='btn btn-xs btn-info' title='Ouvrir le lien'><i class='glyphicon glyphicon-new-window'></i></a>";
-    
     if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
-        $actionsHtml .= boutonSuppression($_lienurlPost . "?id=$idLien&mode=SUPPR", $iconePoubelle, $cheminImages);
+        $actionsHtml .= "<button type='button' class='btn btn-xs btn-danger' title='Supprimer' onclick=\"supprimerLienUrlAjax($idLien);\"><i class='glyphicon glyphicon-trash'></i></button>";
     }
 
     // Badge ID (uniquement pour les admins)
     $badgeId = estAdmin() ? "<span class='label label-default' style='font-weight:normal;'>ID: $idLien</span>" : "<span></span>";
 
     $html .= <<<HTML
-    <div class="video-card">
+    <div class="video-card" id="card-lien-$idLien">
         $thumbHtml
         <div class="video-card-content">
             <h3 title="$titre">$titre</h3>
@@ -146,16 +150,50 @@ $html .= "</div>";
 
 $html .= "</div>"; // .container
 
-// Script pour charger la vidéo YouTube au clic
+// Script pour charger la vidéo YouTube au clic et gérer la suppression AJAX
 $html .= <<<JS
+<script src="../lib/javascript.js"></script>
 <script>
 function loadVideo(container, videoId) {
     container.innerHTML = '<iframe width="100%" height="180" src="https://www.youtube.com/embed/' + videoId + '?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
     container.onclick = null;
     container.style.cursor = 'default';
 }
+
+function supprimerLienUrlAjax(id) {
+    if (!confirm('Voulez-vous vraiment supprimer ce lien ?')) return;
+
+    $.post('lienurlPost.php', { id: id, mode: 'DEL' }, function(response) {
+        if (response.indexOf('ok suppression') !== -1) {
+            $('#card-lien-' + id).fadeOut(500, function() {
+                $(this).remove();
+                if ($('.video-card').length === 0) {
+                    location.reload(); // Recharger pour afficher le message "vide" ou pagination
+                }
+            });
+            if (typeof toastr !== 'undefined') {
+                toastr.success('Le lien a été supprimé avec succès.');
+            } else {
+                alert('Le lien a été supprimé avec succès.');
+            }
+        } else {
+            if (typeof toastr !== 'undefined') {
+                toastr.error('Erreur lors de la suppression : ' + response);
+            } else {
+                alert('Erreur lors de la suppression : ' + response);
+            }
+        }
+    }).fail(function() {
+        if (typeof toastr !== 'undefined') {
+            toastr.error('Erreur réseau lors de la suppression.');
+        } else {
+            alert('Erreur réseau lors de la suppression.');
+        }
+    });
+}
 </script>
 JS;
 
 $html .= envoieFooter();
+echo $MENU_HTML;
 echo $html;

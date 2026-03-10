@@ -57,8 +57,8 @@ class Pagination
         
         if ($total <= 1) return ""; // Pas besoin de pagination pour une seule page
 
-        $chaine = "<span class='pagination-container' style='margin-left: 15px; font-family: sans-serif;'>";
-        $chaine .= "<span style='margin-right: 10px; font-weight: bold;'>Pages :</span> ";
+        $chaine = "<span class=\"pagination-container\" style=\"margin-left: 15px; font-family: sans-serif;\">";
+        $chaine .= "<span style=\"margin-right: 10px; font-weight: bold;\">Pages :</span> ";
 
         // --- BOUTON PRÉCÉDENT ---
         if ($actuelle > 1) {
@@ -76,7 +76,7 @@ class Pagination
             // Toujours afficher la première, la dernière et celles autour de l'actuelle
             if ($i == 1 || $i == $total || ($i >= $actuelle - $range && $i <= $actuelle + $range)) {
                 if ($i == $actuelle) {
-                    $chaine .= "<strong style='background: #337ab7; color: #fff; padding: 2px 8px; border-radius: 3px; margin: 0 2px;'>$i</strong>";
+                    $chaine .= "<strong style=\"background: #337ab7; color: #fff; padding: 2px 8px; border-radius: 3px; margin: 0 2px;\">$i</strong>";
                 } else {
                     $chaine .= ancre($this->urlAjouteParam($_monUrlSansParamPage, "page=$i"), " $i ", -1, -1, "Aller à la page $i") . " ";
                 }

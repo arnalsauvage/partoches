@@ -14,6 +14,7 @@ require_once dirname(__DIR__) . "/lib/utilssi.php";
 require_once "../lib/Pagination.php";
 require_once "Chanson.php";
 require_once "../document/Document.php";
+$pasDeMenu = true;
 require_once "../navigation/menu.php";
 require_once "../note/UtilisateurNote.php";
 
@@ -186,7 +187,10 @@ $resultatIds = Chanson::chercheChansons($critere_cherche, $_SESSION[TRI], $_SESS
 require_once "chanson-v-comp-cherche.php";
 $contenuHtml .= $contenuHtmlCompCherche;
 
-$largeur_ecran = $_SESSION['largeur-fenetre'];
+$largeur_ecran = $_SESSION['largeur-fenetre'] ?? 1200;
+
+// On envoie le HEAD avant le menu
+$headHtml = envoieHead("Partoches - Liste des Chansons", "../../css/index.css");
 
 // Barre d'outils (Ajout + Switch de vue)
 $contenuHtml .= "<div class='row' style='margin-bottom: 20px;'>";
@@ -324,6 +328,8 @@ if ($nbreChansonsTotal == 0) {
 
 $contenuHtml .= "</div></div>\n";
 $contenuHtml .= envoieFooter();
+echo $headHtml;
+echo $MENU_HTML;
 echo $contenuHtml;
 
 function titreColonne($libelle, $nomRubrique): string

@@ -17,69 +17,60 @@ if (!isset ($FichierHtml)) {
             $nouvellefenetre = 'target="_blank"';
         }
         if ($classe != -1) {
-            $optionClasse = " class='$classe'";
+            $optionClasse = " class=\"$classe\"";
         }
         if ($titre != -1) {
             $titre = htmlspecialchars($titre);
             $optionTitre = " title=\"$titre\"";
         }
-        return "<a href='$url'" . "$nouvellefenetre $optionClasse $optionTitre>$libelle</A>";
+        
+        // Protection W3C : on remplace les & par &amp; dans l'URL si ce n'est pas déjà fait
+        $urlPropre = str_replace('&amp;', '&', $url);
+        $urlPropre = str_replace('&', '&amp;', $urlPropre);
+        
+        return "<a href=\"$urlPropre\"" . " $nouvellefenetre$optionClasse$optionTitre>$libelle</a>";
     }
-
-    // Fin de la fonction Ancre____________________________________________
 
     function titre($texte, $niveau)
     {
         return "<h$niveau>$texte</h$niveau>";
     }
 
-    // Fonction retournant le code HTML pour une image ____________________
     function image($urlImage, $largeur = -1, $hauteur = -1, $alt = "image décorative", $class = "")
     {
         $attrLargeur = "";
         $attrHauteur = "";
         if (($largeur != -1) && ($largeur <> "100%")) {
-            $attrLargeur = " width = '$largeur' ";
+            $attrLargeur = " width=\"$largeur\"";
         }
         if (($hauteur != -1) && ($hauteur <> "100%")) {
-            $attrHauteur = " height = '$hauteur' ";
+            $attrHauteur = " height=\"$hauteur\"";
         }
-        return "<img src='".$urlImage."' " . $attrLargeur . $attrHauteur . " alt='$alt' class ='$class'>\n";
+        return "<img src=\"$urlImage\"" . $attrLargeur . $attrHauteur . " alt=\"$alt\" class=\"$class\">\n";
     }
 
-    /**
-     * Affiche la pochette d'une chanson ou une icône par défaut
-     * Utilise désormais les vignettes WebP optimisées à la volée.
-     */
     function affichePochette($nomFichier, $id, $largeur = 48, $hauteur = 48)
     {
         if (empty($nomFichier) || empty($id)) {
             return fallbackPochette($largeur, $hauteur);
         }
 
-        // On détermine la taille de vignette à demander (mini ou sd)
         $tailleVignette = ($largeur > 100) ? 'sd' : 'mini';
-        
-        // Chemin relatif attendu par Image::getThumbnailUrl (ex: "354/cover.jpg")
         $relPath = $id . "/" . $nomFichier;
         $urlVignette = Image::getThumbnailUrl($relPath, $tailleVignette);
 
-        // Si l'URL renvoyée est le fallback icône musique, on utilise notre rendu CSS plus joli
         if (str_contains($urlVignette, 'icone_musique.png')) {
             return fallbackPochette($largeur, $hauteur);
         }
 
-        return "<img src='$urlVignette' width='$largeur' height='$hauteur' alt='couverture' class='img-thumbnail' loading='lazy' style='object-fit: cover;'>";
+        return "<img src=\"$urlVignette\" width=\"$largeur\" height=\"$hauteur\" alt=\"couverture\" class=\"img-thumbnail\" loading=\"lazy\" style=\"object-fit: cover;\">";
     }
 
-    /**
-     * Rendu d'une icône par défaut quand la pochette est absente
-     */
     function fallbackPochette($largeur, $hauteur)
     {
         $fontSize = floor($largeur / 2);
-        return "<div class='text-center img-thumbnail' style='width:{$largeur}px; height:{$hauteur}px; display:flex; align-items:center; justify-content:center; background:#f9f9f9; border:1px solid #ddd;'>
-                    <span class='glyphicon glyphicon-cd' style='font-size:{$fontSize}px; color:#ccc;' title='Pochette absente'></span>
+        return "<div class=\"text-center img-thumbnail\" style=\"width:{$largeur}px; height:{$hauteur}px; display:flex; align-items:center; justify-content:center; background:#f9f9f9; border:1px solid #ddd;\">
+                    <span class=\"glyphicon glyphicon-cd\" style=\"font-size:{$fontSize}px; color:#ccc;\" title=\"Pochette absente\"></span>
                 </div>";
     }
 
@@ -219,45 +210,45 @@ if (!isset ($FichierHtml)) {
     {
         $retour =
             "<!doctype html>
-		<html lang='fr'>
+		<html lang=\"fr\">
 		<head>
-		<meta charset='UTF-8' >";
+		<meta charset=\"UTF-8\" >";
 
         // Pour BootStrap
         $retour .= "
-        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <link rel='icon' href='../../favicon.ico' type='image/x-icon'>
-    	<link href='../../css/bootstrap.min.css' rel='stylesheet'>
+        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">
+		<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+        <link rel=\"icon\" href=\"../../favicon.ico\" type=\"image/x-icon\">
+    	<link href=\"../../css/bootstrap.min.css\" rel=\"stylesheet\">
         <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
-    	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel='stylesheet'>";
+    	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel=\"stylesheet\">";
 
         // filemtime pour forcer le rechargement du css si modifié
         $cssPath = PHP_DIR . "/../css/styles-communs.css";
         $v = file_exists($cssPath) ? filemtime($cssPath) : "";
-        $retour .= " <link rel='stylesheet' type='text/css' href='../../css/styles-communs.css?v=26.03.08.1730'>\r\n";
+        $retour .= " <link rel=\"stylesheet\" type=\"text/css\" href=\"../../css/styles-communs.css?v=26.03.08.1730\">\r\n";
 
         $retour .= "
         
-        <link rel='stylesheet' media='screen' type='text/css' title='resolution' href='$feuilleCss' />
-		<script src='..//lib/javascript.js'></script>
+        <link rel=\"stylesheet\" media=\"screen\" type=\"text/css\" title=\"resolution\" href=\"$feuilleCss\" />
+		<script src=\"../../js/javascript.js\"></script>
 		<!-- Jquery --- source : https://code.jquery.com/jquery-1.12.4.js -->
-		<script src='../../js/jquery-1.12.4.min.js'></script>
+		<script src=\"../../js/jquery-1.12.4.min.js\"></script>
 		<!-- Nos fonctions personnalisées -->
-		<script src='../../js/utilsJquery.js'></script>
+		<script src=\"../../js/utilsJquery.js\"></script>
 		<!-- jquery-ui --- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
 
-		<script src='../../js/jquery-ui.1.12.1.min.js'></script>
+		<script src=\"../../js/jquery-ui.1.12.1.min.js\"></script>
         
 		<!-- Pour bootstrap         -->
-        <script src='../../js/bootstrap.3.2.0.min.js'></script>
+        <script src=\"../../js/bootstrap.3.2.0.min.js\"></script>
 		
 		<!-- Pour Toaster, les petites infos instantanées         -->
-		<link href='../../css/toastr.min.css' rel='stylesheet' type='text/css'>
-		<script src='../../js/toastr.min.js'></script>
+		<link href=\"../../css/toastr.min.css\" rel=\"stylesheet\" type=\"text/css\">
+		<script src=\"../../js/toastr.min.js\"></script>
 
-		<!-- Pour Select2, le combo amélioré         -->		<link href='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' rel='stylesheet' />
-        <script src='https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'></script>
+		<!-- Pour Select2, le combo amélioré         -->		<link href=\"https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css\" rel=\"stylesheet\" />
+        <script src=\"https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js\"></script>
 		
 		<title>$titrePage</title>
 		</head>";

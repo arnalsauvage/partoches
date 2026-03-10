@@ -1,5 +1,10 @@
 <?php
 require_once dirname(__DIR__) . "/lib/utilssi.php";
+$headHtml = envoieHead("Songbook - Voir", "../../css/index.css");
+echo $headHtml;
+$pasDeMenu = true;
+require_once PHP_DIR . "/navigation/menu.php";
+echo $MENU_HTML;
 require_once PHP_DIR . "/songbook/Songbook.php";
 require_once PHP_DIR . "/document/Document.php";
 require_once PHP_DIR . "/chanson/Chanson.php";

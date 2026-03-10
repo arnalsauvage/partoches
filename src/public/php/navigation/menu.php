@@ -6,6 +6,7 @@ require_once "../lib/Image.php";
 /**
  * Gère l'affichage du menu supérieur et l'état de la session utilisateur.
  */
+$contenu = "";
 
 // Initialisation de la largeur de fenêtre si absente
 if (!isset($_SESSION['largeur-fenetre'])) {
@@ -45,10 +46,7 @@ if (isset($_SESSION['login'])) {
     $_SESSION['login'] = "";
 }
 
-// Construction du Head
-$contenu = envoieHead($_SESSION['titreSite'], "../../css/index.css?v=26.03.08");
-if (isset($contenuExtra)) $contenu .= $contenuExtra;
-
+// Construction du Menu (sans le Head automatique)
 $logoSite = !empty($_SESSION['logoSite']) ? $_SESSION['logoSite'] : 'logo_site.png';
 $titreSite = $_SESSION['titreSite'];
 $privilege = $_SESSION['privilege'];
@@ -57,21 +55,21 @@ $user = $_SESSION['user'];
 // --- CONSTRUCTION DU MENU (HEREDOC) ---
 
 // 1. Médias (Tous)
-$lienMedias = "<li><a href='../media/listeMedias.php'>Médias</a></li>";
+$lienMedias = "<li><a href=\"../media/listeMedias.php\">Médias</a></li>";
 
 // 2. Chansons (Tous)
-$lienChansons = "<li><a href='../chanson/chanson_liste.php?razFiltres'>Chansons</a></li>";
+$lienChansons = "<li><a href=\"../chanson/chanson_liste.php?razFiltres\">Chansons</a></li>";
 
 // 3. Strums (Tous)
-$lienStrums = "<li><a href='../strum/strum_liste.php'>Strums</a></li>";
+$lienStrums = "<li><a href=\"../strum/strum_liste.php\">Strums</a></li>";
 
 // 4. Songbooks (Tous - destination selon privilège)
 $liensSongbook = ($privilege > $GLOBALS["PRIVILEGE_MEMBRE"]) 
-    ? "<li><a href='../songbook/songbook_liste.php'>Songbooks</a></li>"
-    : "<li><a href='../songbook/songbook-portfolio.php'>Songbooks</a></li>";
+    ? "<li><a href=\"../songbook/songbook_liste.php\">Songbooks</a></li>"
+    : "<li><a href=\"../songbook/songbook-portfolio.php\">Songbooks</a></li>";
 
 // 5. Liens (Tous)
-$lienLiens = "<li><a href='../liens/lienurl_liste.php'>Liens</a></li>";
+$lienLiens = "<li><a href=\"../liens/lienurl_liste.php\">Liens</a></li>";
 
 // 6. Outils (Tous)
 $lienOutils = <<<HTML
@@ -85,13 +83,13 @@ HTML;
 // 7. Utilisateurs (Admin / Editeur)
 $liensAdminUsers = "";
 if ($privilege > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-    $liensAdminUsers = "<li><a href='../utilisateur/utilisateur_liste.php'>Utilisateurs</a></li>";
+    $liensAdminUsers = "<li><a href=\"../utilisateur/utilisateur_liste.php\">Utilisateurs</a></li>";
 }
 
 // 8. Paramétrage (Admin)
 $lienParametrage = "";
 if (($user == $_SESSION['loginParam']) || ($privilege > $GLOBALS["PRIVILEGE_EDITEUR"])) {
-    $lienParametrage = "<li><a href='../navigation/paramsEdit.php'>Paramétrage</a></li>";
+    $lienParametrage = "<li><a href=\"../navigation/paramsEdit.php\">Paramétrage</a></li>";
 }
 
 // ... GESTION DE L'AVATAR ... (inchangé)
@@ -213,8 +211,10 @@ if (!empty($infoLogin)) {
 </div>
 HTML;
 }
-$contenu .= $extraHtml;
+$MENU_HTML = $contenu . $extraHtml;
 
+// On affiche le menu automatiquement par défaut pour assurer la compatibilité
+// et restaurer les styles sur toutes les pages.
 if (!isset($pasDeMenu) || !$pasDeMenu) {
-    echo $contenu;
+    echo $MENU_HTML;
 }

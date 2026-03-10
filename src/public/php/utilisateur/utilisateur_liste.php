@@ -5,6 +5,7 @@
  */
 
 require_once dirname(__DIR__, 3) . "/autoload.php";
+$pasDeMenu = true;
 require_once "../navigation/menu.php";
 
 // Palette Canopée
@@ -28,9 +29,11 @@ $activeChansons = ($tri == 'chansons') ? 'active' : '';
 $activeLogins = ($tri == 'logins') ? 'active' : '';
 
 // --- RENDU HTML ---
-$html = envoieHead("Communauté", "../../css/utilisateur_liste.css");
+$htmlHead = envoieHead("Communauté", "../../css/utilisateur_liste.css");
+echo $htmlHead;
+echo $MENU_HTML;
 
-$html .= <<<HTML
+$html = <<<HTML
 <div class="container user-container">
     
     <div class="row">

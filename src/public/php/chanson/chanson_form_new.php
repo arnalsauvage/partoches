@@ -88,7 +88,7 @@ if ($mode == "INS"){
 
 $sortie .= "
     <div id='tabs-1' class='col-lg-12 centrer'>
-        <FORM id="chanson-form" METHOD='POST' ACTION='". CHANSON_POST_PHP ."' name='Form'>
+        <FORM id='chanson-form' METHOD='POST' ACTION='". CHANSON_POST_PHP ."' name='Form'>
             <input type=HIDDEN name='id' VALUE='" . $_chanson->getId() . "'>
             
             <div class = 'row'>

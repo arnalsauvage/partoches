@@ -20,15 +20,14 @@ if (!isset ($ModuleTable)) {
 
     function TblEntete($contenu, $nbLig = 1, $nbCol = 1): string
     {
-        //echo "Appel de tbl entete avec contenu = $contenu, nbLig = $nbLig et nbCol = $nbCol";
-        $_entete = "<th ";
+        $_entete = "<th";
         if ($nbLig <> 1){
-            $_entete .= "rowspan='$nbLig' ";
+            $_entete .= " rowspan=\"$nbLig\"";
         }
         if ($nbCol <> 1){
-            $_entete .= "colspan='$nbCol' ";
+            $_entete .= " colspan=\"$nbCol\"";
         }
-        $_entete .= "> " . $contenu;
+        $_entete .= ">" . $contenu;
         $_entete .= "</th>\n";
 
         return $_entete;
@@ -49,7 +48,7 @@ if (!isset ($ModuleTable)) {
     {
         $optionClasse = "";
         if ($classe != -1) {
-            $optionClasse = " CLASS='$classe'";
+            $optionClasse = " class=\"$classe\"";
         }
         return "<tr" . $optionClasse . ">\n";
     }
@@ -63,21 +62,21 @@ if (!isset ($ModuleTable)) {
     {
         $optionClasse = "";
         if ($classe != -1) {
-            $optionClasse = " CLASS='$classe' ";
+            $optionClasse = " class=\"$classe\"";
         }
 
-        $rowSpan = " ";
+        $rowSpan = "";
         if ($nbLig <> 1)
         {
-            $rowSpan = " rowspan='$nbLig' ";
+            $rowSpan = " rowspan=\"$nbLig\"";
         }
 
-        $colSpan = " ";
+        $colSpan = "";
         if ($nbCol <> 1)
         {
-            $colSpan = " rowspan='$nbCol' ";
+            $colSpan = " colspan=\"$nbCol\"";
         }
-        return "<td " . $rowSpan . $colSpan. $optionClasse . ">$contenu</td>\n";
+        return "<td" . $rowSpan . $colSpan. $optionClasse . ">$contenu</td>\n";
     }
 
     function TblCorpsFin(): string
