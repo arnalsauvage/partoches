@@ -174,11 +174,11 @@ if (!isset ($FichierUtilsSi)) {
     }
 
     // Cette fonction retourne un bouton de suppression avec message de confirmation
-    function boutonSuppression($lien, $iconePoubelle, $cheminImages) :string
+    function boutonSuppression($lien, $iconePoubelle = "", $cheminImages = "") :string
     {
-        return "<img src='$cheminImages$iconePoubelle' width='16' alt='supprimer' onclick =\"confirmeSuppr('" . $lien . "','Voulez-vous vraiment supprimer cet élément ?');\" >";
+        $msg = "Voulez-vous vraiment supprimer cet élément ?";
+        return "<button type='button' class='btn btn-xs btn-danger' title='Supprimer' onclick=\"confirmeSuppr('$lien', '$msg');\"><i class='glyphicon glyphicon-trash'></i></button>";
     }
-
     /**
      * Vérifie si l'utilisateur a au moins le privilège demandé
      */

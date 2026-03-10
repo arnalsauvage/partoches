@@ -53,3 +53,58 @@ $(function () {
         };
     }
 });
+
+/**
+ * Fonction de confirmation de suppression moderne (Django Style)
+ * Remplace l'ancienne fonction du fichier javascript.js
+ * @param {string} url - L'URL de redirection en cas de succès
+ * @param {string} message - Le message à afficher
+ */
+function confirmeSuppr(url, message) {
+    const $modal = $('#modalConfirmation');
+    if ($modal.length) {
+        $('#modalConfirmationMessage').text(message || 'Voulez-vous vraiment supprimer cet élément ?');
+        $('#btnConfirmAction').off('click').on('click', function() {
+            window.location.href = url;
+        });
+        $modal.modal('show');
+    } else {
+        // Fallback si la modale n'est pas dans le DOM
+        if (confirm(message || 'Voulez-vous vraiment supprimer cet élément ?')) {
+            window.location.href = url;
+        }
+    }
+}
+
+/**
+ * Change la vignette affichée dans un formulaire (hérité de javascript.js)
+ */
+function changeListeImage(formulaire) {
+    const l1 = formulaire.elements["listeImage"];
+    if (l1) {
+        const image = l1.options[l1.selectedIndex].value;
+        const $vignette = $('#vignette');
+        if ($vignette.length) {
+            $vignette.attr('src', "../../data/vignettes/" + image);
+        }
+    }
+}
+
+/**
+ * Met à jour la liste des images via AJAX (hérité de javascript.js)
+ */
+function miseAjourListeImages(scriptPhpListeImages) {
+    $.get(scriptPhpListeImages, function(data) {
+        if (typeof toastr !== 'undefined') {
+            toastr.info("Nouvelle liste reçue du serveur.");
+        } else {
+            alert("Nouvelle liste reçue du serveur.");
+        }
+        // Attention : eval est dangereux mais on garde la compatibilité pour l'instant
+        eval(data);
+    }).fail(function() {
+        if (typeof toastr !== 'undefined') {
+            toastr.error("Erreur lors de la mise à jour de la liste.");
+        }
+    });
+}

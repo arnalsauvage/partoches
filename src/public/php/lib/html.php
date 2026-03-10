@@ -231,7 +231,6 @@ if (!isset ($FichierHtml)) {
         $retour .= "
         
         <link rel=\"stylesheet\" media=\"screen\" type=\"text/css\" title=\"resolution\" href=\"$feuilleCss\" />
-		<script src=\"../../js/javascript.js\"></script>
 		<!-- Jquery --- source : https://code.jquery.com/jquery-1.12.4.js -->
 		<script src=\"../../js/jquery-1.12.4.min.js\"></script>
 		<!-- Nos fonctions personnalisées -->
@@ -298,6 +297,26 @@ HTML;
         </div>
     </div>
 </footer>
+
+<!-- Modale de Confirmation Globale (Django Style) -->
+<div class="modal fade" id="modalConfirmation" tabindex="-1" role="dialog" aria-labelledby="modalConfirmationLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+      <div class="modal-header" style="background: #2b1d1a; color: white; border-radius: 12px 12px 0 0; padding: 10px 15px;">
+        <h4 class="modal-title" id="modalConfirmationLabel" style="font-weight: bold; font-size: 16px;">
+            <i class="glyphicon glyphicon-warning-sign"></i> Confirmation
+        </h4>
+      </div>
+      <div class="modal-body text-center" style="padding: 20px 15px;">
+        <p id="modalConfirmationMessage" style="font-size: 14px; color: #333; margin: 0;"></p>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid #eee; padding: 10px; display: flex; justify-content: space-between;">
+        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal" style="border-radius: 20px; font-weight: bold; flex-grow: 1; margin-right: 5px;">Annuler</button>
+        <button type="button" id="btnConfirmAction" class="btn btn-danger btn-sm" style="border-radius: 20px; font-weight: bold; flex-grow: 1; margin-left: 5px;">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="../../js/precise-star-rating.js"></script>
 </body>
