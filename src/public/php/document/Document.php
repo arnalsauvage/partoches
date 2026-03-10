@@ -4,7 +4,9 @@
  * Gère les fichiers attachés aux chansons, songbooks, etc.
  */
 
-const BR_REQUETE = "<br>Requete : ";
+if (!defined("BR_REQUETE")) {
+    define("BR_REQUETE", "<br>Requete : ");
+}
 if (!defined("DOSSIER_DATA")) {
     define("DOSSIER_DATA" ,"../../data/");
 }

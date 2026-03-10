@@ -318,7 +318,7 @@ class Utilisateur
         $dateLogin = dateMysqlVersTexte($this->_dateDernierLogin);
         $nbChansons = $this->getNbChansons();
         
-        require_once dirname(__DIR__, 2) . "/lib/Image.php";
+        require_once dirname(__DIR__) . "/lib/Image.php";
         $urlAvatar = Image::getThumbnailUrl($id . "/" . str_replace("/utilisateur", "", $image), 'mini', 'utilisateurs');
 
         $classeStatut = match($this->_privilege) {
