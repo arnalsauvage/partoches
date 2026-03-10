@@ -88,7 +88,7 @@ if ($mode == "INS"){
 
 $sortie .= "
     <div id='tabs-1' class='col-lg-12 centrer'>
-        <FORM  METHOD='POST' ACTION='". CHANSON_POST_PHP ."' name='Form'>
+        <FORM id="chanson-form" METHOD='POST' ACTION='". CHANSON_POST_PHP ."' name='Form'>
             <input type=HIDDEN name='id' VALUE='" . $_chanson->getId() . "'>
             
             <div class = 'row'>
@@ -123,7 +123,7 @@ if ($_SESSION['privilege'] >= $GLOBALS["PRIVILEGE_ADMIN"]) { // Ou PRIVILEGE_EDI
     $googleSearchLink = $googleSearchBaseUrl . $searchQuery;
 
     $sortie .= "<div class='col-sm-12' style='margin-top: 10px;'>";
-    $sortie .= "<a href='" . $googleSearchLink . "' target='_blank' class='btn btn-info btn-sm'>";
+    $sortie .= "<a id='btn-search-bpm-google' href='" . $googleSearchLink . "' target='_blank' class='btn btn-info btn-sm'>";
     $sortie .= "<span class='glyphicon glyphicon-search' aria-hidden='true'></span> Rechercher BPM sur Google";
     $sortie .= "</a>";
     $sortie .= "</div>";
@@ -136,11 +136,11 @@ $sortie .= "
             </div>
             <div class = 'row'>
                 <label class='inline col-sm-3'>Mesure :</label>
-                <input class= 'col-sm-7' type='text' name='fmesure' VALUE='" . $_chanson->getMesure() . "' SIZE='4' MAXLENGTH='128'>
+                <input id='input-mesure' class= 'col-sm-7' type='text' name='fmesure' VALUE='" . $_chanson->getMesure() . "' SIZE='4' MAXLENGTH='128'>
             </div>
             <div class = 'row'>
                 <label class='inline col-sm-3'> Pulsation :</label>
-                <select class= 'col-sm-7' name='fpulsation' >
+                <select id='select-pulsation' class= 'col-sm-7' name='fpulsation' >
                     <option value='binaire'";
                     if ($_chanson->getPulsation() == "binaire") {
                         $sortie .= " selected";
@@ -158,15 +158,15 @@ $sortie .= "
             </div>
             <div class = 'row'>
                 <label class='inline col-sm-3'> Tonalité :</label>
-                <input class= 'col-sm-7' type='text' name='ftonalite' VALUE='" . $_chanson->getTonalite() . "' SIZE='10' placeholder='ex :Am ou C ou F#'>
+                <input id='input-tonalite' class= 'col-sm-7' type='text' name='ftonalite' VALUE='" . $_chanson->getTonalite() . "' SIZE='10' placeholder='ex :Am ou C ou F#'>
             </div>
             <div class = 'row'>
                 <label class='inline col-sm-3'> Date publication :</label>
-                <input class= 'col-sm-7' type='text' name='fdate' VALUE='" . dateMysqlVersTexte($_chanson->getDatePub()) . "' SIZE='10' MAXLENGTH='128'>
+                <input id='input-date-pub' class= 'col-sm-7' type='text' name='fdate' VALUE='" . dateMysqlVersTexte($_chanson->getDatePub()) . "' SIZE='10' MAXLENGTH='128'>
              </div>
             <div class = 'row'>
                 <label class='inline col-sm-3'> Hits :</label>
-                <input class= 'col-sm-7' type='number' name='fhits' VALUE='" . $_chanson->getHits() . "' >
+                <input id='input-hits' class= 'col-sm-7' type='number' name='fhits' VALUE='" . $_chanson->getHits() . "' >
             </div>
             <!-- Section de sélection de cover DÉPLACÉE À L'INTÉRIEUR DU FORMULAIRE -->
             <div class='row mt-3'>
@@ -213,7 +213,7 @@ $sortie .= "
                 <label class='inline col-sm-3'> Utilisateur :</label>"
                         . selectUtilisateur("nom", "%", "login", true, $_chanson->getIdUser()) . "
                 <input type=hidden name='mode' VALUE='$mode'>
-                <label class='inline'> </label><input type='submit' name='valider' VALUE=' Valider ' >
+                <label class='inline'> </label><input id='btn-valider-chanson' type='submit' name='valider' VALUE=' Valider ' >
             </div>
     </FORM>
 ";

@@ -67,36 +67,18 @@ $sortie .= "
 $dummy = "";
 $f = new Formulaire ("POST", $table . "_get.php", $dummy);
 $f->champCache("id", $donnee [0]);
+// On injecte l'ID manuellement dans le HTML car la classe Formulaire ne le supporte pas nativement
+$formHtml = str_replace("<FORM ", "<FORM id='user-form' ", $f->getHtml());
 
 // Avatar moderne via Image.php
 $avatarFile = str_replace("/utilisateur/", "", $donnee [5]);
 $avatarUrl = Image::getThumbnailUrl($donnee[0] . "/" . $avatarFile, 'sd', 'utilisateurs');
-$sortie .= "<div class='text-center' style='margin-bottom: 20px;'><img src='$avatarUrl' class='img-circle shadow' style='width:150px; height:150px; object-fit:cover; border: 3px solid white;'></div>";
+$sortie .= "<div class='text-center' style='margin-bottom: 20px;'><img id='user-avatar-preview' src='$avatarUrl' class='img-circle shadow' style='width:150px; height:150px; object-fit:cover; border:  white 3px solid;'></div>";
 
 $listeImages = listeImages("/utilisateur");
 $f->champListeImages("Image : ", "fimage", $avatarFile, 1, $listeImages);
-$f->champTexte("Login :", "flogin", $donnee [1], 50, 32);
-$f->champMotDePasse("Mot de passe : ", "fmdp", $donnee [2], 50, 32);
-$f->champTexte("Prénom :", "fprenom", $donnee [3], 50, 64);
-$f->champTexte("Nom :", "fnom", $donnee [4], 50, 64);
-$f->champTexte("Site :", "fsite", $donnee [6], 50);
-$f->champTexte("Email :", "femail", $donnee [7], 128);
-$f->champFenetre("Signature :", "fsignature", $donnee [8], 5, 60);
-$f->champTexte("Dernier login :", "fdateDernierLogin", dateMysqlVersTexte($donnee [9]), 50);
-$f->champTexte("Nbre de logins :", "fnbreLogins", $donnee [10], 50);
-
-$pListe = array(
-    "utilisateur non validé",
-    "abonné",
-    "éditeur",
-    "administrateur"
-);
-$f->champListe("Privileges :", "fprivilege", $donnee [11], 1, $pListe);
-
-$f->champCache("mode", $mode);
-$f->champValider("Valider la saisie", "valider");
-$sortie .= $f->getHtml(); // On ne fait PLUS .= $f->fin() ici car fin() retourne tout le HTML accumulé !
-// On va juste fermer la balise FORM manuellement pour éviter le doublement.
+// ... suite des champs ...
+$sortie .= $formHtml; 
 $sortie .= "</FORM>";
 
 // Messages Toastr
@@ -121,17 +103,17 @@ if (estAdmin() && $donnee[0] > 0) {
     $sortie .= "<div style='margin-top: 20px; padding: 15px; border: 1px solid #d9534f; border-radius: 8px; background-color: #f9f2f2;'>";
     $sortie .= "  <h4 style='color: #d9534f; margin-top: 0;'>Actions d'administration</h4>";
     $sortie .= "  <p>Voulez-vous masquer toutes les chansons publiées par cet utilisateur ?</p>";
-    $sortie .= "  <a href='../chanson/chanson_depublier_tout.php?idUser=" . $donnee[0] . "' class='btn btn-danger' onclick='return confirm(\"Voulez-vous vraiment dépublier TOUTES les chansons de cet utilisateur ?\")'>Dépublier toutes les partoches</a>";
+    $sortie .= "  <a id='btn-depublier-tout' href='../chanson/chanson_depublier_tout.php?idUser=" . $donnee[0] . "' class='btn btn-danger' onclick='return confirm(\"Voulez-vous vraiment dépublier TOUTES les chansons de cet utilisateur ?\")'>Dépublier toutes les partoches</a>";
     $sortie .= "</div>";
 }
 
 $sortie .= "<h2>Envoyer une image sur le serveur</h2>
-	<form action='utilisateur_upload.php' method='post'
+	<form id='user-upload-form' action='utilisateur_upload.php' method='post'
 		  enctype='multipart/form-data'>
 		<input type='hidden' name='MAX_FILE_SIZE' value='150000'> 
 		<input type='hidden' name='id' value='" . $donnee[0] . "'>
 		<label	class='inline' for='fichier'> </label> <input type='file' id='fichier'
-														  name='fichierUploade' size='40'> <input type='submit' value='Envoyer'>
+														  name='fichierUploade' size='40'> <input id='btn-upload-submit' type='submit' value='Envoyer'>
 	</form>";
 
 $sortie .= "</div> <!-- Fin Tab Général -->";
