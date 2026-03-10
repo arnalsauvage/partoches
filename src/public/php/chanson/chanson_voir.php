@@ -327,8 +327,8 @@ $contenuHtml .= "
         const \$title = $('#modalStrumNom');
         const \$body = $('#modalChansonsBody');
 
-        \$title.html('<code style=\"background:#eee; color:#e67e22; padding: 2px 6px;\">' + nomStrum + '</code>');
-        \$body.html('<div class=\"text-center\" style=\"padding:20px;\"><i class=\"glyphicon glyphicon-refresh spin\"></i> Chargement...</div>');
+        \$title.html('<code style=\"background:#eee; color:#e67e22; padding: 2px 6px;\">' + nomStrum + '<\/code>');
+        \$body.html('<div class=\"text-center\" style=\"padding:20px;\"><i class=\"glyphicon glyphicon-refresh spin\"><\/i> Chargement...<\/div>');
         \$modal.modal('show');
 
         \$.ajax({

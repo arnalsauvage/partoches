@@ -211,7 +211,7 @@ class Pagination
         // On supprime le parametre à retirer
         unset($params[$_paramAretirer]);
         // On reconstruit la nouvelle url
-        $nouvelleUrl = $_SERVER['PHP_SELF']."?".http_build_query($params);
+        $nouvelleUrl = $_SERVER['PHP_SELF']."?".http_build_query($params, '', '&amp;');
         return($nouvelleUrl);
     }
 
@@ -234,7 +234,7 @@ class Pagination
         unset($mergedParams['razFiltres']);
         unset($mergedParams['raz-recherche']);
 
-        $newQuery = http_build_query($mergedParams);
+        $newQuery = http_build_query($mergedParams, '', '&amp;');
         
         return $path . ($newQuery ? "?" . $newQuery : "");
     }

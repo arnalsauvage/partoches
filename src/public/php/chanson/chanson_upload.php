@@ -167,15 +167,6 @@ function handleFileUpload()
 }
 
 // Appel de la fonction principale
-<<<<<<< HEAD:php/chanson/chanson_upload.php
-handleFileUpload();
-
-    require_once "../media/Media.php";
-    $medias = new Media();
-    $medias->resetAvecDernieresPartoches(99);
-
-header('Location: ./chanson_form.php?id=' . $_POST ['id']);
-=======
 if (handleFileUpload()) {
     actualiseMedias();
 }
@@ -187,4 +178,4 @@ if ($idChanson == 0) {
 }
 
 header("Location: ./chanson_form.php?id=" . $idChanson);
->>>>>>> ia-gemini:src/public/php/chanson/chanson_upload.php
+

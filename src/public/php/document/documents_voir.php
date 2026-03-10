@@ -126,9 +126,9 @@ while ($ligneDoc = $lignes->fetch_row()) {
     $icone = image($iconePath, 32, 32, "icone");
 
     $idUserDoc = $ligneDoc[7] ?? 0;
-    $userPseudo = $tabUsers[$idUserDoc][1] ?? 'Inconnu';
+    $userPseudo = htmlspecialchars($tabUsers[$idUserDoc][1] ?? 'Inconnu', ENT_QUOTES);
     $userImage = $tabUsers[$idUserDoc][5] ?? 'defaut.png';
-    $userNom = $tabUsers[$idUserDoc][0] ?? 'Inconnu';
+    $userNom = htmlspecialchars($tabUsers[$idUserDoc][0] ?? 'Inconnu', ENT_QUOTES);
 
     require_once PHP_DIR . "/lib/Image.php";
     $avatarUrl = Image::getThumbnailUrl($idUserDoc . "/" . $userImage, 'mini', 'utilisateurs');

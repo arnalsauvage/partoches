@@ -12,8 +12,6 @@ if (($_SESSION['privilege'] ?? 0) < ($GLOBALS["PRIVILEGE_MEMBRE"] ?? 1)) {
     exit();
 }
 
-require_once PHP_DIR . "/navigation/menu.php";
-
 // 2. CHARGEMENT DU STRUM
 $id = (int)($_GET['id'] ?? 0);
 $strumObj = new Strum($id);
@@ -39,9 +37,14 @@ $pageTitle = ($mode === 'MAJ') ? 'Modifier le Strum' : 'Nouveau Strum';
 $descAffiche = htmlspecialchars($description);
 
 // --- RENDU HTML ---
-$html = envoieHead($pageTitle, "../../css/strum_form.css");
+$headHtml = envoieHead($pageTitle, "../../css/strum_form.css");
+$pasDeMenu = true;
+require_once PHP_DIR . "/navigation/menu.php";
 
-$html .= <<<HTML
+echo $headHtml;
+echo $MENU_HTML;
+
+$html = <<<HTML
 <div class="container strum-form-container">
     <div class="row">
         <div class="col-xs-12">

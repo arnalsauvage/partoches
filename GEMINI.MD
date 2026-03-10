@@ -64,4 +64,16 @@ Respecter la palette de couleurs "Canopée" pour les nouveaux développements :
 ### 🚫 Balise de fermeture PHP
 Ne **jamais** utiliser la balise de fermeture `?>` à la fin d'un fichier purement PHP. Cela évite l'insertion accidentelle d'espaces ou de retours à la ligne qui pourraient provoquer des erreurs de type "Headers already sent".
 
+## 🐳 Environnement Technique (Mars 2026)
+- **OS** : Windows (Utiliser les commandes PowerShell).
+- **Docker** : Toutes les commandes (PHP, MySQL, Tests) doivent être exécutées via Docker (conteneur `site-partoches`).
+- **Versions** : PHP 8.2.30, MariaDB 11.7.2.
+
+## 🛠️ Protocole de Validation & Qualité
+- **Langue** : Toujours répondre en français, avec un ton sympa et pro.
+- **Avant Commit/Push** : Toujours proposer de lancer :
+    1.  Les **Smoke-tests PHPUnit** via Docker : `docker exec -t site-partoches vendor/bin/phpunit tests/smoke/`
+    2.  Le **Django Linter** (ou script d'audit HTML) pour traquer les erreurs de rendu et les bugs cachés.
+- **Objectif** : Zéro "Parse Error" et une conformité HTML maximale pour éviter les régressions visuelles.
+
 
