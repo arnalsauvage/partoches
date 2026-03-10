@@ -32,10 +32,13 @@ global $contenuHtmlCompCherche;
 function logueRecherche($critereCherche): void
 {
     $date = new DateTime();
-    $myfile = fopen("../../data/logRecherche.txt", "a");
-    $txt = $date->format('Y-m-d--H-i') . " : " . $critereCherche . "\n";
-    fwrite($myfile, $txt);
-    fclose($myfile);
+    $logPath = "../../../data/logs/logRecherche.txt";
+    $myfile = fopen($logPath, "a");
+    if ($myfile) {
+        $txt = $date->format('Y-m-d--H-i') . " : " . $critereCherche . "\n";
+        fwrite($myfile, $txt);
+        fclose($myfile);
+    }
 }
 
 $contenuHtml = "<div class='container'> \n
