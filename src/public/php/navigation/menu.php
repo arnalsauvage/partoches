@@ -1,12 +1,11 @@
 <?php
 require_once "../lib/utilssi.php";
 require_once "../utilisateur/Utilisateur.php";
+require_once "../lib/Image.php";
 
 /**
  * Gère l'affichage du menu supérieur et l'état de la session utilisateur.
  */
-
-$cheminVignettes = "../../data/vignettes/";
 
 // Initialisation de la largeur de fenêtre si absente
 if (!isset($_SESSION['largeur-fenetre'])) {
@@ -100,8 +99,7 @@ if (($user == $_SESSION['loginParam']) || ($privilege > $GLOBALS["PRIVILEGE_EDIT
 
 
 // --- GESTION DE L'AVATAR ET DU ROLE ---
-$imageUser = !empty($_SESSION['image']) ? $_SESSION['image'] : "utilisateur/defaut.png";
-$avatarPath = $cheminVignettes . $imageUser;
+$imageUser = !empty($_SESSION['image']) ? $_SESSION['image'] : "defaut.png";
 $statutTexte = Utilisateur::statut($privilege);
 
 $roleIcon = match(true) {
@@ -111,13 +109,14 @@ $roleIcon = match(true) {
     default                                    => "glyphicon-eye-open"   // Invite / Visiteur
 };
 
-// Vérification de l'existence du fichier sur le serveur
-$avatarFileSystemPath = PHP_DIR . "/../data/vignettes/" . $imageUser;
-if (file_exists($avatarFileSystemPath) && is_file($avatarFileSystemPath)) {
-    $avatarHtml = "<img src='$avatarPath' class='user-avatar-round' alt='$user' title='$user'>";
-} else {
-    // Fallback : On utilise l'icône bonhomme
+// Utilisation de la vignette moderne via Image.php
+$avatarUrl = Image::getThumbnailUrl($_SESSION['id'] . "/" . $imageUser, 'mini', 'utilisateurs');
+
+if (str_contains($avatarUrl, 'icone_arnal.png')) {
+    // Fallback : On utilise l'icône bonhomme si pas d'image
     $avatarHtml = "<span class='user-avatar-round' title='$user ($statutTexte)'><i class='glyphicon glyphicon-user'></i></span>";
+} else {
+    $avatarHtml = "<img src='$avatarUrl' class='user-avatar-round' alt='$user' title='$user'>";
 }
 
 // Lien connexion / déconnexion
@@ -126,7 +125,41 @@ if ($user != "invite") {
     $authLink = "<a href='../navigation/login.php?logoff=1' title='Se déconnecter' class='auth-btn'><i class='glyphicon glyphicon-off'></i></a>";
 } else {
     $extraHtml = file_get_contents(__DIR__ . '/../../html/composants/menuLogin.html');
-    $authLink = "<a id='afficherPopup' title='Se connecter' class='auth-btn' style='cursor:pointer;'><i class='glyphicon glyphicon-log-in'></i></a>";
+    $authLink = "<a id='afficherPopup' href='#' title='Se connecter' class='auth-btn' style='cursor:pointer;'><i class='glyphicon glyphicon-log-in'></i></a>";
+    
+    // Script de gestion de la popup
+    $extraHtml .= <<<JS
+    <script>
+    $(function() {
+        $('#afficherPopup').on('click', function(e) {
+            e.preventDefault();
+            $('.contenu_popup').fadeToggle(200);
+            if ($('.contenu_popup').is(':visible')) {
+                $('#login').focus();
+            }
+        });
+
+        $('.btn-fermer-popup').on('click', function() {
+            $('.contenu_popup').fadeOut(200);
+        });
+
+        // Fermeture si clic en dehors
+        $(document).on('mouseup', function(e) {
+            var container = $(".contenu_popup");
+            if (!container.is(e.target) && container.has(e.target).length === 0 && !$('#afficherPopup').is(e.target) && $('#afficherPopup').has(e.target).length === 0) {
+                container.fadeOut(200);
+            }
+        });
+
+        // Echap pour fermer
+        $(document).on('keyup', function(e) {
+            if (e.key === "Escape") {
+                $(".contenu_popup").fadeOut(200);
+            }
+        });
+    });
+    </script>
+JS;
 }
 
 $userNav = <<<HTML

@@ -1,6 +1,7 @@
 <?php
 
 require_once PHP_DIR . "/navigation/Footer.php";
+require_once PHP_DIR . "/lib/Image.php";
 if (!isset ($FichierHtml)) {
     $FichierHtml = 1;
     // Fonction retournant le code HTML pour un lien hypertexte____________
@@ -48,24 +49,38 @@ if (!isset ($FichierHtml)) {
 
     /**
      * Affiche la pochette d'une chanson ou une icône par défaut
+     * Utilise désormais les vignettes WebP optimisées à la volée.
      */
     function affichePochette($nomFichier, $id, $largeur = 48, $hauteur = 48)
     {
-        // On récupère le dossier des chansons (par défaut ../../data/chansons/)
-        $dossierChansons = $GLOBALS['_DOSSIER_CHANSONS'] ?? "../../data/chansons/";
-        
-        $cheminSysteme = $dossierChansons . $id . "/" . $nomFichier;
-        $cheminHtml = $dossierChansons . $id . "/" . rawurlencode($nomFichier);
-
-        if (!empty($nomFichier) && file_exists($cheminSysteme)) {
-            return image($cheminHtml, $largeur, $hauteur, "couverture", "img-thumbnail");
-        } else {
-            // Si pas d'image, on affiche une icône Bootstrap "CD" dans un cadre
-            $fontSize = floor($largeur / 2);
-            return "<div class='text-center img-thumbnail' style='width:{$largeur}px; height:{$hauteur}px; display:flex; align-items:center; justify-content:center; background:#f9f9f9; border:1px solid #ddd;'>
-                        <span class='glyphicon glyphicon-cd' style='font-size:{$fontSize}px; color:#ccc;' title='Pochette 45t absente'></span>
-                    </div>";
+        if (empty($nomFichier) || empty($id)) {
+            return fallbackPochette($largeur, $hauteur);
         }
+
+        // On détermine la taille de vignette à demander (mini ou sd)
+        $tailleVignette = ($largeur > 100) ? 'sd' : 'mini';
+        
+        // Chemin relatif attendu par Image::getThumbnailUrl (ex: "354/cover.jpg")
+        $relPath = $id . "/" . $nomFichier;
+        $urlVignette = Image::getThumbnailUrl($relPath, $tailleVignette);
+
+        // Si l'URL renvoyée est le fallback icône musique, on utilise notre rendu CSS plus joli
+        if (str_contains($urlVignette, 'icone_musique.png')) {
+            return fallbackPochette($largeur, $hauteur);
+        }
+
+        return "<img src='$urlVignette' width='$largeur' height='$hauteur' alt='couverture' class='img-thumbnail' loading='lazy' style='object-fit: cover;'>";
+    }
+
+    /**
+     * Rendu d'une icône par défaut quand la pochette est absente
+     */
+    function fallbackPochette($largeur, $hauteur)
+    {
+        $fontSize = floor($largeur / 2);
+        return "<div class='text-center img-thumbnail' style='width:{$largeur}px; height:{$hauteur}px; display:flex; align-items:center; justify-content:center; background:#f9f9f9; border:1px solid #ddd;'>
+                    <span class='glyphicon glyphicon-cd' style='font-size:{$fontSize}px; color:#ccc;' title='Pochette absente'></span>
+                </div>";
     }
 
     // Fin de la fonction Image____________________________________________
@@ -293,7 +308,6 @@ HTML;
     </div>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 <script src="../../js/precise-star-rating.js"></script>
 </body>
 </html>
