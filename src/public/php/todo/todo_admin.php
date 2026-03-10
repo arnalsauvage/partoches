@@ -18,6 +18,12 @@ $message = "";
 
 // Sauvegarde du contenu
 if (isset($_POST['content'])) {
+    // On s'assure que le dossier existe (Django Style)
+    $dirTodo = dirname($fileTodo);
+    if (!is_dir($dirTodo)) {
+        mkdir($dirTodo, 0777, true);
+    }
+
     if (file_put_contents($fileTodo, $_POST['content']) !== false) {
         $message = "<div class='alert alert-success'>✅ To-Do List sauvegardée avec succès !</div>";
     } else {
