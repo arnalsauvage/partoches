@@ -2,10 +2,10 @@
 use PHPUnit\Framework\TestCase;
 // require_once 'PHPUnit/Autoload.php';
 session_start();
-require_once "../php/lib/utilssi.php";
-require_once "../php/lienurl.php";
+require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
+require_once __DIR__ . "/../src/public/php/liens/LienUrl.php";
 
-class lienUrlTest extends TestCase
+class LienUrlTest extends TestCase
 {
 
     public function testcreeLienurlOk()

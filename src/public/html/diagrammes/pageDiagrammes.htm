@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>Grille ukulélé Top 5</title>
+    <meta charset='utf-8'>
+    <link href='style.css' rel='stylesheet'>
+    <script async src='diagrammes.js'></script>
+    <script async src='accords.js'></script>
+    <script>
+    function afficher_aide(aide) {
+        aide.style.display = "inline";
+    }
+    function masquer_aide(aide) {
+            aide.style.display = "none";
+    }
+    </script>
+</head>
+<body>
+<h1>Atelier diagrammes ukulélé Top 5</h1>
+<a href="pageAccords.htm"> aller à la page grille</a>
+<br>
+<canvas height=330 id='diagramme1' width=190></canvas>
+
+<div>
+    <label for="name">Nom de l'accord :</label>
+    <img src="petite-info-bulle.png"
+         alt="cherche accord"
+         id ="loupeChercheAccordParNom"
+         class="infobulle-icone"
+         width="16" height="15"
+         onmouseover="afficher_aide(document.getElementById('aide_nomaccord'))"
+         onmouseout="masquer_aide(document.getElementById('aide_nomaccord'))"
+    >
+    <input id="name" maxlength="8" minlength="1" name="name" size="8" type="text"
+           value="Dm7"
+           onkeyup="if(event.keyCode===13) chercheAccordParNom()"
+    >
+    <span role="img" aria-label="loupe" onclick="chercheAccordParNom()">🔍</span>
+
+    <div class="infobulle">
+        <div class="infobulle-texte" id="aide_nomaccord" style="display: none;">
+            A B C D E F G pour la si do re mi fa sol , <br>b pour bémol, # pour dièse,
+            <br> désignation des accords : A, Am, A7M pour la 7ème majeure
+            Am7, Asus2 Asus4, Aaug pour la 5ème augmentée
+            Adim, Adim7, A5, A6, Am6
+        </div>
+    </div>
+</div>
+
+<label for="valeurs">Valeurs (0 à 9):</label>
+<input id="valeurs" maxlength="4" minlength="1" name="valeurs" size="4" type="text" value="2210"
+       onkeyup="if(event.keyCode===13) chercheAccordParPosition()"
+>
+<span onclick="chercheAccordParPosition()"
+       id = "loupeChercheAccordParValeurs"
+>🔍</span>
+<button id="button-dessine" onclick="dessineDiagramme(ctx, 4, 6, 50)">dessine</button>
+<div>
+    <input id="couleurTrait" name="couleurTrait" type="color"
+           value="#012345">
+    <label for="couleurTrait">couleur de trait</label>
+</div>
+
+<div>
+    <input id="couleurGrille" name="couleurGrille" type="color"
+           value="#987654">
+    <label for="couleurGrille">couleur de la grille</label>
+</div>
+
+<div>
+    <input id="couleurRemplissage" name="couleurRemplissage" type="color"
+           value="#e66465">
+    <label for="couleurRemplissage">couleur de remplissage</label>
+</div>
+
+<div class="row">
+    <label class="inline col-sm-3" for="fader">Taille :</label>
+    <div class="col-sm-5">
+        <input id="fader" max="50" min="10" name="ftempo" oninput="outputUpdate(value)"  step="1" type="range"
+               value="40">
+        <output class="inline col-sm-2" for="fader" id="taille">40</output>
+    </div>
+</div>
+<br>
+<div>
+    <a class="leBouton" download="myImage.jpg" href="" id="download" onclick="download_img(this);">Télécharger
+        Diagramme</a>
+</div>
+<br>
+<div>
+    <button class="leBouton" id="randomChord" onclick="setAccordAuHasard();">Accord au hasard</button>
+</div>
+</body>
+</html>

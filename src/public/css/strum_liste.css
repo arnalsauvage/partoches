@@ -1,0 +1,97 @@
+/* Styles spécifiques pour la liste des Strums (Dictionnaire de rythmiques) */
+
+.strum-container {
+    background-color: #fcfaf2; /* Ivoire Canopée */
+    min-height: 100vh;
+    padding-top: 30px;
+    padding-bottom: 100px;
+}
+
+.strum-card {
+    min-height: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    padding: 0;
+    border: 1px solid #ddd;
+    background-color: white;
+    margin-bottom: 25px;
+}
+
+.strum-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.strum-card-header {
+    background-color: #2b1d1a;
+    padding: 15px;
+    text-align: center;
+    border-bottom: 3px solid #8B4513;
+}
+
+.strum-card-header h2 {
+    color: white;
+    margin: 0;
+    font-family: monospace;
+    font-size: 22px;
+    letter-spacing: 2px;
+}
+
+.strum-card-body {
+    padding: 15px;
+}
+
+.strum-card-desc {
+    font-size: 13px;
+    color: #555;
+    height: 40px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+/* Fix pour la modale Bootstrap 3 sans !important */
+body.modal-open .modal-strum {
+    z-index: 2000;
+}
+
+body.modal-open .modal-backdrop {
+    z-index: 1990;
+}
+
+.modal-strum .modal-content {
+    border-radius: 15px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+}
+
+.modal-strum .modal-header {
+    background-color: #2b1d1a;
+    color: white;
+}
+
+.modal-strum .modal-header .close {
+    color: white;
+    opacity: 1;
+}
+
+.strum-list-group-item:hover {
+    background-color: #f5f5f5;
+    text-decoration: none;
+}
+
+.strum-badge-pop {
+    background-color: #e67e22;
+    color: white;
+    margin-left: 5px;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.strum-badge-pop:hover {
+    background-color: #d35400;
+}

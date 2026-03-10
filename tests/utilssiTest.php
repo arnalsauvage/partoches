@@ -2,8 +2,8 @@
 use PHPUnit\Framework\TestCase;
 // require_once 'PHPUnit/Autoload.php';
 session_start();
-require_once "../php/lib/utilssi.php";
-require_once "../php/strum.php";
+require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
+require_once __DIR__ . "/../src/public/php/strum/Strum.php";
 
 
 class utilssiTest extends TestCase

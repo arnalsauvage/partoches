@@ -3,8 +3,8 @@ use PHPUnit\Framework\TestCase;
 // require_once 'PHPUnit/Autoload.php';
 const PHPUNIT_RUNNING = true;
 session_start();
-require_once "../php/lib/utilssi.php";
-require_once "../php/chanson/chanson.php";
+require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
+require_once __DIR__ . "/../src/public/php/chanson/Chanson.php";
 
 class ChansonTest extends TestCase
 {

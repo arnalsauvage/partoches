@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>Diagrammes ukulélé Top 5</title>
+    <meta charset='utf-8'>
+    <link href='style.css' rel='stylesheet'>
+
+</head>
+<body>
+<h1>Atelier grille ukulélé Top 5</h1>
+<a href="pageDiagrammes.htm"> aller à la page diagrammes</a>
+<br>
+<script type="text/javascript">
+    function ajouteImagesAccords() {
+
+        document.getElementById("listeAccords").innerHTML = "";
+
+        var accordsSaisis = document.getElementById("accordsSaisis").value;
+        console.log("accordsSaisis : " + accordsSaisis);
+        accordsSaisis = accordsSaisis.split(" ");
+
+        for (var accord of accordsSaisis) {
+            console.log("afficheAcord : " + accord);
+            afficheAccordSaisi(accord);
+        }
+        var br = document.createElement("br");
+        document.getElementById("listeAccords").appendChild(br);
+    }
+    function afficheAccordSaisi(nomAccord){
+
+
+        var elem = document.createElement("img");
+        var dossier = "Accords/" + nomAccord[0];
+        if (nomAccord[1]=="b")
+            dossier += "b";
+        if (nomAccord[1]=="#") {
+            nomAccord = nomAccord.replace("#","%23");
+            dossier += "%23";
+        }
+        elem.src = dossier + "/" + nomAccord + '.png';
+       // elem.setAttribute("height", "768");
+         elem.setAttribute("width", "200");
+        elem.setAttribute("alt", nomAccord);
+        document.getElementById("listeAccords").appendChild(elem);
+    }
+</script>
+Tape ici ta liste d'accords (ex : Am6 Bb7 C# )
+<textarea id="accordsSaisis"> C C#dim7 Dm7 G7</textarea>
+<button onclick="ajouteImagesAccords();">maj accords</button>
+<div id="listeAccords">
+</div>
+</body>
+</html>

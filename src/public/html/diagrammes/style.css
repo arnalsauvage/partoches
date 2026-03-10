@@ -1,0 +1,29 @@
+a.leBouton {
+font-family: sans-serif;	
+text-decoration: none;
+padding: 1px 3px;
+background-color: white; 
+color: black;
+    border-style:inset;
+}
+a.leBouton:hover {
+background-color: yellow;
+color:red;
+}
+
+.infobulle {
+    position: relative;
+}
+.infobulle-texte {
+    position: absolute;
+    bottom: 100px;
+    left: 50px;
+    width: 200px;
+    height: 75px;
+    color: white;
+    padding: 5px;
+    font-size: 12px;
+    background-color: #996666;
+    border: 5px solid #000000;
+    z-index: 2;
+}

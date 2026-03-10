@@ -1,0 +1,155 @@
+/* Styles spécifiques pour le formulaire de gestion des Songbooks */
+
+.sb-form-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.sb-header-title {
+    color: #2b1d1a;
+    font-weight: bold;
+    border-bottom: 2px solid #D2B48C;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+.sb-well-custom {
+    background: #fcfaf2;
+    border: 1px solid #D2B48C;
+}
+
+.sb-btn-save {
+    background: #8B4513;
+    border: none;
+    font-weight: bold;
+    padding: 10px 30px;
+}
+
+.sb-section-title {
+    color: #2b1d1a;
+    margin-top: 40px;
+}
+
+.sb-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sb-sortable-item {
+    background: white;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    cursor: move;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sb-add-box {
+    margin-top: 30px;
+    padding: 25px;
+    border: 2px dashed #D2B48C;
+    border-radius: 15px;
+    background: white;
+}
+
+.sb-add-title {
+    margin-top: 0;
+    color: #2b1d1a;
+    font-weight: bold;
+}
+
+.sb-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 10px 10px;
+    display: none;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.sb-pdf-selection {
+    margin-top: 20px;
+    display: none;
+    padding: 15px;
+    background: #fcfaf2;
+    border-radius: 10px;
+    border: 1px solid #D2B48C;
+}
+
+.sb-footer-actions {
+    margin-top: 50px;
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+}
+
+.sb-btn-generate {
+    border-radius: 30px;
+    padding: 15px 40px;
+    font-weight: bold;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.sb-btn-create {
+    background-color: #2e7d32;
+    color: white;
+    font-weight: 900;
+    border-radius: 30px;
+    padding: 12px 30px;
+    box-shadow: 0 10px 20px rgba(46, 125, 50, 0.2);
+}
+
+/* Fallback & Old styles neutralisation */
+.sb-form-container fieldset { border: none; padding: 0; margin: 0; }
+.sb-form-container legend { color: #2b1d1a; border: none; margin-bottom: 10px; font-weight: bold; }
+.sb-form-container label { float: none; width: auto; display: inline-block; margin-top: 0; }
+.sb-form-container .form-horizontal .control-label { float: left; width: 16.66666667%; text-align: right; padding-top: 7px; margin-bottom: 0; }
+.sb-form-container .ui-state-default { background: white; color: #2b1d1a; border: 1px solid #ddd; }
+.sb-form-container .list-group-item-action:hover { background-color: #f5f5f5; }
+
+.chanson-item {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.chanson-item:hover {
+    transform: translateX(10px);
+    border-color: #D2B48C;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.chanson-num {
+    font-family: serif;
+    font-style: italic;
+    color: #D2B48C;
+    font-size: 20px;
+    margin-right: 20px;
+    width: 30px;
+    display: inline-block;
+}
+
+.btn-sb-action {
+    border-radius: 20px;
+    padding: 8px 25px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}

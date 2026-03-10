@@ -1,0 +1,50 @@
+services:
+  web:
+    build: .
+    container_name: site-partoches
+    ports:
+      - "8080:80"
+
+    user: "33:33"
+    volumes:
+      - .:/var/www/html
+      - ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+#     - data_volume:/var/www/html/data  # Volume Docker pour les données
+#      - ./data:/var/www/html/data             # dossier data partagé dans le conteneur
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: dbPartoches
+
+  db:
+    image: mariadb:latest
+    container_name: my-mariadb
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: dbPartoches
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./dbPartoches.sql:/docker-entrypoint-initdb.d/dbPartoches.sql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: site-phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+  data_volume:
