@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>La Boîte A Strum</title> <!-- UPDATED PATH -->
+  <script type="module" crossorigin src="/html/boiteAstrum/assets/index-DfEfE7ld.js"></script>
+  <link rel="stylesheet" crossorigin href="/html/boiteAstrum/assets/index-CTkD2rKX.css">
+</head>
+
+<body>
+    <div class="main-container">
+        <header>
+            <div class="header-top">
+                <button id="settings-button" class="icon-button" title="Réglages">⚙️</button>
+            </div>
+            <img src="./medias/img/boiteAstrum.png" id="logo" class="logo" alt="logo la boite à strum">
+            <h1>La Boîte à Strum</h1>
+        </header>
+
+        <main>
+            <!-- SECTION STRUM -->
+            <section class="card strum-section">
+                <h2>Rythme (Strum)</h2>
+                
+                <div class="quick-strum-palette">
+                    <button class="strum-btn" data-char="B" title="Coup Bas Fort">
+                        <img src="./medias/img/flecheBasForce2.png" alt="">
+                        <span>B</span>
+                    </button>
+                    <button class="strum-btn" data-char="b" title="Coup Bas">
+                        <img src="./medias/img/flecheBasForce1.png" alt="">
+                        <span>b</span>
+                    </button>
+                    <button class="strum-btn" data-char="H" title="Coup Haut Fort">
+                        <img src="./medias/img/flecheHautForce2.png" alt="">
+                        <span>H</span>
+                    </button>
+                    <button class="strum-btn" data-char="h" title="Coup Haut">
+                        <img src="./medias/img/flecheHautForce1.png" alt="">
+                        <span>h</span>
+                    </button>
+                    <button class="strum-btn" data-char="X" title="Chunk">
+                        <img src="./medias/img/chunk-fort.png" alt="">
+                        <span>X</span>
+                    </button>
+                    <button class="strum-btn" data-char="E" title="Égréné">
+                        <img src="./medias/img/arpege-fort.png" alt="">
+                        <span>E</span>
+                    </button>
+                    <button class="strum-btn" data-char=" " title="Soupir">
+                        <div style="height: 25px; display: flex; align-items: center;">_</div>
+                        <span>Soupir</span>
+                    </button>
+                    <button id="backspace-strum" class="strum-btn" title="Effacer caractère précédent">
+                        <div style="height: 25px; display: flex; align-items: center;">⌫</div>
+                        <span>Retour</span>
+                    </button>
+                    <button id="clear-strum" class="strum-btn" title="Effacer tout" style="color: var(--primary-color);">
+                        <div style="height: 25px; display: flex; align-items: center;">🗑️</div>
+                        <span>Tout effacer</span>
+                    </button>
+                </div>
+
+                <div class="input-group">
+                    <label for='strumVersionTexte'>Ton strum :</label>
+                    <input type="text" id="strumVersionTexte" value="B BH HBH" placeholder="Ex: B BH HBH">
+                    <button id="help-button" class="help-button" title="Aide">?</button>
+                </div>
+                
+                <div class="display-container">
+                    <p id="mesure" class="mesure-info">4 temps </p>
+                    
+                    <div class="rhythm-grid">
+                        <div class="beat-slot"><img id="b1" src="./medias/img/flecheBasForce0.png" alt="" class="imageFleche"><span id="l1" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="h1" src="./medias/img/flecheHautForce0.png" alt="" class="imageFleche"><span id="l2" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="b2" src="./medias/img/flecheBasForce0.png" alt="" class="imageFleche"><span id="l3" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="h2" src="./medias/img/flecheHautForce0.png" alt="" class="imageFleche"><span id="l4" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="b3" src="./medias/img/flecheBasForce0.png" alt="" class="imageFleche"><span id="l5" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="h3" src="./medias/img/flecheHautForce0.png" alt="" class="imageFleche"><span id="l6" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="b4" src="./medias/img/flecheBasForce0.png" alt="" class="imageFleche"><span id="l7" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="h4" src="./medias/img/flecheHautForce0.png" alt="" class="imageFleche"><span id="l8" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="b5" src="./medias/img/flecheBasForce0.png" alt="" class="imageFleche"><span id="l9" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="h5" src="./medias/img/flecheHautForce0.png" alt="" class="imageFleche"><span id="l10" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="b6" src="./medias/img/flecheBasForce0.png" alt="" class="imageFleche"><span id="l11" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="h6" src="./medias/img/flecheHautForce0.png" alt="" class="imageFleche"><span id="l12" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="b7" src="./medias/img/flecheBasForce0.png" alt="" class="imageFleche"><span id="l13" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="h7" src="./medias/img/flecheHautForce0.png" alt="" class="imageFleche"><span id="l14" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="b8" src="./medias/img/flecheBasForce0.png" alt="" class="imageFleche"><span id="l15" class="rhythm-label"></span></div>
+                        <div class="beat-slot"><img id="h8" src="./medias/img/flecheHautForce0.png" alt="" class="imageFleche"><span id="l16" class="rhythm-label"></span></div>
+                    </div>
+                </div>
+
+                <div class="playback-controls">
+                    <img alt="jouer" src="./medias/img/boutonPlay.png" class="bouton-play" id="play-button">
+                    <img alt="pause" src="./medias/img/boutonPause.png" class="bouton-pause" id="pause-button">
+                </div>
+            </section>
+
+            <div class="settings-container">
+                <!-- SECTION MESURE -->
+                <section class="card mesure-section">
+                    <h2>Paramètres Mesure</h2>
+                    <div class="settings-grid">
+                        <div class="setting-item checkbox-item">
+                            <label for="ternaire">Swing</label>
+                            <input type="checkbox" id="ternaire">
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label for="beatsPerMeasure">Temps / mesure</label>
+                            <select id="beatsPerMeasure">
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4" selected>4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="beatValue">Valeur du temps</label>
+                            <select id="beatValue">
+                                <option value="4" selected>Noire (4)</option>
+                                <option value="8">Croche (8)</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="strumDuration">Durée d'un strum</label>
+                            <select id="strumDuration">
+                                <option value="4">Noire (1/4)</option>
+                                <option value="8" selected>Croche (1/8)</option>
+                                <option value="12">Triolet (1/12)</option>
+                                <option value="16">Double-croche (1/16)</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION METRONOME -->
+                <section class="card metronome-section">
+                    <h2>Tempo & Métronome</h2>
+                    <div class="metronome-layout">
+                        <div class="tempo-row">
+                            <div class="fader-group full-width">
+                                <label for="faderTempo">
+                                    <span>Tempo : <output id="tempo">120</output> BPM</span>
+                                    <span id="tempo-name" class="tempo-name">(Moderato)</span>
+                                </label>
+                                <input type="range" id="faderTempo" min="30" max="250" step="1" value="120">
+                                <div id="training-progress-container" class="training-progress-container" style="display: none;">
+                                    <div id="training-progress-bar" class="training-progress-bar"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="metronome-row">
+                            <div class="setting-item checkbox-item training-toggle">
+                                <label for="training-mode-switch">Mode Entraînement 🚀</label>
+                                <input type="checkbox" id="training-mode-switch">
+                            </div>
+
+                            <div class="fader-group">
+                                <label for="faderVolume">Volume clics : <output id="volume">90</output>%</label>
+                                <input type="range" id="faderVolume" min="0" max="100" step="1" value="90">
+                            </div>
+
+                            <div class="switch-group">
+                                <img src="./medias/img/metronome-sd.webp" class="metronome-decor" alt="">
+                                <div class="toggle-container">
+                                    <span class="toggle-label">OFF</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="metronome-switch" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="toggle-label">ON</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- HELP MODAL -->
+        <div id="help-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Aide pour la saisie du Strum</h2>
+                <div class="help-text">
+                    <p>Pour saisir un rythme, utilisez les lettres suivantes dans la boîte de saisie :</p>
+                    <ul>
+                        <li><strong>B / b</strong> : Coup vers le bas (Fort / Normal)</li>
+                        <li><strong>H / h</strong> : Coup vers le haut (Fort / Normal)</li>
+                        <li><strong>X / x</strong> : Chunk - coup étouffé (Fort / Faible)</li>
+                        <li><strong>E / e</strong> : Égréné / Arpégé (Fort / Doux)</li>
+                        <li><strong>Espace</strong> ou <strong>Tiret (-)</strong> : Silence / Pause</li>
+                    </ul>
+                    <p>L'affichage sous la saisie se met à jour automatiquement pour vous montrer les mesures et les temps détectés.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS MODAL -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Réglages Avancés</h2>
+                <div class="settings-modal-body">
+                    <div class="fader-group">
+                        <label for="faderLatency">
+                            <span>Compensation latence audio</span>
+                            <output id="latency-value">50</output> ms
+                        </label>
+                        <input type="range" id="faderLatency" min="0" max="1000" step="5" value="200">
+                        <p class="setting-desc">Ajustez ce curseur si l'animation visuelle ne semble pas calée sur le son.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Un outil pédagogique pour le strum codé par Arnal &bull; 2026</p>
+        </footer>
+    </div>
+ <!-- UPDATED PATH -->
+</body>
+</html>

@@ -15,8 +15,8 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . "/../php/lib/utilssi.php";
-require_once __DIR__ . "/../php/chanson/chanson.php";
+require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
+require_once __DIR__ . "/../src/public/php/chanson/Chanson.php";
 
 class ChansonFiltreTest extends TestCase
 {

@@ -1,0 +1,100 @@
+/**
+ * Style pour la liste des utilisateurs (Django Style)
+ */
+
+.user-container {
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.user-card {
+    background: #fff;
+    border: 1px solid #D2B48C;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 30px;
+    overflow: hidden;
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(43, 29, 26, 0.2);
+}
+
+.user-card-header {
+    background: #2b1d1a;
+    color: #F5F5DC;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.user-card-header h3 {
+    margin: 10px 0 5px 0;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #D2B48C;
+}
+
+.user-avatar-big {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #D2B48C;
+    object-fit: cover;
+    background: #fff;
+    margin-bottom: 10px;
+}
+
+.user-card-body {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.user-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2b1d1a;
+    margin-bottom: 15px;
+}
+
+.user-stats {
+    font-size: 0.9em;
+    color: #666;
+    background: #fdfaf5;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.user-card-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-create-user {
+    background-color: #8B4513;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 30px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+}
+
+.btn-create-user:hover {
+    background-color: #2b1d1a;
+    color: #D2B48C;
+    transform: scale(1.05);
+}

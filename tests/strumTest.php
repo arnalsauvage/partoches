@@ -2,8 +2,8 @@
 use PHPUnit\Framework\TestCase;
 // require_once 'PHPUnit/Autoload.php';
 session_start();
-require_once "../php/lib/utilssi.php";
-require_once "../php/strum.php";
+require_once "../src/public/php/lib/utilssi.php";
+require_once "../src/public/php/strum/Strum.php";
 
 
 class strumTest extends TestCase
@@ -18,7 +18,7 @@ class strumTest extends TestCase
         $description_attendue = "";
 
         // Quand je crée un objet sans parametres
-        $_strum = new strum();
+        $_strum = new Strum();
 
         // Alors j'obtiens l'objet avec les valeurs attendues
         $this->assertEquals($id_attendu, $_strum->getId());

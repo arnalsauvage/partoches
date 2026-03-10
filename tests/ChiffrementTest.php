@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-require_once("../php/lib/utilssi.php");
+require_once("../src/public/php/lib/utilssi.php");
 
 class ChiffrementTest extends TestCase
 {

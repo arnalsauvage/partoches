@@ -1,0 +1,118 @@
+/**
+ * Style spécifique pour le formulaire de chanson (Django Style)
+ */
+
+.sb-form-container {
+    margin-top: 20px;
+}
+
+.centrer {
+    text-align: center;
+}
+
+/* --- GESTION DES MODALES --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050; /* Au-dessus de la navbar Bootstrap */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* --- LISTE DES DOCUMENTS --- */
+.doc-info-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.edit-doc-container {
+    display: none;
+    align-items: center;
+    gap: 5px;
+}
+
+.edit-doc-input {
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.edit-doc-btn-ok {
+    color: green;
+    cursor: pointer;
+}
+
+.edit-doc-btn-cancel {
+    color: red;
+    cursor: pointer;
+}
+
+.doc-actions {
+    display: flex;
+    gap: 5px;
+}
+
+/* --- RYTHMIQUES (STRUMS) --- */
+.strum-list-container {
+    max-width: 600px;
+    margin: 20px auto;
+    text-align: left;
+}
+
+.strum-add-box {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* --- LIENS EXTERNES --- */
+.lien-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.lien-item label {
+    font-weight: bold;
+    color: #2b1d1a;
+    margin-bottom: 5px;
+}
+
+.lien-item input, .lien-item textarea {
+    margin-bottom: 10px;
+}

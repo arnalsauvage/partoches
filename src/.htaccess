@@ -1,0 +1,11 @@
+# REDIRECTION VERS LE DOSSIER PUBLIC
+# Cette règle permet de pointer le domaine sur le dossier src/ 
+# tout en servant le contenu depuis src/public/ de manière invisible.
+
+RewriteEngine On
+
+# Si la requête ne concerne pas déjà le dossier public
+RewriteCond %{REQUEST_URI} !^/public/
+
+# On réécrit la requête vers le dossier public
+RewriteRule ^(.*)$ public/$1 [L]
