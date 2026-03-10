@@ -3,8 +3,8 @@ use PHPUnit\Framework\TestCase;
 
 const PHPUNIT_RUNNING = true;
 session_start();
-require_once "../src/public/php/lib/utilssi.php";
-require_once "../src/public/php/navigation/Footer.php"; // Ton fichier Footer.php
+require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
+require_once __DIR__ . "/../src/public/php/navigation/Footer.php"; // Ton fichier Footer.php
 
 class FooterTest extends TestCase
 {

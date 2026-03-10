@@ -2,8 +2,8 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once("../src/public/php/lib/utilssi.php");
-require_once("../src/public/php/UtilisateurNote.php");
+require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
+require_once __DIR__ . "/../src/public/php/UtilisateurNote.php";
 
 class UtilisateurNoteTest extends TestCase
 {

@@ -3,7 +3,7 @@ use PHPUnit\Framework\TestCase;
 // require_once 'PHPUnit/Autoload.php';
 session_start();
 require_once "../src/public/php/lib/utilssi.php";
-require_once "../src/public/php/chanson/Chanson.php";
+require_once __DIR__ . "/../src/public/php/chanson/Chanson.php";
 require_once "../src/public/php/chanson/chansonListe.php";
 
 

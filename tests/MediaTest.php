@@ -3,8 +3,8 @@ use PHPUnit\Framework\TestCase;
 const PHPUNIT_RUNNING = true;
 session_start();
 $_SERVER['DOCUMENT_ROOT'] = "../";
-require_once  "../src/public/php/lib/utilssi.php";
-require_once "../src/public/php/media/Media.php"; // Assurez-vous que le chemin est correct
+require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
+require_once __DIR__ . "/../src/public/php/media/Media.php"; // Assurez-vous que le chemin est correct
 
 class MediaTest extends TestCase
 {

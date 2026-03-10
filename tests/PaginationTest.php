@@ -1,7 +1,7 @@
 <?php
 // require_once 'PHPUnit/Autoload.php';
-require_once("../src/public/php/lib/utilssi.php");
-require_once("../src/public/php/lib/Pagination.php");
+require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
+require_once __DIR__ . "/../src/public/php/lib/Pagination.php";
 use PHPUnit\Framework\TestCase;
 
 class PaginationTest extends TestCase

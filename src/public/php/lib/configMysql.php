@@ -13,30 +13,46 @@ if (!defined('PHP_DIR')) {
 if (!isset($configMysql)) {
     $configMysql = TRUE;
 
-    if (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING) {
-        $fichier = dirname(__DIR__, 3) . "/data/conf/params_test.ini";
-    } else {
-        // Le fichier params.ini est dans data/conf/, 3 niveaux au-dessus de ce fichier (lib/)
-        $fichier = dirname(__DIR__, 3) . "/data/conf/params.ini";
+    // --- STRATÉGIE DE CONNEXION (Django Style) ---
+    // 1. On cherche en priorité les variables d'environnement (Docker / PHPUnit Bootstrap)
+    $monserveur = $_ENV['DATABASE_HOST'] ?? $_SERVER['DATABASE_HOST'] ?? null;
+    $mabase = $_ENV['DATABASE_NAME'] ?? $_SERVER['DATABASE_NAME'] ?? null;
+    $LOGIN = $_ENV['DATABASE_USER'] ?? $_SERVER['DATABASE_USER'] ?? null;
+    $MOTDEPASSE = $_ENV['DATABASE_PASSWORD'] ?? $_SERVER['DATABASE_PASSWORD'] ?? null;
+
+    // 2. Si non trouvées, on se rabat sur les fichiers .ini
+    if (!$monserveur) {
+        if (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING) {
+            $fichier = dirname(__DIR__, 3) . "/data/conf/params_test.ini";
+        } else {
+            $fichier = dirname(__DIR__, 3) . "/data/conf/params.ini";
+        }
+
+        if (file_exists($fichier)) {
+            $ini_objet = new FichierIni ();
+            $ini_objet->m_load_fichier($fichier);
+            $monserveur = $ini_objet->m_valeur("monServeur", "mysql");
+            $mabase = $ini_objet->m_valeur("maBase", "mysql");
+            $LOGIN = $ini_objet->m_valeur("login", "mysql");
+            $MOTDEPASSE = $ini_objet->m_valeur("motDePasse", "mysql");
+        }
     }
 
-    // On lit les données dans le fichier ini
-    $ini_objet = new FichierIni ();
-    $ini_objet->m_load_fichier($fichier);
+    // Valeurs par défaut si tout a échoué
+    $monserveur = $monserveur ?: "localhost";
+    $mabase = $mabase ?: "dbPartoches";
+    $LOGIN = $LOGIN ?: "root";
+    $MOTDEPASSE = $MOTDEPASSE ?: "";
 
-    $monserveur = $ini_objet->m_valeur("monServeur", "mysql");
-    $mabase = $ini_objet->m_valeur("maBase", "mysql");
-    $LOGIN = $ini_objet->m_valeur("login", "mysql");
-    $MOTDEPASSE = $ini_objet->m_valeur("motDePasse", "mysql");
-
+    $mysqli = new mysqli($monserveur, $LOGIN, $MOTDEPASSE, $mabase);
+    
     // Gestion du mode Debug (Django)
-    if ($ini_objet->m_valeur("display_errors", "admin") == "1") {
+    if (isset($ini_objet) && $ini_objet->m_valeur("display_errors", "admin") == "1") {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
     }
 
-    $mysqli = new mysqli($monserveur, $LOGIN, $MOTDEPASSE, $mabase);
     if ($mysqli->connect_error) {
         die(' Erreur #1 configMysql : Impossible de créer une connexion persistante ! ' . $mysqli->connect_errno . ') '
             . $mysqli->connect_error);
