@@ -340,9 +340,13 @@ $sortie .= <<<HTML
 </form>
 
 <hr>
-<h3>Outils</h3>
-<a href='../media/listeMedias.php' class='btn btn-default'>Voir les médias</a>
-<a href='paramsEdit.php?resetmedias=125' class='btn btn-warning' onclick='return confirm("Réinitialiser ?");'>Réinitialiser les médias</a>
+<h3>Outils d'administration</h3>
+<div class="btn-group">
+    <a href='../todo/todo_admin.php' class='btn btn-primary'><i class="glyphicon glyphicon-list-alt"></i> Roadbook (To-Do List)</a>
+    <a href='imagesCheck.php' class='btn btn-info'><i class="glyphicon glyphicon-eye-open"></i> Inspecteur d'images</a>
+    <a href='../media/listeMedias.php' class='btn btn-default'>Voir les médias</a>
+    <a href='paramsEdit.php?resetmedias=125' class='btn btn-warning' onclick='return confirm("Réinitialiser ?");'>Réinitialiser les médias</a>
+</div>
 
 <script>
 $(document).ready(function(){
