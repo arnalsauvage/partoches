@@ -122,8 +122,24 @@ function pageDeCouverture(SongBookPDF $pdf, $version, $idSongBook, $imageCouvert
     $pdf->AddPage();
     $version++;
     $dateDuJour = date("d/m/Y");
-    // Position at 1.5 cm from bottom
-    $pdf->Image(DATA_SONGBOOKS . $idSongBook . "/" . $imageCouverture, 5, 5, 190, 250);
+    
+    // On s'assure que l'image est compatible FPDF (conversion WebP -> JPG si besoin)
+    $relPath = "../data/songbooks/" . $idSongBook . "/" . $imageCouverture;
+    // Note: getCompatiblePathForPdf attend un chemin relatif par rapport à data/chansons par défaut.
+    // On va tricher un peu en lui passant le chemin complet ou en adaptant Image.php.
+    // Pour l'instant, on va juste s'assurer que si c'est un webp, on le convertit.
+    $imagePath = DATA_SONGBOOKS . $idSongBook . "/" . $imageCouverture;
+    if (str_ends_with(strtolower($imagePath), '.webp')) {
+        $jpgPath = str_replace('.webp', '-pdf.jpg', $imagePath);
+        if (!file_exists($jpgPath) || filemtime($imagePath) > filemtime($jpgPath)) {
+            $img = Image::load($imagePath);
+            Image::save($img, $jpgPath, 'jpg', 90);
+            imagedestroy($img);
+        }
+        $imagePath = $jpgPath;
+    }
+
+    $pdf->Image($imagePath, 5, 5, 190, 250);
     $pdf->SetY(260);
     $pdf->SetFont(ARIAL, 'B', 10);
     $pdf->SetTextColor(50, 50, 50);

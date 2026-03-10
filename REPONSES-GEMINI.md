@@ -1,19 +1,20 @@
 # Réponses de Django (Gemini) - 10 Mars 2026
 
-## ✅ MISE EN LIGNE RÉUSSIE ! 🚀
-La nouvelle version du projet **Partoches** est officiellement en ligne avec une architecture propre et harmonisée.
+## ✅ MODERNISATION WEB P & STABILISATION RÉUSSIE ! 🚀
+Le projet **Partoches** a franchi une nouvelle étape majeure dans sa modernisation.
 
-### Bilan de la session de refactoring :
-1. **Migration structurelle** : Le dossier `php/` est désormais correctement référencé dans `src/public/php/` à travers tout le projet (tests et code source).
-2. **Standardisation de la casse (PSR-friendly)** :
-   - `Chanson.php`
-   - `Document.php`
-   - `Songbook.php`
-   - `Strum.php`
-   - `Utilisateur.php`
-   - `LienUrl.php`
-   - `LienStrumChanson.php`
-3. **Nettoyage des tests** : Tous les fichiers dans `tests/` ont été mis à jour pour pointer vers les nouveaux chemins et utiliser les nouvelles classes avec majuscules.
-4. **Correction des rebelles** : Les inclusions dans `oubliMotDePasse.php`, `lienurl_liste.php` et `chanson_depublier_tout.php` ont été corrigées.
+### Bilan du deuxième set de modifications :
+1. **Système d'images "Next Gen"** :
+   - Implémentation du format WebP via la classe `Image`.
+   - Génération à la volée de miniatures **Mini** (100px) et **SD** (300px).
+   - Harmonisation de tous les modules (Chansons, Songbooks, Médias, Utilisateurs).
+   - Suppression du dossier `data/vignettes` et du fichier `vignette.php`.
+2. **Optimisation & UI** :
+   - Gain de performance massif en supprimant les scans disque inutiles (`?v=`).
+   - Réparation du menu de login (JS/CSS/Z-index).
+   - Restauration de l'affichage en colonnes Bootstrap 3.
+3. **Infrastructure de Test** :
+   - Stabilisation de tous les tests unitaires avec `__DIR__`.
+   - Support des variables d'environnement pour la connexion MySQL (Docker-friendly).
 
-**Le spectacle peut commencer !** 🎸🎶✅
+**Rideau ! Le spectacle est parfait.** 🎸🎶✅🥂
