@@ -86,7 +86,6 @@ HTML;
 $liensAdminUsers = "";
 if ($privilege > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     $liensAdminUsers = "<li><a href='../utilisateur/utilisateur_liste.php'>Utilisateurs</a></li>";
-    $liensAdminUsers .= "<li><a href='../navigation/imagesCheck.php'>Inspecteur images</a></li>";
 }
 
 // 8. Paramétrage (Admin)
