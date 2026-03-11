@@ -140,11 +140,15 @@ if ($user != "invite") {
             $('.contenu_popup').fadeOut(200);
         });
 
+        // Empêcher la fermeture quand on clique à l'intérieur de la popup
+        $('.contenu_popup').on('mouseup', function(e) {
+            e.stopPropagation();
+        });
+
         // Fermeture si clic en dehors
         $(document).on('mouseup', function(e) {
-            var container = $(".contenu_popup");
-            if (!container.is(e.target) && container.has(e.target).length === 0 && !$('#afficherPopup').is(e.target) && $('#afficherPopup').has(e.target).length === 0) {
-                container.fadeOut(200);
+            if (!$('#afficherPopup').is(e.target) && $('#afficherPopup').has(e.target).length === 0) {
+                $('.contenu_popup').fadeOut(200);
             }
         });
 

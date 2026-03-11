@@ -1,0 +1,590 @@
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu" aria-expanded="false">
+                <span class="sr-only">Menu</span>
+                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="../media/listeMedias.php">
+                <img src="../../images/navigation/logo_site.png" width="42" class="logo" alt="logo">
+                
+            </a>
+        </div>
+        <div id="main-menu" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="divider" role="separator"></li>
+                <li><a href="../media/listeMedias.php">Médias</a></li>
+                <li><a href="../chanson/chanson_liste.php?razFiltres">Chansons</a></li>
+                <li><a href="../strum/strum_liste.php">Strums</a></li>
+                <li><a href="../songbook/songbook_liste.php">Songbooks</a></li>
+                <li><a href="../liens/lienurl_liste.php">Liens</a></li>
+                    <li>
+        <a href="../../html/diagrammes/" target="_blank">
+            <img height="24" alt="outils" src="../../images/icones/diagramme.png"> Outils
+        </a>
+    </li>
+                <li><a href="../utilisateur/utilisateur_liste.php">Utilisateurs</a></li>
+                <li><a href="../navigation/paramsEdit.php">Paramétrage</a></li>
+            </ul>
+                <ul class="nav navbar-nav navbar-right">
+        <li class="navbar-user-info">
+            <span class="glyphicon glyphicon-king role-icon" title="SmokeTest (administrateur)"></span>
+            <span class='user-avatar-round' title='SmokeTest (administrateur)'><i class='glyphicon glyphicon-user'></i></span>
+            <a href='../navigation/login.php?logoff=1' title='Se déconnecter' class='auth-btn'><i class='glyphicon glyphicon-off'></i></a>
+        </li>
+    </ul>
+        </div>
+    </div>
+</nav><!doctype html>
+		<html lang="fr">
+		<head>
+		<meta charset="UTF-8" >
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+    	<link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
+    	 <link href="../../css/jquery-ui.1.12.1.css" rel="stylesheet"> <link rel="stylesheet" type="text/css" href="../../css/styles-communs.css?v=26.03.08.1730">
+
+        
+        <link rel="stylesheet" media="screen" type="text/css" title="resolution" href="../../css/strum_liste.css" />
+		<script src="../../js/javascript.js"></script>
+		<!-- Jquery --- source : https://code.jquery.com/jquery-1.12.4.js -->
+		<script src="../../js/jquery-1.12.4.min.js"></script>
+		<!-- Nos fonctions personnalisées -->
+		<script src="../../js/utilsJquery.js"></script>
+		<!-- jquery-ui --- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
+
+		<script src="../../js/jquery-ui.1.12.1.min.js"></script>
+        
+		<!-- Pour bootstrap         -->
+        <script src="../../js/bootstrap.3.2.0.min.js"></script>
+		
+		<!-- Pour Toaster, les petites infos instantanées         -->
+		<link href="../../css/toastr.min.css" rel="stylesheet" type="text/css">
+		<script src="../../js/toastr.min.js"></script>
+
+		<!-- Pour Select2, le combo amélioré         -->		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+		
+		<title>Répertoire des Strums</title>
+		</head><div class="container strum-container">
+    <div class="row">
+        <div class="col-xs-12 text-center" style="margin-bottom: 30px;">
+            <h1 style="font-weight: 900; letter-spacing: 5px;">
+                <span class="glyphicon glyphicon-music"></span> RÉPERTOIRE DES STRUMS
+            </h1>
+            <p class="text-muted">20 RYTHMES DISPONIBLES</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B-XH-HB-</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Boléro chunk - pour killing me softly</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(64, "B-XH-HB-")' title='Voir les chansons liées'>
+                            1 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B-XH-HB-&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=64' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=64&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>Bhbh</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Carton plein</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>4 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(136, "Bhbh")' title='Voir les chansons liées'>
+                            3 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=Bhbh&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=136' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=136&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>BH-H-HBH</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Chaloupé - pour Tico Tico</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 double-croches</span>
+                        <span class='label label-warning' style='background-color: #f39c12; margin-left: 5px;'>SWING</span>
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(68, "BH-H-HBH")' title='Voir les chansons liées'>
+                            3 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=BH-H-HBH&ternaire=true' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=68' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=68&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>--B---B-</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Contretemps Reggae</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(151, "--B---B-")' title='Voir les chansons liées'>
+                            2 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=--B---B-&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=151' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=151&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B-BHB-B-</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Dirty Old Town</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 croches</span>
+                        <span class='label label-warning' style='background-color: #f39c12; margin-left: 5px;'>SWING</span>
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(137, "B-BHB-B-")' title='Voir les chansons liées'>
+                            2 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B-BHB-B-&ternaire=true' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=137' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=137&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B--H--B---------</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Façon &quot;chan chan&quot;</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>16 double-croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(27, "B--H--B---------")' title='Voir les chansons liées'>
+                            3 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B--H--B---------&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=27' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=27&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B---B--h-hB-BhXh</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Groove sautillant - You sexy thing</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>16 double-croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(102, "B---B--h-hB-BhXh")' title='Voir les chansons liées'>
+                            1 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B---B--h-hB-BhXh&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=102' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=102&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B-Xh-B-Xh</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>hymne des femmes</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(131, "B-Xh-B-Xh")' title='Voir les chansons liées'>
+                            4 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B-Xh-B-Xh&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=131' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=131&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>BhBxBhBx</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Inquiétant</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(155, "BhBxBhBx")' title='Voir les chansons liées'>
+                            1 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=BhBxBhBx&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=155' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=155&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B-B-BhBh</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Pesant</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(154, "B-B-BhBh")' title='Voir les chansons liées'>
+                            1 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B-B-BhBh&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=154' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=154&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B---BhBh</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Posé - pour Police on my back</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(156, "B---BhBh")' title='Voir les chansons liées'>
+                            1 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B---BhBh&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=156' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=156&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B-B-B-Bh-hB-BhBh</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Pour Pourvu qu&#039;elles soient douces</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>16 double-croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(111, "B-B-B-Bh-hB-BhBh")' title='Voir les chansons liées'>
+                            1 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B-B-B-Bh-hB-BhBh&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=111' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=111&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>BhhBhh</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Pour une valse</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>6 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(44, "BhhBhh")' title='Voir les chansons liées'>
+                            2 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=BhhBhh&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=44' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=44&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B--H--B-BH-HB-B-</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Santé !</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>16 double-croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(26, "B--H--B-BH-HB-B-")' title='Voir les chansons liées'>
+                            1 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B--H--B-BH-HB-B-&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=26' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=26&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B-BhB-Bh</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Slow - pour Hey Jude</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(161, "B-BhB-Bh")' title='Voir les chansons liées'>
+                            3 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B-BhB-Bh&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=161' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=161&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>----BH-H-H-HB-B-B---------------</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Strum de l&#039;anamour</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>32 double-croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(30, "----BH-H-H-HB-B-B---------------")' title='Voir les chansons liées'>
+                            2 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=----BH-H-H-HB-B-B---------------&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=30' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=30&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>bHBH</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Strum Foule Sentimentale</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>4 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(23, "bHBH")' title='Voir les chansons liées'>
+                            2 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=bHBH&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=23' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=23&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>Bhhhhh</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Test esssai</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>6 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(174, "Bhhhhh")' title='Voir les chansons liées'>
+                            1 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=Bhhhhh&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=174' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=174&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B-------</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Un seul coup suffit</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>8 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(55, "B-------")' title='Voir les chansons liées'>
+                            8 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B-------&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=55' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=55&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-sm-6 col-md-4 col-lg-3'>
+            <div class='thumbnail strum-card'>
+                <div class='strum-card-header'>
+                    <h2>B-hB-h</h2>
+                </div>
+                <div class='strum-card-body'>
+                    <p class='strum-card-desc'>Valse sautillante pour la Tarentelle</p>
+                    <div style='margin-bottom: 15px;'>
+                        <span class='label label-default' style='background-color: #777;'>6 croches</span>
+                        
+                        <button class='label strum-badge-pop' onclick='voirChansonsStrum(145, "B-hB-h")' title='Voir les chansons liées'>
+                            2 <i class='glyphicon glyphicon-music'></i>
+                        </button>
+                    </div>
+                    
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                        <a title='Ouvrir dans la Boîte à Strum' href='../../html/boiteAstrum/index.html?strum=B-hB-h&ternaire=false' style='text-decoration: none;'>
+                            <img src='../../html/boiteAstrum/medias/img/boiteAstrum.png' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                        </a>
+                        <div class='btn-group'> <a href='strum_form.php?id=145' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a> <a href='strum_post.php?id=145&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm("Supprimer ce strum ?")'><i class='glyphicon glyphicon-trash'></i></a>      </div>
+                    </div>
+                </div>
+            </div>
+        </div></div></div><footer class="site-footer">
+    <div class="container">
+        <div class="footer-content">
+                        <a href="http://www.top5.re" target="_blank">Site web</a> |
+            <a href="https://padlet.com/top5asso/top5-atelier-d-butant-interm-diaire-wwiy3x9lz44a6vyx">padlet </a>   |
+            <a href="http://partoches.canopee-musique.fr" target="_blank">partoches</a>
+            <a href="https://www.youtube.com/channel/UCFKyqYcs5cnML-EgPgYmwdg" target="_blank" title="youtube">
+                &nbsp;
+                <img src="https://cdn3.iconfinder.com/data/icons/peelicons-vol-1/50/YouTube-128.png" width="30" height="30" alt="youtube">
+            </a>
+            &nbsp;
+            <a href="https://twitter.com/top5ukeclub" target="_blank" title="twitter">
+                <img src="https://cdn3.iconfinder.com/data/icons/peelicons-vol-1/50/Twitter-128.png" width="30" height="30" alt="twitter">
+            </a>       
+        </div>
+        
+        <div class="footer-legal">
+            <a href="../../html/mentionsLegales.html" target="_blank">Mentions légales</a>
+            <span class="separator">|</span>
+            <a href="../../html/merci.html" target="_blank">Mercis</a>
+            <span class="separator">|</span>
+            <span>&copy; 2018 - 2026 Partoches Canopée</span>
+        </div>
+    </div>
+</footer>
+
+<script src="../../js/precise-star-rating.js"></script>
+</body>
+</html>

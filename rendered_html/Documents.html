@@ -1,0 +1,408 @@
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu" aria-expanded="false">
+                <span class="sr-only">Menu</span>
+                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="../media/listeMedias.php">
+                <img src="../../images/navigation/logo_site.png" width="42" class="logo" alt="logo">
+                
+            </a>
+        </div>
+        <div id="main-menu" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="divider" role="separator"></li>
+                <li><a href="../media/listeMedias.php">Médias</a></li>
+                <li><a href="../chanson/chanson_liste.php?razFiltres">Chansons</a></li>
+                <li><a href="../strum/strum_liste.php">Strums</a></li>
+                <li><a href="../songbook/songbook_liste.php">Songbooks</a></li>
+                <li><a href="../liens/lienurl_liste.php">Liens</a></li>
+                    <li>
+        <a href="../../html/diagrammes/" target="_blank">
+            <img height="24" alt="outils" src="../../images/icones/diagramme.png"> Outils
+        </a>
+    </li>
+                <li><a href="../utilisateur/utilisateur_liste.php">Utilisateurs</a></li>
+                <li><a href="../navigation/paramsEdit.php">Paramétrage</a></li>
+            </ul>
+                <ul class="nav navbar-nav navbar-right">
+        <li class="navbar-user-info">
+            <span class="glyphicon glyphicon-king role-icon" title="SmokeTest (administrateur)"></span>
+            <span class='user-avatar-round' title='SmokeTest (administrateur)'><i class='glyphicon glyphicon-user'></i></span>
+            <a href='../navigation/login.php?logoff=1' title='Se déconnecter' class='auth-btn'><i class='glyphicon glyphicon-off'></i></a>
+        </li>
+    </ul>
+        </div>
+    </div>
+</nav><h2>Documents publiés pour des chansons</h2> 
+
+<form  METHOD='POST' ACTION='documents_voir.php' NAME='formfiltre'>
+<input type=text list=typesFichier value='' name='filtre'>
+<datalist id=typesFichier >
+   <option value='*'> tous</option>
+   <option value='doc'> document </option>
+   <option value='son'> son</option>p
+   <option value='img'> image</option>
+</datalist>
+<label class='inline'> </label><INPUT TYPE='submit' NAME='filtrer' VALUE=' filtrer ' >
+</form><table> 
+<tr><td><a href="?tri=idUSer" ><span class='glyphicon glyphicon-chevron-up'> </span></a>  Publicateur   <a href="?triDesc=idUSer" >  <span class='glyphicon glyphicon-chevron-down'></span> </a></td>
+<td></td>
+<td></td>
+<td><a href="?tri=tailleKo" ><span class='glyphicon glyphicon-chevron-up'> </span></a>  Taille   <a href="?triDesc=tailleKo" >  <span class='glyphicon glyphicon-chevron-down'></span> </a></td>
+<td><a href="?tri=date" ><span class='glyphicon glyphicon-chevron-up'> </span></a>  Date   <a href="?triDesc=date" >  <span class='glyphicon glyphicon-chevron-down'></span> </a></td>
+<td><a href="?tri=hits" ><span class='glyphicon glyphicon-chevron-up'> </span></a>  Nbre vues   <a href="?triDesc=hits" >  <span class='glyphicon glyphicon-chevron-down'></span> </a></td>
+</tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='admin'> </td>
+<td><a href='../chanson/chanson_voir.php?id=94'> <img src="../../../../data/chansons/94/05-Quand-OnSpromeneAuBordDeLeau-v1.webp" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3139"  class=""><img src="../../images/icones/webp.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/94/05-Quand-OnSpromeneAuBordDeLeau-v1.webp' target='_blank'> 05-Quand-OnSpromeneAuBordDeLeau-v1.webp</a> 
+<td>11 ko  </td><td> -  publié le 08/03/2026 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=730'> <img src="../../../../data/chansons/730/Gaetan-Roussel-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3135"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/730/Gaetan-Roussel-v1.jpg' target='_blank'> Gaetan-Roussel-v1.jpg</a> 
+<td>54 ko  </td><td> -  publié le 12/10/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3136"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/730/Help-myself-v1.docx' target='_blank'> Help-myself-v1.docx</a> 
+<td>101 ko  </td><td> -  publié le 12/10/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3137"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/730/Help-myself-v1.pdf' target='_blank'> Help-myself-v1.pdf</a> 
+<td>170 ko  </td><td> -  publié le 12/10/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td><a href='../chanson/chanson_voir.php?id=727'> <img src="../../../../data/chansons/727/courage-v1.png" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3124"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/727/Courage-cest-noel-v1.docx' target='_blank'> Courage-cest-noel-v1.docx</a> 
+<td>263 ko  </td><td> -  publié le 08/10/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3125"  class=""><img src="../../images/icones/png.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/727/courage-v1.png' target='_blank'> courage-v1.png</a> 
+<td>360 ko  </td><td> -  publié le 08/10/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td><a href='../chanson/chanson_voir.php?id=728'> <img src="../../../../data/chansons/728/le-pere-leon-v1.png" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3126"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/728/Le-pere-Leon-la-mere-Noel-v1.docx' target='_blank'> Le-pere-Leon-la-mere-Noel-v1.docx</a> 
+<td>68 ko  </td><td> -  publié le 08/10/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3127"  class=""><img src="../../images/icones/png.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/728/le-pere-leon-v1.png' target='_blank'> le-pere-leon-v1.png</a> 
+<td>245 ko  </td><td> -  publié le 08/10/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3128"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/728/Le-pere-Leon-la-mere-Noel-v1.pdf' target='_blank'> Le-pere-Leon-la-mere-Noel-v1.pdf</a> 
+<td>150 ko  </td><td> -  publié le 08/10/2025 </td><td> &nbsp; - 10 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td><a href='../chanson/chanson_voir.php?id=726'> <img src="../../../../data/chansons/726/pochette-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3121"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/726/Balance-ton-quoi-v1.docx' target='_blank'> Balance-ton-quoi-v1.docx</a> 
+<td>142 ko  </td><td> -  publié le 04/10/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3122"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/726/Balance-ton-quoi-v1.pdf' target='_blank'> Balance-ton-quoi-v1.pdf</a> 
+<td>245 ko  </td><td> -  publié le 04/10/2025 </td><td> &nbsp; - 11 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3123"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/726/pochette-v1.jpg' target='_blank'> pochette-v1.jpg</a> 
+<td>53 ko  </td><td> -  publié le 04/10/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='xavier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=699'> <img src="../../../../data/chansons/699/gpt1737676162190-v1.png" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3120"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/699/While-my-guitar-gently-weeps---The-Beatles---v2-v1.pdf' target='_blank'> While-my-guitar-gently-weeps---The-Beatles---v2-v1.pdf</a> 
+<td>619 ko  </td><td> -  publié le 02/10/2025 </td><td> &nbsp; - 9 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='xavier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=676'> <img src="../../../../data/chansons/676/thisLandIsYourLand-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3116"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/676/This-land-is-your-land---partoche-v1.pdf' target='_blank'> This-land-is-your-land---partoche-v1.pdf</a> 
+<td>234 ko  </td><td> -  publié le 28/09/2025 </td><td> &nbsp; - 8 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='xavier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3117"  class=""><img src="../images/icones/fichier.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/676/Partition-This-land-is-your-land-v1.pptx' target='_blank'> Partition-This-land-is-your-land-v1.pptx</a> 
+<td>123 ko  </td><td> -  publié le 28/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=724'> <img src="../../../../data/chansons/724/Les-Murs-de-poussiere-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3110"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/724/Les-Murs-de-poussiere-v1.jpg' target='_blank'> Les-Murs-de-poussiere-v1.jpg</a> 
+<td>30 ko  </td><td> -  publié le 23/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3111"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/724/Les-Murs-de-poussiere-v1.docx' target='_blank'> Les-Murs-de-poussiere-v1.docx</a> 
+<td>157 ko  </td><td> -  publié le 23/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3112"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/724/Les-Murs-de-poussiere-v1.pdf' target='_blank'> Les-Murs-de-poussiere-v1.pdf</a> 
+<td>171 ko  </td><td> -  publié le 23/09/2025 </td><td> &nbsp; - 10 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=725'> <img src="../../../../data/chansons/725/Hound-dog-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3113"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/725/Hound-dog-v1.jpg' target='_blank'> Hound-dog-v1.jpg</a> 
+<td>134 ko  </td><td> -  publié le 23/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3114"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/725/Hound-dog-v1.docx' target='_blank'> Hound-dog-v1.docx</a> 
+<td>153 ko  </td><td> -  publié le 23/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3115"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/725/Hound-dog-v1.pdf' target='_blank'> Hound-dog-v1.pdf</a> 
+<td>147 ko  </td><td> -  publié le 23/09/2025 </td><td> &nbsp; - 14 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=718'> <img src="../../../../data/chansons/718/Bruce-Springsteen-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3092"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/718/Hungry-heart-v3.pdf' target='_blank'> Hungry-heart-v3.pdf</a> 
+<td>231 ko  </td><td> -  publié le 20/09/2025 </td><td> &nbsp; - 51 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3093"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/718/Hungry-heart-v3.docx' target='_blank'> Hungry-heart-v3.docx</a> 
+<td>171 ko  </td><td> -  publié le 20/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td><a href='../chanson/chanson_voir.php?id=525'> <img src="../../../../data/chansons/525/CountryRoads-JohnDenver-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=2579"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/525/take-me-home-john-denver-v4-en-D-v2.docx' target='_blank'> take-me-home-john-denver-v4-en-D-v2.docx</a> 
+<td>118 ko  </td><td> -  publié le 17/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=2580"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/525/take-me-home-john-denver-v4-en-D-v2.pdf' target='_blank'> take-me-home-john-denver-v4-en-D-v2.pdf</a> 
+<td>158 ko  </td><td> -  publié le 17/09/2025 </td><td> &nbsp; - 11 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=723'> <img src="../../../../data/chansons/723/Quand-la-ville-dort-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3107"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/723/Quand-la-ville-dort-v1.jpg' target='_blank'> Quand-la-ville-dort-v1.jpg</a> 
+<td>113 ko  </td><td> -  publié le 15/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3108"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/723/Quand-la-ville-dort-v1.pdf' target='_blank'> Quand-la-ville-dort-v1.pdf</a> 
+<td>130 ko  </td><td> -  publié le 15/09/2025 </td><td> &nbsp; - 16 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3109"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/723/Quand-la-ville-dort-v1.docx' target='_blank'> Quand-la-ville-dort-v1.docx</a> 
+<td>135 ko  </td><td> -  publié le 15/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td><a href='../chanson/chanson_voir.php?id=722'> <img src="../../../../data/chansons/722/le-chat-botte2-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3104"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/722/Le-chat-botte-v3.docx' target='_blank'> Le-chat-botte-v3.docx</a> 
+<td>77 ko  </td><td> -  publié le 05/09/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3105"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/722/Le-chat-botte-v3.pdf' target='_blank'> Le-chat-botte-v3.pdf</a> 
+<td>166 ko  </td><td> -  publié le 05/09/2025 </td><td> &nbsp; - 15 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3106"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/722/le-chat-botte2-v1.jpg' target='_blank'> le-chat-botte2-v1.jpg</a> 
+<td>32 ko  </td><td> -  publié le 16/08/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td><a href='../chanson/chanson_voir.php?id=721'> <img src="../../../../data/chansons/721/societe-anonyme-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3101"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/721/societe-anonyme-v1.docx' target='_blank'> societe-anonyme-v1.docx</a> 
+<td>113 ko  </td><td> -  publié le 10/08/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3102"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/721/societe-anonyme-v1.pdf' target='_blank'> societe-anonyme-v1.pdf</a> 
+<td>171 ko  </td><td> -  publié le 10/08/2025 </td><td> &nbsp; - 38 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3103"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/721/societe-anonyme-v1.jpg' target='_blank'> societe-anonyme-v1.jpg</a> 
+<td>25 ko  </td><td> -  publié le 10/08/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td><a href='../chanson/chanson_voir.php?id=720'> <img src="../../../../data/chansons/720/mademoiselle-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3098"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/720/sos-en-Gm-v1.docx' target='_blank'> sos-en-Gm-v1.docx</a> 
+<td>101 ko  </td><td> -  publié le 30/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3099"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/720/sos-en-Gm-v1.pdf' target='_blank'> sos-en-Gm-v1.pdf</a> 
+<td>188 ko  </td><td> -  publié le 30/07/2025 </td><td> &nbsp; - 29 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='michele'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3100"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/720/mademoiselle-v1.jpg' target='_blank'> mademoiselle-v1.jpg</a> 
+<td>40 ko  </td><td> -  publié le 30/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td><a href='../chanson/chanson_voir.php?id=719'> <img src="../../../../data/chansons/719/pochette-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3095"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/719/Counting-Stars-v1.docx' target='_blank'> Counting-Stars-v1.docx</a> 
+<td>152 ko  </td><td> -  publié le 14/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3096"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/719/Counting-Stars-v1.pdf' target='_blank'> Counting-Stars-v1.pdf</a> 
+<td>233 ko  </td><td> -  publié le 14/07/2025 </td><td> &nbsp; - 53 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3097"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/719/pochette-v1.jpg' target='_blank'> pochette-v1.jpg</a> 
+<td>106 ko  </td><td> -  publié le 14/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='gauthier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=718'> <img src="../../../../data/chansons/718/Bruce-Springsteen-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3094"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/718/Bruce-Springsteen-v1.jpg' target='_blank'> Bruce-Springsteen-v1.jpg</a> 
+<td>30 ko  </td><td> -  publié le 13/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='xavier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=717'> <img src="../../../../data/chansons/717/I-love-to-sing-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3086"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/717/I-love-to-sing---Al-Johnson---Fred-Avery-Cartoon-v1.pdf' target='_blank'> I-love-to-sing---Al-Johnson---Fred-Avery-Cartoon-v1.pdf</a> 
+<td>627 ko  </td><td> -  publié le 06/07/2025 </td><td> &nbsp; - 53 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='xavier'> </td>
+<td><a href='../chanson/chanson_voir.php?id=717'> <img src="../../../../data/chansons/717/ilovetosinga-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3087"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/717/I-Love-To-Singa-v1.docx' target='_blank'> I-Love-To-Singa-v1.docx</a> 
+<td>415 ko  </td><td> -  publié le 06/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='Inconnu'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3091"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/717/ilovetosinga-v1.jpg' target='_blank'> ilovetosinga-v1.jpg</a> 
+<td>21 ko  </td><td> -  publié le 06/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='arnaud'> </td>
+<td><a href='../chanson/chanson_voir.php?id=717'> <img src="../../../../data/chansons/717/I-love-to-sing-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3090"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/717/I-love-to-sing-v1.jpg' target='_blank'> I-love-to-sing-v1.jpg</a> 
+<td>14 ko  </td><td> -  publié le 06/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td><a href='../chanson/chanson_voir.php?id=716'> <img src="../../../../data/chansons/716/pochette-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3083"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/716/Gaffe-aux-autres-v1.docx' target='_blank'> Gaffe-aux-autres-v1.docx</a> 
+<td>182 ko  </td><td> -  publié le 04/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3084"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/716/Gaffe-aux-autres-v1.pdf' target='_blank'> Gaffe-aux-autres-v1.pdf</a> 
+<td>246 ko  </td><td> -  publié le 04/07/2025 </td><td> &nbsp; - 56 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3085"  class=""><img src="../../images/icones/jpg.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/716/pochette-v1.jpg' target='_blank'> pochette-v1.jpg</a> 
+<td>23 ko  </td><td> -  publié le 04/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td><a href='../chanson/chanson_voir.php?id=715'> <img src="../../../../data/chansons/715/pochette-v1.jpg" width="128" height="128" alt="chanson" class="">
+ </a> </td>
+<td> <a href="getdoc.php?doc=3080"  class=""><img src="../../images/icones/docx.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/715/Paparazzi-v1.docx' target='_blank'> Paparazzi-v1.docx</a> 
+<td>138 ko  </td><td> -  publié le 03/07/2025 </td><td> &nbsp; - 0 vues </td></tr>
+<tr> 
+<td> <img src='../../images/icones/icone_arnal.png' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='annick'> </td>
+<td>  </td>
+ <td> <a href="getdoc.php?doc=3081"  class=""><img src="../../images/icones/pdf.png" width="32" height="32" alt="icone" class="">
+</a><a href= '../../../../data/chansons/715/Paparazzi-v1.pdf' target='_blank'> Paparazzi-v1.pdf</a> 
+<td>178 ko  </td><td> -  publié le 03/07/2025 </td><td> &nbsp; - 45 vues </td></tr>
+</table><span class="pagination-container" style="margin-left: 15px; font-family: sans-serif;"><span style="margin-right: 10px; font-weight: bold;">Pages :</span> <strong style="background: #337ab7; color: #fff; padding: 2px 8px; border-radius: 3px; margin: 0 2px;">1</strong><a href="/php/document/documents_voir.php?smoke_test=1&amp;page=2"  title="Aller à la page 2"> 2 </a> <a href="/php/document/documents_voir.php?smoke_test=1&amp;page=3"  title="Aller à la page 3"> 3 </a>  ... <a href="/php/document/documents_voir.php?smoke_test=1&amp;page=49"  title="Aller à la page 49"> 49 </a>  <a href="/php/document/documents_voir.php?smoke_test=1&amp;page=2"  title="Page suivante">Suiv. &rsaquo;</a> <a href="/php/document/documents_voir.php?smoke_test=1&amp;page=49"  title="Dernière page">Der. &raquo;</a></span>   <footer class="site-footer">
+    <div class="container">
+        <div class="footer-content">
+                        <a href="http://www.top5.re" target="_blank">Site web</a> |
+            <a href="https://padlet.com/top5asso/top5-atelier-d-butant-interm-diaire-wwiy3x9lz44a6vyx">padlet </a>   |
+            <a href="http://partoches.canopee-musique.fr" target="_blank">partoches</a>
+            <a href="https://www.youtube.com/channel/UCFKyqYcs5cnML-EgPgYmwdg" target="_blank" title="youtube">
+                &nbsp;
+                <img src="https://cdn3.iconfinder.com/data/icons/peelicons-vol-1/50/YouTube-128.png" width="30" height="30" alt="youtube">
+            </a>
+            &nbsp;
+            <a href="https://twitter.com/top5ukeclub" target="_blank" title="twitter">
+                <img src="https://cdn3.iconfinder.com/data/icons/peelicons-vol-1/50/Twitter-128.png" width="30" height="30" alt="twitter">
+            </a>       
+        </div>
+        
+        <div class="footer-legal">
+            <a href="../../html/mentionsLegales.html" target="_blank">Mentions légales</a>
+            <span class="separator">|</span>
+            <a href="../../html/merci.html" target="_blank">Mercis</a>
+            <span class="separator">|</span>
+            <span>&copy; 2018 - 2026 Partoches Canopée</span>
+        </div>
+    </div>
+</footer>
+
+<script src="../../js/precise-star-rating.js"></script>
+</body>
+</html>

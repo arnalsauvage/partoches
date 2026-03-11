@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__DIR__) . "/lib/utilssi.php";
+$pasDeMenu = true;
 require_once "../navigation/menu.php";
 require_once "Songbook.php";
 require_once "../document/Document.php";
@@ -99,5 +100,9 @@ HTML;
 $html .= "  </div>"; // .portfolio-grid
 $html .= "</div>"; // .container
 
+$headHtml = envoieHead("Galerie des Songbooks", "../../css/index.css");
 $html .= envoieFooter();
+
+echo $headHtml;
+echo $MENU_HTML;
 echo $html;
