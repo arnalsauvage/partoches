@@ -19,7 +19,7 @@ Ces fichiers génèrent une page HTML entière en utilisant les fonctions `envoi
 | **Documents** | `php/document/documents_voir.php` | Liste des fichiers attachés. |
 | **Paramétrage** | `php/navigation/paramsEdit.php` | Console d'administration technique du site. |
 | **Roadbook** | `php/todo/todo_admin.php` | Liste des tâches et évolutions (Markdown). |
-| **Inspecteur Images** | `php/navigation/imagesCheck.php` | Outil de nettoyage du filesystem. |
+| **Inspecteur Images** | `php/audit/imagesCheck.php` | Outil de nettoyage du filesystem. |
 
 ## 🛠️ 2. Les Formulaires (Vues d'édition)
 Pages dédiées à la saisie et à la modification des données.

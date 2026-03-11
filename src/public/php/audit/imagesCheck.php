@@ -5,7 +5,7 @@
  */
 
 require_once dirname(__DIR__, 3) . "/autoload.php";
-require_once "menu.php";
+require_once __DIR__ . "/../navigation/menu.php";
 
 /**
  * Supprime récursivement un dossier
@@ -33,7 +33,7 @@ if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_AD
 }
 
 $db = $_SESSION['mysql'];
-$dossierChansons = "../../data/chansons/";
+$dossierChansons = __DIR__ . "/../../../data/chansons/";
 $extensionsAutorisees = ['jpg'];
 
 // --- 0. RÉCUPÉRATION DES IDS CHANSONS EXISTANTS ---

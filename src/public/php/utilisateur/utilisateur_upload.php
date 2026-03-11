@@ -1,7 +1,6 @@
 <?php
 require __DIR__ . "/../lib/utilssi.php";
 require __DIR__ . "/../document/Document.php";
-require_once __DIR__ . "/../lib/vignette.php";
 
 // On vérifie que l'utilisateur est connecté
 if (!isset ($_SESSION ['user'])) {

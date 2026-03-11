@@ -99,6 +99,8 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     $fcover = $_POST['fcover'] ?? null;
     // NOUVEAU : Récupérer le champ publication
     $fpublication = isset($_POST['fpublication']) ? 1 : 0;
+    // NOUVEAU : Récupérer le champ tags
+    $ftags = $_POST['ftags'] ?? '';
 }
 
 $chaine = "Mode  : " . $mode;
@@ -121,6 +123,8 @@ if ($mode == "INS") {
     $_chanson->setCover($fcover);
     // NOUVEAU : Définir la publication
     $_chanson->setPublication($fpublication);
+    // NOUVEAU : Définir les tags
+    $_chanson->setTags($ftags);
     $id = $_chanson->creeChansonBDD();
     $repertoire = "../". $_DOSSIER_CHANSONS . $id . "/";
     if (!file_exists($repertoire)) {
@@ -141,6 +145,8 @@ if ($mode == "MAJ") {
     $_chanson->setCover($fcover);
     // NOUVEAU : Définir la publication
     $_chanson->setPublication($fpublication);
+    // NOUVEAU : Définir les tags
+    $_chanson->setTags($ftags);
     $_chanson->creeModifieChansonBDD();
 }
 

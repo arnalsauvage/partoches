@@ -13,6 +13,7 @@ class Strum
     private int $_longueur; // nb de temps/divisions
     private string $_description;
     private int $_swing; // 1 = ternaire/swing, 0 = binaire
+    private string $_tags; // Tags : exercices, strums, chansons, atelier, sondage
 
     public function __construct()
     {
@@ -31,6 +32,7 @@ class Strum
         $this->_longueur = 8;
         $this->_description = "";
         $this->_swing = 0;
+        $this->_tags = "";
     }
 
     public function __construct1(int $id)
@@ -59,6 +61,9 @@ class Strum
 
     public function getSwing(): int { return $this->_swing; }
     public function setSwing(int $swing): void { $this->_swing = $swing; }
+
+    public function getTags(): string { return $this->_tags; }
+    public function setTags(string $tags): void { $this->_tags = $tags; }
 
     /**
      * Charge les données depuis la BDD
@@ -90,6 +95,7 @@ class Strum
         $this->_strum = (string)($row['strum'] ?? "");
         $this->_description = (string)($row['description'] ?? "");
         $this->_swing = (int)($row['swing'] ?? 0);
+        $this->_tags = (string)($row['tags'] ?? "");
     }
 
     /**
@@ -100,16 +106,16 @@ class Strum
         $db = $_SESSION[self::MYSQL];
         
         if ($this->_id == 0) {
-            $maRequete = "INSERT INTO strum (unite, longueur, strum, description, swing) VALUES (?, ?, ?, ?, ?)";
+            $maRequete = "INSERT INTO strum (unite, longueur, strum, description, swing, tags) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $db->prepare($maRequete);
-            $stmt->bind_param("iissi", $this->_unite, $this->_longueur, $this->_strum, $this->_description, $this->_swing);
+            $stmt->bind_param("iissss", $this->_unite, $this->_longueur, $this->_strum, $this->_description, $this->_swing, $this->_tags);
             if ($stmt->execute()) {
                 $this->_id = $db->insert_id;
             }
         } else {
-            $maRequete = "UPDATE strum SET unite=?, longueur=?, strum=?, description=?, swing=? WHERE id=?";
+            $maRequete = "UPDATE strum SET unite=?, longueur=?, strum=?, description=?, swing=?, tags=? WHERE id=?";
             $stmt = $db->prepare($maRequete);
-            $stmt->bind_param("iissii", $this->_unite, $this->_longueur, $this->_strum, $this->_description, $this->_swing, $this->_id);
+            $stmt->bind_param("iissssi", $this->_unite, $this->_longueur, $this->_strum, $this->_description, $this->_swing, $this->_tags, $this->_id);
             $stmt->execute();
         }
         return $this->_id;
@@ -160,6 +166,17 @@ class Strum
 
         $badgeSwing = $this->_swing ? "<span class='label label-warning' style='background-color: #f39c12; margin-left: 5px;'>SWING</span>" : "";
 
+        $tagsHtml = "";
+        if (!empty($this->_tags)) {
+            $tagsArray = explode(",", $this->_tags);
+            foreach ($tagsArray as $tag) {
+                $tag = trim($tag);
+                if (!empty($tag)) {
+                    $tagsHtml .= "<span class='label label-default' style='margin-right: 3px; background-color: #9e8d8a;'>#$tag</span> ";
+                }
+            }
+        }
+
         $html = "
         <div class='col-sm-6 col-md-4 col-lg-3'>
             <div class='thumbnail strum-card'>
@@ -175,6 +192,9 @@ class Strum
                             $count <i class='glyphicon glyphicon-music'></i>
                         </button>
                     </div>
+                    <div style='margin-bottom: 15px; height: 20px; overflow: hidden;'>
+                        $tagsHtml
+                    </div>
                     
                     <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
                         <a title='Ouvrir dans la Boîte à Strum' href='$urlBoiteAstrum?strum=$strumDisplay$swingParam' style='text-decoration: none;'>
@@ -183,10 +203,10 @@ class Strum
                         <div class='btn-group'>";
         
         if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
-            $html .= " <a href='strum_form.php?id=$id' class='btn btn-xs btn-primary' title='Editer'><i class='glyphicon glyphicon-pencil'></i></a>";
+            $html .= " <a href='strum_form.php?id=$id' class='btn btn-sm btn-primary' title='Editer' style='margin-right: 5px;'><i class='glyphicon glyphicon-pencil'></i></a>";
         }
         if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
-            $html .= " <a href='strum_post.php?id=$id&mode=SUPPR' class='btn btn-xs btn-danger' title='Supprimer' onclick='return confirm(\"Supprimer ce strum ?\")'><i class='glyphicon glyphicon-trash'></i></a>";
+            $html .= " <a href='strum_post.php?id=$id&mode=SUPPR' class='btn btn-sm btn-danger' title='Supprimer' onclick='return confirm(\"Supprimer ce strum ?\")'><i class='glyphicon glyphicon-trash'></i></a>";
         }
 
         $html .= "      </div>

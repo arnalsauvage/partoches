@@ -106,9 +106,18 @@ $contenuHtml .= FIN_DIV;
 // 1. ENTÊTE
 $contenuHtml .= DIV_ROW;
 
-// Colonne Gauche : Titre, Badges, Barre d'outils
 $contenuHtml .= "<section class='col-sm-8'>";
-$contenuHtml .= "  <h2 style='margin-top:0;'>" . htmlentities($_chanson->getNom());
+$tagsHtml = "";
+if (!empty($_chanson->getTags())) {
+    $tagsArray = explode(",", $_chanson->getTags());
+    foreach ($tagsArray as $tag) {
+        $tag = trim($tag);
+        if (!empty($tag)) {
+            $tagsHtml .= "<span class='label label-default' style='margin-left: 5px; background-color: #9e8d8a; font-size: 0.4em; vertical-align: middle;'>#$tag</span>";
+        }
+    }
+}
+$contenuHtml .= "  <h2 style='margin-top:0;'>" . htmlentities($_chanson->getNom()) . $tagsHtml;
 // Bouton Copier URL
 $contenuHtml .= "    <button class='btn btn-xs btn-link' onclick='copyUrlToClipboard()' title='Copier le lien'>
                         <i class='glyphicon glyphicon-link'></i>
@@ -211,28 +220,62 @@ if (!empty($documents)) {
 
 // 3. MÉDIAS (Audio & Vidéo)
 $sectionMedias = "";
+$hasMedias = false;
+$isGuest = (!isset($_SESSION['user']) || $_SESSION['user'] === 'invite');
+
 if (!empty($documents)) {
     foreach ($documents as $ligne) {
         $extension = strtolower(substr(strrchr($ligne[1], '.'), 1));
         $fichierSec = substr($ligne[1], 0, strrpos($ligne[1], '.'));
         $urlDoc = lienUrlAffichageDocument($ligne[0]);
 
-        if (in_array($extension, ['mp3', 'm4a', 'aac'])) {
-            $typeAudio = ($extension === "aac") ? "audio/mpeg" : "audio/mp3";
-            $sectionMedias .= "<div class='col-xs-12 col-sm-6 col-md-4 text-center' style='margin-bottom: 20px;'>";
-            $sectionMedias .= "  <div class='well well-sm'><strong>" . htmlentities($fichierSec) . "</strong><br>";
-            $sectionMedias .= "  <audio controls style='width:100%; margin-top:10px;'><source src='$urlDoc' type='$typeAudio'></audio></div>";
-            $sectionMedias .= "</div>";
-        } elseif ($extension === "mp4") {
-            $sectionMedias .= "<div class='col-xs-12 col-sm-6 col-md-4 text-center' style='margin-bottom: 20px;'>";
-            $sectionMedias .= "  <div class='well well-sm'><strong>" . htmlentities($fichierSec) . "</strong><br>";
-            $sectionMedias .= "  <video width='100%' controls style='margin-top:10px;'><source src='$urlDoc' type='video/ogg'></video></div>";
-            $sectionMedias .= "</div>";
+        if (in_array($extension, ['mp3', 'm4a', 'aac', 'mp4'])) {
+            $hasMedias = true;
+            if ($isGuest) continue; // On ne prépare pas le HTML si c'est un invité
+
+            if (in_array($extension, ['mp3', 'm4a', 'aac'])) {
+                $typeAudio = ($extension === "aac") ? "audio/mpeg" : "audio/mp3";
+                $sectionMedias .= "<div class='col-xs-12 col-sm-6 col-md-4 text-center' style='margin-bottom: 20px;'>";
+                $sectionMedias .= "  <div class='well well-sm'><strong>" . htmlentities($fichierSec) . "</strong><br>";
+                $sectionMedias .= "  <audio controls style='width:100%; margin-top:10px;'><source src='$urlDoc' type='$typeAudio'></audio></div>";
+                $sectionMedias .= "</div>";
+            } elseif ($extension === "mp4") {
+                $sectionMedias .= "<div class='col-xs-12 col-sm-6 col-md-4 text-center' style='margin-bottom: 20px;'>";
+                $sectionMedias .= "  <div class='well well-sm'><strong>" . htmlentities($fichierSec) . "</strong><br>";
+                $sectionMedias .= "  <video width='100%' controls style='margin-top:10px;'><source src='$urlDoc' type='video/ogg'></video></div>";
+                $sectionMedias .= "</div>";
+            }
         }
     }
 }
-if (!empty($sectionMedias)) {
-    $contenuHtml .= "<hr><section class='row'>$sectionMedias</section>";
+
+if ($hasMedias) {
+    if ($isGuest) {
+        $contenuHtml .= <<<HTML
+        <hr>
+        <div class="well text-center" style="background: #F5F5DC; border: 2px dashed #D2B48C; padding: 30px;">
+            <h3 style="color: #8B4513;"><i class="glyphicon glyphicon-lock"></i> Contenu réservé aux membres</h3>
+            <p style="font-size: 16px; margin: 15px 0;">Il y a des vidéos ou des audios associés à cette chanson, mais vous devez vous connecter pour les voir !</p>
+            <div style="margin-top: 20px;">
+                <a href="#" id="ouvrirLoginMention" class="btn btn-primary btn-lg" style="border-radius: 25px; font-weight: bold;">
+                    <i class="glyphicon glyphicon-log-in"></i> SE CONNECTER
+                </a>
+                <p style="margin-top: 15px;"><small>Pas encore de compte ? <a href="../utilisateur/utilisateur_form.php">Créez un compte gratuitement !</a></small></p>
+            </div>
+        </div>
+        <script>
+            $(function() {
+                $('#ouvrirLoginMention').on('click', function(e) {
+                    e.preventDefault();
+                    $('.contenu_popup').fadeIn(300);
+                    $('#login').focus();
+                });
+            });
+        </script>
+HTML;
+    } elseif (!empty($sectionMedias)) {
+        $contenuHtml .= "<hr><section class='row'>$sectionMedias</section>";
+    }
 }
 
 

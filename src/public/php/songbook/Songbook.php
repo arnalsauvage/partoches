@@ -25,6 +25,7 @@ class Songbook
     private int $_hits;
     private int $_idUser;
     private int $_type; // 1: Anthologie, 2: Concert, 3: Thème
+    private string $_tags; // Tags : exercices, strums, chansons, atelier, sondage
 
     public function __construct()
     {
@@ -45,6 +46,7 @@ class Songbook
         $this->setHits(0);
         $this->setIdUser($_SESSION['id'] ?? 1);
         $this->setType(1);
+        $this->setTags("");
     }
 
     public function __construct1(int $id)
@@ -77,6 +79,9 @@ class Songbook
 
     public function getType(): int { return $this->_type; }
     public function setType(int $type): void { $this->_type = $type; }
+
+    public function getTags(): string { return $this->_tags; }
+    public function setTags(string $tags): void { $this->_tags = $tags; }
 
     /**
      * Retourne le libellé du type de songbook
@@ -118,6 +123,7 @@ class Songbook
         $this->_hits = (int)$ligne[5];
         $this->_idUser = (int)$ligne[6];
         $this->_type = (int)($ligne[7] ?? 1);
+        $this->_tags = (string)($ligne[8] ?? "");
     }
 
     /**
@@ -130,16 +136,17 @@ class Songbook
         $desc = $db->real_escape_string($this->_description);
         $date = convertitDateJJMMAAAAversMySql($this->_date);
         $image = $db->real_escape_string($this->_image);
+        $tags = $db->real_escape_string($this->_tags);
 
         if ($this->_id == 0) {
-            $maRequete = sprintf("INSERT INTO songbook (nom, description, date, image, hits, idUser, type) 
-                VALUES ('%s', '%s', '%s', '%s', %d, %d, %d)",
-                $nom, $desc, $date, $image, $this->_hits, $this->_idUser, $this->_type);
+            $maRequete = sprintf("INSERT INTO songbook (nom, description, date, image, hits, idUser, type, tags) 
+                VALUES ('%s', '%s', '%s', '%s', %d, %d, %d, '%s')",
+                $nom, $desc, $date, $image, $this->_hits, $this->_idUser, $this->_type, $tags);
             $db->query($maRequete) or die($db->error);
             $this->_id = $db->insert_id;
         } else {
-            $maRequete = sprintf("UPDATE songbook SET nom='%s', description='%s', date='%s', image='%s', hits=%d, type=%d WHERE id=%d",
-                $nom, $desc, $date, $image, $this->_hits, $this->_type, $this->_id);
+            $maRequete = sprintf("UPDATE songbook SET nom='%s', description='%s', date='%s', image='%s', hits=%d, type=%d, tags='%s' WHERE id=%d",
+                $nom, $desc, $date, $image, $this->_hits, $this->_type, $tags, $this->_id);
             $db->query($maRequete) or die($db->error);
         }
         return $this->_id;
@@ -180,9 +187,20 @@ class Songbook
             default => "#777"
         };
 
+        $tagsHtml = "";
+        if (!empty($this->_tags)) {
+            $tagsArray = explode(",", $this->_tags);
+            foreach ($tagsArray as $tag) {
+                $tag = trim($tag);
+                if (!empty($tag)) {
+                    $tagsHtml .= "<span class='label label-default' style='margin-right: 3px; background-color: #9e8d8a;'>#$tag</span> ";
+                }
+            }
+        }
+
         $html = "
         <div class='col-sm-6 col-md-4 col-lg-3' style='margin-bottom: 30px;'>
-            <div class='thumbnail shadow-hover' style='height: 450px; width: 100%; max-width: 280px; margin: 0 auto; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s ease; padding: 0; border: 1px solid #ddd; background-color: white;'>
+            <div class='thumbnail shadow-hover' style='height: 480px; width: 100%; max-width: 280px; margin: 0 auto; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s ease; padding: 0; border: 1px solid #ddd; background-color: white;'>
                 <div style='height: 280px; overflow: hidden; background-color: #f9f9f9; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #eee; position: relative;'>
                     $imgHtml
                     <span class='label' style='position: absolute; bottom: 10px; right: 10px; background-color: $badgeColor; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);'>$typeLabel</span>
@@ -191,6 +209,10 @@ class Songbook
                     <h4 style='margin-top: 5px; margin-bottom: 8px; color: $c_marron_fonce; height: 40px; overflow: hidden; font-weight: bold; font-size: 16px;'>$nom</h4>
                     <p style='height: 35px; overflow: hidden; font-size: 11px; color: #888; margin-bottom: 10px;'>$desc</p>
                     
+                    <div style='margin-bottom: 10px; height: 20px; overflow: hidden;'>
+                        $tagsHtml
+                    </div>
+
                     <div style='display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f5f5f5; padding-top: 10px;'>
                         <span style='font-size: 10px; color: #bbb;'><i class='glyphicon glyphicon-calendar'></i> $date</span>
                         <span style='font-size: 10px; color: #bbb;'><i class='glyphicon glyphicon-eye-open'></i> $hits</span>
@@ -274,7 +296,8 @@ function chercheSongbook($id): array
     // On simule l'ancien retour (tableau indexé)
     return [
         $sb->getId(), $sb->getNom(), $sb->getDescription(), $sb->getDate(), 
-        $sb->getImage(), $sb->getHits(), $sb->getIdUser(), $sb->getType()
+        $sb->getImage(), $sb->getHits(), $sb->getIdUser(), $sb->getType(),
+        $sb->getTags()
     ];
 }
 
@@ -289,7 +312,7 @@ function chercheSongbookParLeNom($nom): array
     return [];
 }
 
-function creeSongbook($nom, $description, $date, $image, $hits, $type)
+function creeSongbook($nom, $description, $date, $image, $hits, $type, $tags = "")
 {
     $sb = new Songbook();
     $sb->setNom((string)($nom ?? ''));
@@ -298,10 +321,11 @@ function creeSongbook($nom, $description, $date, $image, $hits, $type)
     $sb->setImage((string)($image ?? ''));
     $sb->setHits((int)($hits ?? 0));
     $sb->setType((int)($type ?? 1));
+    $sb->setTags((string)($tags ?? ""));
     return $sb->enregistreBDD();
 }
 
-function modifiesSongbook($id, $nom, $description, $date, $image, $hits, $type)
+function modifiesSongbook($id, $nom, $description, $date, $image, $hits, $type, $tags = "")
 {
     $sb = new Songbook((int)$id);
     $sb->setNom((string)($nom ?? ''));
@@ -310,6 +334,7 @@ function modifiesSongbook($id, $nom, $description, $date, $image, $hits, $type)
     $sb->setImage((string)($image ?? ''));
     $sb->setHits((int)($hits ?? 0));
     $sb->setType((int)($type ?? 1));
+    $sb->setTags((string)($tags ?? ""));
     return $sb->enregistreBDD();
 }
 

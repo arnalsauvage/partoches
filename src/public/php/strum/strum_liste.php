@@ -25,6 +25,19 @@ $html .= <<<HTML
                 <span class="glyphicon glyphicon-music"></span> RÉPERTOIRE DES STRUMS
             </h1>
             <p class="text-muted">$nbStrums RYTHMES DISPONIBLES</p>
+HTML;
+
+if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
+    $html .= <<<HTML
+            <div style="margin-top: 20px;">
+                <a href="strum_form.php" class="btn btn-primary btn-lg" style="border-radius: 30px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                    <i class="glyphicon glyphicon-plus"></i> AJOUTER UN STRUM
+                </a>
+            </div>
+HTML;
+}
+
+$html .= <<<HTML
         </div>
     </div>
 

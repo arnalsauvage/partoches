@@ -170,7 +170,7 @@ echo $alerts;
     <h1><i class="glyphicon glyphicon-cog"></i> Paramétrage</h1>
     <div class="btn-group-django">
         <a href='../todo/todo_admin.php' class='btn-dj btn-dj-primary'><i class="glyphicon glyphicon-list-alt"></i> Roadbook</a>
-        <a href='imagesCheck.php' class='btn-dj btn-dj-info'><i class="glyphicon glyphicon-eye-open"></i> Images</a>
+        <a href='../audit/imagesCheck.php' class='btn-dj btn-dj-info'><i class="glyphicon glyphicon-eye-open"></i> Images</a>
         <a href='../media/listeMedias.php' class='btn-dj btn-dj-default'><i class="glyphicon glyphicon-picture"></i> Médias</a>
     </div>
 </div>
@@ -229,7 +229,9 @@ echo $alerts;
             <div class="row">
                 <div class="col-sm-4">
                     <div class="list-group">
-                        <?php foreach (glob(__DIR__ . "/../../../data/logs/*.{txt,htm,log,html}", GLOB_BRACE) as $l) {
+                        <?php 
+                        $logPath = __DIR__ . "/../../../data/logs/*.{txt,htm,log,html}";
+                        foreach (glob($logPath, GLOB_BRACE) as $l) {
                             $b = basename($l); echo "<a href='#' class='list-group-item item-log-dj' data-file='$b'>$b</a>";
                         } ?>
                     </div>
@@ -256,7 +258,7 @@ echo $alerts;
 #django-config-page { width: 100% !important; max-width: 1200px !important; margin: 20px auto !important; position: static !important; }
 .form-dj-reset { background: #f9f9f9 !important; border: 1px solid #ddd !important; width: 100% !important; position: static !important; margin: 0 !important; padding: 20px !important; box-sizing: border-box !important; }
 .header-django { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.tabs-django { display: flex; list-style: none; padding: 0; margin: 0; border-bottom: 2px solid #D2B48C; }
+.tabs-django { display: flex; list-style: none; padding: 0; margin: 0; border-bottom: 2px solid #D2B48C; flex-wrap: wrap; }
 .tab-dj { padding: 10px 20px; cursor: pointer; border: 1px solid transparent; border-bottom: none; margin-bottom: -2px; font-weight: bold; color: #8B4513; }
 .tab-dj.active { background: #fff; border-color: #D2B48C; border-top: 3px solid #8B4513; color: #2b1d1a; }
 .content-django { background: #fff; border: 1px solid #D2B48C; border-top: none; padding: 20px; min-height: 400px; }
@@ -269,12 +271,24 @@ echo $alerts;
 .input-django { display: block !important; width: 100% !important; padding: 8px !important; border: 1px solid #ccc !important; border-radius: 4px !important; box-sizing: border-box !important; background: #fff !important; color: #333 !important; }
 .input-group-django { position: relative; display: flex; }
 .btn-toggle-pwd { position: absolute; right: 5px; top: 5px; border: none; background: transparent; cursor: pointer; }
-.btn-dj { padding: 8px 15px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; text-decoration: none; }
+.btn-dj { padding: 8px 15px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; text-decoration: none; display: inline-block; margin-bottom: 5px; }
 .btn-dj-primary { background: #8B4513; color: #fff; }
 .btn-dj-info { background: #D2B48C; color: #2b1d1a; }
 .footer-save-dj { margin-top: 20px; padding: 20px; background: #F5F5DC; border: 1px solid #D2B48C; border-radius: 8px; }
 .spin { animation: spin 2s infinite linear; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }
+
+/* Mobile Adaptations */
+@media (max-width: 768px) {
+    .header-django { flex-direction: column; align-items: stretch; text-align: center; }
+    .header-django h1 { margin-bottom: 15px; font-size: 24px; }
+    .btn-group-django { display: flex; flex-direction: column; gap: 5px; }
+    .btn-dj { width: 100%; margin: 0; text-align: left; }
+    .tabs-django { justify-content: space-around; }
+    .tab-dj { flex-grow: 1; text-align: center; padding: 10px 5px; font-size: 12px; }
+    .section-dj { padding: 10px; }
+    .input-django { font-size: 16px; }
+}
 
 /* Fix styles Footer Editor */
 .textarea-footer-dj {

@@ -58,7 +58,7 @@ if ($listeSongbooks) {
                 $docInfo = chercheDocument($lien[1]); // [6] est l'idChanson
                 $idChanson = $docInfo[6];
                 if (isset($titresChansons[$idChanson])) {
-                    $nomChanson = htmlspecialchars(limiteLongueur($titresChansons[$idChanson], 25));
+                    $nomChanson = htmlspecialchars(limiteLongueur($titresChansons[$idChanson], 50));
                     $trackListHtml .= <<<HTML
                     <li class="songbook-track-item">
                         <a href="../chanson/chanson_voir.php?id=$idChanson" title="Voir la fiche">

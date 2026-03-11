@@ -31,6 +31,7 @@ if ($mode == "SUPPR" || $mode == "DEL") {
 if ($mode == "INS" || $mode == "MAJ" || $mode == "NEW" || $mode == "UPDATE") {
     $strumPattern = $_POST['strum'] ?? '';
     $description = $_POST['description'] ?? '';
+    $tags = $_POST['tags'] ?? '';
     $unite = (int)($_POST['unite'] ?? 8);
     $longueur = (int)($_POST['longueur'] ?? 8);
     $swing = (int)($_POST['swing'] ?? 0);
@@ -41,6 +42,7 @@ if ($mode == "INS" || $mode == "MAJ" || $mode == "NEW" || $mode == "UPDATE") {
     $s = new Strum($id);
     $s->setStrum($strumPattern);
     $s->setDescription($description);
+    $s->setTags($tags);
     $s->setUnite($unite);
     $s->setLongueur($longueur);
     $s->setSwing($swing);

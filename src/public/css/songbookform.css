@@ -18,15 +18,57 @@
 }
 
 .sb-well-custom {
-    background: #fcfaf2;
+    background: #fdfaf5;
     border: 1px solid #D2B48C;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.sb-well-custom .control-label {
+    color: #8B4513;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    margin-top: 5px;
+}
+
+.sb-well-custom .form-control {
+    border: 1px solid #D2B48C;
+    border-radius: 8px;
+    padding: 10px 15px;
+    height: auto;
+    font-size: 15px;
+    color: #2b1d1a;
+    transition: all 0.2s;
+}
+
+.sb-well-custom .form-control:focus {
+    border-color: #8B4513;
+    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+    outline: none;
 }
 
 .sb-btn-save {
     background: #8B4513;
     border: none;
     font-weight: bold;
-    padding: 10px 30px;
+    padding: 12px 40px;
+    border-radius: 30px;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+}
+
+.sb-btn-save:hover {
+    background: #2b1d1a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+.sb-btn-save i {
+    margin-right: 8px;
 }
 
 .sb-section-title {

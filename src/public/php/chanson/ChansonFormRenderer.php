@@ -25,6 +25,7 @@ class ChansonFormRenderer
         $datePub = dateMysqlVersTexte($_chanson->getDatePub());
         $hits = $_chanson->getHits();
         $idUser = $_chanson->getIdUser();
+        $tags = htmlspecialchars($_chanson->getTags(), ENT_QUOTES);
         
         $selBinaire = ($_chanson->getPulsation() == "binaire") ? "selected" : "";
         $selTernaire = ($_chanson->getPulsation() == "ternaire") ? "selected" : "";
@@ -89,6 +90,10 @@ class ChansonFormRenderer
             <div class="form-group">
                 <label class="col-sm-3 control-label">Propriétaire :</label>
                 <div class="col-sm-8">$selectUser</div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Tags :</label>
+                <div class="col-sm-8"><input class="form-control" type="text" name="ftags" value="$tags" placeholder="exercices, strums, chansons, atelier, sondage..."></div>
             </div>
             <div class="form-group" style="margin-top: 30px;">
                 <div class="col-sm-offset-3 col-sm-8">

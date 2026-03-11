@@ -1,18 +1,26 @@
 # Résumé des interventions Django (Mercredi 11 Mars 2026)
 
-## Bug : Titre du site manquant ou incorrect sur les sous-pages
-- Résolu par l'utilisation de `__DIR__` dans `params.php` et l'ajout de fallbacks.
+## Bug Fixes & Stabilité
+- **Upload Utilisateur** : Suppression de l'inclusion de `vignette.php` (inexistant) dans `utilisateur_upload.php`. L'upload fonctionne désormais en prod.
+- **Paramétrage Prod** : Sécurisation du chemin des logs (`__DIR__`) dans `paramsEdit.php`. Les logs s'affichent correctement.
+- **Logo Twitter** : Correction du lien cassé et ajout d'une détection automatique des réseaux sociaux (Twitter, FB, Insta) dans la galerie des liens.
 
-## Audit & Refactoring Global : Chemins Relatifs Fragiles
-**Problème :** 
-- Environ 305 occurrences de `../` dans 152 fichiers PHP de `src/public/php/` rendaient l'application fragile aux inclusions distantes et aux déplacements de fichiers.
+## Améliorations UX & UI (Mobile First)
+- **Strums** : Bouton "Ajouter un strum" rétabli pour les admins. Agrandissement des boutons de gestion (btn-sm) et espacement amélioré.
+- **Admin Mobile** : Correction du CSS de `paramsEdit.php` pour éviter la superposition des icônes et le débordement des onglets sur smartphone.
+- **Navbar Mobile** : Optimisation de la barre de navigation pour éviter que le menu burger ne se superpose au titre/logo sur petit écran.
+- **Formulaire Songbook** : Modernisation visuelle complète (Palette Canopée, ombres, focus).
+- **Portfolio Songbook** : Extension de la limite d'affichage des titres de chansons (25 -> 50 caractères).
 
-**Action corrective (Opération "Chemins de Fer") :**
-- Refactorisation massive de tous les dossiers : `chanson`, `document`, `liens`, `media`, `navigation`, `note`, `playlist`, `songbook`, `strum`, `todo`, `utilisateur`.
-- Transformation des `require`, `include` et accès fichiers (`file_exists`, `fopen`, etc.) pour utiliser `__DIR__ . "/../..."`.
-- Suppression des parenthèses superflues sur les instructions d'inclusion.
-- Protection des chemins clients (URLs HTML et redirections `header`) qui sont restés relatifs.
+## Nouvelles Fonctionnalités (Roadbook)
+- **Incitation Connexion** : Sur `chanson_voir.php`, les médias (audio/vidéo) sont masqués pour les non-connectés au profit d'une mention incitative avec accès direct au login.
+- **Système de TAGS (Exercices, Strums, Atelier...)** :
+    - Ajout de la colonne `tags` en BDD (chanson, strum, songbook).
+    - Implémentation complète dans les classes PHP (getters/setters, persistance).
+    - Ajout du champ "Tags" dans tous les formulaires d'édition.
+    - Affichage automatique de BADGES (labels) sur les cartes et les vues détaillées.
 
-**Résultat :**
-- L'application est désormais structurellement robuste. Les inclusions fonctionnent quel que soit le point d'entrée ou le niveau d'imbrication.
-- Aucun bug introduit (vérifié par les smoke-tests PHPUnit).
+## Maintenance Technique
+- **Audit Images** : `imagesCheck.php` déplacé dans `src/public/php/audit/` pour une meilleure organisation. Chemins sécurisés via `__DIR__`.
+- **Refactoring Global** : Sécurisation de 152 fichiers PHP (chemins absolus via `__DIR__`).
+- **Tests Unitaires** : Ajout de `DocumentTest.php` et `FichierIniTest.php` (validés via PHPUnit).

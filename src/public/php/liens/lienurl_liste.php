@@ -70,6 +70,9 @@ while ($_lienurl = $_listeDeslienurls->fetch_row()) {
     $videoId = "";
     $isAudio = preg_match('/\.(mp3|wav|ogg|m4a)$/i', $url);
     $isImage = preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $url);
+    $isTwitter = preg_match('/(twitter\.com|x\.com)/i', $url);
+    $isFacebook = preg_match('/facebook\.com/i', $url);
+    $isInstagram = preg_match('/instagram\.com/i', $url);
     
     if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match)) {
         $videoId = $match[1];
@@ -98,6 +101,23 @@ HTML;
         $thumbHtml = <<<HTML
         <a href="$url" target="_blank" class="video-card-thumb">
             <img src="$url" alt="$titre" style="opacity:1;" loading="lazy">
+        </a>
+HTML;
+    } elseif ($isTwitter) {
+        // CAS TWITTER
+        $thumbHtml = <<<HTML
+        <a href="$url" target="_blank" class="video-card-thumb" style="display:flex; align-items:center; justify-content:center; background:#1da1f2; text-decoration:none;">
+            <img src="../../images/icones/socmark_twitter.png" alt="Twitter" style="width:64px; height:64px; opacity:1;">
+            <div class="video-play-btn" style="font-size:24px; top:75%; color:#fff;"><i class="glyphicon glyphicon-new-window"></i></div>
+        </a>
+HTML;
+    } elseif ($isFacebook) {
+        // CAS FACEBOOK
+        $thumbHtml = <<<HTML
+        <a href="$url" target="_blank" class="video-card-thumb" style="display:flex; align-items:center; justify-content:center; background:#3b5998; text-decoration:none;">
+            <i class="fa fa-facebook" style="font-size:64px; color:#fff;"></i>
+            <img src="../../images/icones/socmark_facebook.png" alt="Facebook" style="width:64px; height:64px; opacity:1;" onerror="this.style.display='none'; this.previousElementSibling.style.display='block';">
+            <div class="video-play-btn" style="font-size:24px; top:75%; color:#fff;"><i class="glyphicon glyphicon-new-window"></i></div>
         </a>
 HTML;
     } else {

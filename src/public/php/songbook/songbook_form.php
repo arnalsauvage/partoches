@@ -171,6 +171,14 @@ $html .= <<<HTML
                                 </div>
                             </div>
                         </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="ftags" class="col-sm-4 control-label">Tags :</label>
+                                <div class="col-sm-8">
+                                    <input type="text" id="ftags" name="ftags" class="form-control" value="{$sb->getTags()}" placeholder="exercices, atelier...">
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
