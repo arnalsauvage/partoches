@@ -1,189 +1,273 @@
 <?php
-// On utilise la librairie fpdf http://www.fpdf.org/
-// ainsi que la librairie fpdi pour importer des pdf existants https://www.setasign.com/products/fpdi/manual/
+/**
+ * Gestion de la génération des Songbooks en PDF.
+ * Utilise FPDF et FPDI.
+ */
 
-const ARIAL = 'Arial';
-const IMAGES_ICONES_TOP_5_PNG = '../../images/icones/top5.png';
-require_once('fpdf/fpdf.php');
-require_once('fpdi/autoload.php');
-require_once('fpdi/Fpdi.php');
+require_once 'fpdf/fpdf.php';
+require_once 'fpdi/autoload.php';
+require_once 'fpdi/Fpdi.php';
+
 use setasign\Fpdi\Fpdi;
 
-const DOSSIER_CHANSONS = "../data/chansons/";
-
-class SongBookPDF extends FPDI
+/**
+ * Classe de rendu PDF personnalisée pour les Songbooks.
+ * Responsabilité : Dessiner les éléments graphiques du document.
+ */
+class SongbookPdf extends Fpdi
 {
-    const ARIAL = 'Arial';
-    public $_nombrePages;
+    public const FONT_ARIAL = 'Arial';
+    public const LOGO_DEFAULT = '../../images/icones/top5.png';
 
-// Page header
-    function Header()
+    public function __construct()
     {
-/*
-        // Arial bold 15
-        $this->SetFont('Arial','B',15);
-        // Move to the right
-        $this->Cell(80);
-        // Title
-        $this->Cell(30,10,'Songbook ',1,0,'C');
-        // Line break
-        $this->Ln(20);
-*/
+        parent::__construct();
+        $this->SetAutoPageBreak(true, 15);
     }
 
-// Page footer
-    function Footer()
+    /**
+     * Pied de page automatique
+     */
+    public function Footer(): void
     {
-        if ($this->PageNo() >2) {
-            // Position at 1.5 cm from bottom
+        if ($this->PageNo() > 2) {
             $this->SetY(-15);
-            // Arial italic 8
-            $this->SetFont(self::ARIAL, 'I', 8);
-            // Page number
+            $this->SetFont(self::FONT_ARIAL, 'I', 8);
             $this->Cell(0, 10, 'Page ' . $this->PageNo(), 0, 0, 'C');
         }
     }
-}
 
-// Ajoute le fichier pdf $file à notre $pdf
-function ajouteFichier($pdf, $file)
-{
-    $nbPage = $pdf->setSourceFile($file);
-    for ($pageEnCours = 1; $pageEnCours <= $nbPage; $pageEnCours++) {
-        $tplidx = $pdf->ImportPage($pageEnCours);
-        $size = $pdf->getTemplatesize($tplidx);
-        // echo "Size du fichier :" . $pdf->name . "size :" ;
-        // print_r($size);
-        $pdf->AddPage('P', array($size['width'], $size['height']));
-        $pdf->useTemplate($tplidx);
+    /**
+     * Ajoute une page de couverture
+     */
+    public function addCover(string $imagePath, string $title, int $version, string $date): void
+    {
+        $this->AddPage();
+        
+        if (file_exists($imagePath)) {
+            $this->Image($imagePath, 5, 5, 190, 250);
+        }
+
+        $this->SetY(260);
+        $this->SetFont(self::FONT_ARIAL, 'B', 10);
+        $this->SetTextColor(50, 50, 50);
+        $this->Cell(0, 12, utf8_decode($title) . " - v" . $version . " du " . $date, 0, 0, "C");
     }
-}
 
-// Teste la génération de pdf
-function testePdf()
-{
-    $pdf = new FPDI();
-    $pdf->AddPage();
-    $pdf->Image("songbook-Madelon-v2.png", 5, 5, 200, 287);
-    $pdf->AddPage();
-    $pdf->SetFont(ARIAL, 'B', 16);
-    $pdf->SetTextColor(50, 50, 50);
-    $pdf->Cell(0, 10, 'Sommaire', 1, 1, 'C'); // Centré
-    $pdf->Cell(10, 10, " ", 0, 1, "L");
-    $pdf->Cell(10, 10, "Chanson 1", 0, 1, "L");
-    $pdf->Cell(10, 10, "Chanson 2", 0, 1, "L");
-    ajouteFichier($pdf, "germaine.pdf");
-    ajouteFichier($pdf, "laJument.pdf");
-    $pdf->Output('compile.pdf', 'F');
-    echo "Fichier <a href='compile.pdf'>compile.pdf</a> généré à partir de Germaine et La Jument de Michao";
-}
+    /**
+     * Ajoute le sommaire au document
+     */
+    public function addTableOfContents(array $songs, string $logoPath, array $pageNumbers): void
+    {
+        $this->AddPage();
+        
+        // Titre Sommaire
+        $this->SetFont(self::FONT_ARIAL, 'B', 20);
+        $this->SetTextColor(50, 50, 50);
+        $this->Cell(30, 10, ' ', 0, 0, "C");
+        $this->Cell(150, 10, 'Sommaire', 1, 1, "C");
 
-function pdfCreeSongbook($idSongBook, $version, $intitule, $imageCouverture, $listeNomsChanson, $listeNomsFichiers, $listeIdChanson, $listeVersionsDoc)
-{
-    $pdf = new SongBookPDF();
+        // Logo du club
+        if (file_exists($logoPath)) {
+            $this->Image($logoPath, 10, 6, 20);
+        }
 
-    $version = pageDeCouverture($pdf, $version, $idSongBook, $imageCouverture, $intitule);
+        // Calcul de l'espacement
+        $lineHeight = (!empty($songs)) ? 240 / (count($songs) + 1) : 10;
+        if ($lineHeight > 40) {
+            $lineHeight = 40;
+        }
 
-    foreach ($listeNomsFichiers as $nomFichier) {
-        $idChanson = array_shift($listeIdChanson); // Pour récupérer l'id de la chanson
-        $versionDoc = array_shift($listeVersionsDoc);
-        $nomFichier = composeNomVersion($nomFichier, $versionDoc);
-        //echo ("Tentative d'ajout du fichier : ".$nomFichier . "\n<br>");
-        try {
-            ajouteFichier($pdf, "../" . DOSSIER_CHANSONS . $idChanson . "/" . $nomFichier);
-        } catch (Exception $e) {
-            echo "Le fichier $nomFichier n'a pas été traité. <br> Exception reçue : ", $e->getMessage(), "\n<br>";
+        $this->SetFont(self::FONT_ARIAL, 'B', $lineHeight);
+        $this->Cell(10, $lineHeight / 2, " ", 0, 1, "L");
+
+        foreach ($songs as $index => $songName) {
+            $pageNumber = $pageNumbers[$index] ?? '?';
+            $this->Cell(10, $lineHeight, $pageNumber . " - " . utf8_decode($songName), 0, 1, "L");
         }
     }
-    ajouteSommaire($pdf, $listeNomsChanson,  IMAGES_ICONES_TOP_5_PNG );
-    $intitule = make_alias ($intitule);
-    $intitule = str_replace("'","",$intitule);
-    $nom_pdf_songbook = "songbook_".$intitule . ".pdf";
-    $pdf->Output(DATA_SONGBOOKS . $idSongBook . "/" . $nom_pdf_songbook, 'F');
-    // Enregistrement du document en base de données
-    $taille = filesize(DATA_SONGBOOKS . $idSongBook . "/" . $nom_pdf_songbook);
-    $version = creeModifieDocument($nom_pdf_songbook, $taille, "songbook", $idSongBook);
-    $nouveauNom = composeNomVersion($nom_pdf_songbook, $version);
-    rename(DATA_SONGBOOKS . $idSongBook . "/" . $nom_pdf_songbook, DATA_SONGBOOKS . $idSongBook . "/" . $nouveauNom);
-    echo "Fichier <a href='../../data/songbooks/$idSongBook/$nouveauNom' target='_blank''>$nouveauNom</a> généré à partir de la liste des partoches";
+
+    /**
+     * Importe et ajoute les pages d'un fichier PDF existant
+     */
+    public function appendPdfFile(string $filePath): int
+    {
+        if (!file_exists($filePath)) {
+            return 0;
+        }
+
+        $pageCount = $this->setSourceFile($filePath);
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $templateId = $this->ImportPage($i);
+            $size = $this->getTemplatesize($templateId);
+            $this->AddPage('P', [$size['width'], $size['height']]);
+            $this->useTemplate($templateId);
+        }
+        
+        return (int)$pageCount;
+    }
 }
 
 /**
- * @param SongBookPDF $pdf
- * @param $version
- * @param $idSongBook
- * @param $imageCouverture
- * @param $intitule
- * @return int
+ * Service orchestrateur pour la création de Songbooks.
+ * Responsabilité : Logique métier, gestion des fichiers, base de données.
  */
-function pageDeCouverture(SongBookPDF $pdf, $version, $idSongBook, $imageCouverture, $intitule): int
+class SongbookPdfService
 {
-// On fait une couverture avec l'image
-    $pdf->AddPage();
-    $version++;
-    $dateDuJour = date("d/m/Y");
+    private string $chansonsDir;
+    private string $songbooksDir;
     
-    // On s'assure que l'image est compatible FPDF (conversion WebP -> JPG si besoin)
-    $relPath = "../data/songbooks/" . $idSongBook . "/" . $imageCouverture;
-    // Note: getCompatiblePathForPdf attend un chemin relatif par rapport à data/chansons par défaut.
-    // On va tricher un peu en lui passant le chemin complet ou en adaptant Image.php.
-    // Pour l'instant, on va juste s'assurer que si c'est un webp, on le convertit.
-    $imagePath = DATA_SONGBOOKS . $idSongBook . "/" . $imageCouverture;
-    if (str_ends_with(strtolower($imagePath), '.webp')) {
-        $jpgPath = str_replace('.webp', '-pdf.jpg', $imagePath);
-        if (!file_exists($jpgPath) || filemtime($imagePath) > filemtime($jpgPath)) {
-            $img = Image::load($imagePath);
-            Image::save($img, $jpgPath, 'jpg', 90);
-            imagedestroy($img);
-        }
-        $imagePath = $jpgPath;
+    public function __construct()
+    {
+        // On pourrait injecter ces chemins via un container
+        $this->chansonsDir = __DIR__ . "/../../data/chansons/";
+        $this->songbooksDir = __DIR__ . "/../../data/songbooks/";
     }
 
-    $pdf->Image($imagePath, 5, 5, 190, 250);
-    $pdf->SetY(260);
-    $pdf->SetFont(ARIAL, 'B', 10);
-    $pdf->SetTextColor(50, 50, 50);
-    $pdf->Cell(0, 12, $intitule . " - v" . $version . " du " . $dateDuJour, 0, 0, "C");
-    return $version;
-    // TODO : ici on pourrait déterminer le ratio de l'image pour ne pas avoir d'image trop étirée
+    /**
+     * Génère le fichier PDF final et met à jour la BDD
+     */
+    public function create(
+        int $id,
+        int $version,
+        string $title,
+        string $coverImage,
+        array $songNames,
+        array $fileNames,
+        array $songIds,
+        array $docVersions
+    ): void {
+        $pdf = new SongbookPdf();
+        $dateStr = date("d/m/Y");
+
+        // 1. Couverture
+        $coverPath = $this->songbooksDir . $id . "/" . $coverImage;
+        $coverPath = $this->ensurePdfCompatibleImage($coverPath);
+        $pdf->addCover($coverPath, $title, $version + 1, $dateStr);
+
+        // 2. Chansons
+        $currentPage = 2;
+        $startPages = [];
+        $validSongs = [];
+
+        foreach ($fileNames as $index => $fileName) {
+            $songId = $songIds[$index];
+            $docVersion = $docVersions[$index];
+            $songName = $songNames[$index];
+            
+            $fullFileName = composeNomVersion($fileName, $docVersion);
+            $filePath = $this->chansonsDir . $songId . "/" . $fullFileName;
+
+            try {
+                $pagesAdded = $pdf->appendPdfFile($filePath);
+                if ($pagesAdded > 0) {
+                    $startPages[] = $currentPage;
+                    $validSongs[] = $songName;
+                    $currentPage += $pagesAdded;
+                }
+            } catch (Exception $e) {
+                error_log("Erreur import PDF ($filePath) : " . $e->getMessage());
+            }
+        }
+
+        // 3. Sommaire
+        $pdf->addTableOfContents($validSongs, $this->getLogoPath(), $startPages);
+
+        // 4. Sortie et Enregistrement
+        $safeTitle = $this->slugify($title);
+        $tempFileName = "songbook_" . $safeTitle . ".pdf";
+        $finalPathDir = $this->songbooksDir . $id . "/";
+        
+        $pdf->Output($finalPathDir . $tempFileName, 'F');
+        
+        // Gestion BDD et renommage (logique existante)
+        $this->finalizeDocument($id, $tempFileName, $finalPathDir);
+    }
+
+    /**
+     * Logique de finalisation : BDD + renommage avec version
+     */
+    private function finalizeDocument(int $id, string $tempName, string $dir): void
+    {
+        $fileSize = filesize($dir . $tempName);
+        $newVersion = creeModifieDocument($tempName, $fileSize, "songbook", $id);
+        $finalName = composeNomVersion($tempName, $newVersion);
+        
+        if (file_exists($dir . $finalName)) {
+            unlink($dir . $finalName);
+        }
+        rename($dir . $tempName, $dir . $finalName);
+        
+        echo "Fichier <a href='../../data/songbooks/$id/$finalName' target='_blank'>$finalName</a> généré avec succès.";
+    }
+
+    /**
+     * Récupère le chemin du logo configuré
+     */
+    public function getLogoPath(): string
+    {
+        $logo = $_SESSION['logoSite'] ?? '';
+        
+        if (!$logo) {
+            $fichierIni = __DIR__ . '/../../../data/conf/params.ini';
+            if (file_exists($fichierIni)) {
+                require_once __DIR__ . '/FichierIni.php';
+                $ini = new FichierIni();
+                $ini->m_load_fichier($fichierIni);
+                $logo = $ini->m_valeur('logoSite', 'general');
+            }
+        }
+
+        if ($logo) {
+            $path = __DIR__ . '/../../images/navigation/' . $logo;
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+
+        return __DIR__ . '/../../images/icones/top5.png';
+    }
+
+    /**
+     * S'assure que l'image est compatible (convertit WebP en JPG si besoin)
+     */
+    private function ensurePdfCompatibleImage(string $path): string
+    {
+        if (str_ends_with(strtolower($path), '.webp')) {
+            $jpgPath = str_replace('.webp', '-pdf.jpg', $path);
+            if (!file_exists($jpgPath) || filemtime($path) > filemtime($jpgPath)) {
+                require_once __DIR__ . "/Image.php";
+                $img = Image::load($path);
+                Image::save($img, $jpgPath, 'jpg', 90);
+                imagedestroy($img);
+            }
+            return $jpgPath;
+        }
+        return $path;
+    }
+
+    /**
+     * Nettoyage du nom de fichier (remplace make_alias)
+     */
+    private function slugify(string $text): string
+    {
+        return make_alias($text); // On garde la fonction existante pour la cohérence des noms
+    }
 }
+
+// --- COUCHE DE COMPATIBILITÉ (Wrappers pour les anciens appels) ---
 
 /**
- * @param SongBookPDF $pdf
- * @param $listeNomsChanson
- * @param $str
+ * Ancienne fonction conservée pour ne pas casser les appels existants (ex: Songbook.php)
  */
-function ajouteSommaire(SongBookPDF $pdf, $listeNomsChanson, $str): void
+function pdfCreeSongbook($id, $version, $intitule, $image, $songs, $files, $ids, $versions): void
 {
-// On crée un sommaire
-    $pdf->AddPage();
-    // Logo
-    $pdf->SetFont(ARIAL, 'B', 20);
-    $pdf->SetTextColor(50, 50, 50);
-
-    $pdf->Cell(30, 10, ' ', 0, 0, "C"); // Centré
-    $pdf->Cell(150, 10, 'Sommaire', 1, 1, "C"); // Centré
-    // $pdf->Cell(10, 10, " ", 0, 1, "L");
-    $pdf->Image( $str , 10, 6, 20);
-
-    // On a une hauteur de 240 à répartir sur la feuille
-    $hauteur_ligne = 240 / (count($listeNomsChanson) + 1);
-    if ($hauteur_ligne > 40) {
-        $hauteur_ligne = 40;
-    }
-
-    $pdf->SetFont(ARIAL, 'B', $hauteur_ligne);
-    // On met une petite ligne vide pour faire de la place
-    $pdf->cell(10, $hauteur_ligne/2, " ", 0, 1, "L");
-    $numeroChanson = 2;
-    foreach ($listeNomsChanson as $nomChanson) {
-        $pdf->Cell(10, $hauteur_ligne, $numeroChanson++ . " - " . utf8_decode($nomChanson), 0, 1, "L");
-    }
-    /// *** FIN SOMMAIRE /////
+    $service = new SongbookPdfService();
+    $service->create($id, (int)$version, $intitule, $image, $songs, $files, $ids, $versions);
 }
 
-function make_alias($name)
-{
+// Les fonctions utilitaires restent accessibles si besoin ailleurs
+function make_alias($name) {
     $alias = mb_strtolower($name, 'UTF-8');
     $alias = mb_strtolower(trim($alias));
     $search = array(utf8_decode('@[ÈÉÊËèéêë]@i'), utf8_decode('@[ÀÁÂÃÄÅàáâãäå]@i'), utf8_decode('@[ÌÍÎÏìíîï]@i'), utf8_decode('@[ÙÚÛÜùúûü]@i'), utf8_decode('@[ÒÓÔÕÖðòóôõö]@i'), utf8_decode('@[çÇ]@i'), utf8_decode('@[Ýýÿ]@i'), utf8_decode('@[,;:!§/.?*°+\'\-]@i'), utf8_decode('@[\s]@'));
@@ -196,20 +280,3 @@ function make_alias($name)
     $alias = utf8_encode($alias);
     return $alias;
 }
-
-function testeCreeSongBook()
-{
-/*    $listeNomsChanson = ["Carmen", "Carmen Tab"];
-    $listeNomsFichiers = ["Habanera-v1.pdf", "Habanera-Tablature-v1.pdf"];
-
-    pdfCreeSongbook(28, "songbook-LesFacesA-v1.jpg", $listeNomsChanson, $listeNomsFichiers);*/
-    $listeNomsChanson = ["Chanson 1"];
-    $listeNomsFichiers = ["AfficheTop5-Rentree2019.pdf"];
-    $listeIdChanson = [154];
-    $listeVersionsDoc = [4];
-
-    pdfCreeSongbook(45, "2","Songbook test", "AuBonheurDesDames-v1.jpg", $listeNomsChanson, $listeNomsFichiers, $listeIdChanson , $listeVersionsDoc);
-}
-
-//testePdf();
-//testeCreeSongbook();

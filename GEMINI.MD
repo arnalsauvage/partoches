@@ -53,6 +53,19 @@ HTML;
 ### 🎼 Accumulation de sortie
 Ne pas multiplier les `echo`. Il est préférable d'accumuler tout le contenu de la page dans une variable unique (généralement `$html` ou `$sortie`) et de l'afficher une seule fois à la fin du script. Cela facilite la maintenance, le débuggage et permet d'éventuelles modifications de headers (redirections) avant l'envoi au navigateur.
 
+### 🛡️ Structures de contrôle (Accolades)
+Toujours utiliser des accolades `{ }` pour les structures de contrôle (`if`, `else`, `for`, `foreach`, `while`), même si le bloc ne contient qu'une seule ligne. Cela améliore la lisibilité et évite des bugs lors de l'ajout ultérieur de lignes.
+
+```php
+// ✅ BIEN
+if ($condition) {
+    doSomething();
+}
+
+// ❌ À ÉVITER
+if ($condition) doSomething();
+```
+
 ### 🌲 Palette Canopée (Style)
 Respecter la palette de couleurs "Canopée" pour les nouveaux développements :
 - **Marron foncé** : `#2b1d1a` (Fonds, titres)
