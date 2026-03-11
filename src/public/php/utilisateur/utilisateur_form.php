@@ -47,8 +47,25 @@ if (isset ($_GET ['id']) && $_GET ['id'] != "") {
 
 // --- RENDU HTML ---
 $headHtml = envoieHead("Profil Utilisateur", "../../css/form.css");
+// --- GESTION DES MESSAGES (TOASTR) ---
+$msgScript = "";
+if (isset($_GET['msg'])) {
+    $m = $_GET['msg'];
+    $msgScript = "<script>$(function() { ";
+    switch($m) {
+        case 'OK_UPLOAD':  $msgScript .= "toastr.success('Image mise à jour avec succès !');"; break;
+        case 'ERR_SIZE':   $msgScript .= "toastr.error('Le fichier est trop volumineux (max 2Mo).');"; break;
+        case 'ERR_EXT':    $msgScript .= "toastr.error('Format d\'image non autorisé (jpg, png, webp).');"; break;
+        case 'ERR_COPY':   $msgScript .= "toastr.error('Erreur technique lors de la copie de l\'image.');"; break;
+        case 'ERR_UPLOAD': $msgScript .= "toastr.error('Erreur lors du transfert du fichier.');"; break;
+        case 'ERR_NO_FILE': $msgScript .= "toastr.warning('Aucun fichier sélectionné.');"; break;
+    }
+    $msgScript .= " });</script>";
+}
+
 echo $headHtml;
 echo $MENU_HTML;
+echo $msgScript;
 $sortie = "";
 
 if ($mode == "MAJ"){

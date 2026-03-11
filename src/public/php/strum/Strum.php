@@ -309,13 +309,22 @@ class Strum
     }
 
     /**
-     * Charge tous les strums avec option de tri
+     * Charge tous les strums avec option de tri et filtre
      * @param string $tri Mode de tri : 'nom', 'date', 'pop'
+     * @param string $mesure Filtre par mesure : '4/4', '3/4', '6/8'
      */
-    public static function chargeStrumsBdd(string $tri = 'nom'): array
+    public static function chargeStrumsBdd(string $tri = 'nom', string $mesure = ''): array
     {
         $db = $_SESSION[self::MYSQL];
         
+        $where = "";
+        if (!empty($mesure)) {
+            $parts = explode('/', $mesure);
+            if (count($parts) == 2) {
+                $where = " WHERE s.longueur = " . (int)$parts[0] . " AND s.unite = " . (int)$parts[1];
+            }
+        }
+
         switch ($tri) {
             case 'date':
                 $ordre = "id DESC";
@@ -335,7 +344,7 @@ class Strum
                 break;
         }
 
-        $maRequete = "SELECT $select FROM strum s $join GROUP BY s.id ORDER BY $ordre";
+        $maRequete = "SELECT $select FROM strum s $join $where GROUP BY s.id ORDER BY $ordre";
         $result = $db->query($maRequete);
         
         $liste = [];

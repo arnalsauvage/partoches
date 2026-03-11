@@ -8,41 +8,76 @@ $pasDeMenu = true;
 require_once __DIR__ . "/../navigation/menu.php";
 
 $db = $_SESSION['mysql'];
-$strums = Strum::chargeStrumsBdd();
+
+// Récupération des paramètres de tri et filtre
+$tri = $_GET['sort'] ?? 'nom';
+$mesure = $_GET['mesure'] ?? '';
+
+$strums = Strum::chargeStrumsBdd($tri, $mesure);
 $nbStrums = count($strums);
 
 // --- RENDU HTML ---
 $headHtml = envoieHead("Répertoire des Strums", "../../css/strum_liste.css");
 echo $headHtml;
 echo $MENU_HTML;
-$html = "";
 
-$html .= <<<HTML
+// Fonctions helper pour les classes CSS actives
+$activeNom = ($tri == 'nom') ? 'btn-primary' : 'btn-default';
+$activeDate = ($tri == 'date') ? 'btn-primary' : 'btn-default';
+$activePop = ($tri == 'pop') ? 'btn-primary' : 'btn-default';
+
+// Préparation des options du select
+$opt44 = ($mesure == '4/4') ? 'selected' : '';
+$opt34 = ($mesure == '3/4') ? 'selected' : '';
+$opt68 = ($mesure == '6/8') ? 'selected' : '';
+
+$html = <<<HTML
 <div class="container strum-container">
     <div class="row">
-        <div class="col-xs-12 text-center" style="margin-bottom: 30px;">
-            <h1 style="font-weight: 900; letter-spacing: 5px;">
+        <div class="col-xs-12 text-center" style="margin-bottom: 20px;">
+            <h1 style="font-weight: 900; letter-spacing: 5px; margin-bottom: 5px;">
                 <span class="glyphicon glyphicon-music"></span> RÉPERTOIRE DES STRUMS
             </h1>
-            <p class="text-muted">$nbStrums RYTHMES DISPONIBLES</p>
+            <p class="text-muted" style="text-transform: uppercase;">$nbStrums RYTHMES DISPONIBLES</p>
+        </div>
+    </div>
+
+    <!-- Barre de filtres et tri -->
+    <div class="row" style="margin-bottom: 30px; background: #fdfaf5; padding: 15px; border-radius: 8px; border: 1px solid #D2B48C;">
+        <div class="col-sm-7 text-center-xs" style="margin-bottom: 10px;">
+            <span style="font-weight: bold; color: #8B4513; margin-right: 10px; text-transform: uppercase; font-size: 12px;">Classer par :</span>
+            <div class="btn-group" role="group">
+                <a href="?sort=nom&mesure=$mesure" class="btn btn-sm $activeNom">Nom</a>
+                <a href="?sort=date&mesure=$mesure" class="btn btn-sm $activeDate">Plus récents</a>
+                <a href="?sort=pop&mesure=$mesure" class="btn btn-sm $activePop">Plus utilisés</a>
+            </div>
+        </div>
+        <div class="col-sm-5 text-right text-center-xs">
+            <form class="form-inline" method="get">
+                <input type="hidden" name="sort" value="$tri">
+                <label style="font-weight: bold; color: #8B4513; margin-right: 10px; text-transform: uppercase; font-size: 12px;">Mesure :</label>
+                <select name="mesure" class="form-control input-sm" onchange="this.form.submit()" style="border-radius: 15px;">
+                    <option value="">Toutes</option>
+                    <option value="4/4" $opt44>4/4</option>
+                    <option value="3/4" $opt34>3/4</option>
+                    <option value="6/8" $opt68>6/8</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
 HTML;
 
 if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
     $html .= <<<HTML
-            <div style="margin-top: 20px;">
+            <div class="col-xs-12 text-center" style="margin-bottom: 30px;">
                 <a href="strum_form.php" class="btn btn-primary btn-lg" style="border-radius: 30px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
                     <i class="glyphicon glyphicon-plus"></i> AJOUTER UN STRUM
                 </a>
             </div>
 HTML;
 }
-
-$html .= <<<HTML
-        </div>
-    </div>
-
-    <div class="row">
-HTML;
 
 foreach ($strums as $s) {
     $html .= $s->afficheCarteStrum();
