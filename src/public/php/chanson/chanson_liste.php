@@ -11,12 +11,12 @@ const CENTRER = "centrer";
 const VAL_FILTRE = "valFiltre";
 const FILTRE = "filtre";
 require_once dirname(__DIR__) . "/lib/utilssi.php";
-require_once "../lib/Pagination.php";
+require_once __DIR__ . "/../lib/Pagination.php";
 require_once "Chanson.php";
-require_once "../document/Document.php";
+require_once __DIR__ . "/../document/Document.php";
 $pasDeMenu = true;
-require_once "../navigation/menu.php";
-require_once "../note/UtilisateurNote.php";
+require_once __DIR__ . "/../navigation/menu.php";
+require_once __DIR__ . "/../note/UtilisateurNote.php";
 
 $chansonForm = "chanson_form.php";
 $chansonPost = "chanson_post.php";

@@ -14,13 +14,13 @@ const JS_CHANSON_FORM_JS = RETOUR_RACINE . RETOUR_RACINE . "js/chansonForm.js?v=
 
 const DIV = "</div>";
 require_once("Chanson.php");
-require_once("../document/Document.php");
-require_once('../liens/LienStrumChanson.php');
-require_once('../liens/LienUrl.php');
-require_once("../navigation/menu.php");
-require_once("../songbook/Songbook.php");
-require_once('../strum/Strum.php');
-require_once("../lib/utilssi.php");
+require_once __DIR__ . "/../document/Document.php";
+require_once __DIR__ . "/../liens/LienStrumChanson.php";
+require_once __DIR__ . "/../liens/LienUrl.php";
+require_once __DIR__ . "/../navigation/menu.php";
+require_once __DIR__ . "/../songbook/Songbook.php";
+require_once __DIR__ . "/../strum/Strum.php";
+require_once __DIR__ . "/../lib/utilssi.php";
 // Inclusion de FichierIni pour lire params.ini
 require_once __DIR__ . '/../lib/FichierIni.php'; // Chemin relatif vers FichierIni
 

@@ -1,5 +1,5 @@
 <?php
-include_once("../lib/utilssi.php");
+include_once __DIR__ . "/../lib/utilssi.php";
 // Objet de gestion des notes utilisateur
 
 class UtilisateurNote

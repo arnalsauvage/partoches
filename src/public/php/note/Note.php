@@ -1,6 +1,6 @@
 <?php
-include_once("../lib/utilssi.php");
-include_once("../note/UtilisateurNote.php");
+include_once __DIR__ . "/../lib/utilssi.php";
+include_once __DIR__ . "/../note/UtilisateurNote.php";
 
 echo envoieHead("Partoches", "../../css/index.css?v=25.3.28") . PHP_EOL;
 

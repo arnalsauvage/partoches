@@ -1,8 +1,8 @@
 <?php
 const FICHIER_UPLOADE = 'fichierUploade';
-require("../document/Document.php");
-require("../lib/utilssi.php");
-require_once("../lib/Image.php");
+require __DIR__ . "/../document/Document.php";
+require __DIR__ . "/../lib/utilssi.php";
+require_once __DIR__ . "/../lib/Image.php";
 
 global $_DOSSIER_CHANSONS;
 

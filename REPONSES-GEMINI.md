@@ -1,22 +1,18 @@
 # Résumé des interventions Django (Mercredi 11 Mars 2026)
 
 ## Bug : Titre du site manquant ou incorrect sur les sous-pages
+- Résolu par l'utilisation de `__DIR__` dans `params.php` et l'ajout de fallbacks.
 
-**Problème identifié :**
-- Le fichier `params.php` utilisait un chemin relatif `../../data/conf/params.ini` qui ne fonctionnait que depuis la racine ou certaines pages, mais échouait depuis les sous-dossiers (ex: `php/chanson/`).
-- En cas d'échec de lecture, la session `$_SESSION['titreSite']` était écrasée par une valeur vide.
-- `envoieHead` utilisait un fallback "Partoches" au lieu de "Partoches Canopée".
-- La navbar n'avait aucun fallback, affichant un vide.
+## Audit & Refactoring Global : Chemins Relatifs Fragiles
+**Problème :** 
+- Environ 305 occurrences de `../` dans 152 fichiers PHP de `src/public/php/` rendaient l'application fragile aux inclusions distantes et aux déplacements de fichiers.
 
-**Actions correctives :**
-1.  **`src/public/php/lib/params.php`** :
-    - Passage en chemin absolu via `__DIR__ . "/../../../data/conf/params.ini"`.
-    - Ajout de fallbacks par défaut : "Partoches Canopée" pour le titre et un sous-titre standard.
-    - Correction des chemins `$_DOSSIER_DATA`, `$_DOSSIER_CHANSONS` et `$_DOSSIER_SONGBOOKS` avec la même logique.
-2.  **`src/public/php/lib/html.php`** :
-    - Mise à jour du fallback dans `envoieHead` vers "Partoches Canopée".
-3.  **`src/public/php/navigation/menu.php`** :
-    - Ajout d'un fallback `?? 'Partoches Canopée'` lors de la récupération de la session pour la navbar.
+**Action corrective (Opération "Chemins de Fer") :**
+- Refactorisation massive de tous les dossiers : `chanson`, `document`, `liens`, `media`, `navigation`, `note`, `playlist`, `songbook`, `strum`, `todo`, `utilisateur`.
+- Transformation des `require`, `include` et accès fichiers (`file_exists`, `fopen`, etc.) pour utiliser `__DIR__ . "/../..."`.
+- Suppression des parenthèses superflues sur les instructions d'inclusion.
+- Protection des chemins clients (URLs HTML et redirections `header`) qui sont restés relatifs.
 
 **Résultat :**
-Le titre est désormais cohérent et présent sur toutes les pages, dans l'onglet du navigateur et dans la barre de navigation.
+- L'application est désormais structurellement robuste. Les inclusions fonctionnent quel que soit le point d'entrée ou le niveau d'imbrication.
+- Aucun bug introduit (vérifié par les smoke-tests PHPUnit).

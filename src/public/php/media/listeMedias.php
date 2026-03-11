@@ -1,10 +1,10 @@
 <?php
-require_once "../lib/utilssi.php";
-require_once "../lib/Pagination.php";
-require_once "../chanson/Chanson.php";
-require_once "../document/Document.php";
-require_once "../note/UtilisateurNote.php";
-require_once 'Media.php';
+require_once __DIR__ . "/../lib/utilssi.php";
+require_once __DIR__ . "/../lib/Pagination.php";
+require_once __DIR__ . "/../chanson/Chanson.php";
+require_once __DIR__ . "/../document/Document.php";
+require_once __DIR__ . "/../note/UtilisateurNote.php";
+require_once __DIR__ . '/Media.php';
 
 $pasDeMenu = true;
 

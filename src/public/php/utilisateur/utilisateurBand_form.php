@@ -1,6 +1,6 @@
 <?php
-include_once("../lib/utilssi.php");
-include_once("../navigation/menu.php");
+include_once __DIR__ . "/../lib/utilssi.php";
+include_once __DIR__ . "/../navigation/menu.php";
 
 $utilisateurForm = "utilisateur_form.php";
 $utilisateurGet = "utilisateur_get.php";

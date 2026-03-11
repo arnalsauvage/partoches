@@ -6,7 +6,7 @@
 
 require_once dirname(__DIR__, 3) . "/autoload.php";
 $pasDeMenu = true;
-require_once "../navigation/menu.php";
+require_once __DIR__ . "/../navigation/menu.php";
 
 // Palette Canopée
 $c_marron_fonce = "#2b1d1a";

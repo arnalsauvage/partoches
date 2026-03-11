@@ -1,6 +1,6 @@
 <?php
-require_once "../lib/configMysql.php";
-require_once("../lib/utilssi.php");
+require_once __DIR__ . "/../lib/configMysql.php";
+require_once __DIR__ . "/../lib/utilssi.php";
 
 // Fonctions de gestion des liens chanson playlist dans la table lienchansonplaylist
 

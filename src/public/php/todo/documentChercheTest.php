@@ -11,7 +11,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
 <?php
-include "../php/documentCherche.php";
+include __DIR__ . "/../php/documentCherche.php";
 ?>
 
 <p>  D'après  <a href="http://www.xul.fr" target="_parent"> xul.fr</a></p>

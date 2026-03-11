@@ -16,8 +16,8 @@
  * enlevée pour une utilisation par un composant javascript / Ajax
  *
  */
-require_once("../lib/utilssi.php");
-require("../liens/lienChansonPlaylist.php");
+require_once __DIR__ . "/../lib/utilssi.php";
+require __DIR__ . "/../liens/lienChansonPlaylist.php";
 
 // Un non-admin ne peut changer l'ordre
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {

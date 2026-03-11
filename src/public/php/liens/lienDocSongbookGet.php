@@ -5,8 +5,8 @@
  * Date: 07/12/2017
  * Time: 15:26
  */
-require_once("../lib/utilssi.php");
-require("../liens/lienDocSongbook.php");
+require_once __DIR__ . "/../lib/utilssi.php";
+require __DIR__ . "/../liens/lienDocSongbook.php";
 
 // Un non-admin ne peut changer l'ordre
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {

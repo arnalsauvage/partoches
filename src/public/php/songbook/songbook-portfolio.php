@@ -1,11 +1,11 @@
 <?php
 require_once dirname(__DIR__) . "/lib/utilssi.php";
 $pasDeMenu = true;
-require_once "../navigation/menu.php";
+require_once __DIR__ . "/../navigation/menu.php";
 require_once "Songbook.php";
-require_once "../document/Document.php";
-require_once "../chanson/Chanson.php";
-require_once "../lib/Image.php";
+require_once __DIR__ . "/../document/Document.php";
+require_once __DIR__ . "/../chanson/Chanson.php";
+require_once __DIR__ . "/../lib/Image.php";
 
 /**
  * Portfolio des Songbooks - Vue moderne type galerie "Canopée"

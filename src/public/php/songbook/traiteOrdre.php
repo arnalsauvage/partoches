@@ -1,6 +1,6 @@
 <?php
-include_once("../lib/utilssi.php");
-include_once("../liens/lienDocSongbook.php");
+include_once __DIR__ . "/../lib/utilssi.php";
+include_once __DIR__ . "/../liens/lienDocSongbook.php";
 
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
 if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_EDITEUR"]) {

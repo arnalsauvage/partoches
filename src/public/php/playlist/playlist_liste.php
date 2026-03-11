@@ -1,8 +1,8 @@
 <?php
 global $playlistForm, $cheminImages, $iconeCreer, $iconeAttention, $playlistVoir, $playlistGet, $iconePoubelle;
-require_once("../lib/utilssi.php");
-require_once("../navigation/menu.php");
-require_once "../playlist/playlist.php";
+require_once __DIR__ . "/../lib/utilssi.php";
+require_once __DIR__ . "/../navigation/menu.php";
+require_once __DIR__ . "/../playlist/playlist.php";
 
 $table = "playlist";
 $fichiersDuPlaylist = "";

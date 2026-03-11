@@ -1,6 +1,6 @@
 <?php
-require("../lib/utilssi.php");
-require("../document/Document.php");
+require __DIR__ . "/../lib/utilssi.php";
+require __DIR__ . "/../document/Document.php";
 
 $autorisees = "pdf doc docx gif jpg png swf mp3 odt";
 $repertoire = "../../data/songbooks/" . $_POST ['id'] . "/";

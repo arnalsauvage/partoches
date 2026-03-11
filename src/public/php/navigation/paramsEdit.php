@@ -3,7 +3,7 @@
 // === ACTIONS AJAX RÉCENTES ===
 if (isset($_POST['action'])) {
     if ($_POST['action'] === 'lecture_log' && isset($_POST['fichier'])) {
-        $fichierLog = "../../../data/logs/" . basename($_POST['fichier']);
+        $fichierLog = __DIR__ . "/../../../data/logs/" . basename($_POST['fichier']);
         if (file_exists($fichierLog)) {
             $ext = strtolower(pathinfo($fichierLog, PATHINFO_EXTENSION));
             $contenu = file_get_contents($fichierLog);
@@ -29,7 +29,7 @@ if (isset($_POST['action'])) {
     }
     
     if ($_POST['action'] === 'execute_sql' && isset($_POST['sql'])) {
-        require_once "../lib/configMysql.php";
+        require_once __DIR__ . "/../lib/configMysql.php";
         $sql = $_POST['sql'];
         $res = $mysqli->query($sql);
         if (!$res) {
@@ -54,7 +54,7 @@ if (isset($_POST['action'])) {
     }
 
     if ($_POST['action'] === 'infos_systeme') {
-        require_once "../lib/configMysql.php";
+        require_once __DIR__ . "/../lib/configMysql.php";
         echo "<h4><i class='glyphicon glyphicon-info-sign'></i> Environnement</h4><ul>";
         echo "<li><strong>Version PHP :</strong> " . phpversion() . "</li>";
         echo "<li><strong>Version MySQL :</strong> " . $mysqli->server_info . "</li>";
@@ -77,7 +77,7 @@ if (isset($_POST['action'])) {
             }
             return $derniereDate;
         }
-        echo date("d/m/Y H:i:s", trouverDerniereDateModif("../../php"));
+        echo date("d/m/Y H:i:s", trouverDerniereDateModif(__DIR__ . "/../../php"));
         exit;
     }
 }
@@ -89,11 +89,11 @@ $pasDeMenu = true;
 require_once "menu.php";
 echo $MENU_HTML;
 
-$fichier = "../../../data/conf/params.ini";
+$fichier = __DIR__ . "/../../../data/conf/params.ini";
 $alerts = "";
 
 if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-    include "../../html/composants/menuLogin.html";
+    include __DIR__ . "/../../html/composants/menuLogin.html";
     exit();
 }
 
@@ -229,7 +229,7 @@ echo $alerts;
             <div class="row">
                 <div class="col-sm-4">
                     <div class="list-group">
-                        <?php foreach (glob("../../../data/logs/*.{txt,htm,log,html}", GLOB_BRACE) as $l) {
+                        <?php foreach (glob(__DIR__ . "/../../../data/logs/*.{txt,htm,log,html}", GLOB_BRACE) as $l) {
                             $b = basename($l); echo "<a href='#' class='list-group-item item-log-dj' data-file='$b'>$b</a>";
                         } ?>
                     </div>

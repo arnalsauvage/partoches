@@ -6,18 +6,18 @@
  * Affiche le détail d'une chanson avec une UX moderne (badges, barre d'outils, lightbox).
  */
 
-require_once "../lib/utilssi.php";
-require_once "../lib/Image.php";
-require_once "../chanson/Chanson.php";
-require_once "../document/Document.php";
-require_once "../liens/LienStrumChanson.php";
-require_once "../liens/LienUrl.php";
-require_once "../liens/lienurl_voir.php";
+require_once __DIR__ . "/../lib/utilssi.php";
+require_once __DIR__ . "/../lib/Image.php";
+require_once __DIR__ . "/../chanson/Chanson.php";
+require_once __DIR__ . "/../document/Document.php";
+require_once __DIR__ . "/../liens/LienStrumChanson.php";
+require_once __DIR__ . "/../liens/LienUrl.php";
+require_once __DIR__ . "/../liens/lienurl_voir.php";
 $pasDeMenu = true;
-require_once "../navigation/menu.php";
-require_once "../note/UtilisateurNote.php";
-require_once "../songbook/Songbook.php";
-require_once "../strum/Strum.php";
+require_once __DIR__ . "/../navigation/menu.php";
+require_once __DIR__ . "/../note/UtilisateurNote.php";
+require_once __DIR__ . "/../songbook/Songbook.php";
+require_once __DIR__ . "/../strum/Strum.php";
 
 // --- CONSTANTES ET GLOBALES ---
 const CHANSON = "chanson";

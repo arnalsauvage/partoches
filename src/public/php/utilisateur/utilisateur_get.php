@@ -1,7 +1,7 @@
 <?php
-require_once("../lib/utilssi.php");
-require_once("../navigation/menu.php");
-require_once "../utilisateur/Utilisateur.php";
+require_once __DIR__ . "/../lib/utilssi.php";
+require_once __DIR__ . "/../navigation/menu.php";
+require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 
 $nomTable = "utilisateur";
 $utilisateurListe = "utilisateur_liste.php";

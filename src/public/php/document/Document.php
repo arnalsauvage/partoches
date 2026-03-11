@@ -8,7 +8,7 @@ if (!defined("BR_REQUETE")) {
     define("BR_REQUETE", "<br>Requete : ");
 }
 if (!defined("DOSSIER_DATA")) {
-    define("DOSSIER_DATA" ,"../../data/");
+    define("DOSSIER_DATA" , __DIR__ . "/../../data/");
 }
 
 require_once dirname(__DIR__) . "/lib/utilssi.php";

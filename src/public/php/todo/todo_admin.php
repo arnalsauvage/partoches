@@ -5,7 +5,7 @@
  */
 
 require_once dirname(__DIR__, 3) . "/autoload.php";
-require_once "../navigation/menu.php";
+require_once __DIR__ . "/../navigation/menu.php";
 
 // Sécurité : Admin requis
 if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {

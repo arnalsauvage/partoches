@@ -1,7 +1,7 @@
 <?php
-require_once "../lib/utilssi.php";
-require_once "../utilisateur/Utilisateur.php";
-require_once "../lib/Image.php";
+require_once __DIR__ . "/../lib/utilssi.php";
+require_once __DIR__ . "/../utilisateur/Utilisateur.php";
+require_once __DIR__ . "/../lib/Image.php";
 
 /**
  * Gère l'affichage du menu supérieur et l'état de la session utilisateur.

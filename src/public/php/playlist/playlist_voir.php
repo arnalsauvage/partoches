@@ -1,10 +1,10 @@
 <?php
-require_once("../lib/utilssi.php");
-require_once("../navigation/menu.php");
+require_once __DIR__ . "/../lib/utilssi.php";
+require_once __DIR__ . "/../navigation/menu.php";
 require_once("playlist.php");
 require_once("lienChansonPlaylist.php");
-require_once("../document/Document.php");
-require_once("../utilisateur/Utilisateur.php");
+require_once __DIR__ . "/../document/Document.php";
+require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 $table = "playlist";
 $sortie = "";
 $monImage = "";

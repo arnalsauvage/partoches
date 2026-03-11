@@ -3,10 +3,10 @@ const PRIVILEGE = 'privilege';
 const NOM_FIC = 'nomFic';
 const ID_DOC = 'idDoc';
 const ID_SONGBOOK = 'id';
-include_once("../lib/utilssi.php");
-include_once("../navigation/menu.php");
+include_once __DIR__ . "/../lib/utilssi.php";
+include_once __DIR__ . "/../navigation/menu.php";
 include_once("Songbook.php");
-include_once("../liens/lienDocSongbook.php");
+include_once __DIR__ . "/../liens/lienDocSongbook.php";
 $nomTable = "songbook";
 
 $id = (int)($_POST[ID_SONGBOOK] ?? ($_GET[ID_SONGBOOK] ?? 0));

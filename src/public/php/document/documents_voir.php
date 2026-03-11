@@ -6,11 +6,11 @@ const CHANSON = "chanson";
 const DOC_PAGE = 'docPage';
 const C_RACINE = "../../";
 require_once dirname(__DIR__) . "/lib/utilssi.php";
-require_once("../lib/Pagination.php");
-require_once("../document/Document.php");
-require_once("../liens/lienDocSongbook.php");
-require_once("../navigation/menu.php");
-require_once("../songbook/Songbook.php");
+require_once __DIR__ . "/../lib/Pagination.php";
+require_once __DIR__ . "/../document/Document.php";
+require_once __DIR__ . "/../liens/lienDocSongbook.php";
+require_once __DIR__ . "/../navigation/menu.php";
+require_once __DIR__ . "/../songbook/Songbook.php";
 $table = "songbook";
 $sortie = "";
 $monImage = "";
@@ -121,7 +121,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
 
     $iconePath = ICONES . $extension . ".png";
     if (!file_exists($iconePath)) {
-        $iconePath = "../images/icones/fichier.png";
+        $iconePath = __DIR__ . "/../images/icones/fichier.png";
     }
     $icone = image($iconePath, 32, 32, "icone");
 

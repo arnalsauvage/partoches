@@ -6,9 +6,9 @@ const RENDOC = "RENDOC";
 const SUPPRFIC = "SUPPRFIC";
 const SUPPR = "SUPPR";
 $nomTable = "chanson";
-require_once("../chanson/Chanson.php");
-require_once("../document/Document.php");
-require_once("../lib/utilssi.php");
+require_once __DIR__ . "/../chanson/Chanson.php";
+require_once __DIR__ . "/../document/Document.php";
+require_once __DIR__ . "/../lib/utilssi.php";
 
 // ecritFichierLog("ajaxlog.htm", "entrée dans chanson_post");
 
@@ -220,7 +220,7 @@ if ($mode != RESTAUREDOC && $mode !=  RENDOC ) {
 
 function resetMediasPartoches($nombreMedias): void
 {
-    require_once ("../media/Media.php");
+    require_once __DIR__ . "/../media/Media.php";
     $medias = new Media();
     $medias->resetAvecDernieresPartoches($nombreMedias);
 }

@@ -1,5 +1,5 @@
 <?php
-include_once("Document.php");
+include_once __DIR__ . "/Document.php";
 
 if (!function_exists('mime_content_type')) {
 // Copié sur les commentaires de la fonction mime_content_type sur la doc de php
@@ -79,14 +79,14 @@ if ((isset ($_GET ['doc'])) && (is_numeric($_GET ['doc']))) {
     $idDoc = $_GET ['doc'];
     $doc = chercheDocument($idDoc);
     // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-    $fichier = "../../data/" . $doc [5] . "s/" . $doc [6] . "/" . composeNomVersion($doc [1], $doc [4]);
+    $fichier = __DIR__ . "/../../data/" . $doc [5] . "s/" . $doc [6] . "/" . composeNomVersion($doc [1], $doc [4]);
 //    header ( "Location: $fichier" );
 
     //tester si le fichier existe
     if ((!file_exists($fichier))) {
         //ce n'est pas le cas, on envoie l'header 404
         header("HTTP/1.0 404 Not Found");
-        echo file_get_contents("404/404.htm");
+        echo file_get_contents(__DIR__ . "/404/404.htm");
         echo " <h1>Fichier non trouvé</h1>\n";
         echo " Le document $idDoc $fichier n'a jamais existé, n'existe pas, et n'existera jamais sur ce site !<br>\n";
         echo " Ou alors y 'a longtemps,<br>\n";

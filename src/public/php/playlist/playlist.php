@@ -1,6 +1,6 @@
 <?php
-require_once("../lib/utilssi.php");
-require_once "../lib/configMysql.php";
+require_once __DIR__ . "/../lib/utilssi.php";
+require_once __DIR__ . "/../lib/configMysql.php";
 //require_once ("lienDocplaylist.php");
 
 $playlistForm = "playlist_form.php";

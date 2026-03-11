@@ -1,5 +1,5 @@
 <?php
-include('../lib/utilssi.php');
+include __DIR__ . '/../lib/utilssi.php';
 include_once "UtilisateurNote.php";
 
 // On gère le cas d'un appel POST

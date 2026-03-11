@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__DIR__) . "/lib/utilssi.php";
-require_once("../utilisateur/Utilisateur.php");
+require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 
 $donnee = null;
 $_login = "";

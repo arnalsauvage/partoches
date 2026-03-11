@@ -1,9 +1,9 @@
 <?php
-include_once("../chanson/Chanson.php");
-include_once("../document/Document.php");
-include_once("../lib/formulaire.php");
-include_once("../lib/utilssi.php");
-require("../utilisateur/Utilisateur.php");
+include_once __DIR__ . "/../chanson/Chanson.php";
+include_once __DIR__ . "/../document/Document.php";
+include_once __DIR__ . "/../lib/formulaire.php";
+include_once __DIR__ . "/../lib/utilssi.php";
+require __DIR__ . "/../utilisateur/Utilisateur.php";
 
 global $_DOSSIER_CHANSONS;
 const RACINE = "../../";

@@ -1,5 +1,5 @@
 <?php
-require_once "../lib/configMysql.php";
+require_once __DIR__ . "/../lib/configMysql.php";
 
 $db = $_SESSION['mysql'];
 

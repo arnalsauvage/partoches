@@ -3,9 +3,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once "../lib/configMysql.php";
-require_once "../lib/utilssi.php";
-require_once "../utilisateur/Utilisateur.php";
+require_once __DIR__ . "/../lib/configMysql.php";
+require_once __DIR__ . "/../lib/utilssi.php";
+require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 
 // Vérification des droits (Membre minimum pour modifier ses propres chansons, Admin pour tout)
 if (!aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {

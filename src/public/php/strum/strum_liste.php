@@ -5,7 +5,7 @@
 
 require_once dirname(__DIR__, 3) . "/autoload.php";
 $pasDeMenu = true;
-require_once "../navigation/menu.php";
+require_once __DIR__ . "/../navigation/menu.php";
 
 $db = $_SESSION['mysql'];
 $strums = Strum::chargeStrumsBdd();

@@ -1,10 +1,10 @@
 <?php
-require_once("../lib/Pagination.php");
+require_once __DIR__ . "/../lib/Pagination.php";
 require_once dirname(__DIR__) . "/lib/utilssi.php";
-require_once("LienUrl.php");
-require_once("lienurl_voir.php");
+require_once __DIR__ . "/LienUrl.php";
+require_once __DIR__ . "/lienurl_voir.php";
 $pasDeMenu = true;
-require_once("../navigation/menu.php");
+require_once __DIR__ . "/../navigation/menu.php";
 
 /**
  * Galerie des Liens Multimédia - Vue moderne et polyvalente
@@ -32,7 +32,7 @@ $pagination->setPageEnCours($page);
 // 3. Construction du HTML
 $headHtml = envoieHead("Galerie des Liens", "../../css/galerie_liens.css");
 $pasDeMenu = true;
-require_once("../navigation/menu.php");
+require_once __DIR__ . "/../navigation/menu.php";
 
 echo $headHtml;
 echo $MENU_HTML;
