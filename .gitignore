@@ -28,3 +28,13 @@ temp_*.php
 php/api/tunebat_scraper.php
 merci.html
 html/boiteAstrum/
+rendered_html/
+temp_media.html
+.phpunit.result.cache
+*.htm
+*.html
+!src/**/*.html
+!tests/**/*.html
+!html/composants/*.html
+!src/public/html/**/*.html
+
