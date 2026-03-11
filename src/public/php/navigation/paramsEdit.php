@@ -5,9 +5,23 @@ if (isset($_POST['action'])) {
     if ($_POST['action'] === 'lecture_log' && isset($_POST['fichier'])) {
         $fichierLog = "../../../data/logs/" . basename($_POST['fichier']);
         if (file_exists($fichierLog)) {
-            echo "<pre style='max-height: 400px; overflow: auto; background: #f8f9fa; padding: 10px; border: 1px solid #ddd;'>";
-            echo htmlspecialchars(file_get_contents($fichierLog));
-            echo "</pre>";
+            $ext = strtolower(pathinfo($fichierLog, PATHINFO_EXTENSION));
+            $contenu = file_get_contents($fichierLog);
+            
+            // Correction encodage si besoin (si le log est en ISO)
+            if (!mb_check_encoding($contenu, 'UTF-8')) {
+                $contenu = mb_convert_encoding($contenu, 'UTF-8', 'ISO-8859-1');
+            }
+
+            if (in_array($ext, ['htm', 'html'])) {
+                // Rendu HTML direct pour les fichiers .htm ou .html
+                echo "<div class='render-html-dj'>$contenu</div>";
+            } else {
+                // Texte brut pour les autres
+                echo "<pre style='max-height: 500px; overflow: auto; background: #f8f9fa; padding: 10px; border: 1px solid #ddd; font-size:12px;'>";
+                echo htmlspecialchars($contenu);
+                echo "</pre>";
+            }
         } else {
             echo "Fichier non trouvé.";
         }
@@ -41,60 +55,32 @@ if (isset($_POST['action'])) {
 
     if ($_POST['action'] === 'infos_systeme') {
         require_once "../lib/configMysql.php";
-        
-        // Version PHP
-        echo "<h4><i class='glyphicon glyphicon-info-sign'></i> Environnement</h4>";
-        echo "<ul>";
+        echo "<h4><i class='glyphicon glyphicon-info-sign'></i> Environnement</h4><ul>";
         echo "<li><strong>Version PHP :</strong> " . phpversion() . "</li>";
         echo "<li><strong>Version MySQL :</strong> " . $mysqli->server_info . "</li>";
-        
-        // Taille BDD
         $res = $mysqli->query("SELECT SUM(data_length + index_length) / 1024 / 1024 AS size FROM information_schema.TABLES WHERE table_schema = '$mabase'");
         $row = $res->fetch_assoc();
-        echo "<li><strong>Taille Base de données :</strong> " . round($row['size'], 2) . " Mo</li>";
-
-        // Taille Chansons
-        function get_dir_size($directory) {
-            $size = 0;
-            foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory)) as $file) {
-                $size += $file->getSize();
-            }
-            return $size;
-        }
-        $dataSize = get_dir_size("../../data/chansons/");
-        echo "<li><strong>Taille Dossier Chansons :</strong> " . round($dataSize / 1024 / 1024, 2) . " Mo</li>";
+        echo "<li><strong>Taille BDD :</strong> " . round($row['size'], 2) . " Mo</li>";
         echo "</ul>";
         exit;
     }
 
     if ($_POST['action'] === 'derniere_date_modif') {
-        function trouverDerniereDateModif($dossier, $extensions = ['php', 'js', 'css', 'html']) {
+        function trouverDerniereDateModif($dossier) {
             $derniereDate = 0;
+            if (!is_dir($dossier)) return 0;
             $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dossier));
             foreach ($it as $fichier) {
-                if ($fichier->isFile()) {
-                    $ext = strtolower(pathinfo($fichier->getFilename(), PATHINFO_EXTENSION));
-                    if (in_array($ext, $extensions)) {
-                        $filemtime = $fichier->getMTime();
-                        if ($filemtime > $derniereDate) {
-                            $derniereDate = $filemtime;
-                        }
-                    }
+                if ($fichier->isFile() && $fichier->getMTime() > $derniereDate) {
+                    $derniereDate = $fichier->getMTime();
                 }
             }
             return $derniereDate;
         }
-        $repertoire = "../../php"; 
-        $timestampDerniereModif = trouverDerniereDateModif($repertoire);
-        if ($timestampDerniereModif > 0) {
-            echo date("d/m/Y H:i:s", $timestampDerniereModif);
-        } else {
-            echo "Aucun fichier trouvé.";
-        }
+        echo date("d/m/Y H:i:s", trouverDerniereDateModif("../../php"));
         exit;
     }
 }
-// Fin ajax
 
 require_once dirname(__DIR__) . "/lib/utilssi.php";
 $headHtml = envoieHead("Paramétrage du site", "../../css/index.css");
@@ -104,301 +90,257 @@ require_once "menu.php";
 echo $MENU_HTML;
 
 $fichier = "../../../data/conf/params.ini";
-$sortie = "<div class='container' style='padding:20px;'>";
+$alerts = "";
 
-// Vérifie les privilèges
 if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
     include "../../html/composants/menuLogin.html";
     exit();
 }
 
-/// Traitement de la reinitialisation des medias
-if (isset($_GET['resetmedias'])) {
-    $nombreMedias = (int) $_GET['resetmedias'];
-    require_once("../media/Media.php");
-    $medias = new Media();
-    $medias->resetMediasDistribues($nombreMedias);
-    $sortie .= "<div class='alert alert-info'>Les médias ont été réinitialisés avec succès ($nombreMedias éléments).</div>";
-}
-
-// Charge le fichier ini
 $ini_objet = new FichierIni();
 $ini_objet->m_load_fichier($fichier);
-
 $bModif = false;
 
-// Items à gérer
 $itemsGeneral = [
-    "loginParam" => "Login paramétrage",
-    "urlSite" => "URL du site",
-    "EmailAdmin" => "Email admin",
-    "titreSite" => "Titre du site",
-    "sousTitreSite" => "Sous-titre du site",
-    "mailOubliMotDePasse" => "Email oubli mot de passe",
-    "nomEmailOubliMotDePasse" => "Nom email oubli mot de passe",
-    "largeurMaxImageChanson" => "Largeur max image chanson (px)",
-    "hauteurMaxImageChanson" => "Hauteur max image chanson (px)",
-    "cleGetSongBpm" => "Clé GetSongBpm",
-    "GEMINI_API_KEY" => "Clé GEMINI",
-    "MAMMOUTH_API_KEY" => "Cle Api Mammouth"
+    "loginParam" => "Login paramétrage", "urlSite" => "URL du site", "EmailAdmin" => "Email admin",
+    "titreSite" => "Titre du site", "sousTitreSite" => "Sous-titre du site",
+    "mailOubliMotDePasse" => "Email d'envoi", "nomEmailOubliMotDePasse" => "Nom d'affichage",
+    "largeurMaxImageChanson" => "Largeur Max (px)", "hauteurMaxImageChanson" => "Hauteur Max (px)",
+    "cleGetSongBpm" => "Clé GetSongBpm", "GEMINI_API_KEY" => "Clé Gemini", "MAMMOUTH_API_KEY" => "Clé Mammouth"
 ];
+$itemsMysql = ["monServeur" => "Serveur MySQL", "maBase" => "Base MySQL", "login" => "Login MySQL", "motDePasse" => "Mot de passe MySQL"];
+$itemsAdmin = ["display_errors" => "Afficher les erreurs PHP", "log_level" => "Niveau de log"];
 
-$itemsMysql = [
-    "monServeur" => "Serveur MySQL",
-    "maBase" => "Base MySQL",
-    "login" => "Login MySQL",
-    "motDePasse" => "Mot de passe MySQL"
-];
-
-$itemsAdmin = [
-    "display_errors" => "Afficher les erreurs PHP (Debug)",
-    "log_level" => "Niveau de log (0=off, 1=errors, 2=full)"
-];
-
-// Création de l'objet Footer
 $footer = new Footer();
 
-// Traiter POST
-foreach (array_merge(array_keys($itemsGeneral), array_keys($itemsMysql), array_keys($itemsAdmin)) as $item) {
-    if (isset($_POST[$item])) {
-        if (array_key_exists($item, $itemsGeneral)) $groupe = "general";
-        elseif (array_key_exists($item, $itemsMysql)) $groupe = "mysql";
-        else $groupe = "admin";
-        
-        $ini_objet->m_put($_POST[$item], $item, $groupe);
-        $bModif = true;
-    }
-}
-
-// Traitement du pied de page
-if (isset($_POST['footerHtml'])) {
-    $footerHtml = strip_tags($_POST['footerHtml'], '<a><br><img><strong><em><p>');
-    $ini_objet->m_put($footerHtml, 'footerHtml', 'footer');
-    $footer->setHtml($footerHtml);
-    $bModif = true;
-}
-
-// Sauvegarde si modifié
-if ($bModif) {
-    $footer->sauveBdd();
-    $ini_objet->save();
-    $sortie .= "<div class='alert alert-success'>Paramètres mis à jour avec succès !</div>";
-}
-
-// Récupération du contenu HTML pour le formulaire
-$footerHtml = htmlspecialchars($footer->getHtml());
-
-// Upload logo
-$logoActuel = $ini_objet->m_valeur('logoSite', 'general');
-$uploadDir = "../../images/navigation/";
-$racineDir = "../../";
-
-if (isset($_FILES['logoSite']) && $_FILES['logoSite']['error'] === UPLOAD_ERR_OK) {
-    require_once "../lib/Image.php";
-    $filename = basename($_FILES['logoSite']['name']);
-    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-    $allowed = ['jpg','jpeg','png','webp'];
-
-    if (in_array($ext, $allowed)) {
-        $newFilename = "logo_site." . $ext;
-        $destination = $uploadDir . $newFilename;
-        $srcImage = Image::load($_FILES['logoSite']['tmp_name']);
-
-        if ($srcImage) {
-            // Logo principal 300x300
-            $dstImage = Image::resize($srcImage, 300, 300);
-            if ($dstImage) {
-                Image::save($dstImage, $destination, $ext, 90);
-                imagedestroy($dstImage);
-            }
-            
-            // Icônes & favicon
-            $faviconImage = Image::resize($srcImage, 32, 32);
-            if ($faviconImage) {
-                Image::save($faviconImage, $racineDir . "favicon.ico", 'png');
-                imagedestroy($faviconImage);
-            }
-
-            $apple120 = Image::resize($srcImage, 120, 120);
-            if ($apple120) {
-                Image::save($apple120, $racineDir . "apple-touch-icon-120x120-precomposed.png", 'png');
-                imagedestroy($apple120);
-            }
-
-            imagedestroy($srcImage);
-            $ini_objet->m_put($newFilename, 'logoSite', 'general');
-            $ini_objet->save();
-            $logoActuel = $newFilename;
-            $sortie .= "<div class='alert alert-success'>Logo et icônes mis à jour !</div>";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
+    foreach (array_merge(array_keys($itemsGeneral), array_keys($itemsMysql), array_keys($itemsAdmin)) as $item) {
+        if (isset($_POST[$item])) {
+            $groupe = array_key_exists($item, $itemsGeneral) ? "general" : (array_key_exists($item, $itemsMysql) ? "mysql" : "admin");
+            // Nettoyage UTF8 avant sauvegarde
+            $valeur = $_POST[$item];
+            $ini_objet->m_put($valeur, $item, $groupe);
+            $bModif = true;
         }
     }
+    if (isset($_POST['footerHtml'])) {
+        $footerHtml = strip_tags($_POST['footerHtml'], '<a><br><img><strong><em><p>');
+        $ini_objet->m_put($footerHtml, 'footerHtml', 'footer');
+        $footer->setHtml($footerHtml);
+        $bModif = true;
+    }
+    if ($bModif) { $footer->sauveBdd(); $ini_objet->save(); $alerts .= "<div class='alert alert-success'>Enregistré !</div>"; }
 }
 
-// Helper pour les champs
-function champInput(FichierIni $ini, $name, $label, $type, $groupe) {
-    $val = htmlspecialchars($ini->m_valeur($name, $groupe) ?? '');
+$footerHtml = htmlspecialchars($footer->getHtml());
+$logoActuel = $ini_objet->m_valeur('logoSite', 'general');
+
+function champInput($ini, $name, $label, $type, $groupe) {
+    $val = $ini->m_valeur($name, $groupe) ?? '';
+    
+    // Correction encodage pour l'affichage (si le INI est en ISO)
+    if (!empty($val) && !mb_check_encoding($val, 'UTF-8')) {
+        $val = mb_convert_encoding($val, 'UTF-8', 'ISO-8859-1');
+    }
+    // Nettoyage final des entités pour éviter le double encodage
+    $val = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
+
+    $html = "<div class='form-group-django'>";
+    $html .= "<label class='label-django'>$label</label>";
     if ($type === "checkbox") {
         $checked = ($val == "1") ? "checked" : "";
-        return "<div class='form-group' style='clear: both; margin-bottom: 15px; overflow: hidden;'>
-                    <div class='checkbox' style='margin-left: 0;'>
-                        <label style='float: none; width: auto; font-weight: bold;'>
-                            <input type='checkbox' name='$name' value='1' $checked style='float: none; width: auto; margin-right: 10px;'> $label
-                        </label>
-                    </div>
-                </div>";
+        $html = "<div class='checkbox-django'><label><input type='checkbox' name='$name' value='1' $checked> $label</label></div>";
+    } else {
+        $isPwd = (str_contains(strtolower($name), 'key') || str_contains(strtolower($name), 'passe') || $name === 'cleGetSongBpm');
+        $inputType = $isPwd ? "password" : $type;
+        $html .= "<div class='input-group-django'>";
+        $html .= "<input type='$inputType' class='input-django' name='$name' id='$name' value='$val'>";
+        if ($isPwd) $html .= "<button type='button' class='btn-toggle-pwd' data-target='$name'><i class='glyphicon glyphicon-eye-open'></i></button>";
+        $html .= "</div>";
     }
-    return "<div class='form-group' style='clear: both; margin-bottom: 15px; overflow: hidden;'>
-        <label for='$name' style='width: 250px;'>$label</label>
-        <input type='$type' class='form-control' name='$name' id='$name' value='$val' style='width: 300px;'>
-    </div>";
+    $html .= "</div>";
+    return $html;
 }
 
-// Formulaire
-$sortie .= "<form method='post' enctype='multipart/form-data'>";
-$sortie .= <<<HTML
-<ul class="nav nav-tabs" role="tablist">
-  <li class="active"><a href="#general" role="tab" data-toggle="tab">Général</a></li>
-  <li><a href="#mysql" role="tab" data-toggle="tab">MySQL</a></li>
-  <li><a href="#footer" role="tab" data-toggle="tab">Pied de page</a></li>
-  <li><a href="#tabLogs" role="tab" data-toggle="tab">Logs</a></li>
-  <li><a href="#tabSql" role="tab" data-toggle="tab">Console SQL</a></li>
-  <li><a href="#tabSysteme" role="tab" data-toggle="tab">Système</a></li>
-</ul>
+echo "<div id='django-config-page' class='container'>";
+echo $alerts;
+?>
 
-<div class="tab-content" style="margin-top:20px; border: 1px solid #ddd; border-top: none; padding: 20px; background: #fff;">
-  <div class="tab-pane fade in active" id="general">
-HTML;
+<div class="header-django">
+    <h1><i class="glyphicon glyphicon-cog"></i> Paramétrage</h1>
+    <div class="btn-group-django">
+        <a href='../todo/todo_admin.php' class='btn-dj btn-dj-primary'><i class="glyphicon glyphicon-list-alt"></i> Roadbook</a>
+        <a href='imagesCheck.php' class='btn-dj btn-dj-info'><i class="glyphicon glyphicon-eye-open"></i> Images</a>
+        <a href='../media/listeMedias.php' class='btn-dj btn-dj-default'><i class="glyphicon glyphicon-picture"></i> Médias</a>
+    </div>
+</div>
 
-foreach ($itemsGeneral as $item => $label) $sortie .= champInput($ini_objet, $item, $label, "text", "general");
-$sortie .= champInput($ini_objet, "display_errors", "Activer l'affichage des erreurs PHP (display_errors)", "checkbox", "admin");
+<form method='post' enctype='multipart/form-data' class='form-dj-reset'>
+    <ul class="tabs-django">
+        <li class="tab-dj active" data-target="dj-gen"><i class="glyphicon glyphicon-home"></i> Général</li>
+        <li class="tab-dj" data-target="dj-sql-db"><i class="glyphicon glyphicon-hdd"></i> Base</li>
+        <li class="tab-dj" data-target="dj-foot"><i class="glyphicon glyphicon-edit"></i> Footer</li>
+        <li class="tab-dj" data-target="dj-logs"><i class="glyphicon glyphicon-list"></i> Logs</li>
+        <li class="tab-dj" data-target="dj-console"><i class="glyphicon glyphicon-console"></i> SQL</li>
+    </ul>
 
-$sortie .= <<<HTML
-    <div class="form-group" style="clear: both; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee;">
-        <label for="logoSite" style="width: 250px;">Logo du site</label>
-        <input type="file" id="logoSite" name="logoSite" class="form-control" style="width: 300px; display: inline-block;">
-        <div style="margin-left: 250px; margin-top: 10px;">
-            <small class="text-muted">Logo actuel :</small><br>
-            <img src='../../images/navigation/$logoActuel' width='48' style='border:1px solid #ccc; padding:2px;'>
+    <div class="content-django">
+        <div id="dj-gen" class="pane-dj active">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="section-dj">
+                        <div class="section-dj-title">Identité</div>
+                        <div style="display:flex; align-items:center; margin-bottom:15px;">
+                            <img src='../../images/navigation/<?php echo $logoActuel; ?>' class="img-thumbnail" style="height:60px; margin-right:15px;">
+                            <input type="file" name="logoSite" class="input-django">
+                        </div>
+                        <?php echo champInput($ini_objet, "titreSite", "Nom du site", "text", "general"); ?>
+                        <?php echo champInput($ini_objet, "sousTitreSite", "Slogan", "text", "general"); ?>
+                        <?php echo champInput($ini_objet, "urlSite", "URL racine", "url", "general"); ?>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="section-dj">
+                        <div class="section-dj-title">Emails & API</div>
+                        <?php echo champInput($ini_objet, "EmailAdmin", "Email admin", "email", "general"); ?>
+                        <?php echo champInput($ini_objet, "cleGetSongBpm", "Clé GetSongBpm", "text", "general"); ?>
+                        <?php echo champInput($ini_objet, "GEMINI_API_KEY", "Clé Gemini", "text", "general"); ?>
+                        <?php echo champInput($ini_objet, "MAMMOUTH_API_KEY", "Clé Mammouth", "text", "general"); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dj-sql-db" class="pane-dj">
+            <div class="section-dj" style="max-width:500px; margin:0 auto;">
+                <div class="section-dj-title">Connexion MySQL</div>
+                <?php foreach ($itemsMysql as $item => $label) echo champInput($ini_objet, $item, $label, ($item === "motDePasse" ? "password" : "text"), "mysql"); ?>
+            </div>
+        </div>
+
+        <div id="dj-foot" class="pane-dj">
+            <div class="section-dj">
+                <div class="section-dj-title">HTML du Footer</div>
+                <textarea name="footerHtml" rows="12" class="textarea-footer-dj"><?php echo $footerHtml; ?></textarea>
+            </div>
+        </div>
+
+        <div id="dj-logs" class="pane-dj">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="list-group">
+                        <?php foreach (glob("../../../data/logs/*.{txt,htm,log,html}", GLOB_BRACE) as $l) {
+                            $b = basename($l); echo "<a href='#' class='list-group-item item-log-dj' data-file='$b'>$b</a>";
+                        } ?>
+                    </div>
+                </div>
+                <div class="col-sm-8"><div id="log-view-dj" class="well-log-dj">Sélectionnez un log...</div></div>
+            </div>
+        </div>
+
+        <div id="dj-console" class="pane-dj">
+            <div class="section-dj">
+                <textarea id="sqlQueryDj" class="input-django" rows="5" placeholder="SELECT * FROM chanson LIMIT 10;" style="width:100%; font-family:monospace;"></textarea>
+                <div style="text-align:right; margin-top:10px;"><button type="button" id="btnRunSqlDj" class="btn-dj btn-dj-info">Exécuter</button></div>
+                <div id="sqlResDj" style="margin-top:20px;"></div>
+            </div>
         </div>
     </div>
-  </div>
 
-  <div class='tab-pane fade' id='mysql'>
-HTML;
-foreach ($itemsMysql as $item => $label) {
-    $type = ($item === "motDePasse") ? "password" : "text";
-    $sortie .= champInput($ini_objet, $item, $label, $type, "mysql");
-}
-$sortie .= "</div>";
-
-$sortie .= <<<HTML
-  <div class='tab-pane fade' id="footer">
-    <div class="form-group">
-        <label for="footerHtml">HTML du pied de page</label>
-        <textarea class="form-control" name="footerHtml" id="footerHtml" rows="8" style="font-family: monospace;">$footerHtml</textarea>
+    <div class="footer-save-dj">
+        <button type="submit" class="btn-dj btn-dj-primary btn-lg" style="width:100%;">ENREGISTRER TOUT</button>
     </div>
-  </div>
-
-  <div class='tab-pane fade' id="tabLogs">
-    <div class="form-group">
-        <label>Choisir un fichier de log :</label>
-        <select id="selectLog" class="form-control">
-            <option value="">-- Sélectionner --</option>
-HTML;
-
-$logs = glob("../../../data/logs/*.{txt,htm,log,html}", GLOB_BRACE);
-foreach ($logs as $l) {
-    $basename = basename($l);
-    $sortie .= "<option value='$basename'>$basename</option>";
-}
-
-$sortie .= <<<HTML
-        </select>
-    </div>
-    <div id="resultatLog" style="margin-top:15px;"></div>
-    <button type="button" class="btn btn-default btn-sm" onclick="$('#resultatLog').empty();">Vider l'affichage</button>
-  </div>
-
-  <div class='tab-pane fade' id="tabSql">
-    <div class="alert alert-warning"><strong>Attention :</strong> Les requêtes sont exécutées directement sur la base.</div>
-    <div class="form-group">
-        <textarea id="sqlQuery" class="form-control" rows="5" placeholder="SELECT * FROM chanson LIMIT 10;"></textarea>
-    </div>
-    <button type="button" id="btnRunSql" class="btn btn-danger">Exécuter la requête</button>
-    <div id="resultatSql" style="margin-top:20px;"></div>
-  </div>
-
-  <div class='tab-pane fade' id="tabSysteme">
-    <div id="resultatSysteme">Chargement...</div>
-    <hr>
-    <button type="button" id="btnRefreshSysteme" class="btn btn-info btn-sm">Rafraîchir les infos</button>
-  </div>
-</div>
-
-<div style="margin-top:20px;">
-    <button type='submit' class='btn btn-primary btn-lg'>Enregistrer les paramètres</button>
-    <button type="button" id="btnDerniereModif" class="btn btn-link">Voir dernière modif php/</button>
-    <span id="resultatDerniereModif" class="text-muted small"></span>
-</div>
 </form>
 
-<hr>
-<h3>Outils d'administration</h3>
-<div class="btn-group">
-    <a href='../todo/todo_admin.php' class='btn btn-primary'><i class="glyphicon glyphicon-list-alt"></i> Roadbook (To-Do List)</a>
-    <a href='imagesCheck.php' class='btn btn-info'><i class="glyphicon glyphicon-eye-open"></i> Inspecteur d'images</a>
-    <a href='../media/listeMedias.php' class='btn btn-default'>Voir les médias</a>
-    <a href='paramsEdit.php?resetmedias=125' class='btn btn-warning' onclick='return confirm("Réinitialiser ?");'>Réinitialiser les médias</a>
-</div>
+<style>
+#django-config-page { width: 100% !important; max-width: 1200px !important; margin: 20px auto !important; position: static !important; }
+.form-dj-reset { background: #f9f9f9 !important; border: 1px solid #ddd !important; width: 100% !important; position: static !important; margin: 0 !important; padding: 20px !important; box-sizing: border-box !important; }
+.header-django { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.tabs-django { display: flex; list-style: none; padding: 0; margin: 0; border-bottom: 2px solid #D2B48C; }
+.tab-dj { padding: 10px 20px; cursor: pointer; border: 1px solid transparent; border-bottom: none; margin-bottom: -2px; font-weight: bold; color: #8B4513; }
+.tab-dj.active { background: #fff; border-color: #D2B48C; border-top: 3px solid #8B4513; color: #2b1d1a; }
+.content-django { background: #fff; border: 1px solid #D2B48C; border-top: none; padding: 20px; min-height: 400px; }
+.pane-dj { display: none; }
+.pane-dj.active { display: block !important; }
+.section-dj { margin-bottom: 20px; padding: 15px; border: 1px solid #eee; border-radius: 4px; }
+.section-dj-title { font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #eee; color: #8B4513; }
+.form-group-django { margin-bottom: 15px; }
+.label-django { display: block !important; width: auto !important; float: none !important; margin-bottom: 5px !important; font-weight: bold !important; color: #333 !important; }
+.input-django { display: block !important; width: 100% !important; padding: 8px !important; border: 1px solid #ccc !important; border-radius: 4px !important; box-sizing: border-box !important; background: #fff !important; color: #333 !important; }
+.input-group-django { position: relative; display: flex; }
+.btn-toggle-pwd { position: absolute; right: 5px; top: 5px; border: none; background: transparent; cursor: pointer; }
+.btn-dj { padding: 8px 15px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; text-decoration: none; }
+.btn-dj-primary { background: #8B4513; color: #fff; }
+.btn-dj-info { background: #D2B48C; color: #2b1d1a; }
+.footer-save-dj { margin-top: 20px; padding: 20px; background: #F5F5DC; border: 1px solid #D2B48C; border-radius: 8px; }
+.spin { animation: spin 2s infinite linear; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }
+
+/* Fix styles Footer Editor */
+.textarea-footer-dj {
+    display: block !important;
+    width: 100% !important;
+    height: 350px !important;
+    padding: 15px !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 14px !important;
+    background: #2b1d1a !important;
+    color: #f5f5dc !important;
+    border: 1px solid #1a1210 !important;
+    border-radius: 8px !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3) !important;
+    box-sizing: border-box !important;
+}
+
+/* Fix styles Logs View */
+.well-log-dj {
+    background: #fff !important;
+    min-height: 500px !important;
+    max-height: 800px !important;
+    overflow: auto !important;
+    padding: 15px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+}
+.render-html-dj {
+    background: white;
+    padding: 10px;
+}
+</style>
 
 <script>
 $(document).ready(function(){
-    // Gestion des onglets
-    $('.nav-tabs a').click(function (e) { e.preventDefault(); $(this).tab('show'); });
-    
-    // Chargement auto du système quand on clique sur l'onglet
-    $('a[href="#tabSysteme"]').on('shown.bs.tab', function (e) { loadSysteme(); });
-
-    // AJAX Logs
-    $('#selectLog').change(function() {
-        var f = $(this).val();
-        if (!f) return;
-        $('#resultatLog').html('Chargement...');
-        $.post('', {action: 'lecture_log', fichier: f}, function(data) {
-            $('#resultatLog').html(data);
-        });
+    $('.tab-dj').on('click', function(){
+        var target = $(this).data('target');
+        $('.tab-dj').removeClass('active');
+        $(this).addClass('active');
+        $('.pane-dj').removeClass('active');
+        $('#' + target).addClass('active');
     });
 
-    // AJAX SQL
-    $('#btnRunSql').click(function() {
-        var query = $('#sqlQuery').val();
-        if (!query) return;
-        $('#resultatSql').html('Exécution...');
-        $.post('', {action: 'execute_sql', sql: query}, function(data) {
-            $('#resultatSql').html(data);
-        });
+    $('.btn-toggle-pwd').click(function(){
+        var i = $('#' + $(this).data('target'));
+        i.attr('type', i.attr('type') === 'password' ? 'text' : 'password');
+        $(this).find('i').toggleClass('glyphicon-eye-open glyphicon-eye-close');
     });
 
-    // AJAX Système
-    function loadSysteme() {
-        $('#resultatSysteme').html('Récupération des données...');
-        $.post('', {action: 'infos_systeme'}, function(data) {
-            $('#resultatSysteme').html(data);
-        });
-    }
-    $('#btnRefreshSysteme').click(function() { loadSysteme(); });
+    $('.item-log-dj').click(function(e){
+        e.preventDefault();
+        var f = $(this).data('file');
+        $('.item-log-dj').removeClass('active');
+        $(this).addClass('active');
+        $('#log-view-dj').html('<div class="text-center" style="margin-top:50px;"><i class="glyphicon glyphicon-refresh spin" style="font-size:20px;"></i> Lecture...</div>');
+        $.post('', {action: 'lecture_log', fichier: f}, function(d){ $('#log-view-dj').html(d); });
+    });
 
-    // AJAX Date Modif
-    $('#btnDerniereModif').click(function() {
-        $('#resultatDerniereModif').text('(Chargement...)');
-        $.post('', {action: 'derniere_date_modif'}, function(data) {
-            $('#resultatDerniereModif').text('Dernière modif : ' + data);
-        });
+    $('#btnRunSqlDj').click(function(){
+        $('#sqlResDj').html('Exécution...');
+        $.post('', {action: 'execute_sql', sql: $('#sqlQueryDj').val()}, function(d){ $('#sqlResDj').html(d); });
     });
 });
 </script>
-HTML;
 
-$sortie .= "</div> <!-- container -->";
-$sortie .= envoieFooter();
-echo $sortie;
+<?php
+echo "</div>"; // #django-config-page
+echo envoieFooter();
+?>

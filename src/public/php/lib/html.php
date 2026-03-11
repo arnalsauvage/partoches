@@ -208,50 +208,45 @@ if (!isset ($FichierHtml)) {
 
     function envoieHead($titrePage, $feuilleCss)
     {
-        $retour =
-            "<!doctype html>
-		<html lang=\"fr\">
-		<head>
-		<meta charset=\"UTF-8\" >";
-
-        // Pour BootStrap
-        $retour .= "
-        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">
-		<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-        <link rel=\"icon\" href=\"../../favicon.ico\" type=\"image/x-icon\">
-    	<link href=\"../../css/bootstrap.min.css\" rel=\"stylesheet\">
-        <!-- source : http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css -->
-    	 <link href=\"../../css/jquery-ui.1.12.1.css\" rel=\"stylesheet\">";
-
-        // filemtime pour forcer le rechargement du css si modifié
         $cssPath = PHP_DIR . "/../css/styles-communs.css";
         $v = file_exists($cssPath) ? filemtime($cssPath) : "";
-        $retour .= " <link rel=\"stylesheet\" type=\"text/css\" href=\"../../css/styles-communs.css?v=26.03.08.1730\">\r\n";
-
-        $retour .= "
         
-        <link rel=\"stylesheet\" media=\"screen\" type=\"text/css\" title=\"resolution\" href=\"$feuilleCss\" />
-		<!-- Jquery --- source : https://code.jquery.com/jquery-1.12.4.js -->
-		<script src=\"../../js/jquery-1.12.4.min.js\"></script>
-		<!-- Nos fonctions personnalisées -->
-		<script src=\"../../js/utilsJquery.js\"></script>
-		<!-- jquery-ui --- source : https://code.jquery.com/ui/1.12.1/jquery-ui.js -->
-
-		<script src=\"../../js/jquery-ui.1.12.1.min.js\"></script>
+        $siteTitle = $_SESSION['titreSite'] ?? 'Partoches Canopée';
         
-		<!-- Pour bootstrap         -->
-        <script src=\"../../js/bootstrap.3.2.0.min.js\"></script>
-		
-		<!-- Pour Toaster, les petites infos instantanées         -->
-		<link href=\"../../css/toastr.min.css\" rel=\"stylesheet\" type=\"text/css\">
-		<script src=\"../../js/toastr.min.js\"></script>
+        // On évite le bégaiement : si $titrePage contient déjà $siteTitle, on ne le rajoute pas
+        if ($titrePage && str_contains(strtolower($titrePage), strtolower($siteTitle))) {
+            $fullTitle = $titrePage;
+        } else {
+            $fullTitle = $titrePage ? "$siteTitle - $titrePage" : $siteTitle;
+        }
 
-		<!-- Pour Select2, le combo amélioré         -->		<link href=\"https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css\" rel=\"stylesheet\" />
-        <script src=\"https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js\"></script>
-		
-		<title>$titrePage</title>
-		</head>";
-        return $retour;
+        $head = <<<HTML
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/jquery-ui.1.12.1.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../../css/styles-communs.css?v=$v">
+    <link rel="stylesheet" media="screen" type="text/css" title="resolution" href="$feuilleCss" />
+    
+    <script src="../../js/jquery-1.12.4.min.js"></script>
+    <script src="../../js/utilsJquery.js"></script>
+    <script src="../../js/jquery-ui.1.12.1.min.js"></script>
+    <script src="../../js/bootstrap.3.2.0.min.js"></script>
+    
+    <link href="../../css/toastr.min.css" rel="stylesheet" type="text/css">
+    <script src="../../js/toastr.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <title>$fullTitle</title>
+</head>
+HTML;
+        return $head;
     }
 
     function envoieFooter()

@@ -48,7 +48,13 @@ if (isset($_SESSION['login'])) {
 
 // Construction du Menu (sans le Head automatique)
 $logoSite = !empty($_SESSION['logoSite']) ? $_SESSION['logoSite'] : 'logo_site.png';
-$titreSite = $_SESSION['titreSite'];
+$titreSite = $_SESSION['titreSite'] ?? 'Partoches Canopée';
+
+// Correction encodage titre site si besoin
+if (!empty($titreSite) && !mb_check_encoding($titreSite, 'UTF-8')) {
+    $titreSite = mb_convert_encoding($titreSite, 'UTF-8', 'ISO-8859-1');
+}
+
 $privilege = $_SESSION['privilege'];
 $user = $_SESSION['user'];
 
@@ -182,9 +188,9 @@ $contenu .= <<<HTML
                 <span class="sr-only">Menu</span>
                 <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="../media/listeMedias.php">
-                <img src="../../images/navigation/$logoSite" width="42" class="logo" alt="logo">
-                $titreSite
+            <a class="navbar-brand" href="../media/listeMedias.php" style="display: flex; align-items: center;">
+                <span class="site-title-nav" style="margin-right: 10px; font-weight: bold; color: #D2B48C;">$titreSite</span>
+                <img src="../../images/navigation/$logoSite" height="40" class="logo" alt="logo">
             </a>
         </div>
         <div id="main-menu" class="collapse navbar-collapse">
