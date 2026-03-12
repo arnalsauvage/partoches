@@ -98,9 +98,9 @@ $html = <<<HTML
         <div class="text-left">
             <span class="label-tool">Trier par</span>
             <div class="btn-group">
-                <a href="?tri=nom&recherche=$recherche&type=$typeFiltre" class="btn-tool btn @TRI_NOM_ACTIVE@" title="Nom"><i class="glyphicon glyphicon-sort-by-alphabet"></i></a>
-                <a href="?triDesc=date&recherche=$recherche&type=$typeFiltre" class="btn-tool btn @TRI_DATE_ACTIVE@" title="Récent"><i class="glyphicon glyphicon-calendar"></i></a>
-                <a href="?triDesc=hits&recherche=$recherche&type=$typeFiltre" class="btn-tool btn @TRI_HITS_ACTIVE@" title="Vues"><i class="glyphicon glyphicon-fire"></i></a>
+                <a href="?tri=nom&amp;recherche=$recherche&amp;type=$typeFiltre" class="btn-tool btn @TRI_NOM_ACTIVE@" title="Nom"><i class="glyphicon glyphicon-sort-by-alphabet"></i></a>
+                <a href="?triDesc=date&amp;recherche=$recherche&amp;type=$typeFiltre" class="btn-tool btn @TRI_DATE_ACTIVE@" title="Récent"><i class="glyphicon glyphicon-calendar"></i></a>
+                <a href="?triDesc=hits&amp;recherche=$recherche&amp;type=$typeFiltre" class="btn-tool btn @TRI_HITS_ACTIVE@" title="Vues"><i class="glyphicon glyphicon-fire"></i></a>
             </div>
         </div>
 
@@ -126,8 +126,8 @@ $html = <<<HTML
         <div class="text-right">
             <span class="label-tool">Affichage</span>
             <div class="btn-group">
-                <a href="?vue=cartes&recherche=$recherche&type=$typeFiltre&tri=$tri" class="btn-tool btn @VUE_CARTES_ACTIVE@" title="Vignettes"><i class="glyphicon glyphicon-th"></i></a>
-                <a href="?vue=liste&recherche=$recherche&type=$typeFiltre&tri=$tri" class="btn-tool btn @VUE_LISTE_ACTIVE@" title="Tableau"><i class="glyphicon glyphicon-th-list"></i></a>
+                <a href="?vue=cartes&amp;recherche=$recherche&amp;type=$typeFiltre&amp;tri=$tri" class="btn-tool btn @VUE_CARTES_ACTIVE@" title="Vignettes"><i class="glyphicon glyphicon-th"></i></a>
+                <a href="?vue=liste&amp;recherche=$recherche&amp;type=$typeFiltre&amp;tri=$tri" class="btn-tool btn @VUE_LISTE_ACTIVE@" title="Tableau"><i class="glyphicon glyphicon-th-list"></i></a>
             </div>
         </div>
 

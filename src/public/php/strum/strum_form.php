@@ -77,7 +77,7 @@ $html = <<<HTML
                     - <code>-</code> (tiret) : Silence / Temps non joué
                 </p>
                 <p>
-                    <strong>Unité & Longueur :</strong><br>
+                    <strong>Unité &amp; Longueur :</strong><br>
                     - Le plus courant : <strong>8 croches</strong> (Unité 8, Longueur 8).<br>
                     - Double croches : <strong>Unité 16</strong>. Si sur une mesure, longueur 16. Si sur deux mesures, longueur 32.<br>
                     - Valse (3/4) : Unité 8, Longueur 6.
@@ -89,19 +89,13 @@ $html = <<<HTML
                 <input id="id" type="hidden" value="$id">
                 
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="strum">Motif de la rythmique (Strum) :</label>
                             <input id="strum" type="text" class="form-control input-lg" style="font-family: monospace; letter-spacing: 2px;" placeholder="Ex: B-BH-HBH" value="$strumPattern">
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="tags">Tags (séparés par des virgules) :</label>
-                            <input id="tags" type="text" class="form-control input-lg" placeholder="exercices, atelier..." value="{$strumObj->getTags()}">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label for="unite">Division du temps (Unité) :</label>
                             <select id="unite" class="form-control">

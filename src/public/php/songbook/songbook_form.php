@@ -30,7 +30,7 @@ function renderDocumentRow($doc, $idSongbook): string {
                 <a href="$url" target="_blank" rel="noopener"><strong>$fichierCourt</strong></a>
                 <span class="text-muted small">($poids ko)</span>
             </div>
-            <a href="songbook_get.php?id=$idSongbook&idDoc=$idDoc&nomFic=$fichierCourt&mode=SUPPRFIC"
+            <a href="songbook_get.php?id=$idSongbook&amp;idDoc=$idDoc&amp;nomFic=$fichierCourt&amp;mode=SUPPRFIC"
                class="btn btn-xs btn-danger"
                title="Supprimer ce fichier"
                aria-label="Supprimer le fichier $fichierCourt"
@@ -50,7 +50,7 @@ function renderSommaireRow($docLien, $idSongbook, $index): string {
                 <i class="glyphicon glyphicon-menu-hamburger text-muted" style="margin-right: 15px;" aria-hidden="true"></i>
                 <strong>$index.</strong> $nomFic
             </span>
-            <a href="songbook_get.php?id=$idSongbook&idDoc=$idDoc&mode=SUPPRDOC"
+            <a href="songbook_get.php?id=$idSongbook&amp;idDoc=$idDoc&amp;mode=SUPPRDOC"
                class="btn btn-link btn-xs text-danger"
                title="Retirer du recueil"
                aria-label="Retirer $nomFic du recueil"
@@ -168,14 +168,6 @@ $html .= <<<HTML
                                 <label for="fdate" class="col-sm-4 control-label">Date :</label>
                                 <div class="col-sm-8">
                                     <input type="text" id="fdate" name="fdate" class="form-control" value="$date" placeholder="JJ/MM/AAAA">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="ftags" class="col-sm-4 control-label">Tags :</label>
-                                <div class="col-sm-8">
-                                    <input type="text" id="ftags" name="ftags" class="form-control" value="{$sb->getTags()}" placeholder="exercices, atelier...">
                                 </div>
                             </div>
                         </div>

@@ -25,7 +25,6 @@ class ChansonFormRenderer
         $datePub = dateMysqlVersTexte($_chanson->getDatePub());
         $hits = $_chanson->getHits();
         $idUser = $_chanson->getIdUser();
-        $tags = htmlspecialchars($_chanson->getTags(), ENT_QUOTES);
         
         $selBinaire = ($_chanson->getPulsation() == "binaire") ? "selected" : "";
         $selTernaire = ($_chanson->getPulsation() == "ternaire") ? "selected" : "";
@@ -90,10 +89,6 @@ class ChansonFormRenderer
             <div class="form-group">
                 <label class="col-sm-3 control-label">Propriétaire :</label>
                 <div class="col-sm-8">$selectUser</div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Tags :</label>
-                <div class="col-sm-8"><input class="form-control" type="text" name="ftags" value="$tags" placeholder="exercices, strums, chansons, atelier, sondage..."></div>
             </div>
             <div class="form-group" style="margin-top: 30px;">
                 <div class="col-sm-offset-3 col-sm-8">
@@ -168,7 +163,7 @@ HTML;
 HTML;
             $privilege = $_SESSION['privilege'] ?? 0;
             if ($privilege > ($GLOBALS["PRIVILEGE_EDITEUR"] ?? 2)) {
-                $out .= boutonSuppression(self::CHANSON_POST . "?id=$id&idDoc=$idDoc&mode=SUPPRDOC", $iconePoubelle, $cheminImages);
+                $out .= boutonSuppression(self::CHANSON_POST . "?id=$id&amp;idDoc=$idDoc&amp;mode=SUPPRDOC", $iconePoubelle, $cheminImages);
             }
             $out .= "</div></li>";
         }
@@ -246,7 +241,7 @@ HTML;
             $nomFic = $fichiersSurDisque[$i+1];
             if (!in_array($nomFic, $fichiersEnBdd)) {
                 $nbOrphelins++;
-                $urlSuppr = self::CHANSON_POST . "?nomFic=" . urlencode(self::RETOUR_RACINE . $_dossier_chansons . $id . "/" . $nomFic) . "&mode=SUPPRFIC&id=$id";
+                $urlSuppr = self::CHANSON_POST . "?nomFic=" . urlencode(self::RETOUR_RACINE . $_dossier_chansons . $id . "/" . $nomFic) . "&amp;mode=SUPPRFIC&amp;id=$id";
                 $btnSuppr = boutonSuppression($urlSuppr, $iconePoubelle, $cheminImages);
                 
                 $out .= <<<HTML
@@ -282,7 +277,7 @@ HTML;
             
             $motif = str_replace(" ", "-", $s->getStrum());
             $badgeSwing = $s->getSwing() ? "<span class='label label-warning'>SWING</span>" : "";
-            $actionDel = "../liens/lienStrumChanson_post.php?id={$l[0]}&mode=DEL&idChanson=$id";
+            $actionDel = "../liens/lienStrumChanson_post.php?id={$l[0]}&amp;mode=DEL&amp;idChanson=$id";
 
             $out .= <<<HTML
             <div class="list-group-item" style="display:flex; justify-content:space-between; align-items:center;">

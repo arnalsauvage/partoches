@@ -351,7 +351,7 @@ class Utilisateur
         $actionsAdmin = "";
         if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
             $urlEdit = "utilisateur_form.php?id=$id";
-            $urlSuppr = "utilisateur_get.php?id=$id&mode=SUPPR";
+            $urlSuppr = "utilisateur_get.php?id=$id&amp;mode=SUPPR";
             $actionsAdmin = <<<HTML
             <div class="user-card-actions">
                 <a href="$urlEdit" class="btn btn-xs btn-primary" title="Modifier"><i class="glyphicon glyphicon-pencil"></i></a>

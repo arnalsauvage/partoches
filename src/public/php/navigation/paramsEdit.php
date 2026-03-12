@@ -7,17 +7,12 @@ if (isset($_POST['action'])) {
         if (file_exists($fichierLog)) {
             $ext = strtolower(pathinfo($fichierLog, PATHINFO_EXTENSION));
             $contenu = file_get_contents($fichierLog);
-            
-            // Correction encodage si besoin (si le log est en ISO)
             if (!mb_check_encoding($contenu, 'UTF-8')) {
                 $contenu = mb_convert_encoding($contenu, 'UTF-8', 'ISO-8859-1');
             }
-
             if (in_array($ext, ['htm', 'html'])) {
-                // Rendu HTML direct pour les fichiers .htm ou .html
                 echo "<div class='render-html-dj'>$contenu</div>";
             } else {
-                // Texte brut pour les autres
                 echo "<pre style='max-height: 500px; overflow: auto; background: #f8f9fa; padding: 10px; border: 1px solid #ddd; font-size:12px;'>";
                 echo htmlspecialchars($contenu);
                 echo "</pre>";
@@ -39,9 +34,7 @@ if (isset($_POST['action'])) {
         } else {
             echo "<div class='table-responsive'><table class='table table-condensed table-striped table-bordered'>";
             echo "<thead><tr class='info'>";
-            while ($finfo = $res->fetch_field()) {
-                echo "<th>" . $finfo->name . "</th>";
-            }
+            while ($finfo = $res->fetch_field()) echo "<th>" . $finfo->name . "</th>";
             echo "</tr></thead><tbody>";
             while ($row = $res->fetch_assoc()) {
                 echo "<tr>";
@@ -55,29 +48,13 @@ if (isset($_POST['action'])) {
 
     if ($_POST['action'] === 'infos_systeme') {
         require_once __DIR__ . "/../lib/configMysql.php";
-        echo "<h4><i class='glyphicon glyphicon-info-sign'></i> Environnement</h4><ul>";
+        echo "<h4><span class='glyphicon glyphicon-info-sign'></span> Environnement</h4><ul>";
         echo "<li><strong>Version PHP :</strong> " . phpversion() . "</li>";
         echo "<li><strong>Version MySQL :</strong> " . $mysqli->server_info . "</li>";
         $res = $mysqli->query("SELECT SUM(data_length + index_length) / 1024 / 1024 AS size FROM information_schema.TABLES WHERE table_schema = '$mabase'");
         $row = $res->fetch_assoc();
         echo "<li><strong>Taille BDD :</strong> " . round($row['size'], 2) . " Mo</li>";
         echo "</ul>";
-        exit;
-    }
-
-    if ($_POST['action'] === 'derniere_date_modif') {
-        function trouverDerniereDateModif($dossier) {
-            $derniereDate = 0;
-            if (!is_dir($dossier)) return 0;
-            $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dossier));
-            foreach ($it as $fichier) {
-                if ($fichier->isFile() && $fichier->getMTime() > $derniereDate) {
-                    $derniereDate = $fichier->getMTime();
-                }
-            }
-            return $derniereDate;
-        }
-        echo date("d/m/Y H:i:s", trouverDerniereDateModif(__DIR__ . "/../../php"));
         exit;
     }
 }
@@ -93,7 +70,8 @@ $fichier = __DIR__ . "/../../../data/conf/params.ini";
 $alerts = "";
 
 if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-    include __DIR__ . "/../../html/composants/menuLogin.html";
+    echo "<div class='container' style='margin-top:100px;'><div class='alert alert-danger'><h4>Accès restreint</h4>Vous devez être administrateur pour accéder à cette page.</div></div>";
+    echo envoieFooter();
     exit();
 }
 
@@ -117,9 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
     foreach (array_merge(array_keys($itemsGeneral), array_keys($itemsMysql), array_keys($itemsAdmin)) as $item) {
         if (isset($_POST[$item])) {
             $groupe = array_key_exists($item, $itemsGeneral) ? "general" : (array_key_exists($item, $itemsMysql) ? "mysql" : "admin");
-            // Nettoyage UTF8 avant sauvegarde
-            $valeur = $_POST[$item];
-            $ini_objet->m_put($valeur, $item, $groupe);
+            $ini_objet->m_put($_POST[$item], $item, $groupe);
             $bModif = true;
         }
     }
@@ -137,25 +113,17 @@ $logoActuel = $ini_objet->m_valeur('logoSite', 'general');
 
 function champInput($ini, $name, $label, $type, $groupe) {
     $val = $ini->m_valeur($name, $groupe) ?? '';
-    
-    // Correction encodage pour l'affichage (si le INI est en ISO)
-    if (!empty($val) && !mb_check_encoding($val, 'UTF-8')) {
-        $val = mb_convert_encoding($val, 'UTF-8', 'ISO-8859-1');
-    }
-    // Nettoyage final des entités pour éviter le double encodage
+    if (!empty($val) && !mb_check_encoding($val, 'UTF-8')) $val = mb_convert_encoding($val, 'UTF-8', 'ISO-8859-1');
     $val = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
 
-    $html = "<div class='form-group-django'>";
-    $html .= "<label class='label-django'>$label</label>";
+    $html = "<div class='form-group-django'><label class='label-django'>$label</label>";
     if ($type === "checkbox") {
         $checked = ($val == "1") ? "checked" : "";
         $html = "<div class='checkbox-django'><label><input type='checkbox' name='$name' value='1' $checked> $label</label></div>";
     } else {
         $isPwd = (str_contains(strtolower($name), 'key') || str_contains(strtolower($name), 'passe') || $name === 'cleGetSongBpm');
-        $inputType = $isPwd ? "password" : $type;
-        $html .= "<div class='input-group-django'>";
-        $html .= "<input type='$inputType' class='input-django' name='$name' id='$name' value='$val'>";
-        if ($isPwd) $html .= "<button type='button' class='btn-toggle-pwd' data-target='$name'><i class='glyphicon glyphicon-eye-open'></i></button>";
+        $html .= "<div class='input-group-django'><input type='" . ($isPwd ? "password" : $type) . "' class='input-django' name='$name' id='$name' value='$val'>";
+        if ($isPwd) $html .= "<button type='button' class='btn-toggle-pwd' data-target='$name'><span class='glyphicon glyphicon-eye-open'></span></button>";
         $html .= "</div>";
     }
     $html .= "</div>";
@@ -167,21 +135,21 @@ echo $alerts;
 ?>
 
 <div class="header-django">
-    <h1><i class="glyphicon glyphicon-cog"></i> Paramétrage</h1>
+    <h1><span class="glyphicon glyphicon-cog"></span> Paramétrage</h1>
     <div class="btn-group-django">
-        <a href='../todo/todo_admin.php' class='btn-dj btn-dj-primary'><i class="glyphicon glyphicon-list-alt"></i> Roadbook</a>
-        <a href='../audit/imagesCheck.php' class='btn-dj btn-dj-info'><i class="glyphicon glyphicon-eye-open"></i> Images</a>
-        <a href='../media/listeMedias.php' class='btn-dj btn-dj-default'><i class="glyphicon glyphicon-picture"></i> Médias</a>
+        <a href='../todo/todo_admin.php' class='btn-dj btn-dj-primary'><span class="glyphicon glyphicon-list-alt"></span> Roadbook</a>
+        <a href='../audit/imagesCheck.php' class='btn-dj btn-dj-info'><span class="glyphicon glyphicon-eye-open"></span> Images</a>
+        <a href='../media/listeMedias.php' class='btn-dj btn-dj-default'><span class="glyphicon glyphicon-picture"></span> Médias</a>
     </div>
 </div>
 
 <form method='post' enctype='multipart/form-data' class='form-dj-reset'>
     <ul class="tabs-django">
-        <li class="tab-dj active" data-target="dj-gen"><i class="glyphicon glyphicon-home"></i> Général</li>
-        <li class="tab-dj" data-target="dj-sql-db"><i class="glyphicon glyphicon-hdd"></i> Base</li>
-        <li class="tab-dj" data-target="dj-foot"><i class="glyphicon glyphicon-edit"></i> Footer</li>
-        <li class="tab-dj" data-target="dj-logs"><i class="glyphicon glyphicon-list"></i> Logs</li>
-        <li class="tab-dj" data-target="dj-console"><i class="glyphicon glyphicon-console"></i> SQL</li>
+        <li class="tab-dj active" data-target="dj-gen"><span class="glyphicon glyphicon-home"></span> Général</li>
+        <li class="tab-dj" data-target="dj-sql-db"><span class="glyphicon glyphicon-hdd"></span> Base</li>
+        <li class="tab-dj" data-target="dj-foot"><span class="glyphicon glyphicon-edit"></span> Footer</li>
+        <li class="tab-dj" data-target="dj-logs"><span class="glyphicon glyphicon-list"></span> Logs</li>
+        <li class="tab-dj" data-target="dj-console"><span class="glyphicon glyphicon-console"></span> SQL</li>
     </ul>
 
     <div class="content-django">
@@ -191,7 +159,7 @@ echo $alerts;
                     <div class="section-dj">
                         <div class="section-dj-title">Identité</div>
                         <div style="display:flex; align-items:center; margin-bottom:15px;">
-                            <img src='../../images/navigation/<?php echo $logoActuel; ?>' class="img-thumbnail" style="height:60px; margin-right:15px;">
+                            <img src='../../images/navigation/<?php echo $logoActuel; ?>' class="img-thumbnail" style="height:60px; margin-right:15px;" alt="Logo">
                             <input type="file" name="logoSite" class="input-django">
                         </div>
                         <?php echo champInput($ini_objet, "titreSite", "Nom du site", "text", "general"); ?>
@@ -201,7 +169,7 @@ echo $alerts;
                 </div>
                 <div class="col-md-6">
                     <div class="section-dj">
-                        <div class="section-dj-title">Emails & API</div>
+                        <div class="section-dj-title">Emails &amp; API</div>
                         <?php echo champInput($ini_objet, "EmailAdmin", "Email admin", "email", "general"); ?>
                         <?php echo champInput($ini_objet, "cleGetSongBpm", "Clé GetSongBpm", "text", "general"); ?>
                         <?php echo champInput($ini_objet, "GEMINI_API_KEY", "Clé Gemini", "text", "general"); ?>
@@ -277,49 +245,16 @@ echo $alerts;
 .footer-save-dj { margin-top: 20px; padding: 20px; background: #F5F5DC; border: 1px solid #D2B48C; border-radius: 8px; }
 .spin { animation: spin 2s infinite linear; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }
-
-/* Mobile Adaptations */
 @media (max-width: 768px) {
     .header-django { flex-direction: column; align-items: stretch; text-align: center; }
     .header-django h1 { margin-bottom: 15px; font-size: 24px; }
-    .btn-group-django { display: flex; flex-direction: column; gap: 5px; }
-    .btn-dj { width: 100%; margin: 0; text-align: left; }
+    .btn-dj { width: 100%; text-align: left; }
     .tabs-django { justify-content: space-around; }
     .tab-dj { flex-grow: 1; text-align: center; padding: 10px 5px; font-size: 12px; }
-    .section-dj { padding: 10px; }
-    .input-django { font-size: 16px; }
 }
-
-/* Fix styles Footer Editor */
-.textarea-footer-dj {
-    display: block !important;
-    width: 100% !important;
-    height: 350px !important;
-    padding: 15px !important;
-    font-family: 'Courier New', Courier, monospace !important;
-    font-size: 14px !important;
-    background: #2b1d1a !important;
-    color: #f5f5dc !important;
-    border: 1px solid #1a1210 !important;
-    border-radius: 8px !important;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3) !important;
-    box-sizing: border-box !important;
-}
-
-/* Fix styles Logs View */
-.well-log-dj {
-    background: #fff !important;
-    min-height: 500px !important;
-    max-height: 800px !important;
-    overflow: auto !important;
-    padding: 15px !important;
-    border: 1px solid #ddd !important;
-    border-radius: 4px !important;
-}
-.render-html-dj {
-    background: white;
-    padding: 10px;
-}
+.textarea-footer-dj { display: block !important; width: 100% !important; height: 350px !important; padding: 15px !important; font-family: monospace !important; font-size: 14px !important; background: #2b1d1a !important; color: #f5f5dc !important; border: 1px solid #1a1210 !important; border-radius: 8px !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3) !important; box-sizing: border-box !important; }
+.well-log-dj { background: #fff !important; min-height: 500px !important; max-height: 800px !important; overflow: auto !important; padding: 15px !important; border: 1px solid #ddd !important; border-radius: 4px !important; }
+.render-html-dj { background: white; padding: 10px; }
 </style>
 
 <script>
@@ -331,22 +266,19 @@ $(document).ready(function(){
         $('.pane-dj').removeClass('active');
         $('#' + target).addClass('active');
     });
-
     $('.btn-toggle-pwd').click(function(){
         var i = $('#' + $(this).data('target'));
         i.attr('type', i.attr('type') === 'password' ? 'text' : 'password');
-        $(this).find('i').toggleClass('glyphicon-eye-open glyphicon-eye-close');
+        $(this).find('span').toggleClass('glyphicon-eye-open glyphicon-eye-close');
     });
-
     $('.item-log-dj').click(function(e){
         e.preventDefault();
         var f = $(this).data('file');
         $('.item-log-dj').removeClass('active');
         $(this).addClass('active');
-        $('#log-view-dj').html('<div class="text-center" style="margin-top:50px;"><i class="glyphicon glyphicon-refresh spin" style="font-size:20px;"></i> Lecture...</div>');
+        $('#log-view-dj').html('<div class="text-center" style="margin-top:50px;"><span class="glyphicon glyphicon-refresh spin"></span> Lecture...</div>');
         $.post('', {action: 'lecture_log', fichier: f}, function(d){ $('#log-view-dj').html(d); });
     });
-
     $('#btnRunSqlDj').click(function(){
         $('#sqlResDj').html('Exécution...');
         $.post('', {action: 'execute_sql', sql: $('#sqlQueryDj').val()}, function(d){ $('#sqlResDj').html(d); });

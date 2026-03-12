@@ -31,7 +31,6 @@ if (($mode == "MAJ") || ($mode == "INS")) {
     $fdescription = $_POST ['fdescription'];
     $fimage = $_POST ['fimage'];
     $ftype = $_POST['ftype'];
-    $ftags = $_POST['ftags'] ?? '';
 
     // Seul admin peut modifier hits et date
     if ($_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
@@ -57,7 +56,7 @@ if ($mode == "MAJ") {
         $fdate = dateMysqlVersTexte($songbook[3]);
     }
     /** @noinspection PhpUndefinedVariableInspection */
-    modifiesSongbook($id, $fnom, $fdescription, $fdate, $fimage, $fhits, $ftype, $ftags);
+    modifiesSongbook($id, $fnom, $fdescription, $fdate, $fimage, $fhits, $ftype);
 }
 
 // Cas de l'ajout d'un Songbook
@@ -65,7 +64,7 @@ if ($mode == "INS") {
     $fhits = 0;
     $fdate = date("d/m/Y");
     /** @noinspection PhpUndefinedVariableInspection */
-    creeSongbook($fnom, $fdescription, $fdate, $fimage, $fhits, $ftype, $ftags);
+    creeSongbook($fnom, $fdescription, $fdate, $fimage, $fhits, $ftype);
 }
 
 // Gestion de la demande de suppression

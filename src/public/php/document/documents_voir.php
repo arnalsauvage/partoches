@@ -67,17 +67,17 @@ $sortie .= <<<HTML
 <form METHOD="POST" ACTION="documents_voir.php" NAME="formfiltre" class="well form-inline">
     <div class="form-group">
         <input type="text" list="typesFichier" value="$contenuFiltrer" name="filtre" class="form-control" placeholder="Filtrer par nom...">
-        <datalist id="typesFichier">
-           <option value="*"> tous</option>
-           <option value="doc"> document </option>
-           <option value="son"> son</option>
-           <option value="img"> image</option>
-        </datalist>
     </div>
     <button type="submit" name="filtrer" class="btn btn-primary">
         <span class="glyphicon glyphicon-filter"></span> Filtrer
     </button>
 </form>
+<datalist id="typesFichier">
+   <option value="*">tous</option>
+   <option value="doc">document</option>
+   <option value="son">son</option>
+   <option value="img">image</option>
+</datalist>
 HTML;
 
 

@@ -28,8 +28,7 @@ $activePop = ($tri == 'pop') ? 'btn-primary' : 'btn-default';
 
 // Préparation des options du select
 $opt44 = ($mesure == '4/4') ? 'selected' : '';
-$opt34 = ($mesure == '3/4') ? 'selected' : '';
-$opt68 = ($mesure == '6/8') ? 'selected' : '';
+$opt3t = ($mesure == '3t') ? 'selected' : '';
 
 $html = <<<HTML
 <div class="container strum-container">
@@ -47,9 +46,9 @@ $html = <<<HTML
         <div class="col-sm-7 text-center-xs" style="margin-bottom: 10px;">
             <span style="font-weight: bold; color: #8B4513; margin-right: 10px; text-transform: uppercase; font-size: 12px;">Classer par :</span>
             <div class="btn-group" role="group">
-                <a href="?sort=nom&mesure=$mesure" class="btn btn-sm $activeNom">Nom</a>
-                <a href="?sort=date&mesure=$mesure" class="btn btn-sm $activeDate">Plus récents</a>
-                <a href="?sort=pop&mesure=$mesure" class="btn btn-sm $activePop">Plus utilisés</a>
+                <a href="?sort=nom&amp;mesure=$mesure" class="btn btn-sm $activeNom">Nom</a>
+                <a href="?sort=date&amp;mesure=$mesure" class="btn btn-sm $activeDate">Plus récents</a>
+                <a href="?sort=pop&amp;mesure=$mesure" class="btn btn-sm $activePop">Plus utilisés</a>
             </div>
         </div>
         <div class="col-sm-5 text-right text-center-xs">
@@ -58,9 +57,8 @@ $html = <<<HTML
                 <label style="font-weight: bold; color: #8B4513; margin-right: 10px; text-transform: uppercase; font-size: 12px;">Mesure :</label>
                 <select name="mesure" class="form-control input-sm" onchange="this.form.submit()" style="border-radius: 15px;">
                     <option value="">Toutes</option>
-                    <option value="4/4" $opt44>4/4</option>
-                    <option value="3/4" $opt34>3/4</option>
-                    <option value="6/8" $opt68>6/8</option>
+                    <option value="4/4" $opt44>4 temps</option>
+                    <option value="3t" $opt3t>3 temps</option>
                 </select>
             </form>
         </div>

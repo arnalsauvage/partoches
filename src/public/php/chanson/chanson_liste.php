@@ -151,8 +151,8 @@ if ($filtre <> "" && $valeur_filtre <> "") {
     $contenuHtml .= "<div class='alert alert-info' role='alert' style='margin: 10px auto; width: 380px; padding: 10px; position: relative; display: flex; align-items: center; justify-content: center;'>";
     
     if ($showButtons) {
-        $urlMoins = "?filtre=$filtre&valFiltre=" . urlencode($valMoins);
-        $urlPlus = "?filtre=$filtre&valFiltre=" . urlencode($valPlus);
+        $urlMoins = "?filtre=$filtre&amp;valFiltre=" . urlencode($valMoins);
+        $urlPlus = "?filtre=$filtre&amp;valFiltre=" . urlencode($valPlus);
         $contenuHtml .= "
         <div class='btn-group btn-group-xs' style='margin-right: 15px;'>
             <a href='$urlMoins' class='btn btn-default' title='Diminuer' style='padding: 2px 8px; border-radius: 10px 0 0 10px;'><i class='glyphicon glyphicon-minus'></i></a>
@@ -263,7 +263,7 @@ if ($_SESSION['vue'] == 'cartes') {
         
         // On repart à la page 1 quand on change de filtre
         $urlSansPage = $pagination->retirerParametreUrl("page");
-        $urlFiltre = $pagination->urlAjouteParam($urlSansPage, FILTRE . "=$cle&" . VAL_FILTRE . "=" . urlencode($valeur));
+        $urlFiltre = $pagination->urlAjouteParam($urlSansPage, FILTRE . "=$cle&amp;" . VAL_FILTRE . "=" . urlencode($valeur));
         
         return TblCellule(ancre($urlFiltre, $texte), 1, 1, $alignement);
     }

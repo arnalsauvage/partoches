@@ -13,7 +13,6 @@ class Strum
     private int $_longueur; // nb de temps/divisions
     private string $_description;
     private int $_swing; // 1 = ternaire/swing, 0 = binaire
-    private string $_tags; // Tags : exercices, strums, chansons, atelier, sondage
 
     public function __construct()
     {
@@ -32,7 +31,6 @@ class Strum
         $this->_longueur = 8;
         $this->_description = "";
         $this->_swing = 0;
-        $this->_tags = "";
     }
 
     public function __construct1(int $id)
@@ -61,9 +59,6 @@ class Strum
 
     public function getSwing(): int { return $this->_swing; }
     public function setSwing(int $swing): void { $this->_swing = $swing; }
-
-    public function getTags(): string { return $this->_tags; }
-    public function setTags(string $tags): void { $this->_tags = $tags; }
 
     /**
      * Charge les données depuis la BDD
@@ -95,7 +90,6 @@ class Strum
         $this->_strum = (string)($row['strum'] ?? "");
         $this->_description = (string)($row['description'] ?? "");
         $this->_swing = (int)($row['swing'] ?? 0);
-        $this->_tags = (string)($row['tags'] ?? "");
     }
 
     /**
@@ -106,16 +100,16 @@ class Strum
         $db = $_SESSION[self::MYSQL];
         
         if ($this->_id == 0) {
-            $maRequete = "INSERT INTO strum (unite, longueur, strum, description, swing, tags) VALUES (?, ?, ?, ?, ?, ?)";
+            $maRequete = "INSERT INTO strum (unite, longueur, strum, description, swing) VALUES (?, ?, ?, ?, ?)";
             $stmt = $db->prepare($maRequete);
-            $stmt->bind_param("iissss", $this->_unite, $this->_longueur, $this->_strum, $this->_description, $this->_swing, $this->_tags);
+            $stmt->bind_param("iisss", $this->_unite, $this->_longueur, $this->_strum, $this->_description, $this->_swing);
             if ($stmt->execute()) {
                 $this->_id = $db->insert_id;
             }
         } else {
-            $maRequete = "UPDATE strum SET unite=?, longueur=?, strum=?, description=?, swing=?, tags=? WHERE id=?";
+            $maRequete = "UPDATE strum SET unite=?, longueur=?, strum=?, description=?, swing=? WHERE id=?";
             $stmt = $db->prepare($maRequete);
-            $stmt->bind_param("iissssi", $this->_unite, $this->_longueur, $this->_strum, $this->_description, $this->_swing, $this->_tags, $this->_id);
+            $stmt->bind_param("iisssi", $this->_unite, $this->_longueur, $this->_strum, $this->_description, $this->_swing, $this->_id);
             $stmt->execute();
         }
         return $this->_id;
@@ -154,7 +148,7 @@ class Strum
         $desc = htmlspecialchars(limiteLongueur($this->getDescription(), 80));
         $unite = $this->renvoieUniteEnFrancais();
         $longueur = $this->getLongueur();
-        $swingParam = "&ternaire=" . ($this->_swing ? "true" : "false");
+        $swingParam = "&amp;ternaire=" . ($this->_swing ? "true" : "false");
         
         $urlBoiteAstrum = "../../html/boiteAstrum/index.html";
         $imageBoiteAstrum = "../../html/boiteAstrum/medias/img/boiteAstrum.png";
@@ -166,17 +160,6 @@ class Strum
 
         $badgeSwing = $this->_swing ? "<span class='label label-warning' style='background-color: #f39c12; margin-left: 5px;'>SWING</span>" : "";
 
-        $tagsHtml = "";
-        if (!empty($this->_tags)) {
-            $tagsArray = explode(",", $this->_tags);
-            foreach ($tagsArray as $tag) {
-                $tag = trim($tag);
-                if (!empty($tag)) {
-                    $tagsHtml .= "<span class='label label-default' style='margin-right: 3px; background-color: #9e8d8a;'>#$tag</span> ";
-                }
-            }
-        }
-
         $html = "
         <div class='col-sm-6 col-md-4 col-lg-3'>
             <div class='thumbnail strum-card'>
@@ -184,16 +167,13 @@ class Strum
                     <h2>$strumDisplay</h2>
                 </div>
                 <div class='strum-card-body'>
-                    <p class='strum-card-desc'>$desc</p>
+                    <p class='strum-card-desc' style='height: 40px; overflow: hidden;'>$desc</p>
                     <div style='margin-bottom: 15px;'>
                         <span class='label label-default' style='background-color: #777;'>$longueur $unite</span>
                         $badgeSwing
                         <button class='label strum-badge-pop' onclick='voirChansonsStrum($id, \"$strumDisplay\")' title='Voir les chansons liées'>
                             $count <i class='glyphicon glyphicon-music'></i>
                         </button>
-                    </div>
-                    <div style='margin-bottom: 15px; height: 20px; overflow: hidden;'>
-                        $tagsHtml
                     </div>
                     
                     <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
@@ -206,7 +186,7 @@ class Strum
             $html .= " <a href='strum_form.php?id=$id' class='btn btn-sm btn-primary' title='Editer' style='margin-right: 5px;'><i class='glyphicon glyphicon-pencil'></i></a>";
         }
         if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
-            $html .= " <a href='strum_post.php?id=$id&mode=SUPPR' class='btn btn-sm btn-danger' title='Supprimer' onclick='return confirm(\"Supprimer ce strum ?\")'><i class='glyphicon glyphicon-trash'></i></a>";
+            $html .= " <a href='strum_post.php?id=$id&amp;mode=SUPPR' class='btn btn-sm btn-danger' title='Supprimer' onclick='return confirm(\"Supprimer ce strum ?\")'><i class='glyphicon glyphicon-trash'></i></a>";
         }
 
         $html .= "      </div>
@@ -319,15 +299,27 @@ class Strum
         
         $where = "";
         if (!empty($mesure)) {
-            $parts = explode('/', $mesure);
-            if (count($parts) == 2) {
-                $where = " WHERE s.longueur = " . (int)$parts[0] . " AND s.unite = " . (int)$parts[1];
+            switch ($mesure) {
+                case '4/4':
+                    $where = " WHERE (s.unite = 4 AND s.longueur = 4) OR (s.unite = 8 AND s.longueur = 8) OR (s.unite = 16 AND s.longueur = 16)";
+                    break;
+                case '3t':
+                case '3/4':
+                case '6/8':
+                    $where = " WHERE (s.unite = 4 AND s.longueur = 3) OR (s.unite = 8 AND s.longueur = 6)";
+                    break;
+                default:
+                    $parts = explode('/', $mesure);
+                    if (count($parts) == 2) {
+                        $where = " WHERE s.longueur = " . (int)$parts[0] . " AND s.unite = " . (int)$parts[1];
+                    }
+                    break;
             }
         }
 
         switch ($tri) {
             case 'date':
-                $ordre = "id DESC";
+                $ordre = "s.id DESC";
                 $select = "s.*";
                 $join = "";
                 break;

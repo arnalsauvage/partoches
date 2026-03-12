@@ -14,7 +14,6 @@ $(document).ready(function () {
             longueur: $('#longueur').val(),
             strum: $('#strum').val(),
             description: $('#description').val(),
-            tags: $('#tags').val(),
             swing: $('#swing').is(':checked') ? 1 : 0,
             mode: mode
         };

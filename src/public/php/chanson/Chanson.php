@@ -22,7 +22,6 @@ class Chanson
     private string $_tonalite;
     private ?string $_cover; // URL de la pochette
     private int $_publication; // 1 = publié, 0 = brouillon
-    private string $_tags; // Tags : exercices, strums, chansons, atelier, sondage
 
     // static $_logger;
 
@@ -54,7 +53,6 @@ class Chanson
         $this->setTonalite("C");
         $this->setCover(null); 
         $this->setPublication(1); // Publié par défaut
-        $this->setTags("");
     }
 
     /**
@@ -320,22 +318,6 @@ class Chanson
         $this->_publication = $publication;
     }
 
-    /**
-     * @return string
-     */
-    public function getTags(): string
-    {
-        return $this->_tags;
-    }
-
-    /**
-     * @param string $tags
-     */
-    public function setTags(string $tags): void
-    {
-        $this->_tags = $tags;
-    }
-
 
     // Cherche une chanson et la renvoie si elle existe
     public function chercheChanson($id): int
@@ -368,7 +350,6 @@ class Chanson
         $this->_tonalite = $ligne[10];
         $this->_cover = $ligne[11] ?? null;
         $this->_publication = (int)($ligne[12] ?? 1); // Nouvelle colonne publication
-        $this->_tags = (string)($ligne[13] ?? ""); // Nouvelle colonne tags
     }
 
     // Cherche un chanson, la charge et renvoie vrai si elle existe
@@ -398,10 +379,9 @@ class Chanson
             $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
             $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
             $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
-            $this->_tags = $_SESSION [self::MYSQL]->real_escape_string($this->_tags ?? '');
             $maRequete = sprintf("UPDATE  chanson SET nom = '%s', interprete = '%s', annee = '%s',
             idUser = %s, tempo = '%s', mesure='%s', pulsation='%s', 
-            hits='%s', tonalite='%s', datePub='%s', cover='%s', publication=%s, tags='%s' WHERE id='%s'", 
+            hits='%s', tonalite='%s', datePub='%s', cover='%s', publication=%s WHERE id='%s'", 
                 $this->_nom,
                 $this->_interprete,
                 $this->_annee,
@@ -414,7 +394,6 @@ class Chanson
                 $this->_datePub,
                 $this->_cover,
                 $this->_publication,
-                $this->_tags,
                 $this->_id);
             $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème modif dans creeModifieChanson #1 : " . $_SESSION [self::MYSQL]->error . " requete : " . $maRequete);
             return $this->_id;
@@ -428,11 +407,10 @@ class Chanson
         $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
         $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
         $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
-        $this->_tags = $_SESSION [self::MYSQL]->real_escape_string($this->_tags ?? '');
         $this->_datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
-        $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite, cover, publication, tags)
+        $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite, cover, publication)
 	        VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', 
-	        '%s', '%s' ,  '%s', '%s', '%s', %s, '%s')", 
+	        '%s', '%s' ,  '%s', '%s', '%s', %s)", 
             $this->_nom,
             $this->_interprete,
             $this->_annee,
@@ -444,8 +422,7 @@ class Chanson
             $this->_hits,
             $this->_tonalite,
             $this->_cover,
-            $this->_publication,
-            $this->_tags);
+            $this->_publication);
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème creeChansonBDD#1 : " . $_SESSION [self::MYSQL]->error);
         $this->setId($_SESSION [self::MYSQL]->insert_id);
         return ($this->getId());
@@ -772,10 +749,10 @@ public static function getTonaliteEquivalents(string $tonalite): array
         $c_beige = "#F5F5DC";
 
         // Construction des liens de filtrage
-        $urlInterprete = "?filtre=interprete&valFiltre=" . urlencode($interpreteFull);
-        $urlAnnee = "?filtre=annee&valFiltre=" . urlencode($annee);
-        $urlTempo = "?filtre=tempo&valFiltre=" . urlencode($tempo);
-        $urlTonalite = "?filtre=tonalite&valFiltre=" . urlencode($tonalite);
+        $urlInterprete = "?filtre=interprete&amp;valFiltre=" . urlencode($interpreteFull);
+        $urlAnnee = "?filtre=annee&amp;valFiltre=" . urlencode($annee);
+        $urlTempo = "?filtre=tempo&amp;valFiltre=" . urlencode($tempo);
+        $urlTonalite = "?filtre=tonalite&amp;valFiltre=" . urlencode($tonalite);
 
         // Badge Non Publié (visible pour admin et auteur)
         $badgeNonPublie = "";
