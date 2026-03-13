@@ -133,7 +133,8 @@ HTML;
         while ($ligneDoc = $lignes->fetch_row()) {
             $idDoc = $ligneDoc[0];
             $fichierCourt = Document::composeNomVersion($ligneDoc[1], $ligneDoc[4]);
-            $fichierUrl = self::RETOUR_RACINE . $_dossier_chansons . "$id/" . rawurlencode($fichierCourt);
+            // Correction Arnal : On force un chemin relatif web pour l'affichage
+            $fichierUrl = "../../data/chansons/$id/" . rawurlencode($fichierCourt);
             $ext = strtolower(pathinfo($ligneDoc[1], PATHINFO_EXTENSION));
             $poids = intval($ligneDoc[2] / 1024);
             
@@ -174,8 +175,14 @@ HTML;
         }
 
         $idChanson = $_chanson->getId();
+        $urlRegen = self::CHANSON_POST . "?id=$idChanson&amp;mode=REGEN_THUMBS";
         $out .= <<<HTML
         </ul>
+        <div style="margin-top: 15px; text-align: right;">
+            <a href="$urlRegen" class="btn btn-xs btn-warning" title="Régénérer toutes les miniatures de cette chanson">
+                <i class="glyphicon glyphicon-refresh"></i> RÉGÉNÉRER LES VIGNETTES
+            </a>
+        </div>
         <div class="well well-sm" style="margin-top: 20px;">
             <h4>Envoyer un nouveau fichier</h4>
             <form action="chanson_upload.php" method="post" enctype="multipart/form-data" class="form-inline">
@@ -241,7 +248,8 @@ HTML;
             $nomFic = $fichiersSurDisque[$i+1];
             if (!in_array($nomFic, $fichiersEnBdd)) {
                 $nbOrphelins++;
-                $urlSuppr = self::CHANSON_POST . "?nomFic=" . urlencode(self::RETOUR_RACINE . $_dossier_chansons . $id . "/" . $nomFic) . "&amp;mode=SUPPRFIC&amp;id=$id";
+                // Correction Arnal : On utilise le chemin physique propre pour unlink, sans le RETOUR_RACINE superflu
+                $urlSuppr = self::CHANSON_POST . "?nomFic=" . urlencode($_dossier_chansons . $id . "/" . $nomFic) . "&amp;mode=SUPPRFIC&amp;id=$id";
                 $btnSuppr = boutonSuppression($urlSuppr, $iconePoubelle, $cheminImages);
                 
                 $out .= <<<HTML

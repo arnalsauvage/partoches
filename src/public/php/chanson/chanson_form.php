@@ -48,6 +48,19 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
 $titrePage = ($mode == "MAJ") ? "Mise à jour - " . $_chanson->getNom() : "Création chanson";
 
+// --- GESTION DES MESSAGES (TOASTR) ---
+$msgScript = "";
+if (isset($_GET['msg'])) {
+    $m = $_GET['msg'];
+    $count = $_GET['count'] ?? 0;
+    $msgScript = "<script>$(function() { ";
+    switch($m) {
+        case 'OK_REGEN': $msgScript .= "toastr.success('Vignettes régénérées avec succès ($count fichier(s) traité(s)).');"; break;
+        case 'OK_UPLOAD': $msgScript .= "toastr.success('Fichier envoyé avec succès !');"; break;
+    }
+    $msgScript .= " });</script>";
+}
+
 // --- RENDU HTML ---
 $headHtml = envoieHead($titrePage, "../../css/chansonform.css?v=" . date('His'));
 $pasDeMenu = true;
@@ -129,4 +142,5 @@ $html .= envoieFooter();
 // --- AFFICHAGE FINAL ---
 echo $headHtml;
 echo $MENU_HTML;
+echo $msgScript;
 echo $html;

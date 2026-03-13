@@ -94,6 +94,29 @@ class Document
     }
 
     /**
+     * Modifie un document par son ID (incrémente la version)
+     * Permet aussi de changer le nom (ex: changement d'extension ou conversion webp)
+     */
+    public static function modifieDocumentParId($id, $nom, $tailleKo)
+    {
+        $date = date("d/m/y");
+        $date = convertitDateJJMMAAAAversMySql($date);
+        $idUser = $_SESSION ['id'] ?? 1;
+
+        $resultat = self::chercheDocument($id);
+        if ($resultat == NULL) {
+            return false;
+        }
+        $version = $resultat[4] + 1;
+
+        $maRequete = "UPDATE document SET nom = '$nom', tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser'
+	        WHERE id = '$id'";
+        $_SESSION ['mysql']->query($maRequete) or die ("Problème modifiedocumentParId #1 : " . $_SESSION ['mysql']->error . BR_REQUETE . $maRequete);
+
+        return $version;
+    }
+
+    /**
      * Modifie un document (incrémente la version)
      */
     public static function modifieDocument($nom, $tailleKo, $nomTable, $idTable)
@@ -186,7 +209,8 @@ class Document
     {
         $ligne = self::chercheDocument($idDoc);
         if ($ligne != 0) {
-            return DOSSIER_DATA . $ligne [5] . "s/" . $ligne [6] . "/" . self::composeNomVersion($ligne [1], $ligne [4]);
+            // On utilise un chemin relatif web plutôt que DOSSIER_DATA (qui est physique)
+            return "../../data/" . $ligne [5] . "s/" . $ligne [6] . "/" . self::composeNomVersion($ligne [1], $ligne [4]);
         }
         return "";
     }

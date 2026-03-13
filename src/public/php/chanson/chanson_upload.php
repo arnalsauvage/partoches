@@ -106,14 +106,13 @@ function handleFileUpload()
     // Si le fichier est pour mise à jour, on recherche son nom dans la bdd d'après son id
     $oldFileId = $_POST['oldFile'] ?? 0;
     if ($oldFileId > 0) {
-        $doc = chercheDocument($oldFileId);
-        $name_file = $doc[1];
-        // On force l'extension .webp si c'est une image et qu'on peut convertir
-        if ($isImage && $canConvertToWebp) {
-            $name_file = pathinfo($name_file, PATHINFO_FILENAME) . ".webp";
-        }
+        $doc = Document::chercheDocument($oldFileId);
+        // On conserve le nom de base du document existant (le "target"), mais on utilise l'extension finale
+        // (utile si on change de format, ex: doc -> pdf, ou jpg -> webp)
+        $oldBaseName = pathinfo($doc[1], PATHINFO_FILENAME);
+        $name_file = $oldBaseName . "." . $finalExt;
     } else {
-        // Simplification du nom de fichier
+        // Simplification du nom de fichier pour une nouvelle insertion
         $name_file = simplifieNomFichier($path);
         if ($isImage && $canConvertToWebp) {
             $name_file = pathinfo($name_file, PATHINFO_FILENAME) . ".webp";
@@ -152,10 +151,16 @@ function handleFileUpload()
         }
     }
 
-    creeModifieDocument($name_file, $_FILES[FICHIER_UPLOADE]['size'], "chanson", $_POST['id']);
-    $doc = chercheDocumentNomTableId($name_file, "chanson", $_POST['id']);
+    // Mise à jour ou création en BDD
+    if ($oldFileId > 0) {
+        $newVersion = Document::modifieDocumentParId($oldFileId, $name_file, $_FILES[FICHIER_UPLOADE]['size']);
+        $doc = Document::chercheDocument($oldFileId);
+    } else {
+        Document::creeModifieDocument($name_file, $_FILES[FICHIER_UPLOADE]['size'], "chanson", $_POST['id']);
+        $doc = Document::chercheDocumentNomTableId($name_file, "chanson", $_POST['id']);
+    }
 
-    $name_file_versioned = str_replace(".$finalExt", "-v" . ($doc[4]), $name_file) . ".$finalExt";
+    $name_file_versioned = Document::composeNomVersion($name_file, $doc[4]);
 
     // Déplacement du fichier final
     if (!rename($tmp_file, $repertoire . $name_file_versioned)) {
