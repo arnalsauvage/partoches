@@ -33,6 +33,6 @@ $_SESSION ['sousTitreSite'] = $sousTitreSite;
 // Niveau de log : on écrit à partir de DEBUG / INFO / WARNING / ERROR
 $niveauDeLog = $ini_objet->m_valeur("niveauDeLog", "general");
 
-$_DOSSIER_DATA = __DIR__ . "/../../../../data/";
+$_DOSSIER_DATA = __DIR__ . "/../../data/";
 $_DOSSIER_CHANSONS = $_DOSSIER_DATA . "chansons/";
 $_DOSSIER_SONGBOOKS = $_DOSSIER_DATA . "songbooks/";
