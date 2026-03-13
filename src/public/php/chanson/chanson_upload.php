@@ -163,10 +163,14 @@ function handleFileUpload()
     $name_file_versioned = Document::composeNomVersion($name_file, $doc[4]);
 
     // Déplacement du fichier final
-    if (!rename($tmp_file, $repertoire . $name_file_versioned)) {
+    $destination = $repertoire . $name_file_versioned;
+    if (!rename($tmp_file, $destination)) {
         echo "Il y a des erreurs! Impossible de copier le fichier $name_file_versioned dans le dossier cible $repertoire";
         return 0;
     }
+    
+    // On force les permissions pour éviter les 403 en production
+    chmod($destination, 0644);
 
     return 1; // Indique que l'upload a réussi
 }
