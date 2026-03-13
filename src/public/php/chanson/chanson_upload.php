@@ -30,7 +30,7 @@ function checkFileUpload()
 function createDirectoryIfNotExists($repertoire)
 {
     if (!file_exists($repertoire)) {
-        mkdir($repertoire, 0755);
+        mkdir($repertoire, 0755, true);
     }
 }
 
