@@ -5,7 +5,10 @@ const RESTAUREDOC = "RESTAUREDOC";
 const RENDOC = "RENDOC";
 const SUPPRFIC = "SUPPRFIC";
 const SUPPR = "SUPPR";
-$nomTable = "chanson";
+const REGEN_THUMBS = "REGEN_THUMBS";
+const CHANSON = "chanson";
+$nomTable = CHANSON;
+require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 require_once __DIR__ . "/../chanson/Chanson.php";
 require_once __DIR__ . "/../document/Document.php";
 require_once __DIR__ . "/../lib/utilssi.php";
@@ -195,6 +198,26 @@ if ($mode == RENDOC && $_SESSION [PRIVILEGE] > 1) {
             echo "La demande n'a pas été traitée... Erreur " . $retour;
         }
     }
+}
+
+// Régénération forcée des vignettes
+if ($mode == REGEN_THUMBS) {
+    require_once "../lib/Image.php";
+    $res = Document::chercheDocumentsTableId(CHANSON, $id);
+    $count = 0;
+    while ($doc = $res->fetch_row()) {
+        $nomDoc = $doc[1];
+        $version = $doc[4];
+        $ext = strtolower(pathinfo($nomDoc, PATHINFO_EXTENSION));
+        if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+            $relPath = $id . "/" . Document::composeNomVersion($nomDoc, $version);
+            // On force la régénération des deux tailles
+            Image::getThumbnailUrl($relPath, 'mini', 'chansons', true);
+            Image::getThumbnailUrl($relPath, 'sd', 'chansons', true);
+            $count++;
+        }
+    }
+    redirection("chanson_form.php?id=$id&msg=OK_REGEN&count=$count");
 }
 
 // Gestion de la demande de suppression de fichier dans la chanson

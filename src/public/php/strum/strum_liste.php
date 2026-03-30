@@ -10,7 +10,8 @@ require_once __DIR__ . "/../navigation/menu.php";
 $db = $_SESSION['mysql'];
 
 // Récupération des paramètres de tri et filtre
-$tri = $_GET['sort'] ?? 'nom';
+// Par défaut, on trie par date (plus récents en premier)
+$tri = $_GET['sort'] ?? 'date';
 $mesure = $_GET['mesure'] ?? '';
 
 $strums = Strum::chargeStrumsBdd($tri, $mesure);

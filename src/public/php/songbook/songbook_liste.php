@@ -16,8 +16,15 @@ $c_ivoire = "#fcfaf2";
 $c_orange = "#e67e22";
 
 // Gestion des paramètres
-$tri = $_GET['tri'] ?? ($_GET['triDesc'] ?? "date");
-$ordreAsc = !isset($_GET['triDesc']);
+// Par défaut, on trie par date décroissante (plus récents en premier)
+if (!isset($_GET['tri']) && !isset($_GET['triDesc'])) {
+    $tri = "date";
+    $ordreAsc = false;
+} else {
+    $tri = $_GET['tri'] ?? $_GET['triDesc'];
+    $ordreAsc = isset($_GET['tri']);
+}
+
 $typeFiltre = $_GET['type'] ?? "";
 $recherche = $_GET['recherche'] ?? "";
 $vueActive = $_SESSION['vue'] ?? 'cartes';

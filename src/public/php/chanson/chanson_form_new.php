@@ -13,16 +13,9 @@ const CHEMIN_SONGBOOK_FORM = RETOUR_RACINE . "/songbook/songbook_form.php";
 const JS_CHANSON_FORM_JS = RETOUR_RACINE . RETOUR_RACINE . "js/chansonForm.js?v=25.3.28";
 
 const DIV = "</div>";
-require_once("Chanson.php");
-require_once __DIR__ . "/../document/Document.php";
-require_once __DIR__ . "/../liens/LienStrumChanson.php";
-require_once __DIR__ . "/../liens/LienUrl.php";
-require_once __DIR__ . "/../navigation/menu.php";
-require_once __DIR__ . "/../songbook/Songbook.php";
-require_once __DIR__ . "/../strum/Strum.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
 require_once __DIR__ . "/../lib/utilssi.php";
-// Inclusion de FichierIni pour lire params.ini
-require_once __DIR__ . '/../lib/FichierIni.php'; // Chemin relatif vers FichierIni
+require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 
 $table =  CHANSON;
 $sortie = "";
@@ -31,7 +24,7 @@ global $cheminImages;
 global $_DOSSIER_CHANSONS;
 
 $listeSongbooks = [];
-$listeSongbooks = listeSongbooks();
+$listeSongbooks = Songbook::listeSongbooks();
 
 // Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
 if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_EDITEUR"]) {
@@ -46,7 +39,7 @@ if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_EDITEUR"]) {
 // $id, $nom, $interprete, $année, $idUser, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
 $_chanson = new Chanson();
 
-// Chargement des donnees de la chanson si l'identifiant est fourni
+$id = 0;
 
 if (isset ($_POST ['id']))
 {
@@ -62,27 +55,31 @@ if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
     $_chanson->setIdUser($_SESSION ['id']);
 }
 
-echo "alive";
+$titrePage = ($mode == "MAJ") ? "Mise à jour - " . $_chanson->getNom() : "Création chanson (Expérimental)";
+
+// --- RENDU HTML ---
+$headHtml = envoieHead($titrePage, "../../css/chansonform.css?v=" . date('His'));
+$pasDeMenu = true;
+require_once "../navigation/menu.php";
 
 $sortie .= "
-  <script>
-  $( function() {
-    $( '#tabs' ).tabs();
-  } );
-  </script>
- 
+<div class='container sb-form-container' style='padding-top: 70px;'>
+  <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;'>
 ";
 
 
 if ($mode == "MAJ"){
-    $sortie .= sprintf("<H1> Mise à jour - %s</H1>", $table);
+    $sortie .= sprintf("<H1 style='margin: 0;'> Mise à jour - %s</H1>", $table);
 }
 if ($mode == "INS"){
-    $sortie .= sprintf("<H1> Création - %s</H1>", $table);
+    $sortie .= sprintf("<H1 style='margin: 0;'> Création - %s</H1>", $table);
     $id = 0;
 }
 
+$sortie .= "</div>";
+
 // --- Début du premier onglet : Chanson ---
+
 // Ce formulaire ne contient pour l'instant que les champs du premier onglet.
 // Les informations externes (BPM, Année, Visuel) seront ajoutées via des appels API.
 
@@ -441,6 +438,11 @@ $sortie .= "<script src='" . JS_CHANSON_FORM_JS . "'></script>";
 </script>
 JAVASCRIPT;
 
+$sortie .= "</div> <!-- Fin .container -->";
+
+// --- AFFICHAGE FINAL ---
+echo $headHtml;
+echo $MENU_HTML;
 echo $sortie;
 echo envoieFooter();
 

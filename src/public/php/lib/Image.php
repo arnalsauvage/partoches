@@ -15,9 +15,10 @@ class Image {
      * @param string $relPath Chemin relatif (ex: "354/couverture.jpg" ou "1/avatar.png")
      * @param string $size 'mini' (100px) ou 'sd' (300px)
      * @param string $subDir Sous-dossier dans data/ (chansons, utilisateurs...)
+     * @param bool $force Si vrai, régénère la vignette même si elle existe
      * @return string URL de la vignette
      */
-    public static function getThumbnailUrl(string $relPath, string $size = 'mini', string $subDir = 'chansons'): string {
+    public static function getThumbnailUrl(string $relPath, string $size = 'mini', string $subDir = 'chansons', bool $force = false): string {
         $fallback = ($subDir === 'utilisateurs') ? "../../images/icones/icone_arnal.png" : "../../images/icones/vinyle.png";
         
         if (empty($relPath)) return $fallback;
@@ -32,8 +33,8 @@ class Image {
         $thumbUrl = "../../data/$subDir/" . dirname($relPath) . "/" . $pathInfo['filename'] . $suffix;
 
         // --- OPTIMISATION ÉCLAIR ---
-        // Si le WebP existe déjà, on le renvoie direct sans check de date source (sauf si on force)
-        if (file_exists($thumbPath)) {
+        // Si le WebP existe déjà, on le renvoie direct (sauf si on force)
+        if (!$force && file_exists($thumbPath)) {
             return $thumbUrl;
         }
 
@@ -84,6 +85,9 @@ class Image {
     }
 
     private static function generateThumb($srcPath, $destPath, $maxWidth) {
+        // Tentative d'augmentation de la mémoire pour les grosses images
+        @ini_set('memory_limit', '256M');
+
         if (!function_exists('imagewebp')) {
             error_log("IMAGE_LIB ERROR: GD support WebP manquant sur ce serveur.");
             return false;
@@ -91,20 +95,38 @@ class Image {
 
         $srcImg = self::load($srcPath);
         if (!$srcImg) {
-            error_log("IMAGE_LIB ERROR: Impossible de charger la source : $srcPath");
+            error_log("IMAGE_LIB ERROR: Impossible de charger la source : $srcPath (Fichier corrompu ou trop gros ?)");
             return false;
         }
 
         $thumbImg = self::resizeToLimit($srcImg, $maxWidth, $maxWidth);
         if (!$thumbImg) {
-            error_log("IMAGE_LIB ERROR: Echec du redimensionnement : $srcPath");
+            error_log("IMAGE_LIB ERROR: Echec du redimensionnement ($maxWidth px) : $srcPath");
             imagedestroy($srcImg);
             return false;
         }
 
+        // On s'assure que le dossier existe
+        $destDir = dirname($destPath);
+        if (!file_exists($destDir)) {
+            mkdir($destDir, 0755, true);
+        }
+
+        // Suppression de l'éventuel fichier de 0 octets qui bloquerait
+        if (file_exists($destPath) && filesize($destPath) === 0) {
+            unlink($destPath);
+        }
+
         $res = self::save($thumbImg, $destPath, 'webp', self::QUALITY_WEBP);
         if (!$res) {
-            error_log("IMAGE_LIB ERROR: Impossible d'ecrire le fichier (droits ?) : $destPath");
+            error_log("IMAGE_LIB ERROR: Impossible d'ecrire le fichier (droits ou disque plein ?) : $destPath");
+        } else {
+            // Check final : si le fichier fait 0 octets, c'est un echec de imagewebp
+            if (filesize($destPath) === 0) {
+                error_log("IMAGE_LIB ERROR: imagewebp a genere un fichier vide : $destPath");
+                unlink($destPath);
+                $res = false;
+            }
         }
         
         imagedestroy($srcImg);

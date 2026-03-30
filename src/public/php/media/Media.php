@@ -347,9 +347,34 @@ class Media
         $documents = chercheDocuments("nomTable", "chanson", "date", false);
         while ($compteur < $nombrePartoches && $document = $documents->fetch_row()) {
             if (str_ends_with(strtolower($document[1]), ".pdf")) {
-                $this->ajoutePartoche($document[0]);
+                $this->ajouteDocument($document[0], "partoche");
                 $compteur++;
             }
+        }
+    }
+
+    public function chercheNderniersAudios($nombreAudios = 50): void
+    {
+        $this->checkDbConnection();
+        $compteur = 0;
+        
+        // 1. Chercher dans les documents (fichiers mp3, m4a, aac)
+        $exts = ["mp3", "m4a", "aac"];
+        foreach ($exts as $ext) {
+            $documents = chercheDocuments("nom", "%.$ext", "date", false);
+            while ($compteur < $nombreAudios && $document = $documents->fetch_row()) {
+                if ($document[6] > 0 && $document[2] == 'chanson') { // idTable > 0 et nomTable == chanson
+                    $this->ajouteDocument($document[0], "audio");
+                    $compteur++;
+                }
+            }
+        }
+
+        // 2. Chercher dans les liens (type "Audio")
+        $nderniersLiens = chercheNderniersLiens("Audio");
+        while ($compteur < $nombreAudios && $liensUrl = $nderniersLiens->fetch_row()) {
+            $this->ajouteLienurl($liensUrl[0]);
+            $compteur++;
         }
     }
 
@@ -357,28 +382,39 @@ class Media
     {
         $this->checkDbConnection();
         $compteur = 0;
-        $nderniersLiens = chercheNderniersLiens("vidéo");
+        $nderniersLiens = chercheNderniersLiens("vid%"); // "vid%" pour attraper Vidéo, Vidéo, video, Video
+        while ($compteur < $nombreVideos && $liensUrl = $nderniersLiens->fetch_row()) {
+            $this->ajouteLienurl($liensUrl[0]);
+            $compteur++;
+        }
+        
+        // On cherche aussi les types "Video" explicitement au cas où
+        $nderniersLiens = chercheNderniersLiens("Video");
         while ($compteur < $nombreVideos && $liensUrl = $nderniersLiens->fetch_row()) {
             $this->ajouteLienurl($liensUrl[0]);
             $compteur++;
         }
     }
 
-    public function transformePartocheEnMedia($idDocPartoche): void
+    public function transformeDocumentEnMedia($idDoc, $typeForce = null): void
     {
         $this->checkDbConnection();
-        $document = chercheDocument($idDocPartoche);
+        $document = chercheDocument($idDoc);
         $idChanson = $document[6];
         $chanson = new Chanson($idChanson);
         
+        $extension = strtolower(pathinfo($document[1], PATHINFO_EXTENSION));
+        $type = $typeForce ?? ($extension === 'pdf' ? 'partoche' : 'audio');
+
         $this->setTitre($chanson->getNom());
-        $this->setDescription("Partoche pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
+        $descPrefix = ($type === 'partoche') ? "Partoche" : "Audio";
+        $this->setDescription("$descPrefix pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
         $this->setAuteur((int)$document[7]);
         $this->setDatePub($document[3]);
-        $this->setType("partoche");
-        $this->setTags("partoche " . $chanson->getAnnee());
+        $this->setType($type);
+        $this->setTags("$type " . $chanson->getAnnee());
         $this->setImage("./data/chansons/$idChanson/" . rawurlencode(imageTableId(self::TABLE_CHANSON, $idChanson)));
-        $this->setLien("./php/document/" . lienUrlTelechargeDocument($idDocPartoche));
+        $this->setLien("./php/document/" . lienUrlTelechargeDocument($idDoc));
     }
 
     public function transformeLienUrlEnMedia($idLienurl): void
@@ -389,26 +425,28 @@ class Media
         $chanson = new Chanson($idChanson);
         
         $this->setTitre($chanson->getNom());
-        $this->setDescription("Vidéo pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
+        $type = (string)$lienUrl[4];
+        $descPrefix = (str_contains(strtolower($type), 'vid')) ? "Vidéo" : "Audio";
+        $this->setDescription("$descPrefix pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
         $this->setAuteur((int)($lienUrl[7] ?? 1));
         $this->setDatePub($lienUrl[6]);
-        $this->setType((string)$lienUrl[4]);
-        $this->setTags($lienUrl[4] . " " . $chanson->getAnnee());
+        $this->setType($type);
+        $this->setTags($type . " " . $chanson->getAnnee());
         $this->setImage("./data/chansons/$idChanson/" . rawurlencode(imageTableId(self::TABLE_CHANSON, $idChanson)));
         $this->setLien((string)$lienUrl[3]);
     }
 
-    public function ajoutePartoche($idPartoche): void
+    public function ajouteDocument($idDoc, $typeForce = null): void
     {
         $this->checkDbConnection();
-        $this->transformePartocheEnMedia($idPartoche);
+        $this->transformeDocumentEnMedia($idDoc, $typeForce);
         $this->persist();
     }
 
-    public function ajouteLienurl($idPartoche): void
+    public function ajouteLienurl($idLien): void
     {
         $this->checkDbConnection();
-        $this->transformeLienUrlEnMedia($idPartoche);
+        $this->transformeLienUrlEnMedia($idLien);
         $this->persist();
     }
 
@@ -469,9 +507,19 @@ HTML;
         $auteur = chercheUtilisateur($this->_auteur);
         $auteurNom = htmlspecialchars($auteur[3] ?? "Auteur inconnu");
 
-        $isVideo = in_array($type, ["vidéo", "video"]);
-        $couleurBadge = $isVideo ? "primary" : "danger";
-        $emoji = $isVideo ? "🎬" : "🎵";
+        $isVideo = str_contains($type, 'vid');
+        $isAudio = ($type === 'audio' || $type === 'mp3' || $type === 'm4a');
+        
+        $couleurBadge = "danger"; // Par défaut Partoche
+        $emoji = "🎵";
+
+        if ($isVideo) {
+            $couleurBadge = "primary";
+            $emoji = "🎬";
+        } elseif ($isAudio) {
+            $couleurBadge = "warning";
+            $emoji = "🔊";
+        }
 
         return [
             'type' => $type,
@@ -492,8 +540,8 @@ HTML;
     {
         $this->checkDbConnection();
         $requete = "";
-        if ($this->getType() === 'partoche') {
-            if (preg_match('/getdoc.php\?doc=(\d+)/', $this->getLien(), $matches)) {
+        if ($this->getType() === 'partoche' || $this->getType() === 'audio') {
+            if (preg_match('/doc=(\d+)/', $this->getLien(), $matches)) {
                 $idDocument = (int)$matches[1];
                 $requete = "SELECT idTable FROM document WHERE id = $idDocument AND nomTable = 'chanson' LIMIT 1";
             }
@@ -525,6 +573,13 @@ HTML;
         return true;
     }
 
+    public function resetAvecDerniersAudios(int $nb = 50) :bool
+    {
+        $this->checkDbConnection();
+        $this->chercheNderniersAudios($nb);
+        return true;
+    }
+
     public function resetMediaTable(int $totalMedias = 50): void
     {
         $this->checkDbConnection();
@@ -533,30 +588,22 @@ HTML;
         $this->resetMediasDistribues($totalMedias);
     }
 
-    public function resetMediasDistribues(int $totalMedias): array
+    public function resetMediasDistribues(int $totalMedias = 50): array
     {
         $this->checkDbConnection();
         $db = $_SESSION[self::MYSQL];
 
-        $resultVideos = $db->query("SELECT COUNT(*) AS nb FROM lienurl WHERE type LIKE 'vid%'");
-        $nbVideos = $resultVideos ? (int) $resultVideos->fetch_assoc()["nb"] : 0;
-
-        $resultPartoches = $db->query("SELECT COUNT(*) AS nb FROM document WHERE nomTable='chanson' AND nom LIKE '%.pdf'");
-        $nbPartoches = $resultPartoches ? (int) $resultPartoches->fetch_assoc()["nb"] : 0;
-
-        $totalExistants = $nbVideos + $nbPartoches;
-        if ($totalExistants === 0) {
-            $nbVideosATraiter = (int) round($totalMedias / 2);
-        } else {
-            $pctVideos = $nbVideos / $totalExistants;
-            $nbVideosATraiter = (int) round($pctVideos * $totalMedias);
-        }
-        $nbPartochesATraiter = $totalMedias - $nbVideosATraiter;
+        // On définit des quotas plus équilibrés pour être sûr de voir de tout
+        // Même si une catégorie est moins représentée en BDD, on veut ses derniers éléments.
+        $nbVideosATraiter = 15;
+        $nbAudiosATraiter = 15;
+        $nbPartochesATraiter = $totalMedias - $nbVideosATraiter - $nbAudiosATraiter; // 20 par défaut
 
         $this->resetAvecDernieresPartoches($nbPartochesATraiter);
         $this->resetAvecDernieresVideos($nbVideosATraiter);
+        $this->resetAvecDerniersAudios($nbAudiosATraiter);
 
-        return [$nbVideosATraiter, $nbPartochesATraiter];
+        return [$nbVideosATraiter, $nbPartochesATraiter, $nbAudiosATraiter];
     }
 
     private function checkDbConnection(): void

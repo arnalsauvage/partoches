@@ -166,7 +166,7 @@ if (!isset ($FichierUtilsSi)) {
     function generateQRCode($url, $size): string
     {
 
-        $apiUrl = "https://api.qrserver.com/v1/create-qr-code/?data=" . urlencode($url) . "&size=".$size."x"."$size";
+        $apiUrl = "https://api.qrserver.com/v1/create-qr-code/?data=" . urlencode($url) . "&amp;size=".$size."x"."$size";
         return "<img src='$apiUrl' alt='QR Code'>";
     }
 
