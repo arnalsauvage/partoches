@@ -12,6 +12,7 @@ class Media
     const D_M_Y = "d/m/Y";
     const MYSQL = 'mysql';
     const TABLE_CHANSON = "chanson";
+    const CONFIG_MYSQL = "/lib/configMysql.php";
     private int $_id; // identifiant en BDD
     private string $_type; // type de média (mp3, pdf, vidéo YouTube)
     private string $_titre; // titre du média
@@ -197,7 +198,7 @@ class Media
     private static function verifieExistenceMedia(string $lienurl): ?int
     {
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            require_once PHP_DIR . "/lib/configMysql.php";
+            require_once PHP_DIR . self::CONFIG_MYSQL;
         }
         $lienurl = $_SESSION[self::MYSQL]->real_escape_string($lienurl);
         $requete = "SELECT id FROM media WHERE lien = '$lienurl' LIMIT 1";
@@ -297,7 +298,7 @@ class Media
     public static function chercheMediasParType($type): array
     {
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            require_once PHP_DIR . "/lib/configMysql.php";
+            require_once PHP_DIR . self::CONFIG_MYSQL;
         }
         $db = $_SESSION[self::MYSQL];
         $type = $db->real_escape_string($type);
@@ -313,7 +314,7 @@ class Media
     public static function chercheTousLesMedias(int $limit = 50, int $offset = 0, array $filtres = []): array
     {
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            require_once PHP_DIR . "/lib/configMysql.php";
+            require_once PHP_DIR . self::CONFIG_MYSQL;
         }
         $db = $_SESSION[self::MYSQL];
         $where = "";
@@ -337,7 +338,7 @@ class Media
     public static function compteTousLesMedias(array $filtres = []): int
     {
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            require_once PHP_DIR . "/lib/configMysql.php";
+            require_once PHP_DIR . self::CONFIG_MYSQL;
         }
         $db = $_SESSION[self::MYSQL];
         $where = "";
@@ -526,46 +527,19 @@ HTML;
         $imageRelative = ltrim($this->_image, './data/chansons/');
         $imageUrl = Image::getThumbnailUrl($imageRelative, 'sd');
 
-        $lien = ($type === "partoche")
-            ? "../../" . ltrim(htmlspecialchars($this->_lien), './')
-            : htmlspecialchars($this->_lien);
+        // Correction des liens : si c'est un lien interne vers getdoc.php, on remonte à la racine
+        $lienRaw = $this->_lien;
+        if (str_contains($lienRaw, 'getdoc.php')) {
+            // On s'assure que le lien commence proprement pour le ltrim
+            $lien = "../../" . ltrim(ltrim($lienRaw, '.'), '/');
+        } else {
+            $lien = htmlspecialchars($lienRaw);
+        }
 
         $auteur = chercheUtilisateur($this->_auteur);
         $auteurNom = htmlspecialchars($auteur[3] ?? "Auteur inconnu");
 
-        $isVideo = str_contains($type, 'vid');
-        $isAudio = ($type === 'audio' || $type === 'mp3' || $type === 'm4a');
-        $isPartoche = ($type === 'partoche' || $type === 'pdf');
-        $isMuseScore = ($type === 'musescore');
-        $isMiseEnPage = ($type === 'mise en page');
-        $isSongpress = ($type === 'songpress');
-        $isDiapo = ($type === 'diapo');
-        
-        $couleurBadge = "default"; 
-        $emoji = "📄";
-
-        if ($isVideo) {
-            $couleurBadge = "primary";
-            $emoji = "🎬";
-        } elseif ($isAudio) {
-            $couleurBadge = "warning";
-            $emoji = "🔊";
-        } elseif ($isPartoche) {
-            $couleurBadge = "danger";
-            $emoji = "🎵";
-        } elseif ($isMuseScore) {
-            $couleurBadge = "success";
-            $emoji = "🎼";
-        } elseif ($isMiseEnPage) {
-            $couleurBadge = "info";
-            $emoji = "🎨";
-        } elseif ($isSongpress) {
-            $couleurBadge = "success";
-            $emoji = "🎸";
-        } elseif ($isDiapo) {
-            $couleurBadge = "warning";
-            $emoji = "📽️";
-        }
+        $config = $this->getConfigByType($type);
 
         return [
             'type' => $type,
@@ -577,9 +551,49 @@ HTML;
             'description' => htmlspecialchars($this->_description),
             'datePub' => htmlspecialchars($this->_datePub),
             'auteurNom' => $auteurNom,
-            'couleurBadge' => $couleurBadge,
-            'emoji' => $emoji
+            'couleurBadge' => $config['couleurBadge'],
+            'emoji' => $config['emoji']
         ];
+    }
+
+    /**
+     * Centralise la configuration visuelle par type de média
+     */
+    private function getConfigByType(string $type): array
+    {
+        $isVideo = str_contains($type, 'vid');
+        $isAudio = ($type === 'audio' || $type === 'mp3' || $type === 'm4a');
+        $isPartoche = ($type === 'partoche' || $type === 'pdf');
+        
+        $config = [
+            'couleurBadge' => 'default',
+            'emoji' => '📄'
+        ];
+
+        if ($isVideo) {
+            $config['couleurBadge'] = "primary";
+            $config['emoji'] = "🎬";
+        } elseif ($isAudio) {
+            $config['couleurBadge'] = "warning";
+            $config['emoji'] = "🔊";
+        } elseif ($isPartoche) {
+            $config['couleurBadge'] = "danger";
+            $config['emoji'] = "🎵";
+        } elseif ($type === 'musescore') {
+            $config['couleurBadge'] = "success";
+            $config['emoji'] = "🎼";
+        } elseif ($type === 'mise en page') {
+            $config['couleurBadge'] = "info";
+            $config['emoji'] = "🎨";
+        } elseif ($type === 'songpress') {
+            $config['couleurBadge'] = "success";
+            $config['emoji'] = "🎸";
+        } elseif ($type === 'diapo') {
+            $config['couleurBadge'] = "warning";
+            $config['emoji'] = "📽️";
+        }
+
+        return $config;
     }
 
     private function getIdChansonAssocie(): ?int
@@ -637,10 +651,10 @@ HTML;
         $this->checkDbConnection();
         $db = $_SESSION[self::MYSQL];
         $db->query("TRUNCATE TABLE media"); // On rase tout pour repartir sur une base saine
-        $this->resetMediasDistribues($totalMedias);
+        $this->resetMediasDistribues();
     }
 
-    public function resetMediasDistribues(int $totalMedias = 2000): array
+    public function resetMediasDistribues(): array
     {
         $this->checkDbConnection();
         
@@ -662,7 +676,7 @@ HTML;
     private function checkDbConnection(): void
     {
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            require_once PHP_DIR . "/lib/configMysql.php";
+            require_once PHP_DIR . self::CONFIG_MYSQL;
         }
     }
 }
