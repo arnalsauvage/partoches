@@ -13,172 +13,159 @@ class Media
     const MYSQL = 'mysql';
     const TABLE_CHANSON = "chanson";
     const CONFIG_MYSQL = "/lib/configMysql.php";
-    private int $_id; // identifiant en BDD
-    private string $_type; // type de média (mp3, pdf, vidéo YouTube)
-    private string $_titre; // titre du média
-    private string $_image; // URL de l'image associée
-    private int $_auteur; // identifiant de l'utilisateur ayant proposé le média
-    private string $_lien; // URL de la ressource
-    private string $_description; // description du média
-    private string $_tags; // tags associés au média
-    private string $_datePub; // date de publication en AAAA-MM-JJ
-    private int $_hits; // compteur de visites
-    private $_lastError = ""; // pour stocker la dernière erreur
 
-    function __construct()
+    private int $id = 0; // identifiant en BDD
+    private string $type = ""; // type de média (mp3, pdf, vidéo YouTube)
+    private string $titre = ""; // titre du média
+    private string $image = ""; // URL de l'image associée
+    private int $auteur = 1; // identifiant de l'utilisateur ayant proposé le média
+    private string $lien = ""; // URL de la ressource
+    private string $description = ""; // description du média
+    private string $tags = ""; // tags associés au média
+    private string $datePub = ""; // date de publication en AAAA-MM-JJ
+    private int $hits = 0; // compteur de visites
+    private string $lastError = ""; // pour stocker la dernière erreur
+
+    /**
+     * Constructeur unique et flexible
+     */
+    public function __construct(array $data = [])
     {
-        $a = func_get_args();
-        $i = func_num_args();
-        if (method_exists($this, $f = '__construct' . $i)) {
-            call_user_func_array(array($this, $f), $a);
+        $this->datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
+        
+        if (!empty($data)) {
+            $this->hydrate($data);
         }
     }
 
-    public function __construct0()
+    /**
+     * Remplit l'objet à partir d'un tableau
+     */
+    private function hydrate(array $data): void
     {
-        $this->_id = 0;
-        $this->setType("");
-        $this->setTitre("");
-        $this->setImage("");
-        $this->setAuteur(1);
-        $this->setLien("");
-        $this->setDescription("");
-        $this->setTags("");
-        $this->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
-        $this->setHits(0);
-    }
-
-    public function __construct7($_type, $_titre, $_image, $_auteur, $_lien, $_description, $_tags)
-    {
-        $this->setId(0);
-        $this->setType($_type);
-        $this->setTitre($_titre);
-        $this->setImage($_image);
-        $this->setAuteur($_auteur);
-        $this->setLien($_lien);
-        $this->setDescription($_description);
-        $this->setTags($_tags);
-        $this->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
-        $this->setHits(0);
-    }
-
-    public function __construct8($_id, $_type, $_titre, $_image, $_auteur, $_lien, $_description, $_tags)
-    {
-        $this->__construct7($_type, $_titre, $_image, $_auteur, $_lien, $_description, $_tags);
-        $this->setId($_id);
+        if (isset($data['id'])) $this->setId((int)$data['id']);
+        if (isset($data['type'])) $this->setType((string)$data['type']);
+        if (isset($data['titre'])) $this->setTitre((string)$data['titre']);
+        if (isset($data['image'])) $this->setImage((string)$data['image']);
+        if (isset($data['auteur'])) $this->setAuteur((int)$data['auteur']);
+        if (isset($data['lien'])) $this->setLien((string)$data['lien']);
+        if (isset($data['description'])) $this->setDescription((string)$data['description']);
+        if (isset($data['tags'])) $this->setTags((string)$data['tags']);
+        if (isset($data['datePub'])) $this->setDatePub((string)$data['datePub']);
+        if (isset($data['hits'])) $this->setHits((int)$data['hits']);
     }
 
     // Getters et Setters
 
     public function getId(): int
     {
-        return $this->_id;
+        return $this->id;
     }
 
     public function setId(int $id): void
     {
         if ($id > 0) {
-            $this->_id = $id;
+            $this->id = $id;
         }
     }
 
     public function getType(): string
     {
-        return $this->_type;
+        return $this->type;
     }
 
     public function setType(string $type): void
     {
-        $this->_type = $type;
+        $this->type = $type;
     }
 
     public function getTitre(): string
     {
-        return $this->_titre;
+        return $this->titre;
     }
 
     public function setTitre(string $titre): void
     {
-        $this->_titre = $titre;
+        $this->titre = $titre;
     }
 
     public function getImage(): string
     {
-        return $this->_image;
+        return $this->image;
     }
 
     public function setImage(string $image): void
     {
-        $this->_image = $image;
+        $this->image = $image;
     }
 
     public function getAuteur(): int
     {
-        return $this->_auteur;
+        return $this->auteur;
     }
 
     public function setAuteur(int $auteur): void
     {
         if ($auteur > 0) {
-            $this->_auteur = $auteur;
+            $this->auteur = $auteur;
         }
     }
 
     public function getLien(): string
     {
-        return $this->_lien;
+        return $this->lien;
     }
 
     public function setLien(string $lien): void
     {
-        $this->_lien = $lien;
+        $this->lien = $lien;
     }
 
     public function getDescription(): string
     {
-        return $this->_description;
+        return $this->description;
     }
 
     public function setDescription(string $description): void
     {
-        $this->_description = $description;
+        $this->description = $description;
     }
 
     public function getTags(): string
     {
-        return $this->_tags;
+        return $this->tags;
     }
 
     public function setTags(string $tags): void
     {
-        $this->_tags = $tags;
+        $this->tags = $tags;
     }
 
     public function getDatePub(): string
     {
-        return $this->_datePub;
+        return $this->datePub;
     }
 
     public function setDatePub(string $datePub): void
     {
-        $this->_datePub = $datePub;
+        $this->datePub = $datePub;
     }
 
     public function getHits(): int
     {
-        return $this->_hits;
+        return $this->hits;
     }
 
     public function setHits(int $hits): void
     {
         if ($hits >= 0) {
-            $this->_hits = $hits;
+            $this->hits = $hits;
         }
     }
 
-    public function getLastError()
+    public function getLastError(): string
     {
-        return $this->_lastError;
+        return $this->lastError;
     }
 
 
@@ -186,7 +173,7 @@ class Media
     public function persist()
     {
         $this->checkDbConnection();
-        $idExistant = self::verifieExistenceMedia($this->_lien);
+        $idExistant = self::verifieExistenceMedia($this->lien);
         if ($idExistant !== null) {
             $this->setId($idExistant);
             return $this->modifieMediaBDD();
@@ -216,19 +203,19 @@ class Media
         $db = $_SESSION[self::MYSQL];
         $maRequete = sprintf("INSERT INTO media (type, titre, image, auteur, lien, description, tags, datePub, hits)
             VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
-            $db->real_escape_string($this->_type),
-            $db->real_escape_string($this->_titre),
-            $db->real_escape_string($this->_image),
-            $db->real_escape_string((string)$this->_auteur),
-            $db->real_escape_string($this->_lien),
-            $db->real_escape_string($this->_description),
-            $db->real_escape_string($this->_tags),
-            $db->real_escape_string($this->_datePub),
-            $db->real_escape_string((string)$this->_hits));
+            $db->real_escape_string($this->type),
+            $db->real_escape_string($this->titre),
+            $db->real_escape_string($this->image),
+            $db->real_escape_string((string)$this->auteur),
+            $db->real_escape_string($this->lien),
+            $db->real_escape_string($this->description),
+            $db->real_escape_string($this->tags),
+            $db->real_escape_string($this->datePub),
+            $db->real_escape_string((string)$this->hits));
 
         $result = $db->query($maRequete);
         if (!$result) {
-            $this->_lastError = $db->error;
+            $this->lastError = $db->error;
             return false;
         }
 
@@ -242,22 +229,22 @@ class Media
         $db = $_SESSION[self::MYSQL];
         $maRequete = sprintf(
             "UPDATE media SET type='%s', titre='%s', image='%s', auteur='%s', lien='%s', description='%s', tags='%s', datePub='%s', hits='%s' WHERE id=%d",
-            $db->real_escape_string($this->_type),
-            $db->real_escape_string($this->_titre),
-            $db->real_escape_string($this->_image),
-            $db->real_escape_string((string)$this->_auteur),
-            $db->real_escape_string($this->_lien),
-            $db->real_escape_string($this->_description),
-            $db->real_escape_string($this->_tags),
-            $db->real_escape_string($this->_datePub),
-            $db->real_escape_string((string)$this->_hits),
+            $db->real_escape_string($this->type),
+            $db->real_escape_string($this->titre),
+            $db->real_escape_string($this->image),
+            $db->real_escape_string((string)$this->auteur),
+            $db->real_escape_string($this->lien),
+            $db->real_escape_string($this->description),
+            $db->real_escape_string($this->tags),
+            $db->real_escape_string($this->datePub),
+            $db->real_escape_string((string)$this->hits),
             (int)$this->getId()
         );
 
         return $db->query($maRequete);
     }
 
-    public function supprimeMediaBDD()
+    public function supprimeMediaBDD(): void
     {
         $this->checkDbConnection();
         $maRequete = "DELETE FROM media WHERE id = " . (int)$this->getId();
@@ -266,7 +253,7 @@ class Media
 
     public function infosMedia(): string
     {
-        return "Id : " . $this->_id . " Titre : " . $this->_titre . "<br>\n";
+        return "Id : " . $this->id . " Titre : " . $this->titre . "<br>\n";
     }
 
     public function chercheMedia($id): int
@@ -274,25 +261,25 @@ class Media
         $this->checkDbConnection();
         $maRequete = sprintf("SELECT * FROM media WHERE id = %d", (int)$id);
         $result = $_SESSION[self::MYSQL]->query($maRequete);
-        if ($ligne = $result->fetch_row()) {
+        if ($result && $ligne = $result->fetch_row()) {
             $this->mysqlRowVersObjet($ligne);
             return 1;
         }
         return 0;
     }
 
-    private function mysqlRowVersObjet($ligne)
+    private function mysqlRowVersObjet($ligne): void
     {
-        $this->_id = (int)$ligne[0];
-        $this->_type = (string)$ligne[1];
-        $this->_titre = (string)$ligne[2];
-        $this->_image = (string)$ligne[3];
-        $this->_auteur = (int)$ligne[4];
-        $this->_lien = (string)$ligne[5];
-        $this->_description = (string)$ligne[6];
-        $this->_tags = (string)$ligne[7];
-        $this->_datePub = (string)$ligne[8];
-        $this->_hits = (int)$ligne[9];
+        $this->id = (int)$ligne[0];
+        $this->type = (string)$ligne[1];
+        $this->titre = (string)$ligne[2];
+        $this->image = (string)$ligne[3];
+        $this->auteur = (int)$ligne[4];
+        $this->lien = (string)$ligne[5];
+        $this->description = (string)$ligne[6];
+        $this->tags = (string)$ligne[7];
+        $this->datePub = (string)$ligne[8];
+        $this->hits = (int)$ligne[9];
     }
 
     public static function chercheMediasParType($type): array
@@ -305,8 +292,10 @@ class Media
         $maRequete = "SELECT id FROM media WHERE type = '$type'";
         $result = $db->query($maRequete);
         $tableau = [];
-        while ($row = $result->fetch_row()) {
-            $tableau[] = $row[0];
+        if ($result) {
+            while ($row = $result->fetch_row()) {
+                $tableau[] = $row[0];
+            }
         }
         return $tableau;
     }
@@ -359,49 +348,51 @@ class Media
     public function chercheNdernieresPartoches($nombrePartoches = 500): void
     {
         $this->checkDbConnection();
-        // On cherche les documents PDF (partitions classiques)
         $maRequete = "SELECT id FROM document WHERE nomTable = 'chanson' AND nom LIKE '%.pdf' ORDER BY date DESC LIMIT $nombrePartoches";
         $result = $_SESSION[self::MYSQL]->query($maRequete);
-        while ($document = $result->fetch_row()) {
-            $this->ajouteDocument($document[0], "partoche");
+        if ($result) {
+            while ($document = $result->fetch_row()) {
+                $this->ajouteDocument($document[0], "partoche");
+            }
         }
     }
 
     public function chercheNderniersAudios($nombreAudios = 500): void
     {
         $this->checkDbConnection();
-        // 1. Documents (mp3, m4a, aac)
         $maRequete = "SELECT id FROM document WHERE nomTable='chanson' AND (nom LIKE '%.mp3' OR nom LIKE '%.m4a' OR nom LIKE '%.aac') ORDER BY date DESC LIMIT $nombreAudios";
         $result = $_SESSION[self::MYSQL]->query($maRequete);
-        while ($document = $result->fetch_row()) {
-            $this->ajouteDocument($document[0], "audio");
+        if ($result) {
+            while ($document = $result->fetch_row()) {
+                $this->ajouteDocument($document[0], "audio");
+            }
         }
-        // 2. Liens (type "Audio")
         $nderniersLiens = chercheNderniersLiens("Audio");
-        while ($liensUrl = $nderniersLiens->fetch_row()) {
-            $this->ajouteLienurl($liensUrl[0]);
+        if ($nderniersLiens) {
+            while ($liensUrl = $nderniersLiens->fetch_row()) {
+                $this->ajouteLienurl($liensUrl[0]);
+            }
         }
     }
 
     public function chercheNdernieresVideos($nombreVideos = 500): void
     {
         $this->checkDbConnection();
-        // 1. Liens (vid%)
         $nderniersLiens = chercheNderniersLiens("vid%"); 
-        while ($liensUrl = $nderniersLiens->fetch_row()) {
-            $this->ajouteLienurl($liensUrl[0]);
+        if ($nderniersLiens) {
+            while ($liensUrl = $nderniersLiens->fetch_row()) {
+                $this->ajouteLienurl($liensUrl[0]);
+            }
         }
-        // 2. Documents (.mp4)
         $maRequete = "SELECT id FROM document WHERE nomTable='chanson' AND nom LIKE '%.mp4' ORDER BY date DESC LIMIT $nombreVideos";
         $result = $_SESSION[self::MYSQL]->query($maRequete);
-        while ($document = $result->fetch_row()) {
-            $this->ajouteDocument($document[0], "vidéo");
+        if ($result) {
+            while ($document = $result->fetch_row()) {
+                $this->ajouteDocument($document[0], "vidéo");
+            }
         }
     }
 
-    /**
-     * Indexation intelligente de tous les autres types de fichiers
-     */
     public function chercheAutresDocuments($nombreDocs = 1000): void
     {
         $this->checkDbConnection();
@@ -411,15 +402,17 @@ class Media
                       AND nom NOT LIKE '%.jpg' AND nom NOT LIKE '%.png' AND nom NOT LIKE '%.webp'
                       ORDER BY date DESC LIMIT $nombreDocs";
         $result = $_SESSION[self::MYSQL]->query($maRequete);
-        while ($document = $result->fetch_row()) {
-            $ext = strtolower(pathinfo($document[1], PATHINFO_EXTENSION));
-            $type = match($ext) {
-                'mscz' => 'musescore',
-                'crd'  => 'songpress',
-                'ppt', 'pptx', 'doc', 'docx', 'svg' => 'document',
-                default => 'fichier'
-            };
-            $this->ajouteDocument($document[0], $type);
+        if ($result) {
+            while ($document = $result->fetch_row()) {
+                $ext = strtolower(pathinfo($document[1], PATHINFO_EXTENSION));
+                $type = match($ext) {
+                    'mscz' => 'musescore',
+                    'crd'  => 'songpress',
+                    'ppt', 'pptx', 'doc', 'docx', 'svg' => 'document',
+                    default => 'fichier'
+                };
+                $this->ajouteDocument($document[0], $type);
+            }
         }
     }
 
@@ -431,15 +424,15 @@ class Media
         $chanson = new Chanson($idChanson);
         
         $extension = strtolower(pathinfo($document[1], PATHINFO_EXTENSION));
-        $type = $typeForce ?? ($extension === 'pdf' ? 'partoche' : 'audio');
+        $typeDoc = $typeForce ?? ($extension === 'pdf' ? 'partoche' : 'audio');
 
         $this->setTitre($chanson->getNom());
-        $descPrefix = ($type === 'partoche') ? "Partoche" : "Audio";
+        $descPrefix = ($typeDoc === 'partoche') ? "Partoche" : "Audio";
         $this->setDescription("$descPrefix pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
         $this->setAuteur((int)$document[7]);
         $this->setDatePub($document[3]);
-        $this->setType($type);
-        $this->setTags("$type " . $chanson->getAnnee());
+        $this->setType($typeDoc);
+        $this->setTags("$typeDoc " . $chanson->getAnnee());
         $this->setImage("./data/chansons/$idChanson/" . rawurlencode(imageTableId(self::TABLE_CHANSON, $idChanson)));
         $this->setLien("./php/document/" . lienUrlTelechargeDocument($idDoc));
     }
@@ -452,13 +445,13 @@ class Media
         $chanson = new Chanson($idChanson);
         
         $this->setTitre($chanson->getNom());
-        $type = (string)$lienUrl[4];
-        $descPrefix = (str_contains(strtolower($type), 'vid')) ? "Vidéo" : "Audio";
+        $typeLien = (string)$lienUrl[4];
+        $descPrefix = (str_contains(strtolower($typeLien), 'vid')) ? "Vidéo" : "Audio";
         $this->setDescription("$descPrefix pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
         $this->setAuteur((int)($lienUrl[7] ?? 1));
         $this->setDatePub($lienUrl[6]);
-        $this->setType($type);
-        $this->setTags($type . " " . $chanson->getAnnee());
+        $this->setType($typeLien);
+        $this->setTags($typeLien . " " . $chanson->getAnnee());
         $this->setImage("./data/chansons/$idChanson/" . rawurlencode(imageTableId(self::TABLE_CHANSON, $idChanson)));
         $this->setLien((string)$lienUrl[3]);
     }
@@ -520,50 +513,44 @@ HTML;
             $chansonTitre = $chanson->getNom();
         }
 
-        $type = strtolower($this->_type);
-        $titre = htmlspecialchars($this->_titre);
+        $typeMedia = strtolower($this->type);
+        $titreMedia = htmlspecialchars($this->titre);
         
-        // On récupère le chemin relatif propre (ex: 354/cover.jpg)
-        $imageRelative = ltrim($this->_image, './data/chansons/');
+        $imageRelative = ltrim($this->image, './data/chansons/');
         $imageUrl = Image::getThumbnailUrl($imageRelative, 'sd');
 
-        // Correction des liens : si c'est un lien interne vers getdoc.php, on remonte à la racine
-        $lienRaw = $this->_lien;
+        $lienRaw = $this->lien;
         if (str_contains($lienRaw, 'getdoc.php')) {
-            // On s'assure que le lien commence proprement pour le ltrim
-            $lien = "../../" . ltrim(ltrim($lienRaw, '.'), '/');
+            $lienFinal = "../../" . ltrim(ltrim($lienRaw, '.'), '/');
         } else {
-            $lien = htmlspecialchars($lienRaw);
+            $lienFinal = htmlspecialchars($lienRaw);
         }
 
-        $auteur = chercheUtilisateur($this->_auteur);
-        $auteurNom = htmlspecialchars($auteur[3] ?? "Auteur inconnu");
+        $auteurData = chercheUtilisateur($this->auteur);
+        $auteurNom = htmlspecialchars($auteurData[3] ?? "Auteur inconnu");
 
-        $config = $this->getConfigByType($type);
+        $config = $this->getConfigByType($typeMedia);
 
         return [
-            'type' => $type,
-            'titre' => $titre,
+            'type' => $typeMedia,
+            'titre' => $titreMedia,
             'imageUrl' => $imageUrl,
             'id_chanson' => $idChanson,
             'chanson_titre' => $chansonTitre,
-            'lien' => $lien,
-            'description' => htmlspecialchars($this->_description),
-            'datePub' => htmlspecialchars($this->_datePub),
+            'lien' => $lienFinal,
+            'description' => htmlspecialchars($this->description),
+            'datePub' => htmlspecialchars($this->datePub),
             'auteurNom' => $auteurNom,
             'couleurBadge' => $config['couleurBadge'],
             'emoji' => $config['emoji']
         ];
     }
 
-    /**
-     * Centralise la configuration visuelle par type de média
-     */
-    private function getConfigByType(string $type): array
+    private function getConfigByType(string $typeMedia): array
     {
-        $isVideo = str_contains($type, 'vid');
-        $isAudio = ($type === 'audio' || $type === 'mp3' || $type === 'm4a');
-        $isPartoche = ($type === 'partoche' || $type === 'pdf');
+        $isVideo = str_contains($typeMedia, 'vid');
+        $isAudio = ($typeMedia === 'audio' || $typeMedia === 'mp3' || $typeMedia === 'm4a');
+        $isPartoche = ($typeMedia === 'partoche' || $typeMedia === 'pdf');
         
         $config = [
             'couleurBadge' => 'default',
@@ -579,16 +566,16 @@ HTML;
         } elseif ($isPartoche) {
             $config['couleurBadge'] = "danger";
             $config['emoji'] = "🎵";
-        } elseif ($type === 'musescore') {
+        } elseif ($typeMedia === 'musescore') {
             $config['couleurBadge'] = "success";
             $config['emoji'] = "🎼";
-        } elseif ($type === 'mise en page') {
+        } elseif ($typeMedia === 'mise en page') {
             $config['couleurBadge'] = "info";
             $config['emoji'] = "🎨";
-        } elseif ($type === 'songpress') {
+        } elseif ($typeMedia === 'songpress') {
             $config['couleurBadge'] = "success";
             $config['emoji'] = "🎸";
-        } elseif ($type === 'diapo') {
+        } elseif ($typeMedia === 'diapo') {
             $config['couleurBadge'] = "warning";
             $config['emoji'] = "📽️";
         }
@@ -600,20 +587,18 @@ HTML;
     {
         $this->checkDbConnection();
         $requete = "";
-        $type = $this->getType();
+        $typeMedia = $this->getType();
         
-        // Tous les types basés sur des fichiers (PDF, MP3, MSCZ, DocX, etc.)
         $typesFichiers = ['partoche', 'audio', 'musescore', 'songpress', 'document', 'pdf', 'fichier'];
         
-        if (in_array($type, $typesFichiers)) {
+        if (in_array($typeMedia, $typesFichiers)) {
             if (preg_match('/doc=(\d+)/', $this->getLien(), $matches)) {
                 $idDocument = (int)$matches[1];
                 $requete = "SELECT idTable FROM document WHERE id = $idDocument AND nomTable = 'chanson' LIMIT 1";
             }
         } else {
-            // Pour les liens (Vidéos, Audios externes)
-            $lien = $_SESSION[self::MYSQL]->real_escape_string($this->getLien());
-            $requete = "SELECT idtable FROM lienurl WHERE nomtable = 'chanson' AND url = '$lien' LIMIT 1";
+            $lienEscaped = $_SESSION[self::MYSQL]->real_escape_string($this->getLien());
+            $requete = "SELECT idtable FROM lienurl WHERE nomtable = 'chanson' AND url = '$lienEscaped' LIMIT 1";
         }
 
         if (!empty($requete)) {
@@ -646,11 +631,11 @@ HTML;
         return true;
     }
 
-    public function resetMediaTable(int $totalMedias = 50): void
+    public function resetMediaTable(): void
     {
         $this->checkDbConnection();
         $db = $_SESSION[self::MYSQL];
-        $db->query("TRUNCATE TABLE media"); // On rase tout pour repartir sur une base saine
+        $db->query("TRUNCATE TABLE media");
         $this->resetMediasDistribues();
     }
 
@@ -658,8 +643,6 @@ HTML;
     {
         $this->checkDbConnection();
         
-        // Pour une indexation complète, on utilise un grand nombre par défaut
-        // On ne limite plus strictement par petites catégories
         $nbVideosATraiter = 500;
         $nbAudiosATraiter = 500;
         $nbAutresDocsATraiter = 500;

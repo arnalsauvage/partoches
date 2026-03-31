@@ -20,7 +20,16 @@ class MediaTest extends TestCase
 
     public function testConstructeur()
     {
-        $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
+        $data = [
+            'type' => self::TYPE_MEDIA,
+            'titre' => self::TITRE_MEDIA,
+            'image' => self::IMAGE_MEDIA,
+            'auteur' => self::AUTEUR_MEDIA,
+            'lien' => self::LIEN_MEDIA,
+            'description' => self::DESCRIPTION_MEDIA,
+            'tags' => self::TAGS_MEDIA
+        ];
+        $media = new Media($data);
         $this->assertEquals(self::TITRE_MEDIA, $media->getTitre());
         $this->assertEquals(self::TYPE_MEDIA, $media->getType());
     }
@@ -28,12 +37,21 @@ class MediaTest extends TestCase
     protected function setUp(): void
     {
         $media = new Media();
-        $media->resetMediaTable(10); // Initialise avec un petit nombre positif
+        $media->resetMediaTable(); // Utilise maintenant les valeurs par défaut
     }
 
     public function testEnregistreBDD()
     {
-        $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
+        $data = [
+            'type' => self::TYPE_MEDIA,
+            'titre' => self::TITRE_MEDIA,
+            'image' => self::IMAGE_MEDIA,
+            'auteur' => self::AUTEUR_MEDIA,
+            'lien' => self::LIEN_MEDIA,
+            'description' => self::DESCRIPTION_MEDIA,
+            'tags' => self::TAGS_MEDIA
+        ];
+        $media = new Media($data);
         $mediaId = $media->persist();
 
         // On recharge le média pour vérifier
@@ -48,7 +66,16 @@ class MediaTest extends TestCase
 
     public function testChercheMediaBDD()
     {
-        $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
+        $data = [
+            'type' => self::TYPE_MEDIA,
+            'titre' => self::TITRE_MEDIA,
+            'image' => self::IMAGE_MEDIA,
+            'auteur' => self::AUTEUR_MEDIA,
+            'lien' => self::LIEN_MEDIA,
+            'description' => self::DESCRIPTION_MEDIA,
+            'tags' => self::TAGS_MEDIA
+        ];
+        $media = new Media($data);
         $media->persist();
         $id = $media->getId();
         $media = new Media();
@@ -65,7 +92,16 @@ class MediaTest extends TestCase
 
     public function testInfosMedia()
     {
-        $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
+        $data = [
+            'type' => self::TYPE_MEDIA,
+            'titre' => self::TITRE_MEDIA,
+            'image' => self::IMAGE_MEDIA,
+            'auteur' => self::AUTEUR_MEDIA,
+            'lien' => self::LIEN_MEDIA,
+            'description' => self::DESCRIPTION_MEDIA,
+            'tags' => self::TAGS_MEDIA
+        ];
+        $media = new Media($data);
         $media->persist();
 
         $infos = $media->infosMedia();
@@ -78,7 +114,16 @@ class MediaTest extends TestCase
 
     public function testChercheMediasParType()
     {
-        $media = new Media(self::TYPE_MEDIA, self::TITRE_MEDIA, self::IMAGE_MEDIA, self::AUTEUR_MEDIA, self::LIEN_MEDIA, self::DESCRIPTION_MEDIA, self::TAGS_MEDIA);
+        $data = [
+            'type' => self::TYPE_MEDIA,
+            'titre' => self::TITRE_MEDIA,
+            'image' => self::IMAGE_MEDIA,
+            'auteur' => self::AUTEUR_MEDIA,
+            'lien' => self::LIEN_MEDIA,
+            'description' => self::DESCRIPTION_MEDIA,
+            'tags' => self::TAGS_MEDIA
+        ];
+        $media = new Media($data);
         $media->persist();
 
         $medias = Media::chercheMediasParType(self::TYPE_MEDIA);
