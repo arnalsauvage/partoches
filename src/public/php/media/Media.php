@@ -1,11 +1,6 @@
 <?php
-require_once PHP_DIR . "/document/Document.php";
-require_once PHP_DIR . "/liens/LienUrl.php";
-require_once PHP_DIR . "/chanson/Chanson.php";
-require_once PHP_DIR . "/utilisateur/Utilisateur.php";
+require_once dirname(__DIR__, 2) . "/autoload.php";
 require_once PHP_DIR . "/lib/utilssi.php";
-require_once PHP_DIR . "/lib/configMysql.php";
-require_once PHP_DIR . "/lib/Image.php";
 
 class Media
 {
@@ -43,17 +38,26 @@ class Media
      */
     private function hydrate(array $data): void
     {
-        if (isset($data['id'])) $this->setId((int)$data['id']);
-        if (isset($data['type'])) $this->setType((string)$data['type']);
-        if (isset($data['titre'])) $this->setTitre((string)$data['titre']);
-        if (isset($data['image'])) $this->setImage((string)$data['image']);
-        if (isset($data['auteur'])) $this->setAuteur((int)$data['auteur']);
-        if (isset($data['lien'])) $this->setLien((string)$data['lien']);
-        if (isset($data['description'])) $this->setDescription((string)$data['description']);
-        if (isset($data['tags'])) $this->setTags((string)$data['tags']);
-        if (isset($data['datePub'])) $this->setDatePub((string)$data['datePub']);
-        if (isset($data['hits'])) $this->setHits((int)$data['hits']);
+        $mapping = [
+            'id'          => fn(mixed $v) => $this->setId((int) $v),
+            'type'        => fn(mixed $v) => $this->setType((string) $v),
+            'titre'       => fn(mixed $v) => $this->setTitre((string) $v),
+            'image'       => fn(mixed $v) => $this->setImage((string) $v),
+            'auteur'      => fn(mixed $v) => $this->setAuteur((int) $v),
+            'lien'        => fn(mixed $v) => $this->setLien((string) $v),
+            'description' => fn(mixed $v) => $this->setDescription((string) $v),
+            'tags'        => fn(mixed $v) => $this->setTags((string) $v),
+            'datePub'     => fn(mixed $v) => $this->setDatePub((string) $v),
+            'hits'        => fn(mixed $v) => $this->setHits((int) $v),
+        ];
+
+        foreach ($mapping as $key => $setter) {
+            if (array_key_exists($key, $data)) {
+                $setter($data[$key]);
+            }
+        }
     }
+
 
     // Getters et Setters
 
