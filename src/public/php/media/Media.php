@@ -310,89 +310,115 @@ class Media
         return $tableau;
     }
 
-    public static function chercheTousLesMedias(): array
+    public static function chercheTousLesMedias(int $limit = 50, int $offset = 0, array $filtres = []): array
     {
         if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
             require_once PHP_DIR . "/lib/configMysql.php";
         }
-        $maRequete = "SELECT id FROM media ORDER BY datePub DESC";
-        $result = $_SESSION[self::MYSQL]->query($maRequete);
+        $db = $_SESSION[self::MYSQL];
+        $where = "";
+        
+        if (!empty($filtres) && !in_array('tous', $filtres)) {
+            $escapedFiltres = array_map(fn($f) => "'" . $db->real_escape_string($f) . "'", $filtres);
+            $where = "WHERE type IN (" . implode(',', $escapedFiltres) . ")";
+        }
+
+        $maRequete = "SELECT id FROM media $where ORDER BY datePub DESC LIMIT $limit OFFSET $offset";
+        $result = $db->query($maRequete);
         $tableau = [];
-        while ($row = $result->fetch_row()) {
-            $tableau[] = $row[0];
+        if ($result) {
+            while ($row = $result->fetch_row()) {
+                $tableau[] = $row[0];
+            }
         }
         return $tableau;
     }
 
-    public static function normalize($string): string
+    public static function compteTousLesMedias(array $filtres = []): int
     {
-        $string = mb_strtolower($string);
-        $string = preg_replace('/[áàâãäå]/u', 'a', $string);
-        $string = preg_replace('/[éèêë]/u', 'e', $string);
-        $string = preg_replace('/[íìîï]/u', 'i', $string);
-        $string = preg_replace('/[óòôõö]/u', 'o', $string);
-        $string = preg_replace('/[úùûü]/u', 'u', $string);
-        $string = preg_replace('/[ýÿ]/u', 'y', $string);
-        $string = preg_replace('/ç/u', 'c', $string);
-        $string = preg_replace('/ñ/u', 'n', $string);
-        $string = preg_replace('/[^a-z0-9\s]/', ' ', $string);
-        $string = preg_replace('/\s+/', ' ', $string);
-        return trim($string);
-    }
-
-    public function chercheNdernieresPartoches($nombrePartoches = 100): void
-    {
-        $this->checkDbConnection();
-        $compteur = 0;
-        $documents = chercheDocuments("nomTable", "chanson", "date", false);
-        while ($compteur < $nombrePartoches && $document = $documents->fetch_row()) {
-            if (str_ends_with(strtolower($document[1]), ".pdf")) {
-                $this->ajouteDocument($document[0], "partoche");
-                $compteur++;
-            }
+        if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
+            require_once PHP_DIR . "/lib/configMysql.php";
         }
-    }
-
-    public function chercheNderniersAudios($nombreAudios = 50): void
-    {
-        $this->checkDbConnection();
-        $compteur = 0;
+        $db = $_SESSION[self::MYSQL];
+        $where = "";
         
-        // 1. Chercher dans les documents (fichiers mp3, m4a, aac)
-        $exts = ["mp3", "m4a", "aac"];
-        foreach ($exts as $ext) {
-            $documents = chercheDocuments("nom", "%.$ext", "date", false);
-            while ($compteur < $nombreAudios && $document = $documents->fetch_row()) {
-                if ($document[6] > 0 && $document[2] == 'chanson') { // idTable > 0 et nomTable == chanson
-                    $this->ajouteDocument($document[0], "audio");
-                    $compteur++;
-                }
-            }
+        if (!empty($filtres) && !in_array('tous', $filtres)) {
+            $escapedFiltres = array_map(fn($f) => "'" . $db->real_escape_string($f) . "'", $filtres);
+            $where = "WHERE type IN (" . implode(',', $escapedFiltres) . ")";
         }
+        
+        $res = $db->query("SELECT COUNT(*) FROM media $where");
+        if ($res) {
+            $row = $res->fetch_row();
+            return (int)$row[0];
+        }
+        return 0;
+    }
 
-        // 2. Chercher dans les liens (type "Audio")
+    public function chercheNdernieresPartoches($nombrePartoches = 500): void
+    {
+        $this->checkDbConnection();
+        // On cherche les documents PDF (partitions classiques)
+        $maRequete = "SELECT id FROM document WHERE nomTable = 'chanson' AND nom LIKE '%.pdf' ORDER BY date DESC LIMIT $nombrePartoches";
+        $result = $_SESSION[self::MYSQL]->query($maRequete);
+        while ($document = $result->fetch_row()) {
+            $this->ajouteDocument($document[0], "partoche");
+        }
+    }
+
+    public function chercheNderniersAudios($nombreAudios = 500): void
+    {
+        $this->checkDbConnection();
+        // 1. Documents (mp3, m4a, aac)
+        $maRequete = "SELECT id FROM document WHERE nomTable='chanson' AND (nom LIKE '%.mp3' OR nom LIKE '%.m4a' OR nom LIKE '%.aac') ORDER BY date DESC LIMIT $nombreAudios";
+        $result = $_SESSION[self::MYSQL]->query($maRequete);
+        while ($document = $result->fetch_row()) {
+            $this->ajouteDocument($document[0], "audio");
+        }
+        // 2. Liens (type "Audio")
         $nderniersLiens = chercheNderniersLiens("Audio");
-        while ($compteur < $nombreAudios && $liensUrl = $nderniersLiens->fetch_row()) {
+        while ($liensUrl = $nderniersLiens->fetch_row()) {
             $this->ajouteLienurl($liensUrl[0]);
-            $compteur++;
         }
     }
 
-    public function chercheNdernieresVideos($nombreVideos = 50): void
+    public function chercheNdernieresVideos($nombreVideos = 500): void
     {
         $this->checkDbConnection();
-        $compteur = 0;
-        $nderniersLiens = chercheNderniersLiens("vid%"); // "vid%" pour attraper Vidéo, Vidéo, video, Video
-        while ($compteur < $nombreVideos && $liensUrl = $nderniersLiens->fetch_row()) {
+        // 1. Liens (vid%)
+        $nderniersLiens = chercheNderniersLiens("vid%"); 
+        while ($liensUrl = $nderniersLiens->fetch_row()) {
             $this->ajouteLienurl($liensUrl[0]);
-            $compteur++;
         }
-        
-        // On cherche aussi les types "Video" explicitement au cas où
-        $nderniersLiens = chercheNderniersLiens("Video");
-        while ($compteur < $nombreVideos && $liensUrl = $nderniersLiens->fetch_row()) {
-            $this->ajouteLienurl($liensUrl[0]);
-            $compteur++;
+        // 2. Documents (.mp4)
+        $maRequete = "SELECT id FROM document WHERE nomTable='chanson' AND nom LIKE '%.mp4' ORDER BY date DESC LIMIT $nombreVideos";
+        $result = $_SESSION[self::MYSQL]->query($maRequete);
+        while ($document = $result->fetch_row()) {
+            $this->ajouteDocument($document[0], "vidéo");
+        }
+    }
+
+    /**
+     * Indexation intelligente de tous les autres types de fichiers
+     */
+    public function chercheAutresDocuments($nombreDocs = 1000): void
+    {
+        $this->checkDbConnection();
+        $maRequete = "SELECT id, nom FROM document WHERE nomTable='chanson' 
+                      AND nom NOT LIKE '%.pdf' AND nom NOT LIKE '%.mp3' AND nom NOT LIKE '%.m4a' 
+                      AND nom NOT LIKE '%.aac' AND nom NOT LIKE '%.mp4' 
+                      AND nom NOT LIKE '%.jpg' AND nom NOT LIKE '%.png' AND nom NOT LIKE '%.webp'
+                      ORDER BY date DESC LIMIT $nombreDocs";
+        $result = $_SESSION[self::MYSQL]->query($maRequete);
+        while ($document = $result->fetch_row()) {
+            $ext = strtolower(pathinfo($document[1], PATHINFO_EXTENSION));
+            $type = match($ext) {
+                'mscz' => 'musescore',
+                'crd'  => 'songpress',
+                'ppt', 'pptx', 'doc', 'docx', 'svg' => 'document',
+                default => 'fichier'
+            };
+            $this->ajouteDocument($document[0], $type);
         }
     }
 
@@ -509,9 +535,14 @@ HTML;
 
         $isVideo = str_contains($type, 'vid');
         $isAudio = ($type === 'audio' || $type === 'mp3' || $type === 'm4a');
+        $isPartoche = ($type === 'partoche' || $type === 'pdf');
+        $isMuseScore = ($type === 'musescore');
+        $isMiseEnPage = ($type === 'mise en page');
+        $isSongpress = ($type === 'songpress');
+        $isDiapo = ($type === 'diapo');
         
-        $couleurBadge = "danger"; // Par défaut Partoche
-        $emoji = "🎵";
+        $couleurBadge = "default"; 
+        $emoji = "📄";
 
         if ($isVideo) {
             $couleurBadge = "primary";
@@ -519,6 +550,21 @@ HTML;
         } elseif ($isAudio) {
             $couleurBadge = "warning";
             $emoji = "🔊";
+        } elseif ($isPartoche) {
+            $couleurBadge = "danger";
+            $emoji = "🎵";
+        } elseif ($isMuseScore) {
+            $couleurBadge = "success";
+            $emoji = "🎼";
+        } elseif ($isMiseEnPage) {
+            $couleurBadge = "info";
+            $emoji = "🎨";
+        } elseif ($isSongpress) {
+            $couleurBadge = "success";
+            $emoji = "🎸";
+        } elseif ($isDiapo) {
+            $couleurBadge = "warning";
+            $emoji = "📽️";
         }
 
         return [
@@ -540,12 +586,18 @@ HTML;
     {
         $this->checkDbConnection();
         $requete = "";
-        if ($this->getType() === 'partoche' || $this->getType() === 'audio') {
+        $type = $this->getType();
+        
+        // Tous les types basés sur des fichiers (PDF, MP3, MSCZ, DocX, etc.)
+        $typesFichiers = ['partoche', 'audio', 'musescore', 'songpress', 'document', 'pdf', 'fichier'];
+        
+        if (in_array($type, $typesFichiers)) {
             if (preg_match('/doc=(\d+)/', $this->getLien(), $matches)) {
                 $idDocument = (int)$matches[1];
                 $requete = "SELECT idTable FROM document WHERE id = $idDocument AND nomTable = 'chanson' LIMIT 1";
             }
         } else {
+            // Pour les liens (Vidéos, Audios externes)
             $lien = $_SESSION[self::MYSQL]->real_escape_string($this->getLien());
             $requete = "SELECT idtable FROM lienurl WHERE nomtable = 'chanson' AND url = '$lien' LIMIT 1";
         }
@@ -584,7 +636,7 @@ HTML;
     {
         $this->checkDbConnection();
         $db = $_SESSION[self::MYSQL];
-        $db->query("DELETE FROM media"); // On vide TOUT avant de reconstruire
+        $db->query("TRUNCATE TABLE media"); // On rase tout pour repartir sur une base saine
         $this->resetMediasDistribues($totalMedias);
     }
 
@@ -593,17 +645,19 @@ HTML;
         $this->checkDbConnection();
         $db = $_SESSION[self::MYSQL];
 
-        // On définit des quotas plus équilibrés pour être sûr de voir de tout
-        // Même si une catégorie est moins représentée en BDD, on veut ses derniers éléments.
-        $nbVideosATraiter = 15;
-        $nbAudiosATraiter = 15;
-        $nbPartochesATraiter = $totalMedias - $nbVideosATraiter - $nbAudiosATraiter; // 20 par défaut
+        // On définit des quotas plus équilibrés pour inclure tous les types
+        // On s'assure de ne jamais avoir de nombres négatifs
+        $nbVideosATraiter = min(12, $totalMedias);
+        $nbAudiosATraiter = min(12, max(0, $totalMedias - $nbVideosATraiter));
+        $nbAutresDocsATraiter = min(6, max(0, $totalMedias - $nbVideosATraiter - $nbAudiosATraiter));
+        $nbPartochesATraiter = max(0, $totalMedias - $nbVideosATraiter - $nbAudiosATraiter - $nbAutresDocsATraiter);
 
         $this->resetAvecDernieresPartoches($nbPartochesATraiter);
         $this->resetAvecDernieresVideos($nbVideosATraiter);
         $this->resetAvecDerniersAudios($nbAudiosATraiter);
+        $this->chercheAutresDocuments($nbAutresDocsATraiter);
 
-        return [$nbVideosATraiter, $nbPartochesATraiter, $nbAudiosATraiter];
+        return [$nbVideosATraiter, $nbPartochesATraiter, $nbAudiosATraiter, $nbAutresDocsATraiter];
     }
 
     private function checkDbConnection(): void

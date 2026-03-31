@@ -49,7 +49,8 @@ class HtmlLintTest extends TestCase
             'Tag output invalid',
             'Tag canvas invalid',
             'Tag video invalid',
-            'Tag audio invalid'
+            'Tag audio invalid',
+            'Tag datalist invalid'
         ];
 
         foreach ($errors as $error) {
@@ -68,6 +69,13 @@ class HtmlLintTest extends TestCase
                     trim($error->message)
                 );
             }
+        }
+
+        if (!empty($criticalErrors)) {
+            $logDir = __DIR__ . '/../../rendered_html';
+            if (!is_dir($logDir)) mkdir($logDir, 0777, true);
+            $safeName = str_replace(['/', ' '], ['_', '_'], trim($path, '/'));
+            file_put_contents($logDir . '/' . $safeName . '.html', $content);
         }
 
         $this->assertEmpty($criticalErrors, "La page $path présente des erreurs HTML :\n" . implode("\n", $criticalErrors));

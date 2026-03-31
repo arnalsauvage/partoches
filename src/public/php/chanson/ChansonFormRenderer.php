@@ -115,7 +115,7 @@ HTML;
             <strong><i class="glyphicon glyphicon-search"></i> Recherches externes :</strong><br>
             <ul class="list-inline" style="margin-top: 10px;">
                 <li><a href="https://www.youtube.com/results?search_query=$query" target="_blank" class="btn btn-xs btn-default">YouTube</a></li>
-                <li><a href="https://www.qwant.com/?q=discogs+$query&t=images" target="_blank" class="btn btn-xs btn-default">Images</a></li>
+                <li><a href="https://www.qwant.com/?q=discogs+$query&amp;t=images" target="_blank" class="btn btn-xs btn-default">Images</a></li>
                 <li><a href="https://songbpm.com/searches/$artiste+$nom" target="_blank" class="btn btn-xs btn-default">Tempo (BPM)</a></li>
                 <li><a href="https://fr.wikipedia.org/w/index.php?search=$query" target="_blank" class="btn btn-xs btn-default">Wikipedia</a></li>
             </ul>

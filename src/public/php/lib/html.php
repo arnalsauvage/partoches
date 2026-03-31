@@ -245,6 +245,7 @@ if (!isset ($FichierHtml)) {
     
     <title>$fullTitle</title>
 </head>
+<body>
 HTML;
         return $head;
     }
