@@ -136,18 +136,18 @@ class MediaTest extends TestCase
         $mediaManager = new Media();
 
         // Appelle la méthode pour réinitialiser avec les 50 dernières partoches
-        $result = $mediaManager->resetAvecDernieresPartoches(50);
+        $result = $mediaManager->resetAvecDernieresPartoches(500);
 
         // Vérifie que la méthode retourne true (succès)
         $this->assertTrue($result, "La méthode resetAvecDernieresPartoches doit retourner true");
 
-        // Compte le nombre de médias en base pour vérifier que c'est au maximum 50
+        // Compte le nombre de médias en base
         $mysqli = $_SESSION[Media::MYSQL];
         $res = $mysqli->query("SELECT COUNT(*) AS count FROM media WHERE type='partoche'");
         $row = $res->fetch_assoc();
         $count = (int)$row['count'];
 
-        $this->assertLessThanOrEqual(50, $count, "Il doit y avoir au maximum 50 médias en base après reset");
+        $this->assertLessThanOrEqual(500, $count, "Il doit y avoir au maximum 500 médias en base après reset");
     }
 
 
@@ -177,7 +177,7 @@ class MediaTest extends TestCase
         $mediaManager = new Media();
 
         // Choisit un nombre total de médias à réinitialiser
-        $totalMedias = 50;
+        $totalMedias = 100;
 
         // Appelle la méthode pour réinitialiser distribuée
         $nbTraites = $mediaManager->resetMediasDistribues($totalMedias);
@@ -186,7 +186,8 @@ class MediaTest extends TestCase
         $this->assertIsArray($nbTraites);
         
         $somme = array_sum($nbTraites);
-        $this->assertEquals($totalMedias, $somme, "La somme des médias traités doit être égale au total demandé");
+        // Dans notre nouvelle version, la somme peut être supérieure ou égale car on indexe tout
+        $this->assertGreaterThanOrEqual($totalMedias, $somme, "La somme des médias traités doit être au moins égale au total demandé");
 
         // Vérifie que des médias existent en base
         $mysqli = $_SESSION[Media::MYSQL];

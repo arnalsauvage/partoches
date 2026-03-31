@@ -640,17 +640,16 @@ HTML;
         $this->resetMediasDistribues($totalMedias);
     }
 
-    public function resetMediasDistribues(int $totalMedias = 50): array
+    public function resetMediasDistribues(int $totalMedias = 2000): array
     {
         $this->checkDbConnection();
-        $db = $_SESSION[self::MYSQL];
-
-        // On définit des quotas plus équilibrés pour inclure tous les types
-        // On s'assure de ne jamais avoir de nombres négatifs
-        $nbVideosATraiter = min(12, $totalMedias);
-        $nbAudiosATraiter = min(12, max(0, $totalMedias - $nbVideosATraiter));
-        $nbAutresDocsATraiter = min(6, max(0, $totalMedias - $nbVideosATraiter - $nbAudiosATraiter));
-        $nbPartochesATraiter = max(0, $totalMedias - $nbVideosATraiter - $nbAudiosATraiter - $nbAutresDocsATraiter);
+        
+        // Pour une indexation complète, on utilise un grand nombre par défaut
+        // On ne limite plus strictement par petites catégories
+        $nbVideosATraiter = 500;
+        $nbAudiosATraiter = 500;
+        $nbAutresDocsATraiter = 500;
+        $nbPartochesATraiter = 500;
 
         $this->resetAvecDernieresPartoches($nbPartochesATraiter);
         $this->resetAvecDernieresVideos($nbVideosATraiter);

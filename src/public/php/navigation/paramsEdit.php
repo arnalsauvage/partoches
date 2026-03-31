@@ -49,6 +49,15 @@ if (isset($_POST['action'])) {
         echo "</ul>";
         exit;
     }
+
+    if ($_POST['action'] === 'regenere_medias') {
+        require_once dirname(__DIR__) . "/lib/utilssi.php";
+        require_once dirname(__DIR__) . "/media/Media.php";
+        $media = new Media();
+        $media->resetMediaTable(5000); // On indexe TOUT
+        echo "✅ Catalogue régénéré avec succès !";
+        exit;
+    }
 }
 
 require_once dirname(__DIR__) . "/lib/utilssi.php";
@@ -152,7 +161,7 @@ echo $alerts;
     <div class="btn-group-django">
         <a href='../todo/todo_admin.php' class='btn-dj btn-dj-primary'><span class="glyphicon glyphicon-list-alt"></span> Roadbook</a>
         <a href='../audit/imagesCheck.php' class='btn-dj btn-dj-info'><span class="glyphicon glyphicon-eye-open"></span> Images</a>
-        <a href='../media/listeMedias.php' class='btn-dj btn-dj-default'><span class="glyphicon glyphicon-picture"></span> Médias</a>
+        <button type='button' id='btnRegenMedias' class='btn-dj btn-dj-default'><span class="glyphicon glyphicon-refresh"></span> Régénère Médias</button>
     </div>
 </div>
 
@@ -249,6 +258,16 @@ $(document).ready(function(){
     $('#btnRunSqlDj').click(function(){
         $('#sqlResDj').html('Exécution...');
         $.post('', {action: 'execute_sql', sql: $('#sqlQueryDj').val()}, function(d){ $('#sqlResDj').html(d); });
+    });
+    $('#btnRegenMedias').click(function(){
+        if (!confirm('Voulez-vous vraiment régénérer tout le catalogue des médias ? Cela peut prendre quelques secondes.')) return;
+        var btn = $(this);
+        var oldHtml = btn.html();
+        btn.prop('disabled', true).html('<span class="glyphicon glyphicon-refresh spin"></span> Régénération...');
+        $.post('', {action: 'regenere_medias'}, function(d){
+            toastr.success(d);
+            btn.prop('disabled', false).html(oldHtml);
+        });
     });
 });
 </script>
