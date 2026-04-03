@@ -55,7 +55,7 @@ class SongbookPdf extends Fpdi
     }
 
     /**
-     * Ajoute le sommaire au document
+     * Ajoute le sommaire au document (gère plusieurs pages si nécessaire)
      */
     public function addTableOfContents(array $songs, string $logoPath, array $pageNumbers): void
     {
@@ -72,18 +72,34 @@ class SongbookPdf extends Fpdi
             $this->Image($logoPath, 10, 6, 20);
         }
 
-        // Calcul de l'espacement
-        $lineHeight = (!empty($songs)) ? 240 / (count($songs) + 1) : 10;
-        if ($lineHeight > 40) {
-            $lineHeight = 40;
+        // Configuration de l'espacement
+        $maxSongsPerPage = 35;
+        $totalSongs = count($songs);
+        
+        if ($totalSongs <= $maxSongsPerPage) {
+            // Ancienne logique pour les petits songbooks (auto-ajustement)
+            $lineHeight = ($totalSongs > 0) ? 240 / ($totalSongs + 1) : 10;
+            if ($lineHeight > 20) $lineHeight = 20;
+            if ($lineHeight < 6) $lineHeight = 6;
+        } else {
+            // Nouvelle logique pour les gros songbooks (taille fixe, multi-pages)
+            $lineHeight = 7;
         }
 
         $this->SetFont(self::FONT_ARIAL, 'B', $lineHeight);
         $this->Cell(10, $lineHeight / 2, " ", 0, 1, "L");
 
+        $songCount = 0;
         foreach ($songs as $index => $songName) {
+            if ($songCount > 0 && $songCount % $maxSongsPerPage == 0 && $totalSongs > $maxSongsPerPage) {
+                $this->AddPage();
+                $this->SetY(20);
+                $this->SetFont(self::FONT_ARIAL, 'B', $lineHeight);
+            }
+            
             $pageNumber = $pageNumbers[$index] ?? '?';
             $this->Cell(10, $lineHeight, $pageNumber . " - " . utf8_decode($songName), 0, 1, "L");
+            $songCount++;
         }
     }
 
@@ -149,6 +165,7 @@ class SongbookPdfService
         $currentPage = 2;
         $startPages = [];
         $validSongs = [];
+        $skippedSongs = [];
 
         foreach ($fileNames as $index => $fileName) {
             $songId = $songIds[$index];
@@ -164,8 +181,11 @@ class SongbookPdfService
                     $startPages[] = $currentPage;
                     $validSongs[] = $songName;
                     $currentPage += $pagesAdded;
+                } else {
+                    $skippedSongs[] = "$songName (Fichier introuvable)";
                 }
             } catch (Exception $e) {
+                $skippedSongs[] = "$songName (Incompatible)";
                 error_log("Erreur import PDF ($filePath) : " . $e->getMessage());
             }
         }
@@ -181,13 +201,13 @@ class SongbookPdfService
         $pdf->Output($finalPathDir . $tempFileName, 'F');
         
         // Gestion BDD et renommage (logique existante)
-        $this->finalizeDocument($id, $tempFileName, $finalPathDir);
+        $this->finalizeDocument($id, $tempFileName, $finalPathDir, $skippedSongs);
     }
 
     /**
      * Logique de finalisation : BDD + renommage avec version
      */
-    private function finalizeDocument(int $id, string $tempName, string $dir): void
+    private function finalizeDocument(int $id, string $tempName, string $dir, array $skipped = []): void
     {
         $fileSize = filesize($dir . $tempName);
         $newVersion = creeModifieDocument($tempName, $fileSize, "songbook", $id);
@@ -199,6 +219,10 @@ class SongbookPdfService
         rename($dir . $tempName, $dir . $finalName);
         
         echo "Fichier <a href='../../data/songbooks/$id/$finalName' target='_blank'>$finalName</a> généré avec succès.";
+        
+        if (!empty($skipped)) {
+            echo "<br><small class='text-warning'>Attention, " . count($skipped) . " morceau(x) ont été ignorés : " . implode(', ', $skipped) . "</small>";
+        }
     }
 
     /**
@@ -262,6 +286,10 @@ class SongbookPdfService
  */
 function pdfCreeSongbook($id, $version, $intitule, $image, $songs, $files, $ids, $versions): void
 {
+    // Augmentation des limites pour les gros songbooks
+    ini_set('memory_limit', '512M');
+    set_time_limit(300); // 5 minutes
+
     $service = new SongbookPdfService();
     $service->create($id, (int)$version, $intitule, $image, $songs, $files, $ids, $versions);
 }
