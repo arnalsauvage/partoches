@@ -60,12 +60,12 @@ $typesFiltres = [
 $filtresRecherche = in_array('tous', $filtresActuels) ? array_keys($typesFiltres) : $filtresActuels;
 
 // === Pagination ===
-$totalItems = Media::compteTousLesMedias($filtresRecherche);
+$totalItems = MediaRepository::compteTousLesMedias($filtresRecherche);
 $pagination = new Pagination($totalItems, $itemsParPage, $pageActuelle);
 $offset = ($pageActuelle - 1) * $itemsParPage;
 
 // === Récupération des médias ===
-$idsMedias = Media::chercheTousLesMedias($itemsParPage, $offset, $filtresRecherche);
+$idsMedias = MediaRepository::chercheTousLesMedias($itemsParPage, $offset, $filtresRecherche);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -178,9 +178,10 @@ $idsMedias = Media::chercheTousLesMedias($itemsParPage, $offset, $filtresRecherc
             echo "<div class='col-12 text-center'><p class='alert alert-info'>Aucun média ne correspond à cette sélection. Ouvrez la configuration pour allumer quelques boutons ! 🎸</p></div>";
         } else {
             foreach ($idsMedias as $id) {
-                $media = new Media();
-                $media->chercheMedia($id);
-                echo $media->afficheComposantMedia();
+                $media = MediaRepository::chercheMedia($id);
+                if ($media) {
+                    echo MediaRenderer::afficheComposantMedia($media);
+                }
             }
         }
         ?>

@@ -89,7 +89,8 @@ HTML;
 // 7. Utilisateurs (Admin / Editeur)
 $liensAdminUsers = "";
 if ($privilege > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-    $liensAdminUsers = "<li><a href=\"../utilisateur/utilisateur_liste.php\">Utilisateurs</a></li>";
+    $liensAdminUsers = "<li><a href=\"../playlist/playlist_liste.php\">Playlists</a></li>";
+    $liensAdminUsers .= "<li><a href=\"../utilisateur/utilisateur_liste.php\">Utilisateurs</a></li>";
 }
 
 // 8. Paramétrage (Admin)

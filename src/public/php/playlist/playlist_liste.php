@@ -1,91 +1,103 @@
 <?php
-global $playlistForm, $cheminImages, $iconeCreer, $iconeAttention, $playlistVoir, $playlistGet, $iconePoubelle;
+/**
+ * PAGE : playlist_liste.php
+ * Affichage moderne des playlists sous forme de cartes Canopée.
+ */
+
 require_once __DIR__ . "/../lib/utilssi.php";
+$pasDeMenu = true;
 require_once __DIR__ . "/../navigation/menu.php";
 require_once __DIR__ . "/../playlist/playlist.php";
 
-$table = "playlist";
-$fichiersDuPlaylist = "";
-$fichiersDuPlaylist .= entreBalise("Playlists", "H1");
-$fichiersDuPlaylist .= TblDebut(0);
-$cheminPlaylist = ".data/playlists/";
+echo envoieHead("Playlists", "styles-communs.css");
+echo $MENU_HTML;
 
-// Gestion du paramètre de tri
-if (isset ($_GET ['tri']) && is_numeric($_GET ['tri'])) {
-    $tri = $_GET ['tri'];
-    $ordreAsc = true;
+// --- PARAMÈTRES ET FILTRES ---
+$tri = $_GET['tri'] ?? 'date';
+$ordreAsc = isset($_GET['tri']); // tri = ASC, triDesc = DESC
+if (isset($_GET['triDesc'])) {
+    $tri = $_GET['triDesc'];
+    $ordreAsc = false;
+}
+
+$recherche = $_GET['recherche'] ?? '';
+$critereRecherche = ($recherche != "") ? "%$recherche%" : "%";
+
+// --- RÉCUPÉRATION DES DONNÉES ---
+$resultat = cherchePlaylists("nom", $critereRecherche, $tri, $ordreAsc);
+
+// --- CONSTRUCTION DU CONTENU HTML ---
+$html = "
+<div class='container'>
+    <div class='starter-template'>
+        <h1 style='margin-bottom: 30px; border-bottom: 2px solid #8B4513; padding-bottom: 10px; color: #2b1d1a;'>
+            <i class='glyphicon glyphicon-list-alt'></i> Playlists
+        </h1>
+
+        <!-- BARRE D'OUTILS -->
+        <div class='well' style='background-color: #f5f5f5; border: 1px solid #ddd; padding: 15px; margin-bottom: 30px; border-radius: 8px;'>
+            <div class='row'>
+                <form method='GET' action='playlist_liste.php' class='form-inline'>
+                    <div class='col-md-6 col-sm-12'>
+                        <div class='input-group' style='width: 100%;'>
+                            <input type='text' name='recherche' class='form-control' placeholder='Rechercher une playlist...' value='" . htmlspecialchars($recherche) . "'>
+                            <span class='input-group-btn'>
+                                <button class='btn btn-primary' type='submit' style='background-color: #8B4513; border: none;'>
+                                    <i class='glyphicon glyphicon-search'></i>
+                                </button>
+                                " . ($recherche != "" ? "<a href='playlist_liste.php' class='btn btn-default' title='Réinitialiser'><i class='glyphicon glyphicon-remove'></i></a>" : "") . "
+                            </span>
+                        </div>
+                    </div>
+                    <div class='col-md-6 col-sm-12 text-right' style='margin-top: 5px;'>
+                        <div class='btn-group'>
+                            <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                <i class='glyphicon glyphicon-sort'></i> Trier par : " . ucfirst($tri) . " <span class='caret'></span>
+                            </button>
+                            <ul class='dropdown-menu dropdown-menu-right'>
+                                <li><a href='?tri=nom&recherche=$recherche'>Nom (A-Z)</a></li>
+                                <li><a href='?triDesc=nom&recherche=$recherche'>Nom (Z-A)</a></li>
+                                <li role='separator' class='divider'></li>
+                                <li><a href='?tri=date&recherche=$recherche'>Date (Ancienne)</a></li>
+                                <li><a href='?triDesc=date&recherche=$recherche'>Date (Récente)</a></li>
+                                <li role='separator' class='divider'></li>
+                                <li><a href='?triDesc=hits&recherche=$recherche'>Popularité (Vues)</a></li>
+                            </ul>
+                        </div>
+                        ";
+if ($_SESSION['privilege'] >= $GLOBALS["PRIVILEGE_EDITEUR"]) {
+    $html .= "          <a href='playlist_form.php' class='btn btn-success' style='background-color: #2b1d1a; border: 1px solid #D2B48C;'>
+                            <i class='glyphicon glyphicon-plus'></i> Nouvelle Playlist
+                        </a>";
+}
+$html .= "          </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- AFFICHAGE DES CARTES -->
+        <div class='row'>";
+
+if ($resultat->num_rows > 0) {
+    while ($ligne = $resultat->fetch_row()) {
+        $html .= afficheCartePlaylist($ligne);
+    }
 } else {
-    if (isset ($_GET ['triDesc'])) {
-        $tri = $_GET ['triDesc'];
-        $ordreAsc = false;
-    } else {
-        $tri = "date";
-        $ordreAsc = false;
-    }
+    $html .= "
+        <div class='col-xs-12'>
+            <div class='alert alert-info text-center' style='padding: 40px; border: 2px dashed #D2B48C; background: #F5F5DC; color: #2b1d1a;'>
+                <i class='glyphicon glyphicon-info-sign' style='font-size: 48px; display: block; margin-bottom: 15px;'></i>
+                <p style='font-size: 1.2em;'>Aucune playlist trouvée pour cette recherche.</p>
+                <a href='playlist_liste.php' class='btn btn-link'>Afficher toutes les playlists</a>
+            </div>
+        </div>";
 }
 
-// Chargement de la liste des playlists
-$resultat = cherchePlaylists("nom", "%", $tri, $ordreAsc);
-$numligne = 0;
+$html .= "
+        </div> <!-- Fin row -->
+    </div> <!-- Fin starter-template -->
+</div> <!-- Fin container -->
+";
 
-// Affichage de la liste
-
-// //////////////////////////////////////////////////////////////////////ADMIN : bouton nouveau
-if ($_SESSION ['privilege'] >= $GLOBALS["PRIVILEGE_EDITEUR"])
-    $fichiersDuPlaylist .= "<BR>" . ancre("$playlistForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer un nouvel playlist");
-// //////////////////////////////////////////////////////////////////////ADMIN
-
-$fichiersDuPlaylist .= image($iconeAttention, "100%", 1, 1);
-$fichiersDuPlaylist .= TblDebut(0);
-TblCellule(ancre("?tri=hits", "Hits")) . TblFinLigne();
-
-$fichiersDuPlaylist .= TblDebut(0);
-$fichiersDuPlaylist .= TblDebutLigne() . TblCellule("  Tri  ");
-$fichiersDuPlaylist .= titreColonne("Nom", "nom");
-$fichiersDuPlaylist .= titreColonne("Description", "description");
-$fichiersDuPlaylist .= titreColonne("Date", "date");
-$fichiersDuPlaylist .= titreColonne("Vues", "hits");
-$fichiersDuPlaylist .= TblFinLigne();
-
-while ($ligne = $resultat->fetch_row()) {
-    $numligne++;
-    $fichiersDuPlaylist .= TblDebutLigne();
-    // Playlist : 	[0]id 	[1]nom 	[2]description 	[3]date  	[4]image 	[5]hits 	[6]idUser
-    if ($ligne [4])
-        // //////////////////////////////////////////////////////////////////////ADMIN : bouton modifier
-        if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"])
-            $fichiersDuPlaylist .= TblCellule(ancre($playlistForm . "?id=$ligne[0]", "modifier"));
-        else
-            $fichiersDuPlaylist .= TblCellule(image(($cheminPlaylist . $ligne[0] . "/" . $ligne [4]), 32, 32)); // image
-    else
-        $fichiersDuPlaylist .= TblCellule(ancre($playlistForm . "?id=$ligne[0]", "voir"));
-
-    $fichiersDuPlaylist .= TblCellule(ancre($playlistVoir . "?id=$ligne[0]", entreBalise($ligne [1], "H2"))); // Nom
-
-    $fichiersDuPlaylist .= TblCellule("  " . $ligne [2]); // description
-    $fichiersDuPlaylist .= TblCellule(" " . dateMysqlVersTexte($ligne [3], 0)); // date
-    $fichiersDuPlaylist .= TblCellule("  -  " . $ligne [5] . " hit(s)"); // hits
-
-    // //////////////////////////////////////////////////////////////////////ADMIN : bouton supprimer
-    if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"]) {
-        $fichiersDuPlaylist .= TblCellule(boutonSuppression($playlistGet . "?id=$ligne[0]&mode=SUPPR", $iconePoubelle, $cheminImages));
-        // //////////////////////////////////////////////////////////////////////ADMIN
-
-        $fichiersDuPlaylist .= TblFinLigne();
-    }
-}
-$fichiersDuPlaylist .= TblFin();
-
-$fichiersDuPlaylist .= image($iconeAttention, "100%", 1, 1);
-// //////////////////////////////////////////////////////////////////////ADMIN : bouton ajouter
-if ($_SESSION ['privilege'] >=$ GLOBALS["PRIVILEGE_EDITEUR"])
-    $fichiersDuPlaylist .= "<BR>" . ancre("?page=$playlistForm", image($cheminImages . $iconeCreer, 32, 32) . "Créer une nouvelle playlist");
-// //////////////////////////////////////////////////////////////////////ADMIN
-$fichiersDuPlaylist .= envoieFooter();
-echo $fichiersDuPlaylist;
-
-function titreColonne($libelle, $nomRubrique)
-{
-    $chaine = TblCellule(ancre("?tri=$nomRubrique", "<span class='glyphicon glyphicon-chevron-up'> ") . "  $libelle   " . ancre("?triDesc=$nomRubrique", "  <span class='glyphicon glyphicon-chevron-down'> "));
-    return $chaine;
-}
+$html .= envoieFooter();
+echo $html;

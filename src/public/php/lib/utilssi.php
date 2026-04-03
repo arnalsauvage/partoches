@@ -116,9 +116,7 @@ if (!isset ($FichierUtilsSi)) {
     function actualiseMedias(): void
     {
         // On évite les inclusions multiples si on est déjà dans un processus complexe
-        require_once PHP_DIR . "/media/Media.php";
-        $media = new Media();
-        $media->resetMediaTable();
+        MediaService::resetMediaTable();
     }
 
     // Fonction pour filtrer les données venant de POST et GET

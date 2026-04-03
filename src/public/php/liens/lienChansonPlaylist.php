@@ -69,10 +69,16 @@ function chercheLienParIdPlaylistOrdre($idPlaylist, $ordre)
 // Crée un lienChansonPlaylist
 function creelienChansonPlaylist($idChanson, $idPlaylist)
 {
-    chercheLiensChansonPlaylist("idPlaylist", $idPlaylist, "id");
-    $nb = $_SESSION ['mysql']->affected_rows + 1;
-    $maRequete = "INSERT INTO lienchansonplaylist VALUES (NULL, '$idChanson', '$idPlaylist', '$nb')";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creelienChansonPlaylist#1 : " . $_SESSION ['mysql']->error);
+    $idChanson = (int)$idChanson;
+    $idPlaylist = (int)$idPlaylist;
+    
+    // On compte proprement en SQL
+    $res = $_SESSION['mysql']->query("SELECT COUNT(*) FROM lienchansonplaylist WHERE idPlaylist = '$idPlaylist'");
+    $row = $res->fetch_row();
+    $nb = $row[0] + 1;
+
+    $maRequete = "INSERT INTO lienchansonplaylist (id, idChanson, idPlaylist, ordre) VALUES (NULL, '$idChanson', '$idPlaylist', '$nb')";
+    $_SESSION ['mysql']->query($maRequete) or die ("Problème creelienChansonPlaylist#1 : " . $_SESSION ['mysql']->error);
 }
 
 // Modifie en base la lienChansonPlaylist
@@ -167,24 +173,50 @@ function ordonneLiensPlaylist($idPlaylist)
 
 function remonteTitrePlaylist($idPlaylist, $rang, $longueurSaut)
 {
-    if ($rang < $longueurSaut)
+    if ($rang <= $longueurSaut) {
         return false;
+    }
 
     // cherche le doc à monter
     $lienAmonter = chercheLienParIdPlaylistOrdre($idPlaylist, $rang);
-    if ($lienAmonter == 0)
+    if ($lienAmonter == 0) {
         return false;
+    }
 
     // cherche le doc à baisser
     $lienAbaisser = chercheLienParIdPlaylistOrdre($idPlaylist, $rang - $longueurSaut);
-    if ($lienAbaisser == 0)
+    if ($lienAbaisser == 0) {
         return false;
+    }
 
     //  changer l'ordre et enregistrer
-    modifielienChansonPlaylist($lienAmonter[0], $lienAmonter[1], $lienAmonter[2], $lienAmonter[3] - $longueurSaut);
-    modifielienChansonPlaylist($lienAbaisser[0], $lienAbaisser[1], $lienAbaisser[2], $lienAbaisser[3] + $longueurSaut);
+    modifielienChansonPlaylist($lienAmonter[0], $lienAmonter[1], $lienAmonter[2], (int)$lienAmonter[3] - (int)$longueurSaut);
+    modifielienChansonPlaylist($lienAbaisser[0], $lienAbaisser[1], $lienAbaisser[2], (int)$lienAbaisser[3] + (int)$longueurSaut);
+
+    //  réordonner au cas où
+    ordonneLiensPlaylist($idPlaylist);
+    return true;
+}
+
+function descendTitrePlaylist($idPlaylist, $rang, $longueurSaut)
+{
+    // cherche le doc à descendre
+    $lienAdescendre = chercheLienParIdPlaylistOrdre($idPlaylist, $rang);
+    if ($lienAdescendre == 0) {
+        return false;
+    }
+
+    // cherche le doc à monter
+    $lienAmonter = chercheLienParIdPlaylistOrdre($idPlaylist, $rang + $longueurSaut);
+    if ($lienAmonter == 0) {
+        return false;
+    }
 
     //  changer l'ordre et enregistrer
+    modifielienChansonPlaylist($lienAdescendre[0], $lienAdescendre[1], $lienAdescendre[2], (int)$lienAdescendre[3] + (int)$longueurSaut);
+    modifielienChansonPlaylist($lienAmonter[0], $lienAmonter[1], $lienAmonter[2], (int)$lienAmonter[3] - (int)$longueurSaut);
+
+    //  réordonner au cas où
     ordonneLiensPlaylist($idPlaylist);
     return true;
 }

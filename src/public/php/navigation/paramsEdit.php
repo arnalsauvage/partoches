@@ -52,9 +52,7 @@ if (isset($_POST['action'])) {
 
     if ($_POST['action'] === 'regenere_medias') {
         require_once dirname(__DIR__) . "/lib/utilssi.php";
-        require_once dirname(__DIR__) . "/media/Media.php";
-        $media = new Media();
-        $media->resetMediaTable(5000); // On indexe TOUT
+        MediaService::resetMediaTable(); // On indexe TOUT (le service gère les quotas)
         echo "✅ Catalogue régénéré avec succès !";
         exit;
     }
