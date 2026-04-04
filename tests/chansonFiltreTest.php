@@ -11,7 +11,7 @@ if (empty($_SERVER['DOCUMENT_ROOT'])) {
 }
 
 // On simule une session si elle n'existe pas
-if (session_status() == PHP_SESSION_NONE) {
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 

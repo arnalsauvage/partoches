@@ -1,10 +1,17 @@
 <?php
 use PHPUnit\Framework\TestCase;
-// require_once 'PHPUnit/Autoload.php';
-session_start();
-require_once "../src/public/php/lib/utilssi.php";
+
+if (!defined('PHPUNIT_RUNNING')) {
+    define('PHPUNIT_RUNNING', true);
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
 require_once __DIR__ . "/../src/public/php/chanson/Chanson.php";
-require_once "../src/public/php/chanson/chansonListe.php";
+require_once __DIR__ . "/../src/public/php/chanson/chansonListe.php";
 
 
 class chansonListeTest extends TestCase

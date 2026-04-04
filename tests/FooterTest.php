@@ -2,7 +2,7 @@
 use PHPUnit\Framework\TestCase;
 
 const PHPUNIT_RUNNING = true;
-session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
 require_once __DIR__ . "/../src/public/php/navigation/Footer.php"; // Ton fichier Footer.php
 

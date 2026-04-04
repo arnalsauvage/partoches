@@ -70,6 +70,13 @@ if (!isset($configMysql)) {
         return (0);
     }
     $_SESSION ['mysql'] = $mysqli;
+
+    // === CHARGEMENT DES PARAMÈTRES EN SESSION (Django) ===
+    if (isset($ini_objet)) {
+        $_SESSION['titreSite'] = $ini_objet->m_valeur("titreSite", "general");
+        $_SESSION['logoSite'] = $ini_objet->m_valeur("logoSite", "general");
+        $_SESSION['loginParam'] = $ini_objet->m_valeur("loginParam", "general");
+    }
 }
 //	echo "connexion : $idconnect";
 //	return($idconnect);

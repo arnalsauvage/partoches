@@ -96,7 +96,7 @@ if ($privilege > $GLOBALS["PRIVILEGE_MEMBRE"]) {
 // 8. Paramétrage (Admin)
 $lienParametrage = "";
 if (($user == $_SESSION['loginParam']) || ($privilege > $GLOBALS["PRIVILEGE_EDITEUR"])) {
-    $lienParametrage = "<li><a href=\"../navigation/paramsEdit.php\">Paramétrage</a></li>";
+    $lienParametrage = "<li><a href=\"../admin/params.php\">Paramétrage</a></li>";
 }
 
 // ... GESTION DE L'AVATAR ... (inchangé)
@@ -129,7 +129,7 @@ if ($user != "invite") {
     $authLink = "<a href='../navigation/login.php?logoff=1' title='Se déconnecter' class='auth-btn'><i class='glyphicon glyphicon-off'></i></a>";
 } else {
     $extraHtml = file_get_contents(__DIR__ . '/../../html/composants/menuLogin.html');
-    $authLink = "<a id='afficherPopup' href='#' title='Se connecter' class='auth-btn' style='cursor:pointer;'><i class='glyphicon glyphicon-log-in'></i></a>";
+    $authLink = "<a id='afficherPopup' href='#' title='Se connecter' class='auth-btn auth-btn-pointer'><i class='glyphicon glyphicon-log-in'></i></a>";
     
     // Script de gestion de la popup
     $extraHtml .= <<<JS
@@ -186,16 +186,16 @@ $contenu .= <<<HTML
         <div class="navbar-header">
             <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu" aria-expanded="false">
                 <span class="sr-only">Menu</span>
-                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="../media/listeMedias.php" style="display: flex; align-items: center;">
-                <span class="site-title-nav" style="margin-right: 10px; font-weight: bold; color: #D2B48C;">$titreSite</span>
+            <a class="navbar-brand navbar-brand-flex" href="../media/listeMedias.php">
+                <span class="site-title-nav">$titreSite</span>
                 <img src="../../images/navigation/$logoSite" height="40" class="logo" alt="logo">
             </a>
         </div>
         <div id="main-menu" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="divider" role="separator"></li>
+                <li class="divider" aria-hidden="true"></li>
                 $lienMedias
                 $lienChansons
                 $lienStrums
@@ -215,7 +215,7 @@ HTML;
 if (!empty($infoLogin)) {
     $contenu .= <<<HTML
 <div class="container">
-    <div class="starter-template" style="padding-top: 10px; padding-bottom: 0;">
+    <div class="starter-template msg-flash-container">
         $infoLogin
     </div>
 </div>

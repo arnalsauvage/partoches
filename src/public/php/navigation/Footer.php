@@ -8,25 +8,34 @@ class Footer
 {
     const MYSQL = 'mysql';
     private string $_html;
+    private string $_cle;
 
-    public function __construct()
+    public function __construct(string $cle = 'footerHtml')
     {
         $this->_html = "";
+        $this->_cle = $cle;
         $this->chargeDepuisBdd();
     }
 
     /**
      * Charge le footer HTML depuis la table parametres.
-     * La table doit contenir une ligne : nom='footerHtml', valeur='<html>'
      */
     public function chargeDepuisBdd(): void
     {
-        $maRequete = "SELECT valeur FROM parametres WHERE nom='footerHtml' LIMIT 1";
-        $result = $_SESSION[self::MYSQL]->query($maRequete)
-        or die("Problème chargeDepuisBdd : " . $_SESSION[self::MYSQL]->error . " requête : " . $maRequete);
+        // On s'assure que la table existe pour eviter les plantages
+        $db = $_SESSION[self::MYSQL] ?? null;
+        if (!$db) {
+            $this->_html = "";
+            return;
+        }
+        
+        $db->query("CREATE TABLE IF NOT EXISTS parametres (nom VARCHAR(255) PRIMARY KEY, valeur TEXT)");
 
-        if ($ligne = $result->fetch_row()) {
-            $this->_html = $ligne[0];
+        $maRequete = "SELECT valeur FROM parametres WHERE nom='" . $this->_cle . "' LIMIT 1";
+        $result = $db->query($maRequete);
+
+        if ($result && ($ligne = $result->fetch_row())) {
+            $this->_html = $ligne[0] ?? '';
         } else {
             $this->_html = "";
         }
@@ -34,26 +43,26 @@ class Footer
 
     /**
      * Sauvegarde le footer HTML dans la table parametres.
-     * S'il existe déjà, on le met à jour, sinon on crée la ligne.
      */
     public function sauveBdd(): void
     {
-        $valeur = $_SESSION[self::MYSQL]->real_escape_string($this->_html);
+        $db = $_SESSION[self::MYSQL] ?? null;
+        if (!$db) return;
+
+        $valeur = $db->real_escape_string($this->_html);
 
         // Vérifie si la clé existe déjà
-        $check = "SELECT COUNT(*) FROM parametres WHERE nom='footerHtml'";
-        $res = $_SESSION[self::MYSQL]->query($check)
-        or die("Problème vérification parametres : " . $_SESSION[self::MYSQL]->error);
-        $exists = ($res->fetch_row()[0] > 0);
+        $check = "SELECT COUNT(*) FROM parametres WHERE nom='" . $this->_cle . "'";
+        $res = $db->query($check);
+        $exists = ($res && ($row = $res->fetch_row()) && $row[0] > 0);
 
         if ($exists) {
-            $maRequete = "UPDATE parametres SET valeur='$valeur' WHERE nom='footerHtml'";
+            $maRequete = "UPDATE parametres SET valeur='$valeur' WHERE nom='" . $this->_cle . "'";
         } else {
-            $maRequete = "INSERT INTO parametres (nom, valeur) VALUES ('footerHtml', '$valeur')";
+            $maRequete = "INSERT INTO parametres (nom, valeur) VALUES ('" . $this->_cle . "', '$valeur')";
         }
 
-        $_SESSION[self::MYSQL]->query($maRequete)
-        or die("Problème sauveBdd : " . $_SESSION[self::MYSQL]->error . " requête : " . $maRequete);
+        $db->query($maRequete);
     }
 
     /**

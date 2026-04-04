@@ -2,14 +2,21 @@
 
 use PHPUnit\Framework\TestCase;
 
+if (!defined('PHPUNIT_RUNNING')) {
+    define('PHPUNIT_RUNNING', true);
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
-require_once __DIR__ . "/../src/public/php/UtilisateurNote.php";
+require_once __DIR__ . "/../src/public/php/note/UtilisateurNote.php";
 
 class UtilisateurNoteTest extends TestCase
 {
     function setUp():void
     {
-        @session_start();
     }
 
     public function testSetIdObjetNote()

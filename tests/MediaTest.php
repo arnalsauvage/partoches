@@ -1,7 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
-const PHPUNIT_RUNNING = true;
-session_start();
+if (!defined('PHPUNIT_RUNNING')) define('PHPUNIT_RUNNING', true);
+if (session_status() === PHP_SESSION_NONE) session_start();
 $_SERVER['DOCUMENT_ROOT'] = "../";
 require_once __DIR__ . "/../src/autoload.php";
 

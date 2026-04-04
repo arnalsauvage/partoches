@@ -1,0 +1,104 @@
+<?php
+/**
+ * VUE : params_view.phtml
+ * Template HTML pour l'administration.
+ */
+?>
+<div id="django-config-page" class="container">
+    <?= $alerts ?>
+    
+    <div class="header-django">
+        <h1><span class="glyphicon glyphicon-cog"></span> Parametrage</h1>
+        <div class="btn-group-django">
+            <a href="../todo/todo_admin.php" class="btn-dj btn-dj-primary"><span class="glyphicon glyphicon-list-alt"></span> Roadbook</a>
+            <a href="../audit/imagesCheck.php" class="btn-dj btn-dj-info"><span class="glyphicon glyphicon-eye-open"></span> Images</a>
+            <button type="button" id="btnRegenMedias" class="btn-dj btn-dj-default"><span class="glyphicon glyphicon-refresh"></span> Regenere Medias</button>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="form-dj-reset">
+        <ul class="tabs-django">
+            <li class="tab-dj active" data-target="dj-gen"><span class="glyphicon glyphicon-home"></span> General</li>
+            <li class="tab-dj" data-target="dj-sql-db"><span class="glyphicon glyphicon-hdd"></span> Base</li>
+            <li class="tab-dj" data-target="dj-foot"><span class="glyphicon glyphicon-edit"></span> Footer</li>
+            <li class="tab-dj" data-target="dj-logs"><span class="glyphicon glyphicon-list"></span> Logs</li>
+            <li class="tab-dj" data-target="dj-console"><span class="glyphicon glyphicon-console"></span> SQL</li>
+            <li class="tab-dj" data-target="dj-diag"><span class="glyphicon glyphicon-wrench"></span> Diagnostic</li>
+        </ul>
+
+        <div class="content-django">
+            <!-- ONGLET GÉNÉRAL -->
+            <div id="dj-gen" class="pane-dj active">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="section-dj">
+                            <div class="section-dj-title">Identite</div>
+                            <div class="logo-config-container">
+                                <img src="../../images/navigation/<?= $logoActuel ?>" class="img-thumbnail logo-config-preview" alt="Logo">
+                                <input type="file" name="logoSite" class="input-django">
+                            </div>
+                            <?= $genFields1 ?>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section-dj">
+                            <div class="section-dj-title">Emails &amp; API</div>
+                            <?= $genFields2 ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONGLET BASE -->
+            <div id="dj-sql-db" class="pane-dj">
+                <div class="section-dj section-sql-db">
+                    <div class="section-dj-title">Connexion MySQL</div>
+                    <?= $mysqlFields ?>
+                </div>
+            </div>
+
+            <!-- ONGLET FOOTER -->
+            <div id="dj-foot" class="pane-dj">
+                <div class="section-dj">
+                    <div class="section-dj-title">HTML du Footer</div>
+                    <textarea name="footerHtml" rows="12" class="textarea-footer-dj"><?= $footerHtml ?></textarea>
+                </div>
+            </div>
+
+            <!-- ONGLET LOGS -->
+            <div id="dj-logs" class="pane-dj">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="list-group"><?= $logLinks ?></div>
+                    </div>
+                    <div class="col-sm-8"><div id="log-view-dj" class="well-log-dj">Selectionnez un log...</div></div>
+                </div>
+            </div>
+
+            <!-- ONGLET CONSOLE SQL -->
+            <div id="dj-console" class="pane-dj">
+                <div class="section-dj">
+                    <textarea id="sqlQueryDj" class="input-django sql-console-textarea" rows="5" placeholder="SELECT * FROM chanson LIMIT 10;"></textarea>
+                    <div class="sql-actions-bar"><button type="button" id="btnRunSqlDj" class="btn-dj btn-dj-info">Executer</button></div>
+                    <div id="sqlResDj" class="sql-results-container"></div>
+                </div>
+            </div>
+
+            <!-- ONGLET DIAGNOSTIC -->
+            <div id="dj-diag" class="pane-dj">
+                <div class="section-dj">
+                    <div class="section-dj-title">Diagnostic Systeme</div>
+                    <p>Lancez une analyse complete de l'environnement pour detecter les problemes de memoire, d'extensions ou de permissions.</p>
+                    <button type="button" id="btnRunDiagDj" class="btn-dj btn-dj-warning"><span class="glyphicon glyphicon-play"></span> Lancer le Diagnostic</button>
+                    <div id="diagResDj" class="diag-results-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-save-dj">
+            <button type="submit" class="btn-dj btn-dj-primary btn-lg full-width">ENREGISTRER TOUT</button>
+        </div>
+    </form>
+</div>
+
+<script src="../../js/params.js"></script>

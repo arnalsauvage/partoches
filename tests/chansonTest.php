@@ -1,8 +1,14 @@
 <?php
 use PHPUnit\Framework\TestCase;
-// require_once 'PHPUnit/Autoload.php';
-const PHPUNIT_RUNNING = true;
-session_start();
+
+if (!defined('PHPUNIT_RUNNING')) {
+    define('PHPUNIT_RUNNING', true);
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
 require_once __DIR__ . "/../src/public/php/chanson/Chanson.php";
 
@@ -52,7 +58,7 @@ class ChansonTest extends TestCase
         $this->assertEquals("aeiou", Chanson::normalize("àéîôù"));
     }
 
-    public function testMoteurRecherche($recherche1){
+    public function testMoteurRecherche(){
 
         // Test avec une recherche connue qui devrait retourner des résultats
         $recherche1 = "contrefaçon";
