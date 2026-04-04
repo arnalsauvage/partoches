@@ -74,7 +74,8 @@ if (isset($_POST['action'])) {
         echo "<hr><strong>Permissions Dossiers :</strong><br>";
         $dossiers = [
             'Songbooks' => __DIR__ . '/../../data/songbooks/',
-            'Chansons' => __DIR__ . '/../../data/chansons/'
+            'Chansons' => __DIR__ . '/../../data/chansons/',
+            'Migrations' => __DIR__ . '/../../../data/database/migrations/'
         ];
         foreach ($dossiers as $nom => $path) {
             if (is_dir($path)) {
@@ -84,15 +85,78 @@ if (isset($_POST['action'])) {
             }
         }
 
-        echo "<hr><strong>Test écriture :</strong><br>";
-        $testFile = __DIR__ . '/../../data/songbooks/test_write.txt';
-        if (@file_put_contents($testFile, "test")) {
-            echo "Ecriture : ✅ OK<br>";
-            @unlink($testFile);
-        } else {
-            echo "Ecriture : ❌ ÉCHOUÉ (Vérifiez les droits CHMOD)<br>";
+        echo "<hr><strong>Migrations BDD :</strong><br>";
+        require_once __DIR__ . "/../lib/configMysql.php";
+        // On vérifie si la table migrations existe
+        $checkTable = $mysqli->query("SHOW TABLES LIKE 'migrations'");
+        $played = [];
+        if ($checkTable->num_rows > 0) {
+            $res = $mysqli->query("SELECT version FROM migrations");
+            while ($row = $res->fetch_row()) $played[] = $row[0];
         }
+        
+        $migrationDir = __DIR__ . '/../../../data/database/migrations/';
+        $files = glob($migrationDir . "*.sql");
+        $pending = 0;
+        foreach ($files as $f) {
+            $b = basename($f);
+            if (!in_array($b, $played)) {
+                echo "⏳ En attente : $b <br>";
+                $pending++;
+            } else {
+                echo "✅ Appliquée : $b <br>";
+            }
+        }
+        if ($pending > 0) {
+            echo "<br><button type='button' id='btnRunMigDj' class='btn btn-xs btn-primary'>Appliquer les $pending migrations</button>";
+        } else {
+            echo "<em>Toute la base est à jour. 🎸</em>";
+        }
+
         echo "</div>";
+        exit;
+    }
+
+    if ($_POST['action'] === 'run_migrations') {
+        require_once __DIR__ . "/../lib/configMysql.php";
+        
+        // 1. Création table migrations si besoin
+        $mysqli->query("CREATE TABLE IF NOT EXISTS `migrations` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `version` varchar(255) NOT NULL,
+            `date_execution` datetime DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        // 2. Scan des fichiers
+        $migrationDir = __DIR__ . '/../../../data/database/migrations/';
+        $files = glob($migrationDir . "*.sql");
+        sort($files); // Ordre alphabétique
+
+        $res = $mysqli->query("SELECT version FROM migrations");
+        $played = [];
+        while ($row = $res->fetch_row()) $played[] = $row[0];
+
+        $successCount = 0;
+        foreach ($files as $f) {
+            $version = basename($f);
+            if (!in_array($version, $played)) {
+                $sql = file_get_contents($f);
+                // On exécute multi-requêtes
+                if ($mysqli->multi_query($sql)) {
+                    do {
+                        if ($result = $mysqli->store_result()) $result->free();
+                    } while ($mysqli->more_results() && $mysqli->next_result());
+                    
+                    $mysqli->query("INSERT INTO migrations (version) VALUES ('" . $mysqli->real_escape_string($version) . "')");
+                    $successCount++;
+                } else {
+                    echo "❌ Erreur sur $version : " . $mysqli->error;
+                    exit;
+                }
+            }
+        }
+        echo "✅ $successCount migration(s) appliquée(s) avec succès !";
         exit;
     }
 }
@@ -319,6 +383,14 @@ $(document).ready(function(){
     $('#btnRunDiagDj').click(function(){
         $('#diagResDj').html('<div class="text-center"><span class="glyphicon glyphicon-refresh spin"></span> Analyse en cours...</div>');
         $.post('', {action: 'diagnostic_systeme'}, function(d){ $('#diagResDj').html(d); });
+    });
+    $(document).on('click', '#btnRunMigDj', function(){
+        var btn = $(this);
+        btn.prop('disabled', true).html('<span class="glyphicon glyphicon-refresh spin"></span> Migration en cours...');
+        $.post('', {action: 'run_migrations'}, function(d){
+            toastr.success(d);
+            $('#btnRunDiagDj').click(); // On rafraîchit le diag
+        });
     });
 });
 </script>
