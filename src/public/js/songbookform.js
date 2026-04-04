@@ -65,7 +65,8 @@ $(document).ready(function () {
                     html += '</div>';
                     $('#pdf-report-zone').html(html);
 
-                    setTimeout(() => window.location.href = 'songbook_form.php?id=' + id, 3000);
+                    // On ne recharge plus automatiquement pour laisser lire le rapport
+                    // setTimeout(() => window.location.href = 'songbook_form.php?id=' + id, 3000);
                 } else {
                     let html = '<div class="alert alert-danger">';
                     html += '<h4><i class="glyphicon glyphicon-exclamation-sign"></i> Échec de la génération</h4>';
