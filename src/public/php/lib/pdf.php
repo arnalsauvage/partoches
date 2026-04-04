@@ -142,6 +142,7 @@ class SongbookPdfService
 
     /**
      * Génère le fichier PDF final et met à jour la BDD
+     * Retourne un tableau avec le statut et les détails
      */
     public function create(
         int $id,
@@ -152,20 +153,37 @@ class SongbookPdfService
         array $fileNames,
         array $songIds,
         array $docVersions
-    ): void {
+    ): array {
         $pdf = new SongbookPdf();
         $dateStr = date("d/m/Y");
+        $results = [
+            'success' => false,
+            'errors' => [],
+            'warnings' => [],
+            'skipped' => [],
+            'file' => ''
+        ];
 
         // 1. Couverture
         $coverPath = $this->songbooksDir . $id . "/" . $coverImage;
-        $coverPath = $this->ensurePdfCompatibleImage($coverPath);
-        $pdf->addCover($coverPath, $title, $version + 1, $dateStr);
+        if (!file_exists($coverPath)) {
+            $results['errors'][] = "Image de couverture introuvable : $coverImage";
+            // On continue quand même avec le logo par défaut si possible ou on échoue ?
+            // Dans le doute on tente de continuer sans image de couverture
+        } else {
+            $coverPath = $this->ensurePdfCompatibleImage($coverPath);
+        }
+        
+        try {
+            $pdf->addCover($coverPath, $title, $version + 1, $dateStr);
+        } catch (Exception $e) {
+            $results['errors'][] = "Erreur lors de l'ajout de la couverture : " . $e->getMessage();
+        }
 
         // 2. Chansons
         $currentPage = 2;
         $startPages = [];
         $validSongs = [];
-        $skippedSongs = [];
 
         foreach ($fileNames as $index => $fileName) {
             $songId = $songIds[$index];
@@ -175,6 +193,11 @@ class SongbookPdfService
             $fullFileName = composeNomVersion($fileName, $docVersion);
             $filePath = $this->chansonsDir . $songId . "/" . $fullFileName;
 
+            if (!file_exists($filePath)) {
+                $results['skipped'][] = "$songName (Fichier introuvable : $fullFileName)";
+                continue;
+            }
+
             try {
                 $pagesAdded = $pdf->appendPdfFile($filePath);
                 if ($pagesAdded > 0) {
@@ -182,32 +205,49 @@ class SongbookPdfService
                     $validSongs[] = $songName;
                     $currentPage += $pagesAdded;
                 } else {
-                    $skippedSongs[] = "$songName (Fichier introuvable)";
+                    $results['skipped'][] = "$songName (PDF vide ou illisible)";
                 }
             } catch (Exception $e) {
-                $skippedSongs[] = "$songName (Incompatible)";
+                $results['skipped'][] = "$songName (Incompatible : " . $e->getMessage() . ")";
                 error_log("Erreur import PDF ($filePath) : " . $e->getMessage());
             }
         }
 
+        if (empty($validSongs)) {
+            $results['errors'][] = "Aucune chanson valide n'a pu être ajoutée au Songbook.";
+            return $results;
+        }
+
         // 3. Sommaire
-        $pdf->addTableOfContents($validSongs, $this->getLogoPath(), $startPages);
+        try {
+            $pdf->addTableOfContents($validSongs, $this->getLogoPath(), $startPages);
+        } catch (Exception $e) {
+            $results['warnings'][] = "Erreur lors de la génération du sommaire : " . $e->getMessage();
+        }
 
         // 4. Sortie et Enregistrement
         $safeTitle = $this->slugify($title);
         $tempFileName = "songbook_" . $safeTitle . ".pdf";
         $finalPathDir = $this->songbooksDir . $id . "/";
         
-        $pdf->Output($finalPathDir . $tempFileName, 'F');
-        
-        // Gestion BDD et renommage (logique existante)
-        $this->finalizeDocument($id, $tempFileName, $finalPathDir, $skippedSongs);
+        try {
+            $pdf->Output($finalPathDir . $tempFileName, 'F');
+            // Gestion BDD et renommage
+            $finalName = $this->finalizeDocument($id, $tempFileName, $finalPathDir);
+            $results['success'] = true;
+            $results['file'] = $finalName;
+        } catch (Exception $e) {
+            $results['errors'][] = "Erreur lors de l'enregistrement du fichier PDF : " . $e->getMessage();
+        }
+
+        return $results;
     }
 
     /**
      * Logique de finalisation : BDD + renommage avec version
+     * Retourne le nom final du fichier
      */
-    private function finalizeDocument(int $id, string $tempName, string $dir, array $skipped = []): void
+    private function finalizeDocument(int $id, string $tempName, string $dir): string
     {
         $fileSize = filesize($dir . $tempName);
         $newVersion = creeModifieDocument($tempName, $fileSize, "songbook", $id);
@@ -218,11 +258,7 @@ class SongbookPdfService
         }
         rename($dir . $tempName, $dir . $finalName);
         
-        echo "Fichier <a href='../../data/songbooks/$id/$finalName' target='_blank'>$finalName</a> généré avec succès.";
-        
-        if (!empty($skipped)) {
-            echo "<br><small class='text-warning'>Attention, " . count($skipped) . " morceau(x) ont été ignorés : " . implode(', ', $skipped) . "</small>";
-        }
+        return $finalName;
     }
 
     /**

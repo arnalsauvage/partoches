@@ -372,7 +372,7 @@ function fichiersSongbook($id): array
     return $retour;
 }
 
-function CreeSongBookPdf($idSongbook)
+function CreeSongBookPdf($idSongbook): array
 {
     $db = $_SESSION['mysql'];
     $listeNomsChanson = []; $listeNomsFichier = []; $listeIdChanson = []; $listeVersionsDoc = [];
@@ -394,7 +394,20 @@ function CreeSongBookPdf($idSongbook)
     $image = imageSongbook($idSongbook);
     $nomGenere = make_alias("songbook_" . $sb->getNom()) . '.pdf';
     $doc = chercheDocumentNomTableId($nomGenere, "songbook", $idSongbook);
-    pdfCreeSongbook($idSongbook, $doc[4], $sb->getNom(), $image, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
+    
+    // On retourne le résultat du service
+    return pdfCreeSongbookResult($idSongbook, $doc[4], $sb->getNom(), $image, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
+}
+
+/**
+ * Nouvelle version de la fonction de création qui retourne le tableau de résultats
+ */
+function pdfCreeSongbookResult($id, $version, $intitule, $image, $songs, $files, $ids, $versions): array
+{
+    ini_set('memory_limit', '512M');
+    set_time_limit(300);
+    $service = new SongbookPdfService();
+    return $service->create($id, (int)$version, $intitule, $image, $songs, $files, $ids, $versions);
 }
 
 function listeSongbooks($type = 0): array

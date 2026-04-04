@@ -37,17 +37,61 @@ $(document).ready(function () {
     // Fonction globale pour la génération PDF
     window.genereUnPdf = function(id) {
         if (typeof toastr !== 'undefined') toastr.info("Génération du PDF en cours...");
+        
+        // On prépare une zone pour les messages détaillés si elle n'existe pas
+        if ($('#pdf-report-zone').length === 0) {
+            $('.container').first().prepend('<div id="pdf-report-zone" style="margin-top:20px;"></div>');
+        }
+        $('#pdf-report-zone').empty();
+
         $.ajax({
             type: "POST",
             url: "songbook_get.php",
             data: { id: id, mode: "GENEREPDF" },
+            dataType: 'json',
             success: function (response) {
-                if (response.indexOf("n'a pas été traité") === -1) {
+                if (response.success) {
                     if (typeof toastr !== 'undefined') toastr.success("PDF régénéré avec succès !");
-                    setTimeout(() => window.location.href = 'songbook_form.php?id=' + id, 1500);
+                    
+                    let html = '<div class="alert alert-success">';
+                    html += '<h4><i class="glyphicon glyphicon-ok"></i> Génération réussie !</h4>';
+                    html += '<p>Le fichier <strong>' + response.file + '</strong> a été créé.</p>';
+                    
+                    if (response.skipped && response.skipped.length > 0) {
+                        html += '<hr><p><strong>Note :</strong> Certains morceaux ont été ignorés :</p><ul>';
+                        response.skipped.forEach(s => html += '<li>' + s + '</li>');
+                        html += '</ul>';
+                    }
+                    html += '</div>';
+                    $('#pdf-report-zone').html(html);
+
+                    setTimeout(() => window.location.href = 'songbook_form.php?id=' + id, 3000);
                 } else {
+                    let html = '<div class="alert alert-danger">';
+                    html += '<h4><i class="glyphicon glyphicon-exclamation-sign"></i> Échec de la génération</h4>';
+                    html += '<ul>';
+                    response.errors.forEach(e => html += '<li>' + e + '</li>');
+                    html += '</ul>';
+                    
+                    if (response.skipped && response.skipped.length > 0) {
+                        html += '<hr><p>Morceaux posant problème :</p><ul>';
+                        response.skipped.forEach(s => html += '<li>' + s + '</li>');
+                        html += '</ul>';
+                    }
+                    html += '</div>';
+                    $('#pdf-report-zone').html(html);
+                    
                     if (typeof toastr !== 'undefined') toastr.error("Erreur de génération.");
                 }
+            },
+            error: function(xhr, status, error) {
+                let html = '<div class="alert alert-danger">';
+                html += '<h4><i class="glyphicon glyphicon-fire"></i> Erreur Serveur</h4>';
+                html += '<p>' + error + '</p>';
+                html += '<p><small>Il est possible que le serveur ait dépassé son temps d\'exécution ou sa limite de mémoire.</small></p>';
+                html += '</div>';
+                $('#pdf-report-zone').html(html);
+                if (typeof toastr !== 'undefined') toastr.error("Erreur critique.");
             }
         });
     };

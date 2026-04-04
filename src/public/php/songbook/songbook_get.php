@@ -92,9 +92,17 @@ if ($mode == "SUPPRFICPOU" && $_SESSION [PRIVILEGE] > 1) {
 }
 
 // Ce cas est appelé en ajax, donc on ne redirigera pas
-if ($mode == "GENEREPDF") {
-    creeSongbookPdf($id);
+if ($mode == "GENEREPDF" && $id) {
+    $results = CreeSongBookPdf($id);
+
+    // Si c'est un appel AJAX (demandé par songbookform.js)
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode($results);
+        exit;
+    }
 }
+
 
 // On fait une redirection dans tous les cas, sauf la demande de génération de PDF - appel ajax
 if (($mode != "GENEREPDF") && ($mode != "RESTAUREDOC")) {
