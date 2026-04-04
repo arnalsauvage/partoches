@@ -40,51 +40,55 @@ $(document).ready(function () {
         
         // On prépare une zone pour les messages détaillés si elle n'existe pas
         if ($('#pdf-report-zone').length === 0) {
-            $('.sb-footer-actions').before('<div id="pdf-report-zone" style="margin-bottom:20px;"></div>');
+            $('.sb-header-title').after('<div id="pdf-report-zone" style="margin: 20px 0;"></div>');
         }
-        $('#pdf-report-zone').empty().html('<div class="alert alert-info"><span class="glyphicon glyphicon-refresh spin"></span> Travail en cours, veuillez patienter...</div>');
+        $('#pdf-report-zone').empty().html('<div class="alert alert-info"><span class="glyphicon glyphicon-refresh spin"></span> Travail en cours, veuillez patienter (cela peut prendre 30s)...</div>');
         
         $.ajax({
             type: "POST",
             url: "songbook_get.php",
             data: { id: id, mode: "GENEREPDF" },
             success: function (response) {
-                let data = response;
+                console.log("Réponse reçue :", response);
+                let data = null;
                 
-                // Si la réponse n'est pas un objet (ex: JSON corrompu par un warning)
-                if (typeof response !== 'object') {
+                if (typeof response === 'object') {
+                    data = response;
+                } else {
                     try {
-                        // On tente de trouver le JSON dans la masse de texte si besoin
                         let jsonStart = response.indexOf('{');
                         let jsonEnd = response.lastIndexOf('}');
                         if (jsonStart !== -1 && jsonEnd !== -1) {
                             data = JSON.parse(response.substring(jsonStart, jsonEnd + 1));
                         }
                     } catch (e) {
-                        console.error("Impossible de parser la réponse", e);
+                        console.error("Erreur parsing JSON manuel", e);
                     }
                 }
 
                 if (data && data.success) {
-                    if (typeof toastr !== 'undefined') toastr.success("PDF régénéré !");
+                    if (typeof toastr !== 'undefined') toastr.success("Génération réussie !");
                     
                     let html = '<div class="alert alert-success">';
-                    html += '<h4><i class="glyphicon glyphicon-ok"></i> Génération réussie !</h4>';
-                    html += '<p>Le fichier <strong>' + data.file + '</strong> a été créé.</p>';
+                    html += '<h4><i class="glyphicon glyphicon-ok"></i> PDF généré avec succès !</h4>';
+                    html += '<p>Le fichier <strong>' + data.file + '</strong> est prêt.</p>';
                     
                     if (data.skipped && data.skipped.length > 0) {
-                        html += '<hr><p><strong>Attention :</strong> Certains morceaux ont été ignorés (PDF incompatibles ou manquants) :</p><ul>';
+                        html += '<hr><p><strong>Note :</strong> ' + data.skipped.length + ' morceau(x) ont été ignorés (incompatibles) :</p><ul class="small">';
                         data.skipped.forEach(s => html += '<li>' + s + '</li>');
-                        html += '</ul><p><small>Astuce : Enregistrez ces PDF au format "PDF 1.4" ou "Optimisé" pour les rendre compatibles.</small></p>';
+                        html += '</ul>';
                     }
                     html += '</div>';
                     $('#pdf-report-zone').html(html);
                 } else {
                     let html = '<div class="alert alert-danger"><h4>Échec de la génération</h4>';
-                    if (data && data.errors) {
+                    if (data && data.errors && data.errors.length > 0) {
                         html += '<ul>' + data.errors.map(e => '<li>'+e+'</li>').join('') + '</ul>';
                     } else {
-                        html += '<p>Une erreur inconnue est survenue.</p>';
+                        html += '<p>Le serveur a renvoyé une réponse invalide ou incomplète.</p>';
+                        if (typeof response === 'string' && response.length > 0) {
+                            html += '<hr><p>Réponse brute :</p><pre>' + response.substring(0, 200) + '</pre>';
+                        }
                     }
                     html += '</div>';
                     $('#pdf-report-zone').html(html);
@@ -93,9 +97,9 @@ $(document).ready(function () {
             error: function(xhr, status, error) {
                 let html = '<div class="alert alert-danger">';
                 html += '<h4><i class="glyphicon glyphicon-fire"></i> Erreur Serveur (' + xhr.status + ')</h4>';
-                html += '<p>La génération a échoué du côté du serveur.</p>';
+                html += '<p>Détail : ' + error + '</p>';
                 if (xhr.responseText) {
-                    html += '<hr><p>Détail technique :</p><pre style="max-height:150px; overflow:auto;">' + xhr.responseText.substring(0, 500) + '</pre>';
+                    html += '<hr><pre style="max-height:100px;">' + xhr.responseText.substring(0, 300) + '</pre>';
                 }
                 html += '</div>';
                 $('#pdf-report-zone').html(html);
