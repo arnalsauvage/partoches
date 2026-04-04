@@ -149,35 +149,30 @@ function afficheCartePlaylist($ligne): string
     
     $imagePochette = imagePlaylist($id);
     
-    // Palette Canopée
-    $c_marron_fonce = "#2b1d1a";
-    $c_marron_clair = "#D2B48C"; 
-    $c_accent = "#8B4513";
-
     $urlVoir = "playlist_voir.php?id=$id";
     
     $htmlImage = "";
     if ($imagePochette != "") {
-        $htmlImage = "<img src='../data/playlists/$imagePochette' style='max-height: 100%; max-width: 100%; object-fit: cover;' alt='Pochette'>";
+        $htmlImage = "<img src='../data/playlists/$imagePochette' alt='Pochette'>";
     } else {
-        $htmlImage = "<i class='glyphicon glyphicon-music' style='font-size: 64px; color: $c_marron_fonce;'></i>";
+        $htmlImage = "<i class='glyphicon glyphicon-music' style='font-size: 64px;'></i>";
     }
 
     // Sous-titre (Description)
-    $sousTitre = "<p style='height: 40px; overflow: hidden; margin-bottom: 10px; font-size: 0.9em; color: #9e8d8a;'>$description</p>";
+    $sousTitre = "<p class='text-muted small' style='height: 40px; overflow: hidden; margin-bottom: 10px;'>$description</p>";
 
     // Badges (Date, Hits)
     $badges = "
-        <span style='font-size: 0.85em;'><i class='glyphicon glyphicon-calendar'></i> $date</span>
+        <span class='small'><i class='glyphicon glyphicon-calendar'></i> $date</span>
         <span style='margin: 0 10px; opacity: 0.3;'>|</span>
-        <span style='font-size: 0.85em;'><i class='glyphicon glyphicon-eye-open'></i> $hits</span>";
+        <span class='small'><i class='glyphicon glyphicon-eye-open'></i> $hits</span>";
 
     // Actions (Écouter, Modifier)
     $actions = "
-        <a href='$urlVoir' class='btn btn-primary' style='background-color: $c_accent; border: none; border-radius: 0 0 0 12px;'><i class='glyphicon glyphicon-play'></i> Écouter</a>";
+        <a href='$urlVoir' class='btn btn-canopee-ecouter'><i class='glyphicon glyphicon-play'></i> Écouter</a>";
     
     if ($_SESSION['privilege'] >= $GLOBALS["PRIVILEGE_EDITEUR"]) {
-        $actions .= "  <a href='playlist_form.php?id=$id' class='btn btn-default' style='background-color: transparent; color: $c_marron_clair; border: 1px solid $c_marron_clair; border-radius: 0 0 12px 0;' title='Modifier'><i class='glyphicon glyphicon-pencil'></i></a>";
+        $actions .= "  <a href='playlist_form.php?id=$id' class='btn btn-canopee-modifier-outline' title='Modifier'><i class='glyphicon glyphicon-pencil'></i></a>";
     }
 
     return ComposantsUI::afficheCarteCanopee($nom, $sousTitre, $htmlImage, $urlVoir, $badges, $actions, ['hauteur' => '380px']);

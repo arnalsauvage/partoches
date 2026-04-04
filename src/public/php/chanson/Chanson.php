@@ -742,11 +742,6 @@ public static function getTonaliteEquivalents(string $tonalite): array
         $tempo = $this->getTempo();
         $tonalite = $this->getTonalite();
 
-        // Palette Canopée
-        $c_marron_fonce = "#2b1d1a";
-        $c_marron_clair = "#D2B48C"; // Bois clair
-        $c_accent = "#8B4513";
-
         // Construction des liens de filtrage
         $urlInterprete = "?filtre=interprete&amp;valFiltre=" . urlencode($interpreteFull);
         $urlAnnee = "?filtre=annee&amp;valFiltre=" . urlencode($annee);
@@ -755,31 +750,31 @@ public static function getTonaliteEquivalents(string $tonalite): array
 
         // Sous-titre (Interprète)
         $sousTitre = "<p style='font-style: italic; margin: 0;'>
-                        <a href='$urlInterprete' title='Filtrer par cet interprète' style='color: #9e8d8a; text-decoration: none;'>$interpreteAffiche</a>
+                        <a href='$urlInterprete' title='Filtrer par cet interprète' class='text-muted' style='text-decoration: none;'>$interpreteAffiche</a>
                       </p>";
 
         // Badges (Année, Tempo, Tona)
         $badges = "
             <a href='$urlAnnee' title='Filtrer par cette année' style='text-decoration: none;'>
-                <span class='label' style='background-color: $c_marron_clair; color: $c_marron_fonce; cursor: pointer;'>$annee</span>
+                <span class='label label-default' style='background-color: var(--c-marron-clair); color: var(--c-marron-fonce);'>$annee</span>
             </a>
             <a href='$urlTempo' title='Filtrer par ce tempo' style='text-decoration: none;'>
-                <span class='label' style='background-color: #777; color: white; cursor: pointer;'>$tempo BPM</span>
+                <span class='label label-default'>$tempo BPM</span>
             </a>
             <a href='$urlTonalite' title='Filtrer par cette tonalité' style='text-decoration: none;'>
-                <span class='label' style='background-color: $c_accent; color: white; cursor: pointer;'>$tonalite</span>
+                <span class='label' style='background-color: var(--c-accent);'>$tonalite</span>
             </a>";
 
         // Actions (Voir, Editer)
         $actions = "
             <div class='btn-group' role='group'>
-                <a href='chanson_voir.php?id=$_id' class='btn' style='background-color: $c_marron_clair; color: $c_marron_fonce; font-weight: bold; border-radius: 0;'>Voir</a>
+                <a href='chanson_voir.php?id=$_id' class='btn btn-canopee-voir'>Voir</a>
             </div>";
         
         if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
             $actions .= "
             <div class='btn-group' role='group'>
-                <a href='chanson_form.php?id=$_id' class='btn' style='background-color: $c_accent; color: white; border-radius: 0; border: none;'>Editer</a>
+                <a href='chanson_form.php?id=$_id' class='btn btn-canopee-editer'>Editer</a>
             </div>";
         }
 
@@ -787,7 +782,7 @@ public static function getTonaliteEquivalents(string $tonalite): array
         $badgeSpecial = "";
         if ($this->getPublication() == 0) {
             if (estAdmin() || (isset($_SESSION['id']) && $_SESSION['id'] == $this->getIdUser())) {
-                $badgeSpecial = "<div style='position: absolute; top: 10px; left: 10px; z-index: 10; background-color: #d9534f; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; text-transform: uppercase;'>Brouillon</div>";
+                $badgeSpecial = "<div class='badge-brouillon'>Brouillon</div>";
             }
         }
 

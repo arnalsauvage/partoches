@@ -231,6 +231,7 @@ if (!isset ($FichierHtml)) {
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <link href="../../css/jquery-ui.1.12.1.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../../css/styles-communs.css?v=$v">
+    <link rel="stylesheet" type="text/css" href="../../css/composants-canopee.css?v=$v">
     <link rel="stylesheet" media="screen" type="text/css" title="resolution" href="$feuilleCss" />
     
     <script src="../../js/jquery-1.12.4.min.js"></script>

@@ -1,0 +1,127 @@
+/* 
+   DESIGN SYSTEM : CANOPÉE
+   Centralisation des styles pour les composants réutilisables.
+*/
+
+:root {
+    --c-marron-fonce: #2b1d1a;
+    --c-marron-clair: #D2B48C;
+    --c-accent: #8B4513;
+    --c-beige: #F5F5DC;
+    --c-gris-texte: #9e8d8a;
+    --c-danger: #d9534f;
+}
+
+/* --- CARTES CANOPÉE --- */
+.carte-canopee {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    padding: 0;
+    border: 1px solid var(--c-marron-clair);
+    background-color: var(--c-marron-fonce);
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.carte-canopee:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    transform: translateY(-5px);
+}
+
+.carte-canopee .image-container {
+    height: 180px;
+    overflow: hidden;
+    background-color: var(--c-marron-clair);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 3px solid var(--c-accent);
+}
+
+.carte-canopee .image-container img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+.carte-canopee .caption {
+    padding: 15px;
+    text-align: center;
+    color: var(--c-beige);
+}
+
+.carte-canopee h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: var(--c-marron-clair);
+    height: 44px;
+    overflow: hidden;
+    font-weight: bold;
+}
+
+.carte-canopee .sous-titre {
+    height: 40px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.carte-canopee .badges-container {
+    margin-bottom: 15px;
+    height: 25px;
+}
+
+/* --- BADGES SPÉCIAUX --- */
+.badge-brouillon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    background-color: var(--c-danger);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+/* --- BOUTONS CANOPÉE --- */
+.btn-canopee-voir {
+    background-color: var(--c-marron-clair);
+    color: var(--c-marron-fonce);
+    font-weight: bold;
+    border-radius: 0;
+}
+
+.btn-canopee-voir:hover {
+    background-color: #c5a47a;
+    color: var(--c-marron-fonce);
+}
+
+.btn-canopee-editer {
+    background-color: var(--c-accent);
+    color: white;
+    border-radius: 0;
+    border: none;
+}
+
+.btn-canopee-editer:hover {
+    background-color: #6d350f;
+    color: white;
+}
+
+.btn-canopee-ecouter {
+    background-color: var(--c-accent);
+    color: white;
+    border: none;
+    border-radius: 0 0 0 12px;
+}
+
+.btn-canopee-modifier-outline {
+    background-color: transparent;
+    color: var(--c-marron-clair);
+    border: 1px solid var(--c-marron-clair);
+    border-radius: 0 0 12px 0;
+}

@@ -20,35 +20,29 @@ class ComposantsUI
      */
     public static function afficheCarteCanopee($titre, $sousTitre, $imageHtml, $urlVoir, $badgesHtml = "", $actionsHtml = "", $options = []): string
     {
-        // Palette Canopée
-        $c_marron_fonce = "#2b1d1a";
-        $c_marron_clair = "#D2B48C"; 
-        $c_accent = "#8B4513";
-        $c_beige = "#F5F5DC";
-
         $hauteur = $options['hauteur'] ?? "400px";
-        $badgeSpecial = $options['badgeSpecial'] ?? ""; // Ex: "Brouillon"
+        $badgeSpecial = $options['badgeSpecial'] ?? ""; // Ex: HTML du badge brouillon
 
         $html = "
         <div class='col-sm-6 col-md-4 col-lg-3' style='margin-bottom: 25px;'>
-            <div class='thumbnail shadow-hover' style='height: $hauteur; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; padding: 0; border: 1px solid $c_marron_clair; background-color: $c_marron_fonce; position: relative;'>
+            <div class='thumbnail carte-canopee' style='height: $hauteur;'>
                 
                 $badgeSpecial
                 
-                <a href='$urlVoir' style='text-decoration: none;'>
-                    <div style='height: 180px; overflow: hidden; background-color: $c_marron_clair; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid $c_accent;'>
+                <a href='$urlVoir'>
+                    <div class='image-container'>
                         $imageHtml
                     </div>
                 </a>
                 
-                <div class='caption' style='padding: 15px; text-align: center; color: $c_beige;'>
-                    <h4 style='margin-top: 0; margin-bottom: 5px; color: $c_marron_clair; height: 44px; overflow: hidden; font-weight: bold;'>$titre</h4>
+                <div class='caption'>
+                    <h4>$titre</h4>
                     
-                    <div style='height: 40px; overflow: hidden; margin-bottom: 10px;'>
+                    <div class='sous-titre'>
                         $sousTitre
                     </div>
                     
-                    <div style='margin-bottom: 15px; height: 25px;'>
+                    <div class='badges-container'>
                         $badgesHtml
                     </div>
                     
