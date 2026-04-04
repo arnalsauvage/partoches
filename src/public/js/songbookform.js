@@ -38,11 +38,11 @@ $(document).ready(function () {
     window.genereUnPdf = function(id) {
         if (typeof toastr !== 'undefined') toastr.info("Génération du PDF en cours...");
         
-        // On prépare une zone pour les messages détaillés si elle n'existe pas
-        if ($('#pdf-report-zone').length === 0) {
-            $('.sb-header-title').after('<div id="pdf-report-zone" style="margin: 20px 0;"></div>');
-        }
-        $('#pdf-report-zone').empty().html('<div class="alert alert-info"><span class="glyphicon glyphicon-refresh spin"></span> Travail en cours, veuillez patienter (cela peut prendre 30s)...</div>');
+        let $modal = $('#modalPdfReport');
+        let $reportBody = $('#pdf-report-body');
+        
+        $reportBody.html('<div class="alert alert-info"><span class="glyphicon glyphicon-refresh spin"></span> Travail en cours, veuillez patienter (cela peut prendre 30s)...</div>');
+        $modal.modal('show');
         
         $.ajax({
             type: "POST",
@@ -79,7 +79,7 @@ $(document).ready(function () {
                         html += '</ul>';
                     }
                     html += '</div>';
-                    $('#pdf-report-zone').html(html);
+                    $reportBody.html(html);
                 } else {
                     let html = '<div class="alert alert-danger"><h4>Échec de la génération</h4>';
                     if (data && data.errors && data.errors.length > 0) {
@@ -87,22 +87,22 @@ $(document).ready(function () {
                     } else {
                         html += '<p>Le serveur a renvoyé une réponse invalide ou incomplète.</p>';
                         if (typeof response === 'string' && response.length > 0) {
-                            html += '<hr><p>Réponse brute :</p><pre>' + response.substring(0, 200) + '</pre>';
+                            html += '<hr><p>Réponse brute :</p><pre style="max-height:200px; overflow:auto;">' + response.substring(0, 500) + '</pre>';
                         }
                     }
                     html += '</div>';
-                    $('#pdf-report-zone').html(html);
+                    $reportBody.html(html);
                 }
             },
             error: function(xhr, status, error) {
                 let html = '<div class="alert alert-danger">';
                 html += '<h4><i class="glyphicon glyphicon-fire"></i> Erreur Serveur (' + xhr.status + ')</h4>';
-                html += '<p>Détail : ' + error + '</p>';
+                html += '<p>La génération a échoué du côté du serveur.</p>';
                 if (xhr.responseText) {
-                    html += '<hr><pre style="max-height:100px;">' + xhr.responseText.substring(0, 300) + '</pre>';
+                    html += '<hr><p>Détail technique :</p><pre style="max-height:200px; overflow:auto;">' + xhr.responseText.substring(0, 500) + '</pre>';
                 }
                 html += '</div>';
-                $('#pdf-report-zone').html(html);
+                $reportBody.html(html);
             }
         });
     };

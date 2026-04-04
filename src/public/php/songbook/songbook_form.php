@@ -269,6 +269,24 @@ HTML;
             <i class="glyphicon glyphicon-refresh" aria-hidden="true"></i> RÉGÉNÉRER LE PDF COMPLET
         </button>
     </footer>
+
+    <!-- Modal pour le rapport de génération -->
+    <div class="modal fade" id="modalPdfReport" tabindex="-1" role="dialog" aria-labelledby="modalPdfReportLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="modalPdfReportLabel">Rapport de Génération PDF</h4>
+          </div>
+          <div class="modal-body" id="pdf-report-body">
+            <!-- Le contenu sera injecté par JS -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+          </div>
+        </div>
+      </div>
+    </div>
 HTML;
 }
 
