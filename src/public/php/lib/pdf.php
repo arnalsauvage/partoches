@@ -132,12 +132,21 @@ class SongbookPdfService
 {
     private string $chansonsDir;
     private string $songbooksDir;
+    private string $logFile;
     
     public function __construct()
     {
-        // On pourrait injecter ces chemins via un container
         $this->chansonsDir = __DIR__ . "/../../data/chansons/";
         $this->songbooksDir = __DIR__ . "/../../data/songbooks/";
+        $this->logFile = __DIR__ . "/../../../data/logs/songbook_gen.log";
+    }
+
+    private function log(string $message): void
+    {
+        $date = date("Y-m-d H:i:s");
+        $formattedMessage = "[$date] $message\n";
+        file_put_contents($this->logFile, $formattedMessage, FILE_APPEND);
+        error_log("SongbookGen: $message"); // Doublon dans le log serveur classique
     }
 
     /**
@@ -154,8 +163,8 @@ class SongbookPdfService
         array $songIds,
         array $docVersions
     ): array {
-        // Logging de début
-        error_log("Démarrage génération Songbook #$id - " . count($songNames) . " chansons.");
+        $this->log("--- DÉBUT GÉNÉRATION SONGBOOK #$id ($title) ---");
+        $this->log("Nombre de chansons demandées : " . count($songNames));
         
         $pdf = new SongbookPdf();
         $dateStr = date("d/m/Y");
@@ -168,21 +177,27 @@ class SongbookPdfService
         ];
 
         // 1. Couverture
+        $this->log("Étape 1 : Traitement de la couverture...");
         $coverPath = $this->songbooksDir . $id . "/" . $coverImage;
         if (!empty($coverImage) && file_exists($coverPath)) {
             try {
+                $this->log("Image de couverture trouvée : $coverImage");
                 $coverPath = $this->ensurePdfCompatibleImage($coverPath);
                 $pdf->addCover($coverPath, $title, $version + 1, $dateStr);
+                $this->log("Couverture ajoutée au PDF.");
             } catch (Exception $e) {
+                $this->log("ERREUR COUVERTURE : " . $e->getMessage());
                 $results['warnings'][] = "Erreur image couverture : " . $e->getMessage();
-                $pdf->AddPage(); // On ajoute une page vide pour ne pas décaler le reste
+                $pdf->AddPage();
             }
         } else {
+            $this->log("Pas d'image de couverture (chemin : $coverPath)");
             $pdf->AddPage();
             $results['warnings'][] = "Pas d'image de couverture trouvée.";
         }
 
         // 2. Chansons
+        $this->log("Étape 2 : Incorporation des chansons...");
         $currentPage = 2;
         $startPages = [];
         $validSongs = [];
@@ -195,63 +210,68 @@ class SongbookPdfService
             $fullFileName = composeNomVersion($fileName, $docVersion);
             $filePath = $this->chansonsDir . $songId . "/" . $fullFileName;
 
+            $this->log("[$index] Traitement : $songName (Fichier : $fullFileName)");
+
             if (!file_exists($filePath)) {
-                $results['skipped'][] = "$songName (Fichier introuvable : $fullFileName)";
+                $this->log("  -> ❌ Fichier introuvable à l'adresse : $filePath");
+                $results['skipped'][] = "$songName (Fichier introuvable)";
                 continue;
             }
 
             try {
-                // Log de progression tous les 10 fichiers
-                if ($index % 10 == 0) {
-                    error_log("Songbook #$id : Traitement chanson $index (" . memory_get_usage()/1024/1024 . " MB)");
-                }
-
+                $memBefore = round(memory_get_usage()/1024/1024, 2);
                 $pagesAdded = $pdf->appendPdfFile($filePath);
+                $memAfter = round(memory_get_usage()/1024/1024, 2);
+                
                 if ($pagesAdded > 0) {
+                    $this->log("  -> ✅ Ajouté ($pagesAdded page(s)) - RAM: $memAfter Mo");
                     $startPages[] = $currentPage;
                     $validSongs[] = $songName;
                     $currentPage += $pagesAdded;
                 } else {
+                    $this->log("  -> ⚠️ PDF semble vide ou illisible.");
                     $results['skipped'][] = "$songName (PDF vide)";
                 }
             } catch (Exception $e) {
+                $this->log("  -> ❌ ERREUR : " . $e->getMessage());
                 $results['skipped'][] = "$songName (Erreur : " . $e->getMessage() . ")";
-                error_log("Erreur import PDF ($filePath) : " . $e->getMessage());
             }
             
-            // On tente de libérer un peu de mémoire si possible
-            if ($index % 50 == 0) {
-                gc_collect_cycles();
-            }
+            if ($index % 20 == 0) gc_collect_cycles();
         }
 
         if (empty($validSongs)) {
+            $this->log("ÉCHEC : Aucune chanson valide ajoutée.");
             $results['errors'][] = "Aucune chanson valide n'a pu être ajoutée.";
             return $results;
         }
 
         // 3. Sommaire
+        $this->log("Étape 3 : Génération du sommaire...");
         try {
             $pdf->addTableOfContents($validSongs, $this->getLogoPath(), $startPages);
+            $this->log("Sommaire généré avec succès.");
         } catch (Exception $e) {
+            $this->log("ERREUR SOMMAIRE : " . $e->getMessage());
             $results['warnings'][] = "Erreur sommaire : " . $e->getMessage();
         }
 
         // 4. Sortie et Enregistrement
+        $this->log("Étape 4 : Finalisation du fichier final...");
         $safeTitle = $this->slugify($title);
         $tempFileName = "songbook_" . $safeTitle . ".pdf";
         $finalPathDir = $this->songbooksDir . $id . "/";
         
         try {
-            error_log("Songbook #$id : Finalisation PDF (" . memory_get_usage()/1024/1024 . " MB)");
+            $this->log("Écriture du fichier temporaire : $tempFileName");
             $pdf->Output($finalPathDir . $tempFileName, 'F');
             $finalName = $this->finalizeDocument($id, $tempFileName, $finalPathDir);
             $results['success'] = true;
             $results['file'] = $finalName;
-            error_log("Songbook #$id : Succès !");
+            $this->log("--- SUCCÈS : $finalName généré avec succès ---");
         } catch (Exception $e) {
+            $this->log("ERREUR FINALE : " . $e->getMessage());
             $results['errors'][] = "Erreur enregistrement : " . $e->getMessage();
-            error_log("Songbook #$id : Échec enregistrement - " . $e->getMessage());
         }
 
         return $results;
