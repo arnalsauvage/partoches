@@ -1,58 +1,51 @@
-# Structure du Projet Partoches 🎸
+# Structure du Projet Partoches 🎸 (Mise à jour 2026)
 
 Ce document répertorie les fichiers PHP du projet classés par leur rôle dans le rendu visuel et la logique applicative.
 
-## 🌟 1. Les Vues Principales (Pages complètes)
-Ces fichiers génèrent une page HTML entière en utilisant les fonctions `envoieHead()` et `envoieFooter()`.
+## 🏛️ 1. L'Administration (Quartier Général)
+Nouveau dossier centralisant la gestion technique du site.
 
 | Page | Chemin | Description |
 | :--- | :--- | :--- |
-| **Accueil (Médias)** | `php/media/listeMedias.php` | Galerie des dernières publications (chansons, vidéos, partoches). |
+| **Console Admin** | `php/admin/params.php` | Contrôleur principal de l'administration. |
+| **Admin Service** | `php/admin/AdminService.php` | Logique métier (Logs, SQL, Migrations). |
+| **Vue Admin** | `php/admin/params_view.phtml` | Template HTML de la console. |
+| **Ajax Admin** | `php/admin/params_ajax.php` | Handlers pour les fonctions asynchrones. |
+
+## 🌟 2. Les Vues Principales (Pages complètes)
+Ces fichiers génèrent une page HTML entière en utilisant `envoieHead()` et `envoieFooter()`.
+
+| Page | Chemin | Description |
+| :--- | :--- | :--- |
+| **Accueil (Médias)** | `php/media/listeMedias.php` | Galerie des dernières publications. |
 | **Liste Chansons** | `php/chanson/chanson_liste.php` | Répertoire complet des chansons avec filtres. |
-| **Fiche Chanson** | `php/chanson/chanson_voir.php` | Détail d'un morceau (accords, paroles, médias liés). |
+| **Fiche Chanson** | `php/chanson/chanson_voir.php` | Détail d'un morceau (accords, paroles, etc.). |
+| **Liste Playlists** | `php/playlist/playlist_liste.php` | Galerie moderne des listes de lecture. |
+| **Voir Playlist** | `php/playlist/playlist_voir.php` | Consultation et tri des morceaux d'une playlist. |
 | **Liste Songbooks** | `php/songbook/songbook_liste.php` | Gestion des recueils (mode admin/éditeur). |
-| **Galerie Songbooks** | `php/songbook/songbook-portfolio.php` | Vue "mosaïque" des songbooks pour les membres. |
-| **Voir Songbook** | `php/songbook/songbook_voir.php` | Sommaire et consultation d'un recueil spécifique. |
 | **Communauté** | `php/utilisateur/utilisateur_liste.php` | Liste des musiciens inscrits (cartes profil). |
 | **Répertoire Strums** | `php/strum/strum_liste.php` | Galerie des rythmes et motifs de grattage. |
-| **Galerie des Liens** | `php/liens/lienurl_liste.php` | Liens externes et vidéos partagées. |
-| **Documents** | `php/document/documents_voir.php` | Liste des fichiers attachés. |
-| **Paramétrage** | `php/navigation/paramsEdit.php` | Console d'administration technique du site. |
-| **Roadbook** | `php/todo/todo_admin.php` | Liste des tâches et évolutions (Markdown). |
-| **Inspecteur Images** | `php/audit/imagesCheck.php` | Outil de nettoyage du filesystem. |
 
-## 🛠️ 2. Les Formulaires (Vues d'édition)
-Pages dédiées à la saisie et à la modification des données.
-
-- **Chanson** : `php/chanson/chanson_form.php` (utilise `chanson_form_new.php`)
+## 🛠️ 3. Les Formulaires (Vues d'édition)
+- **Chanson** : `php/chanson/chanson_form.php`
 - **Utilisateur** : `php/utilisateur/utilisateur_form.php`
 - **Songbook** : `php/songbook/songbook_form.php`
 - **Strum** : `php/strum/strum_form.php`
 - **Playlist** : `php/playlist/playlist_form.php`
 
-## 🎼 3. Les Composants & Wrappers (Fragments HTML)
-Classes et fonctions produisant des morceaux de code HTML réutilisables.
+## 🎼 4. Les Composants & Librairies (Design System)
+Éléments réutilisables et moteurs du site.
 
 ### Classes avec rendu visuel
-- **Chanson** (`Chanson.php`) : `afficheCarteChanson()`, `afficheLigneTableau()`.
-- **Utilisateur** (`Utilisateur.php`) : `afficheCarte()`, `getAvatarHtml()`.
+- **ComposantsUI** (`lib/ComposantsUI.php`) : **(Nouveau)** Gabarit central des cartes Canopée.
+- **Chanson** (`Chanson.php`) : `afficheCarteChanson()` (utilise ComposantsUI).
+- **Playlist** (`playlist.php`) : `afficheCartePlaylist()` (utilise ComposantsUI).
 - **Media** (`Media.php`) : `afficheComposantMedia()`.
-- **Strum** (`Strum.php`) : `afficheCarte()`.
-- **Songbook** (`Songbook.php`) : `afficheCarteSongbook()`.
 
-### Librairies de rendu
-- **HTML** (`lib/html.php`) : Fonctions de base (`ancre`, `image`, `affichePochette`, `envoieHead`, `envoieFooter`).
-- **Tableaux** (`lib/tableHtml.php`) : Génération dynamique de tableaux HTML.
-- **Formulaires** (`lib/formulaire.php`) : Génération de champs de saisie Bootstrap.
+### Librairies de rendu & Cœur
+- **HTML** (`lib/html.php`) : Moteur de rendu (`envoieHead`, `envoieFooter`, `ancre`).
 - **Menu** (`navigation/menu.php`) : La barre de navigation globale.
-
-## 🎸 4. Les "Backstage" (Logique & API)
-Fichiers traitant les données sans produire de rendu HTML direct (redirections, JSON, calculs).
-
-- **Traitement POST** : `chanson_post.php`, `utilisateur_get.php`, `lienurlPost.php`, etc.
-- **Ajax** : `chanson_publication_ajax.php`, `document_recherche_ajax.php`.
-- **Services API** : `api/discogs_proxy.php`, `api/songbpm_proxy.php`.
-- **Cœur** : `lib/mysql.php` (BDD), `lib/Image.php` (WebP), `lib/Chiffrement.php`.
+- **Cœur** : `lib/configMysql.php` (Init), `lib/mysql.php` (BDD), `lib/Chiffrement.php`.
 
 ---
-*Document généré par Django (Gemini) - 10 Mars 2026*
+*Document maintenu par Django (Gemini) - 4 Avril 2026*
