@@ -199,15 +199,28 @@ function afficheCartePlaylist($ligne): string
 /**
  * Récupère la liste des chansons pour une playlist donnée
  * @param int $idPlaylist
+ * @param string $tri Critère de tri (nom, datePub, hits, tonalite, annee, tempo)
  * @return mysqli_result|array
  */
-function getMorceauxPlaylist($idPlaylist)
+function getMorceauxPlaylist($idPlaylist, $tri = 'ordre')
 {
     $db = $_SESSION['mysql'];
     $idPlaylist = (int)$idPlaylist;
     $donnee = cherchePlaylist($idPlaylist);
     
-    // Si la playlist est dynamique (type = 1 ou 'dynamique')
+    // Mapping des tris
+    $sortMap = [
+        'nom' => 'c.nom ASC',
+        'date' => 'c.datePub DESC',
+        'hits' => 'c.hits DESC',
+        'tona' => 'c.tonalite ASC',
+        'annee' => 'c.annee DESC',
+        'bpm' => 'c.tempo DESC',
+        'ordre' => 'lcp.ordre ASC'
+    ];
+    $orderBy = $sortMap[$tri] ?? 'c.nom ASC';
+
+    // Si la playlist est dynamique
     $type = $donnee['type'] ?? $donnee[7] ?? 0;
     if ($type == 1 || $type == 'dynamique') {
         $criteresStr = $donnee['criteres'] ?? $donnee[8] ?? "[]";
@@ -238,16 +251,18 @@ function getMorceauxPlaylist($idPlaylist)
             }
         }
 
-        $sql = "SELECT c.* FROM chanson c $jointures WHERE " . implode(" AND ", $conditions) . " ORDER BY c.nom ASC";
+        $sql = "SELECT c.* FROM chanson c $jointures WHERE " . implode(" AND ", $conditions) . " ORDER BY $orderBy";
         return $db->query($sql);
     } 
     
     // Sinon, playlist manuelle classique (via la table de liens)
+    // Note: Si on trie manuellement, on ignore l'ordre défini par l'utilisateur
+    $currentOrder = ($tri == 'ordre') ? 'lcp.ordre ASC' : $orderBy;
     $sql = "SELECT c.*, lcp.ordre 
             FROM chanson c 
             INNER JOIN lienchansonplaylist lcp ON c.id = lcp.id_chanson 
             WHERE lcp.id_playlist = $idPlaylist 
-            ORDER BY lcp.ordre ASC";
+            ORDER BY $currentOrder";
     return $db->query($sql);
 }
 

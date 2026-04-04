@@ -34,6 +34,9 @@ $nomPlaylist = htmlspecialchars($donnee['nom'] ?? '');
 $description = $donnee['description'] ?? '';
 $datePub = dateMysqlVersTexte($donnee['date_creation'] ?? $donnee['date'] ?? '');
 $hits = $donnee['hits'] ?? 0;
+$typePl = $donnee['type'] ?? 0;
+
+$tri = $_GET['tri'] ?? ($typePl == 1 ? 'nom' : 'ordre');
 
 $sortie .= "<div class='container'>";
 $sortie .= "  <div class='starter-template'>";
@@ -67,9 +70,36 @@ $sortie .= "        </div>";
 $sortie .= "      </div>";
 $sortie .= "    </div>";
 
-$sortie .= "    <h2 style='margin-bottom: 30px; border-bottom: 2px solid #8B4513; padding-bottom: 10px;'>Morceaux de la playlist</h2>";
+// BARRE DE TRI
+$labels = [
+    'ordre' => 'Ordre manuel',
+    'nom' => 'Ordre Alpha',
+    'date' => 'Date publication',
+    'hits' => 'Nombre de vues',
+    'tona' => 'Tonalité',
+    'annee' => 'Année chanson',
+    'bpm' => 'Tempo (BPM)'
+];
 
-$lignes = getMorceauxPlaylist($idPlaylist);
+$sortie .= "    <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #8B4513; padding-bottom: 10px;'>";
+$sortie .= "        <h2 style='margin: 0;'>Morceaux</h2>";
+$sortie .= "        <div class='btn-group'>";
+$sortie .= "            <button type='button' class='btn btn-sm btn-default dropdown-toggle' data-toggle='dropdown'>";
+$sortie .= "                <i class='glyphicon glyphicon-sort'></i> Trier par : " . ($labels[$tri] ?? $tri) . " <span class='caret'></span>";
+$sortie .= "            </button>";
+$sortie .= "            <ul class='dropdown-menu dropdown-menu-right'>";
+if ($typePl == 0) $sortie .= "                <li><a href='?id=$idPlaylist&tri=ordre'>Ordre manuel</a></li>";
+$sortie .= "                <li><a href='?id=$idPlaylist&tri=nom'>Ordre Alpha (Titre)</a></li>";
+$sortie .= "                <li><a href='?id=$idPlaylist&tri=date'>Date de publication</a></li>";
+$sortie .= "                <li><a href='?id=$idPlaylist&tri=hits'>Nombre de vues</a></li>";
+$sortie .= "                <li><a href='?id=$idPlaylist&tri=tona'>Tonalité</a></li>";
+$sortie .= "                <li><a href='?id=$idPlaylist&tri=annee'>Année de la chanson</a></li>";
+$sortie .= "                <li><a href='?id=$idPlaylist&tri=bpm'>BPM (Tempo)</a></li>";
+$sortie .= "            </ul>";
+$sortie .= "        </div>";
+$sortie .= "    </div>";
+
+$lignes = getMorceauxPlaylist($idPlaylist, $tri);
 
 if ($lignes->num_rows > 0) {
     $sortie .= "    <div class='row'>";
