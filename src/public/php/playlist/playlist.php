@@ -151,9 +151,8 @@ function afficheCartePlaylist($ligne): string
     
     // Palette Canopée
     $c_marron_fonce = "#2b1d1a";
-    $c_marron_clair = "#D2B48C"; // Bois clair
+    $c_marron_clair = "#D2B48C"; 
     $c_accent = "#8B4513";
-    $c_beige = "#F5F5DC";
 
     $urlVoir = "playlist_voir.php?id=$id";
     
@@ -164,36 +163,24 @@ function afficheCartePlaylist($ligne): string
         $htmlImage = "<i class='glyphicon glyphicon-music' style='font-size: 64px; color: $c_marron_fonce;'></i>";
     }
 
-    $html = "
-    <div class='col-sm-6 col-md-4 col-lg-3' style='margin-bottom: 25px;'>
-        <div class='thumbnail shadow-hover' style='height: 380px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; padding: 0; border: 1px solid $c_marron_clair; background-color: $c_marron_fonce; position: relative;'>
-            <a href='$urlVoir' style='text-decoration: none;'>
-                <div style='height: 180px; overflow: hidden; background-color: $c_marron_clair; display: flex; align-items: center; justify-content: center; border-bottom: 3px solid $c_accent;'>
-                    $htmlImage
-                </div>
-            </a>
-            <div class='caption' style='padding: 15px; text-align: center; color: $c_beige;'>
-                <h4 style='margin-top: 0; margin-bottom: 5px; color: $c_marron_clair; height: 44px; overflow: hidden; font-weight: bold;'>$nom</h4>
-                <p style='height: 40px; overflow: hidden; margin-bottom: 10px; font-size: 0.9em; color: #9e8d8a;'>$description</p>
-                <div style='margin-bottom: 15px; border-top: 1px solid rgba(210, 180, 140, 0.2); padding-top: 10px;'>
-                    <span style='font-size: 0.85em;'><i class='glyphicon glyphicon-calendar'></i> $date</span>
-                    <span style='margin: 0 10px; opacity: 0.3;'>|</span>
-                    <span style='font-size: 0.85em;'><i class='glyphicon glyphicon-eye-open'></i> $hits</span>
-                </div>
-                <div class='btn-group btn-group-justified'>
-                    <a href='$urlVoir' class='btn btn-primary' style='background-color: $c_accent; border: none; border-radius: 0 0 0 12px;'><i class='glyphicon glyphicon-play'></i> Écouter</a>";
+    // Sous-titre (Description)
+    $sousTitre = "<p style='height: 40px; overflow: hidden; margin-bottom: 10px; font-size: 0.9em; color: #9e8d8a;'>$description</p>";
+
+    // Badges (Date, Hits)
+    $badges = "
+        <span style='font-size: 0.85em;'><i class='glyphicon glyphicon-calendar'></i> $date</span>
+        <span style='margin: 0 10px; opacity: 0.3;'>|</span>
+        <span style='font-size: 0.85em;'><i class='glyphicon glyphicon-eye-open'></i> $hits</span>";
+
+    // Actions (Écouter, Modifier)
+    $actions = "
+        <a href='$urlVoir' class='btn btn-primary' style='background-color: $c_accent; border: none; border-radius: 0 0 0 12px;'><i class='glyphicon glyphicon-play'></i> Écouter</a>";
     
     if ($_SESSION['privilege'] >= $GLOBALS["PRIVILEGE_EDITEUR"]) {
-        $html .= "  <a href='playlist_form.php?id=$id' class='btn btn-default' style='background-color: transparent; color: $c_marron_clair; border: 1px solid $c_marron_clair; border-radius: 0 0 12px 0;' title='Modifier'><i class='glyphicon glyphicon-pencil'></i></a>";
+        $actions .= "  <a href='playlist_form.php?id=$id' class='btn btn-default' style='background-color: transparent; color: $c_marron_clair; border: 1px solid $c_marron_clair; border-radius: 0 0 12px 0;' title='Modifier'><i class='glyphicon glyphicon-pencil'></i></a>";
     }
-    
-    $html .= "
-                </div>
-            </div>
-        </div>
-    </div>";
 
-    return $html;
+    return ComposantsUI::afficheCarteCanopee($nom, $sousTitre, $htmlImage, $urlVoir, $badges, $actions, ['hauteur' => '380px']);
 }
 
 /**
