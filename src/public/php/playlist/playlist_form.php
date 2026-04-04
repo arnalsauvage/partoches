@@ -48,11 +48,11 @@ if ($id > 0) {
 // Chargement des données
 if ($mode == "MAJ") {
     $donnee = chercheplaylist($id);
-    $titrePage = "Mise à jour - " . htmlspecialchars($donnee['nom'] ?? $donnee[1] ?? '');
-    $typePl = $donnee['type'] ?? $donnee[7] ?? 0;
-    $criteres = json_decode($donnee['criteres'] ?? $donnee[8] ?? "[]", true);
+    $titrePage = "Mise à jour - " . htmlspecialchars($donnee['nom'] ?? '');
+    $typePl = $donnee['type'] ?? 0;
+    $criteres = json_decode($donnee['criteres'] ?? "[]", true);
 } else {
-    $donnee = ['id'=>0, 'nom'=>'', 'description'=>'', 'date'=>date("Y-m-d"), 'image'=>'', 'hits'=>0, 'type'=>0, 'criteres'=>''];
+    $donnee = ['id'=>0, 'nom'=>'', 'description'=>'', 'date_creation'=>date("Y-m-d"), 'image'=>'', 'hits'=>0, 'type'=>0, 'criteres'=>''];
     $titrePage = "Nouvelle Playlist";
     $typePl = 0;
     $criteres = [];

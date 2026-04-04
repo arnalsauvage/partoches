@@ -46,8 +46,8 @@ if ($mode == "MAJ" && $id) {
         // Seul l'admin peut changer hits et date, donc on les recharge si on n'est pas admin
         $playlist = cherchePlaylist($id);
         if ($playlist) {
-            $fhits = $playlist[5];
-            $fdate = dateMysqlVersTexte($playlist[3]);
+            $fhits = $playlist['hits'] ?? 0;
+            $fdate = dateMysqlVersTexte($playlist['date_creation'] ?? $playlist['date'] ?? date("Y-m-d"));
         }
     }
     modifiePlaylist($id, $fnom, $fdescription, $fdate, $fimage, $fhits, $ftype, $fcriteres);

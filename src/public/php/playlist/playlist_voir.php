@@ -30,10 +30,10 @@ augmenteHits($table, $idPlaylist);
 $tabUsers = portraitDesUtilisateurs();
 
 $donnee = chercheplaylist($idPlaylist);
-$nomPlaylist = htmlspecialchars($donnee[1]);
-$description = $donnee[2];
-$datePub = dateMysqlVersTexte($donnee[3]);
-$hits = $donnee[5];
+$nomPlaylist = htmlspecialchars($donnee['nom'] ?? '');
+$description = $donnee['description'] ?? '';
+$datePub = dateMysqlVersTexte($donnee['date_creation'] ?? $donnee['date'] ?? '');
+$hits = $donnee['hits'] ?? 0;
 
 $sortie .= "<div class='container'>";
 $sortie .= "  <div class='starter-template'>";

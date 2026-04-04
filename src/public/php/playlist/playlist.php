@@ -35,8 +35,7 @@ function cherchePlaylist($id)
     $id = (int)$id;
     $maRequete = "SELECT * FROM playlist WHERE id = '$id'";
     $result = $db->query($maRequete) or die ("Problème cherchePlaylist #1 : " . $db->error);
-    // ON REVIENT AU FETCH_ROW POUR COMPATIBILITÉ INDEX NUMÉRIQUES [1], [2]...
-    return ($ligne = $result->fetch_row()) ? $ligne : 0;
+    return ($ligne = $result->fetch_assoc()) ? $ligne : 0;
 }
 
 // Cherche une playlist et la renvoie si elle existe
@@ -46,7 +45,7 @@ function cherchePlaylistParLeNom($nom)
     $nom = $db->real_escape_string($nom);
     $maRequete = "SELECT * FROM playlist WHERE nom = '$nom'";
     $result = $db->query($maRequete) or die ("Problème cherchePlaylistParLeNom #1 : " . $db->error);
-    return ($ligne = $result->fetch_row()) ? $ligne : 0;
+    return ($ligne = $result->fetch_assoc()) ? $ligne : 0;
 }
 
 // Crée une playlist
@@ -137,16 +136,16 @@ function infosPlaylist($id)
 
 /**
  * Affiche une carte moderne (thumbnail Bootstrap 3) pour la playlist
- * @param array $ligne Données de la playlist (id, nom, description, date, image, hits)
+ * @param array $ligne Données de la playlist (associatif)
  * @return string HTML de la carte
  */
 function afficheCartePlaylist($ligne): string
 {
-    $id = $ligne[0];
-    $nom = htmlspecialchars($ligne[1]);
-    $description = htmlspecialchars(limiteLongueur($ligne[2], 60));
-    $date = dateMysqlVersTexte($ligne[3]);
-    $hits = $ligne[5];
+    $id = $ligne['id'] ?? $ligne[0] ?? 0;
+    $nom = htmlspecialchars($ligne['nom'] ?? $ligne[1] ?? '');
+    $description = htmlspecialchars(limiteLongueur($ligne['description'] ?? $ligne[2] ?? '', 60));
+    $date = dateMysqlVersTexte($ligne['date_creation'] ?? $ligne['date'] ?? $ligne[3] ?? '');
+    $hits = $ligne['hits'] ?? $ligne[8] ?? $ligne[5] ?? 0;
     
     $imagePochette = imagePlaylist($id);
     
@@ -209,8 +208,10 @@ function getMorceauxPlaylist($idPlaylist)
     $donnee = cherchePlaylist($idPlaylist);
     
     // Si la playlist est dynamique (type = 1 ou 'dynamique')
-    if (isset($donnee[7]) && ($donnee[7] == 1 || $donnee[7] == 'dynamique')) {
-        $criteres = json_decode($donnee[8], true);
+    $type = $donnee['type'] ?? $donnee[7] ?? 0;
+    if ($type == 1 || $type == 'dynamique') {
+        $criteresStr = $donnee['criteres'] ?? $donnee[8] ?? "[]";
+        $criteres = json_decode($criteresStr, true);
         $conditions = ["1=1"]; // Condition de base
         $jointures = "";
 
