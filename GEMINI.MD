@@ -20,6 +20,11 @@ Le projet est en pleine mutation vers une architecture **SOLID** et un **Design 
 
 ## 🏛️ Architecture & Standards (Django Standards)
 
+### 0. Protocole de Démarrage (CRITIQUE)
+À chaque début de session, l'agent **DOIT** impérativement lire :
+1.  **`README.md`** : Pour comprendre l'état actuel de l'architecture et de la stack.
+2.  **`REPONSES-GEMINI.md`** : Pour prendre connaissance des derniers changements effectués et du contexte de la session précédente.
+
 ### 1. Séparation des Préoccupations (SOLID)
 Fini les fichiers "God Objects". Chaque fonctionnalité doit être découpée en trois piliers :
 *   **Le Contrôleur (`.php`)** : Reçoit la requête, gère la sécurité et orchestre les services.
