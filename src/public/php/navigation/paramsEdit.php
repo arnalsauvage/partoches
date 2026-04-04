@@ -56,6 +56,45 @@ if (isset($_POST['action'])) {
         echo "✅ Catalogue régénéré avec succès !";
         exit;
     }
+
+    if ($_POST['action'] === 'diagnostic_systeme') {
+        echo "<h4><span class='glyphicon glyphicon-wrench'></span> Diagnostic du serveur</h4>";
+        echo "<div class='well' style='background:#f8f9fa; font-family:monospace; font-size:12px;'>";
+        echo "<strong>PHP Version :</strong> " . PHP_VERSION . "<br>";
+        echo "<strong>Memory Limit :</strong> " . ini_get('memory_limit') . "<br>";
+        echo "<strong>Max Execution Time :</strong> " . ini_get('max_execution_time') . "s<br>";
+        echo "<strong>Display Errors :</strong> " . ini_get('display_errors') . "<br>";
+        
+        echo "<hr><strong>Extensions :</strong><br>";
+        $extensions = ['mbstring', 'gd', 'mysqli', 'zlib', 'iconv'];
+        foreach ($extensions as $ext) {
+            echo ($ext . ": " . (extension_loaded($ext) ? "✅ OK" : "❌ MANQUANTE")) . "<br>";
+        }
+
+        echo "<hr><strong>Permissions Dossiers :</strong><br>";
+        $dossiers = [
+            'Songbooks' => __DIR__ . '/../../data/songbooks/',
+            'Chansons' => __DIR__ . '/../../data/chansons/'
+        ];
+        foreach ($dossiers as $nom => $path) {
+            if (is_dir($path)) {
+                echo "$nom : " . (is_writable($path) ? "✅ Éscriptible" : "❌ LECTURE SEULE") . " <small>($path)</small><br>";
+            } else {
+                echo "$nom : ❌ INTROUVABLE <br>";
+            }
+        }
+
+        echo "<hr><strong>Test écriture :</strong><br>";
+        $testFile = __DIR__ . '/../../data/songbooks/test_write.txt';
+        if (@file_put_contents($testFile, "test")) {
+            echo "Ecriture : ✅ OK<br>";
+            @unlink($testFile);
+        } else {
+            echo "Ecriture : ❌ ÉCHOUÉ (Vérifiez les droits CHMOD)<br>";
+        }
+        echo "</div>";
+        exit;
+    }
 }
 
 require_once dirname(__DIR__) . "/lib/utilssi.php";
@@ -170,6 +209,7 @@ echo $alerts;
         <li class="tab-dj" data-target="dj-foot"><span class="glyphicon glyphicon-edit"></span> Footer</li>
         <li class="tab-dj" data-target="dj-logs"><span class="glyphicon glyphicon-list"></span> Logs</li>
         <li class="tab-dj" data-target="dj-console"><span class="glyphicon glyphicon-console"></span> SQL</li>
+        <li class="tab-dj" data-target="dj-diag"><span class="glyphicon glyphicon-wrench"></span> Diagnostic</li>
     </ul>
 
     <div class="content-django">
@@ -224,6 +264,15 @@ echo $alerts;
                 <div id="sqlResDj" style="margin-top:20px;"></div>
             </div>
         </div>
+
+        <div id="dj-diag" class="pane-dj">
+            <div class="section-dj">
+                <div class="section-dj-title">Diagnostic Système</div>
+                <p>Lancez une analyse complète de l'environnement pour détecter les problèmes de mémoire, d'extensions ou de permissions.</p>
+                <button type="button" id="btnRunDiagDj" class="btn-dj btn-dj-warning"><span class="glyphicon glyphicon-play"></span> Lancer le Diagnostic</button>
+                <div id="diagResDj" style="margin-top:20px;"></div>
+            </div>
+        </div>
     </div>
 
     <div class="footer-save-dj">
@@ -266,6 +315,10 @@ $(document).ready(function(){
             toastr.success(d);
             btn.prop('disabled', false).html(oldHtml);
         });
+    });
+    $('#btnRunDiagDj').click(function(){
+        $('#diagResDj').html('<div class="text-center"><span class="glyphicon glyphicon-refresh spin"></span> Analyse en cours...</div>');
+        $.post('', {action: 'diagnostic_systeme'}, function(d){ $('#diagResDj').html(d); });
     });
 });
 </script>
