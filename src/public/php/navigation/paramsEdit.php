@@ -58,6 +58,7 @@ if (isset($_POST['action'])) {
     }
 
     if ($_POST['action'] === 'diagnostic_systeme') {
+        require_once __DIR__ . "/../lib/configMysql.php";
         echo "<h4><span class='glyphicon glyphicon-wrench'></span> Diagnostic du serveur</h4>";
         echo "<div class='well' style='background:#f8f9fa; font-family:monospace; font-size:12px;'>";
         echo "<strong>PHP Version :</strong> " . PHP_VERSION . "<br>";
@@ -216,7 +217,7 @@ $logoActuel = $ini_objet->m_valeur('logoSite', 'general');
 function champInput($ini, $name, $label, $type, $groupe) {
     $val = $ini->m_valeur($name, $groupe) ?? '';
     if (!empty($val) && !mb_check_encoding($val, 'UTF-8')) $val = mb_convert_encoding($val, 'UTF-8', 'ISO-8859-1');
-    $val = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
+    $val = htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
 
     $out = "<div class='form-group-django'>";
     if ($type === "checkbox") {

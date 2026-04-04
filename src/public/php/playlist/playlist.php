@@ -18,6 +18,9 @@ function cherchePlaylists($critere, $valeur, $critereTri = 'nom', $bTriAscendant
     $valeur = $db->real_escape_string($valeur);
     $critereTri = $db->real_escape_string($critereTri);
     
+    // Mapping pour la compatibilité avec le renommage de colonnes
+    if ($critereTri === 'date') $critereTri = 'date_creation';
+    
     $maRequete = "SELECT * FROM playlist WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
     $maRequete .= $bTriAscendant ? " ASC" : " DESC";
     
@@ -59,7 +62,7 @@ function creePlaylist($nom, $description, $date, $image, $hits, $type = 0, $crit
     $type = (int)$type;
     $criteres = $db->real_escape_string($criteres);
     
-    $maRequete = "INSERT INTO playlist (id, nom, description, date, image, hits, idUser, type, criteres) 
+    $maRequete = "INSERT INTO playlist (id, nom, description, date_creation, image, hits, id_utilisateur, type, criteres) 
                   VALUES (NULL, '$nom', '$description', '$date', '$image', '$hits', '$idUser', '$type', '$criteres')";
     $db->query($maRequete) or die ("Problème creePlaylist #1 : " . $db->error);
 }
@@ -78,7 +81,7 @@ function modifiePlaylist($id, $nom, $description, $date, $image, $hits, $type = 
     $criteres = $db->real_escape_string($criteres);
     
     $maRequete = "UPDATE playlist
-	              SET nom = '$nom', description = '$description', date = '$date' , image = '$image', hits = '$hits', type = '$type', criteres = '$criteres'
+	              SET nom = '$nom', description = '$description', date_creation = '$date' , image = '$image', hits = '$hits', type = '$type', criteres = '$criteres'
 	              WHERE id='$id'";
     $db->query($maRequete) or die ("Problème modifiePlaylist #1 : " . $db->error);
 }
@@ -205,8 +208,8 @@ function getMorceauxPlaylist($idPlaylist)
     $idPlaylist = (int)$idPlaylist;
     $donnee = cherchePlaylist($idPlaylist);
     
-    // Si la playlist est dynamique (type = 1)
-    if (isset($donnee[7]) && $donnee[7] == 1) {
+    // Si la playlist est dynamique (type = 1 ou 'dynamique')
+    if (isset($donnee[7]) && ($donnee[7] == 1 || $donnee[7] == 'dynamique')) {
         $criteres = json_decode($donnee[8], true);
         $conditions = ["1=1"]; // Condition de base
         $jointures = "";
@@ -222,8 +225,8 @@ function getMorceauxPlaylist($idPlaylist)
             }
             // Filtre par Strum
             if (!empty($criteres['idStrum'])) {
-                $jointures .= " INNER JOIN lienstrumchanson lsc ON c.id = lsc.idChanson ";
-                $conditions[] = "lsc.idStrum = " . (int)$criteres['idStrum'];
+                $jointures .= " INNER JOIN lienstrumchanson lsc ON c.id = lsc.id_chanson ";
+                $conditions[] = "lsc.id_strum = " . (int)$criteres['idStrum'];
             }
             // Filtre par Saison Musicale (01/08 au 31/07)
             if (!empty($criteres['saison'])) {
@@ -241,8 +244,8 @@ function getMorceauxPlaylist($idPlaylist)
     // Sinon, playlist manuelle classique (via la table de liens)
     $sql = "SELECT c.*, lcp.ordre 
             FROM chanson c 
-            INNER JOIN lienchansonplaylist lcp ON c.id = lcp.idChanson 
-            WHERE lcp.idPlaylist = $idPlaylist 
+            INNER JOIN lienchansonplaylist lcp ON c.id = lcp.id_chanson 
+            WHERE lcp.id_playlist = $idPlaylist 
             ORDER BY lcp.ordre ASC";
     return $db->query($sql);
 }
