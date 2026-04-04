@@ -348,13 +348,10 @@ function pdfCreeSongbook($id, $version, $intitule, $image, $songs, $files, $ids,
 function make_alias($name) {
     $alias = mb_strtolower($name, 'UTF-8');
     $alias = mb_strtolower(trim($alias));
-    $search = array(utf8_decode('@[ÈÉÊËèéêë]@i'), utf8_decode('@[ÀÁÂÃÄÅàáâãäå]@i'), utf8_decode('@[ÌÍÎÏìíîï]@i'), utf8_decode('@[ÙÚÛÜùúûü]@i'), utf8_decode('@[ÒÓÔÕÖðòóôõö]@i'), utf8_decode('@[çÇ]@i'), utf8_decode('@[Ýýÿ]@i'), utf8_decode('@[,;:!§/.?*°+\'\-]@i'), utf8_decode('@[\s]@'));
+    $search = array('@[ÈÉÊËèéêë]@i', '@[ÀÁÂÃÄÅàáâãäå]@i', '@[ÌÍÎÏìíîï]@i', '@[ÙÚÛÜùúûü]@i', '@[ÒÓÔÕÖðòóôõö]@i', '@[çÇ]@i', '@[Ýýÿ]@i', '@[,;:!§/.?*°+\'\-]@i', '@[\s]@');
     $replace = array('e', 'a', 'i', 'u', 'o', 'c', 'y', '', '-');
-    $alias = preg_replace($search, $replace, utf8_decode($alias));
+    $alias = preg_replace($search, $replace, $alias);
     $search = array('.', ',', '?', ';', ':', '/', '!', '§', '%', 'ù', '*', 'µ', '¨', '^', '$', '£', 'ø', '=', '+', '}', ')', '°', ']', '@', '^', '\\', '|', '[', '{', '#', '~', '}', ']', '&', '²');
     $alias = str_replace($search, '', $alias);
-    $search = array('@-{2,}@i');
-    $alias = preg_replace($search, '-', $alias);
-    $alias = utf8_encode($alias);
     return $alias;
 }
