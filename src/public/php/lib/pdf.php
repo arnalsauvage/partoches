@@ -154,6 +154,9 @@ class SongbookPdfService
         array $songIds,
         array $docVersions
     ): array {
+        // Logging de début
+        error_log("Démarrage génération Songbook #$id - " . count($songNames) . " chansons.");
+        
         $pdf = new SongbookPdf();
         $dateStr = date("d/m/Y");
         $results = [
@@ -166,18 +169,17 @@ class SongbookPdfService
 
         // 1. Couverture
         $coverPath = $this->songbooksDir . $id . "/" . $coverImage;
-        if (!file_exists($coverPath)) {
-            $results['errors'][] = "Image de couverture introuvable : $coverImage";
-            // On continue quand même avec le logo par défaut si possible ou on échoue ?
-            // Dans le doute on tente de continuer sans image de couverture
+        if (!empty($coverImage) && file_exists($coverPath)) {
+            try {
+                $coverPath = $this->ensurePdfCompatibleImage($coverPath);
+                $pdf->addCover($coverPath, $title, $version + 1, $dateStr);
+            } catch (Exception $e) {
+                $results['warnings'][] = "Erreur image couverture : " . $e->getMessage();
+                $pdf->AddPage(); // On ajoute une page vide pour ne pas décaler le reste
+            }
         } else {
-            $coverPath = $this->ensurePdfCompatibleImage($coverPath);
-        }
-        
-        try {
-            $pdf->addCover($coverPath, $title, $version + 1, $dateStr);
-        } catch (Exception $e) {
-            $results['errors'][] = "Erreur lors de l'ajout de la couverture : " . $e->getMessage();
+            $pdf->AddPage();
+            $results['warnings'][] = "Pas d'image de couverture trouvée.";
         }
 
         // 2. Chansons
@@ -199,22 +201,32 @@ class SongbookPdfService
             }
 
             try {
+                // Log de progression tous les 10 fichiers
+                if ($index % 10 == 0) {
+                    error_log("Songbook #$id : Traitement chanson $index (" . memory_get_usage()/1024/1024 . " MB)");
+                }
+
                 $pagesAdded = $pdf->appendPdfFile($filePath);
                 if ($pagesAdded > 0) {
                     $startPages[] = $currentPage;
                     $validSongs[] = $songName;
                     $currentPage += $pagesAdded;
                 } else {
-                    $results['skipped'][] = "$songName (PDF vide ou illisible)";
+                    $results['skipped'][] = "$songName (PDF vide)";
                 }
             } catch (Exception $e) {
-                $results['skipped'][] = "$songName (Incompatible : " . $e->getMessage() . ")";
+                $results['skipped'][] = "$songName (Erreur : " . $e->getMessage() . ")";
                 error_log("Erreur import PDF ($filePath) : " . $e->getMessage());
+            }
+            
+            // On tente de libérer un peu de mémoire si possible
+            if ($index % 50 == 0) {
+                gc_collect_cycles();
             }
         }
 
         if (empty($validSongs)) {
-            $results['errors'][] = "Aucune chanson valide n'a pu être ajoutée au Songbook.";
+            $results['errors'][] = "Aucune chanson valide n'a pu être ajoutée.";
             return $results;
         }
 
@@ -222,7 +234,7 @@ class SongbookPdfService
         try {
             $pdf->addTableOfContents($validSongs, $this->getLogoPath(), $startPages);
         } catch (Exception $e) {
-            $results['warnings'][] = "Erreur lors de la génération du sommaire : " . $e->getMessage();
+            $results['warnings'][] = "Erreur sommaire : " . $e->getMessage();
         }
 
         // 4. Sortie et Enregistrement
@@ -231,13 +243,15 @@ class SongbookPdfService
         $finalPathDir = $this->songbooksDir . $id . "/";
         
         try {
+            error_log("Songbook #$id : Finalisation PDF (" . memory_get_usage()/1024/1024 . " MB)");
             $pdf->Output($finalPathDir . $tempFileName, 'F');
-            // Gestion BDD et renommage
             $finalName = $this->finalizeDocument($id, $tempFileName, $finalPathDir);
             $results['success'] = true;
             $results['file'] = $finalName;
+            error_log("Songbook #$id : Succès !");
         } catch (Exception $e) {
-            $results['errors'][] = "Erreur lors de l'enregistrement du fichier PDF : " . $e->getMessage();
+            $results['errors'][] = "Erreur enregistrement : " . $e->getMessage();
+            error_log("Songbook #$id : Échec enregistrement - " . $e->getMessage());
         }
 
         return $results;

@@ -86,12 +86,13 @@ $(document).ready(function () {
             },
             error: function(xhr, status, error) {
                 let html = '<div class="alert alert-danger">';
-                html += '<h4><i class="glyphicon glyphicon-fire"></i> Erreur Serveur</h4>';
-                html += '<p>' + error + '</p>';
-                html += '<p><small>Il est possible que le serveur ait dépassé son temps d\'exécution ou sa limite de mémoire.</small></p>';
+                html += '<h4><i class="glyphicon glyphicon-fire"></i> Erreur Serveur (' + xhr.status + ')</h4>';
+                html += '<p><strong>Statut :</strong> ' + status + '</p>';
+                html += '<p><strong>Détail :</strong> ' + error + '</p>';
+                html += '<p><small>Il est possible que le serveur ait dépassé son temps d\'exécution ou sa limite de mémoire. Vérifiez les logs d\'erreurs du serveur pour plus de détails.</small></p>';
                 html += '</div>';
                 $('#pdf-report-zone').html(html);
-                if (typeof toastr !== 'undefined') toastr.error("Erreur critique.");
+                if (typeof toastr !== 'undefined') toastr.error("Erreur critique (" + xhr.status + ").");
             }
         });
     };
