@@ -8,7 +8,7 @@ require_once __DIR__ . "/../chanson/Chanson.php";
 require_once __DIR__ . "/../document/Document.php";
 require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 
-echo envoieHead("Voir Playlist", "styles-communs.css");
+echo envoieHead("Voir Playlist", "../../css/styles-communs.css");
 echo $MENU_HTML;
 $table = "playlist";
 $sortie = "";

@@ -58,7 +58,7 @@ if ($mode == "MAJ") {
     $criteres = [];
 }
 
-echo envoieHead($titrePage, "styles-communs.css");
+echo envoieHead($titrePage, "../../css/styles-communs.css");
 echo $MENU_HTML;
 ?>
 

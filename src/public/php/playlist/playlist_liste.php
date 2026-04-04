@@ -9,7 +9,7 @@ $pasDeMenu = true;
 require_once __DIR__ . "/../navigation/menu.php";
 require_once __DIR__ . "/../playlist/playlist.php";
 
-echo envoieHead("Playlists", "styles-communs.css");
+echo envoieHead("Playlists", "../../css/styles-communs.css");
 echo $MENU_HTML;
 
 // --- PARAMÈTRES ET FILTRES ---
