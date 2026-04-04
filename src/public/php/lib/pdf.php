@@ -51,7 +51,7 @@ class SongbookPdf extends Fpdi
         $this->SetY(260);
         $this->SetFont(self::FONT_ARIAL, 'B', 10);
         $this->SetTextColor(50, 50, 50);
-        $this->Cell(0, 12, utf8_decode($title) . " - v" . $version . " du " . $date, 0, 0, "C");
+        $this->Cell(0, 12, mb_convert_encoding($title, 'ISO-8859-1', 'UTF-8') . " - v" . $version . " du " . $date, 0, 0, "C");
     }
 
     /**
@@ -98,7 +98,7 @@ class SongbookPdf extends Fpdi
             }
             
             $pageNumber = $pageNumbers[$index] ?? '?';
-            $this->Cell(10, $lineHeight, $pageNumber . " - " . utf8_decode($songName), 0, 1, "L");
+            $this->Cell(10, $lineHeight, $pageNumber . " - " . mb_convert_encoding($songName, 'ISO-8859-1', 'UTF-8'), 0, 1, "L");
             $songCount++;
         }
     }

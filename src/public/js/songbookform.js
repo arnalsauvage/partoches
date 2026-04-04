@@ -89,6 +89,12 @@ $(document).ready(function () {
                 html += '<h4><i class="glyphicon glyphicon-fire"></i> Erreur Serveur (' + xhr.status + ')</h4>';
                 html += '<p><strong>Statut :</strong> ' + status + '</p>';
                 html += '<p><strong>Détail :</strong> ' + error + '</p>';
+                
+                if (status === 'parsererror') {
+                    html += '<hr><p><strong>Réponse brute du serveur (parfois contient l\'erreur PHP) :</strong></p>';
+                    html += '<pre style="max-height:200px; overflow:auto;">' + (xhr.responseText ? xhr.responseText.substring(0, 1000) : "Réponse vide") + '</pre>';
+                }
+
                 html += '<p><small>Il est possible que le serveur ait dépassé son temps d\'exécution ou sa limite de mémoire. Vérifiez les logs d\'erreurs du serveur pour plus de détails.</small></p>';
                 html += '</div>';
                 $('#pdf-report-zone').html(html);

@@ -93,6 +93,8 @@ if ($mode == "SUPPRFICPOU" && $_SESSION [PRIVILEGE] > 1) {
 
 // Ce cas est appelé en ajax, donc on ne redirigera pas
 if ($mode == "GENEREPDF" && $id) {
+    // On désactive l'affichage des erreurs pour ne pas corrompre le JSON
+    ini_set('display_errors', '0');
     $results = CreeSongBookPdf($id);
 
     // Si c'est un appel AJAX (demandé par songbookform.js)
