@@ -40,67 +40,65 @@ $(document).ready(function () {
         
         // On prépare une zone pour les messages détaillés si elle n'existe pas
         if ($('#pdf-report-zone').length === 0) {
-            $('body').prepend('<div id="pdf-report-zone" class="container" style="margin-top:20px; position:relative; z-index:9999;"></div>');
+            $('.sb-footer-actions').before('<div id="pdf-report-zone" style="margin-bottom:20px;"></div>');
         }
-        $('#pdf-report-zone').empty();
-        window.scrollTo(0, 0);
-
+        $('#pdf-report-zone').empty().html('<div class="alert alert-info"><span class="glyphicon glyphicon-refresh spin"></span> Travail en cours, veuillez patienter...</div>');
+        
         $.ajax({
             type: "POST",
             url: "songbook_get.php",
             data: { id: id, mode: "GENEREPDF" },
-            dataType: 'json',
             success: function (response) {
-                if (response.success) {
-                    if (typeof toastr !== 'undefined') toastr.success("PDF régénéré avec succès !");
+                let data = response;
+                
+                // Si la réponse n'est pas un objet (ex: JSON corrompu par un warning)
+                if (typeof response !== 'object') {
+                    try {
+                        // On tente de trouver le JSON dans la masse de texte si besoin
+                        let jsonStart = response.indexOf('{');
+                        let jsonEnd = response.lastIndexOf('}');
+                        if (jsonStart !== -1 && jsonEnd !== -1) {
+                            data = JSON.parse(response.substring(jsonStart, jsonEnd + 1));
+                        }
+                    } catch (e) {
+                        console.error("Impossible de parser la réponse", e);
+                    }
+                }
+
+                if (data && data.success) {
+                    if (typeof toastr !== 'undefined') toastr.success("PDF régénéré !");
                     
                     let html = '<div class="alert alert-success">';
                     html += '<h4><i class="glyphicon glyphicon-ok"></i> Génération réussie !</h4>';
-                    html += '<p>Le fichier <strong>' + response.file + '</strong> a été créé.</p>';
+                    html += '<p>Le fichier <strong>' + data.file + '</strong> a été créé.</p>';
                     
-                    if (response.skipped && response.skipped.length > 0) {
-                        html += '<hr><p><strong>Note :</strong> Certains morceaux ont été ignorés :</p><ul>';
-                        response.skipped.forEach(s => html += '<li>' + s + '</li>');
-                        html += '</ul>';
+                    if (data.skipped && data.skipped.length > 0) {
+                        html += '<hr><p><strong>Attention :</strong> Certains morceaux ont été ignorés (PDF incompatibles ou manquants) :</p><ul>';
+                        data.skipped.forEach(s => html += '<li>' + s + '</li>');
+                        html += '</ul><p><small>Astuce : Enregistrez ces PDF au format "PDF 1.4" ou "Optimisé" pour les rendre compatibles.</small></p>';
                     }
                     html += '</div>';
                     $('#pdf-report-zone').html(html);
-
-                    // On ne recharge plus automatiquement pour laisser lire le rapport
-                    // setTimeout(() => window.location.href = 'songbook_form.php?id=' + id, 3000);
                 } else {
-                    let html = '<div class="alert alert-danger">';
-                    html += '<h4><i class="glyphicon glyphicon-exclamation-sign"></i> Échec de la génération</h4>';
-                    html += '<ul>';
-                    response.errors.forEach(e => html += '<li>' + e + '</li>');
-                    html += '</ul>';
-                    
-                    if (response.skipped && response.skipped.length > 0) {
-                        html += '<hr><p>Morceaux posant problème :</p><ul>';
-                        response.skipped.forEach(s => html += '<li>' + s + '</li>');
-                        html += '</ul>';
+                    let html = '<div class="alert alert-danger"><h4>Échec de la génération</h4>';
+                    if (data && data.errors) {
+                        html += '<ul>' + data.errors.map(e => '<li>'+e+'</li>').join('') + '</ul>';
+                    } else {
+                        html += '<p>Une erreur inconnue est survenue.</p>';
                     }
                     html += '</div>';
                     $('#pdf-report-zone').html(html);
-                    
-                    if (typeof toastr !== 'undefined') toastr.error("Erreur de génération.");
                 }
             },
             error: function(xhr, status, error) {
                 let html = '<div class="alert alert-danger">';
                 html += '<h4><i class="glyphicon glyphicon-fire"></i> Erreur Serveur (' + xhr.status + ')</h4>';
-                html += '<p><strong>Statut :</strong> ' + status + '</p>';
-                html += '<p><strong>Détail :</strong> ' + error + '</p>';
-                
-                if (status === 'parsererror') {
-                    html += '<hr><p><strong>Réponse brute du serveur (parfois contient l\'erreur PHP) :</strong></p>';
-                    html += '<pre style="max-height:200px; overflow:auto;">' + (xhr.responseText ? xhr.responseText.substring(0, 1000) : "Réponse vide") + '</pre>';
+                html += '<p>La génération a échoué du côté du serveur.</p>';
+                if (xhr.responseText) {
+                    html += '<hr><p>Détail technique :</p><pre style="max-height:150px; overflow:auto;">' + xhr.responseText.substring(0, 500) + '</pre>';
                 }
-
-                html += '<p><small>Il est possible que le serveur ait dépassé son temps d\'exécution ou sa limite de mémoire. Vérifiez les logs d\'erreurs du serveur pour plus de détails.</small></p>';
                 html += '</div>';
                 $('#pdf-report-zone').html(html);
-                if (typeof toastr !== 'undefined') toastr.error("Erreur critique (" + xhr.status + ").");
             }
         });
     };

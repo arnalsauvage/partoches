@@ -99,12 +99,9 @@ if ($mode == "GENEREPDF" && $id) {
     $results = CreeSongBookPdf($id);
     ob_end_clean();
 
-    // Si c'est un appel AJAX (demandé par songbookform.js)
-    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-        header('Content-Type: application/json');
-        echo json_encode($results);
-        exit;
-    }
+    header('Content-Type: application/json');
+    echo json_encode($results);
+    exit; // ON ARRÊTE TOUT ICI
 }
 
 
