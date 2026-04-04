@@ -40,9 +40,10 @@ $(document).ready(function () {
         
         // On prépare une zone pour les messages détaillés si elle n'existe pas
         if ($('#pdf-report-zone').length === 0) {
-            $('.container').first().prepend('<div id="pdf-report-zone" style="margin-top:20px;"></div>');
+            $('body').prepend('<div id="pdf-report-zone" class="container" style="margin-top:20px; position:relative; z-index:9999;"></div>');
         }
         $('#pdf-report-zone').empty();
+        window.scrollTo(0, 0);
 
         $.ajax({
             type: "POST",

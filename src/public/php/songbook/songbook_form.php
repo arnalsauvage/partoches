@@ -275,7 +275,7 @@ HTML;
 $html .= "</div></div></div>";
 
 // JavaScript Spécifique
-$html .= '<script src="../../js/songbookform.js"></script>';
+$html .= '<script src="../../js/songbookform.js?v=' . time() . '"></script>';
 
 echo $html;
 echo envoieFooter();
