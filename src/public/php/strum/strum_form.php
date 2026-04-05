@@ -60,7 +60,22 @@ $html = <<<HTML
             </header>
 
             <!-- ZONE D'AIDE (MASQUÉE PAR DÉFAUT) -->
-            ... [rest of aideBox code] ...
+            <div id="aideBox" class="strum-help-box" style="display:none;">
+                <h4 style="margin-top:0; font-weight:bold; color:#2b1d1a;">Guide de saisie des rythmiques</h4>
+                <p>
+                    <strong>Symboles :</strong><br>
+                    - <code>B</code> ou <code>H</code> : Coup Bas ou Haut (accentué)<br>
+                    - <code>b</code> ou <code>h</code> : Coup Bas ou Haut (doux)<br>
+                    - <code>X</code> : Chunk / Etouffé<br>
+                    - <code>-</code> (tiret) : Silence / Temps non joué
+                </p>
+                <p>
+                    <strong>Unité &amp; Longueur :</strong><br>
+                    - Le plus courant : <strong>8 croches</strong> (Unité 8, Longueur 8).<br>
+                    - Double croches : <strong>Unité 16</strong>. Si sur une mesure, longueur 16. Si sur deux mesures, longueur 32.<br>
+                    - Valse (3/4) : Unité 8, Longueur 6.
+                </p>
+            </div>
 
             <!-- FORMULAIRE -->
             <div id="editionStrum">
