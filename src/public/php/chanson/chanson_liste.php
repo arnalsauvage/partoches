@@ -11,6 +11,7 @@ const CENTRER = "centrer";
 const VAL_FILTRE = "valFiltre";
 const FILTRE = "filtre";
 require_once dirname(__DIR__, 3) . "/autoload.php";
+$pasDeMenu = true;
 require_once PHP_DIR . "/navigation/menu.php";
 
 $chansonForm = "chanson_form.php";

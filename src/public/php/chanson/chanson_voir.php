@@ -7,6 +7,7 @@
  */
 
 require_once dirname(__DIR__, 3) . "/autoload.php";
+$pasDeMenu = true;
 require_once PHP_DIR . "/navigation/menu.php";
 require_once PHP_DIR . "/liens/lienurl_voir.php";
 

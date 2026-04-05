@@ -41,6 +41,21 @@ class Strum
         }
     }
 
+    public function __construct4(string $strum, int $unite, int $longueur, string $description)
+    {
+        $this->__construct0();
+        $this->_strum = $strum;
+        $this->_unite = $unite;
+        $this->_longueur = $longueur;
+        $this->_description = $description;
+    }
+
+    public function __construct5(int $id, string $strum, int $unite, int $longueur, string $description)
+    {
+        $this->__construct4($strum, $unite, $longueur, $description);
+        $this->_id = $id;
+    }
+
     // Getters & Setters
     public function getId(): int { return $this->_id; }
     public function setId(int $id): void { $this->_id = $id; }

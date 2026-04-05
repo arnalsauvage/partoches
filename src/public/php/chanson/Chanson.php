@@ -483,9 +483,16 @@ class Chanson
             while ($row = $result->fetch_assoc()) {
                 $normalized_titre = self::normalize($row["nom"]);
                 $normalized_interprete = self::normalize($row["interprete"]);
-                $distance_titre = levenshtein($rechercheNormalisee, $normalized_titre);
-                $distance_interprete = levenshtein($rechercheNormalisee, $normalized_interprete);
-                $distance = min($distance_titre, $distance_interprete);
+                
+                // Priorité aux correspondances de sous-chaîne (Score 0)
+                if (str_contains($normalized_titre, $rechercheNormalisee) || str_contains($normalized_interprete, $rechercheNormalisee)) {
+                    $distance = 0;
+                } else {
+                    $distance_titre = levenshtein($rechercheNormalisee, $normalized_titre);
+                    $distance_interprete = levenshtein($rechercheNormalisee, $normalized_interprete);
+                    $distance = min($distance_titre, $distance_interprete);
+                }
+                
                 $row['distance'] = $distance;
                 $matches[] = $row;
             }

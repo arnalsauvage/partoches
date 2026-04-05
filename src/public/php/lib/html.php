@@ -215,6 +215,11 @@ HTML;
         return str_replace($replacements, $entities, $string);
     }
 
+    function echappeGuillemetSimple($chaine)
+    {
+        return str_replace("'", "&#39;", $chaine);
+    }
+
     function simplifieNomFichier($nomOriginal){
         $table = array(
             'Š'=>'S', 'š'=>'s', 'Đ'=>'Dj', 'đ'=>'dj', 'Ž'=>'Z', 'ž'=>'z', 'Č'=>'C', 'č'=>'c', 'Ć'=>'C', 'ć'=>'c',

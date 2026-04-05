@@ -6,18 +6,31 @@ use PHPUnit\Framework\TestCase;
  */
 class DocumentTest extends TestCase
 {
+    private $oldMysql;
+
     protected function setUp(): void
     {
-        // On mocke la session MySQL pour éviter les accès réels à la BDD
-        if (!isset($_SESSION)) {
-            $_SESSION = [];
+        // On sauvegarde l'ancienne connexion pour ne pas casser les autres tests
+        if (isset($_SESSION['mysql'])) {
+            $this->oldMysql = $_SESSION['mysql'];
         }
-        
+
+        // On mocke la session MySQL pour éviter les accès réels à la BDD dans ce test unitaire
         $mysqlMock = $this->getMockBuilder(stdClass::class)
             ->addMethods(['query', 'error'])
             ->getMock();
             
         $_SESSION['mysql'] = $mysqlMock;
+    }
+
+    protected function tearDown(): void
+    {
+        // On restaure l'ancienne connexion
+        if ($this->oldMysql !== null) {
+            $_SESSION['mysql'] = $this->oldMysql;
+        } else {
+            unset($_SESSION['mysql']);
+        }
     }
 
     /**

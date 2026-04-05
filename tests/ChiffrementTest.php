@@ -46,7 +46,6 @@ class ChiffrementTest extends TestCase
         $_chaine = "invite";
         $_chaine_chiffree_attendue = "YXFUaU9SdkkvMHZlVFgzRjlRTmZEdjV6Rk9Pd093PT0=";
         $chaine_chiffree = Chiffrement::crypt($_chaine);
-        echo $_chaine . " ==> " . $chaine_chiffree . "\n";
         $chaine_dechiffree = Chiffrement::decrypt($chaine_chiffree);
 
         $this->assertEquals($_chaine , $chaine_dechiffree);

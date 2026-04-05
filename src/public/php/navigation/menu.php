@@ -13,7 +13,7 @@ if (!isset($_SESSION['largeur-fenetre'])) {
 
 // Gestion automatique du compte invité si non connecté
 if (!isset($_SESSION['user'])) {
-    $donnee = login_utilisateur("invite", "invite");
+    $donnee = Utilisateur::login_utilisateur("invite", "invite");
     if ($donnee) {
         $_SESSION['id'] = $donnee[0];
         $_SESSION['user'] = $donnee[1];
@@ -93,7 +93,7 @@ if ($privilege > $GLOBALS["PRIVILEGE_MEMBRE"]) {
 
 // 8. Paramétrage (Admin)
 $lienParametrage = "";
-if (($user == $_SESSION['loginParam']) || ($privilege > $GLOBALS["PRIVILEGE_EDITEUR"])) {
+if (($user == ($_SESSION['loginParam'] ?? '')) || ($privilege > $GLOBALS["PRIVILEGE_EDITEUR"])) {
     $lienParametrage = "<li><a href=\"../admin/params.php\" title=\"Paramétrage\"><i class=\"glyphicon glyphicon-cog\"></i></a></li>";
 }
 
