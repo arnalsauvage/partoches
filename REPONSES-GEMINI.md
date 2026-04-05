@@ -33,6 +33,9 @@
 - **Refactoring Media** : Migration vers `MediaService::resetMediasDistribues()`.
 - **UI/UX Formulaire** : Refonte totale de `chanson_form_new.php` avec le Design System Canopée (Cartes, classes `.input-django`, sidebar pour les covers).
 - **Fix SQL** : Correction d'une erreur de tri sur le sélecteur d'utilisateurs.
+- **Correction Strums** : 
+    - Fix de l'affichage des rythmiques dans `ChansonFormRenderer.php` (passage en `fetch_assoc` pour plus de robustesse).
+    - Rétablissement de la popup des chansons liées dans `strum_liste.php` (inclusion du JS et de la modale manquante).
 
 ### 🎸 Note de Django
 "Le bug du dimanche est maté et le nouveau formulaire a un look d'enfer ! Tout est en place pour que la musique continue sans fausses notes. Rock'n'Roll !" 🎷🤘✨

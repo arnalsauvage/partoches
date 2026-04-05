@@ -82,7 +82,34 @@ foreach ($strums as $s) {
     $html .= $s->afficheCarteStrum();
 }
 
-$html .= "</div></div>";
+$html .= <<<HTML
+    </div>
+</div>
+
+<!-- MODALE POUR VOIR LES CHANSONS LIÉES -->
+<div class="modal fade" id="modalChansonsStrum" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="border-radius: 12px; border: 4px solid var(--c-marron-clair);">
+            <div class="modal-header" style="background-color: var(--c-beige); border-bottom: 2px solid var(--c-marron-clair);">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" style="font-weight: bold; color: var(--c-marron-fonce);">
+                    <i class="glyphicon glyphicon-music"></i> Chansons utilisant <span id="modalStrumNom"></span>
+                </h4>
+            </div>
+            <div class="modal-body" id="modalChansonsBody" style="max-height: 400px; overflow-y: auto; padding: 0;">
+                <!-- Contenu chargé via AJAX -->
+            </div>
+            <div class="modal-footer" style="background-color: var(--c-beige); border-top: 1px solid var(--c-marron-clair);">
+                <button type="button" class="btn btn-dj btn-dj-default" data-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- INCLUSION DU JS POUR LES STRUMS -->
+<script src="../../js/strum_liste.js?v=2026-04-05"></script>
+HTML;
+
 $html .= envoieFooter();
 
 echo $html;
