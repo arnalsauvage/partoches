@@ -7,7 +7,23 @@
     padding-bottom: 100px;
 }
 
+/* Fix pour l'alignement des cartes (Flexbox) */
+.strum-container .row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* On s'assure que les colonnes ne s'écrasent pas */
+.strum-container .row > [class*='col-'] {
+    display: flex;
+    flex-direction: column;
+}
+
+/* La carte doit prendre toute la hauteur de sa colonne */
 .strum-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     min-height: 280px;
     border-radius: 12px;
     overflow: hidden;
@@ -19,28 +35,12 @@
     margin-bottom: 25px;
 }
 
-.strum-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-}
-
-.strum-card-header {
-    background-color: #2b1d1a;
-    padding: 15px;
-    text-align: center;
-    border-bottom: 3px solid #8B4513;
-}
-
-.strum-card-header h2 {
-    color: white;
-    margin: 0;
-    font-family: monospace;
-    font-size: 22px;
-    letter-spacing: 2px;
-}
-
+/* On force le body de la carte à pousser le footer vers le bas */
 .strum-card-body {
     padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .strum-card-desc {
@@ -49,6 +49,11 @@
     height: 40px;
     overflow: hidden;
     margin-bottom: 10px;
+}
+
+/* Petit ajustement pour que le contenu du body s'espace bien */
+.strum-card-body > div:last-child {
+    margin-top: auto;
 }
 
 /* Fix pour la modale Bootstrap 3 sans !important */
