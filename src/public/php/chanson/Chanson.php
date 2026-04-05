@@ -405,7 +405,17 @@ class Chanson
         $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
         $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
         $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
-        $this->_datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
+        
+        // On n'écrase la date que si elle est vide ou par défaut
+        if (empty($this->_datePub) || $this->_datePub == '0000-00-00') {
+            $this->_datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
+        } else {
+            // S'assurer que la date est au format MySQL
+            if (str_contains($this->_datePub, '/')) {
+                $this->_datePub = convertitDateJJMMAAAAversMySql($this->_datePub);
+            }
+        }
+
         $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite, cover, publication)
 	        VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', 
 	        '%s', '%s' ,  '%s', '%s', '%s', %s)", 
@@ -484,8 +494,14 @@ class Chanson
                 $normalized_titre = self::normalize($row["nom"]);
                 $normalized_interprete = self::normalize($row["interprete"]);
                 
+                $compact_recherche = str_replace(' ', '', $rechercheNormalisee);
+                $compact_titre = str_replace(' ', '', $normalized_titre);
+                $compact_interprete = str_replace(' ', '', $normalized_interprete);
+
                 // Priorité aux correspondances de sous-chaîne (Score 0)
-                if (str_contains($normalized_titre, $rechercheNormalisee) || str_contains($normalized_interprete, $rechercheNormalisee)) {
+                if (str_contains($normalized_titre, $rechercheNormalisee) || 
+                    str_contains($normalized_interprete, $rechercheNormalisee) ||
+                    ($compact_recherche !== '' && (str_contains($compact_titre, $compact_recherche) || str_contains($compact_interprete, $compact_recherche)))) {
                     $distance = 0;
                 } else {
                     $distance_titre = levenshtein($rechercheNormalisee, $normalized_titre);
@@ -726,7 +742,7 @@ public static function getTonaliteEquivalents(string $tonalite): array
         $string = preg_replace('/[ýÿ]/u', 'y', $string);
         $string = preg_replace('/ç/u', 'c', $string);
         $string = preg_replace('/ñ/u', 'n', $string);
-        $string = preg_replace('/[^a-z0-9\s]/', '', $string); // Supprimer les caractères non-alphanumériques
+        $string = preg_replace('/[^a-z0-9]/', ' ', $string); // Remplacer tout le reste par des espaces
         $string = preg_replace('/\s+/', ' ', $string); // Réduire les espaces multiples
         return trim($string); // Supprimer les espaces au début et à la fin
     }

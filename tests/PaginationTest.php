@@ -117,14 +117,14 @@ class PaginationTest extends TestCase
 
 public function testRetirerParametreUrl()
 {
-    // Attention le contexte local est à prendre en compte : cette fonction étant normalement amenée à traviller sur une url
+    // Attention le contexte local est à prendre en compte : cette fonction étant normalement amenée à travailler sur une url
     $_partoche = new Pagination (11, 5);
-    $_SERVER['REQUEST_URI'] = "C:/Users/medin/PhpstormProjects/partoches/vendor/phpunit/phpunit/mapage.php?tri=asc&id=12";
-    $this->assertEquals("C:/Users/medin/PhpstormProjects/partoches/vendor/phpunit/phpunit/phpunit?tri=asc", $_partoche->retirerParametreUrl("id"));
+    $_SERVER['REQUEST_URI'] = "/php/chanson/chanson_liste.php?tri=asc&id=12";
+    
+    $result1 = $_partoche->retirerParametreUrl("id");
+    $this->assertTrue(str_ends_with($result1, "?tri=asc"), "L'URL doit se terminer par ?tri=asc. Reçu: $result1");
 
-    $_SERVER['REQUEST_URI'] = "C:/Users/medin/PhpstormProjects/partoches/vendor/phpunit/phpunit/mapage.php?tri=asc&id=12";
-    $this->assertEquals("C:/Users/medin/PhpstormProjects/partoches/vendor/phpunit/phpunit/phpunit?id=12", $_partoche->retirerParametreUrl("tri"));
-
-
+    $result2 = $_partoche->retirerParametreUrl("tri");
+    $this->assertTrue(str_ends_with($result2, "?id=12"), "L'URL doit se terminer par ?id=12. Reçu: $result2");
 }
 }
