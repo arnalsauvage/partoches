@@ -18,7 +18,7 @@ $fimage = "/utilisateur/" . $_POST ['fimage'];
 if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
     $fprivilege = $_SESSION ['privilege'];
     // ne peut changer son nombre de connexions, il faut donc charger la valeur, elle n'est pas passée par le formulaire
-    $fnbreLogins = chercheUtilisateur($_SESSION ['id']);
+    $fnbreLogins = Utilisateur::chercheUtilisateur($_SESSION ['id']);
     $fnbreLogins = $fnbreLogins[11];
 }
 else

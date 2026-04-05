@@ -36,12 +36,12 @@ augmenteHits(CHANSON, $idChanson);
 
 // Données de base
 $datePub = dateMysqlVersTexte($_chanson->getDatePub());
-$utilisateur = chercheUtilisateur($_chanson->getIdUser())[1];
+$utilisateur = Utilisateur::chercheUtilisateur($_chanson->getIdUser())[1];
 $hits = $_chanson->getHits() + 1;
-$monImage = imageTableId(CHANSON, $idChanson);
+$monImage = Document::imageTableId(CHANSON, $idChanson);
 
 // Récupération et filtrage des documents
-$resultDocs = chercheDocumentsTableId(CHANSON, $idChanson);
+$resultDocs = Document::chercheDocumentsTableId(CHANSON, $idChanson);
 $documents = [];
 $nbImages = 0;
 
@@ -165,7 +165,7 @@ if (!empty($documents)) {
         if (!file_exists(ICONES . $extension . ".png")) $icone = image("../images/icones/fichier.png", 32, 32, "icone");
 
         $sectionDocs .= "<div class='col-xs-6 col-sm-3 col-md-2 centrer' style='margin-bottom: 20px;'>";
-        $sectionDocs .= "  <a href='" . lienUrlAffichageDocument($ligne[0]) . "' target='_blank' class='thumbnail' style='text-decoration:none; padding:10px;'>$icone<br><small>" . htmlentities($fichierSec) . "</small></a>";
+        $sectionDocs .= "  <a href='" . Document::lienUrlAffichageDocument($ligne[0]) . "' target='_blank' class='thumbnail' style='text-decoration:none; padding:10px;'>$icone<br><small>" . htmlentities($fichierSec) . "</small></a>";
         $sectionDocs .= "</div>";
     }
     if (!empty($sectionDocs)) $contenuHtml .= "<hr><h2><i class='glyphicon glyphicon-file'></i> Documents attachés</h2><div class='row'>$sectionDocs</div>";
@@ -180,7 +180,7 @@ if (!empty($documents)) {
     foreach ($documents as $ligne) {
         $extension = strtolower(substr(strrchr($ligne[1], '.'), 1));
         $fichierSec = substr($ligne[1], 0, strrpos($ligne[1], '.'));
-        $urlDoc = lienUrlAffichageDocument($ligne[0]);
+        $urlDoc = Document::lienUrlAffichageDocument($ligne[0]);
 
         if (in_array($extension, ['mp3', 'm4a', 'aac', 'mp4'])) {
             $hasMedias = true;
@@ -221,7 +221,7 @@ if (!empty($liens) && $liens->num_rows > 0) {
     $contenuHtml .= "<hr><h2><i class='glyphicon glyphicon-link'></i> Liens associés</h2><div class='row'>";
     while ($lien = $liens->fetch_row()) {
         $contenuHtml .= "<div class='col-sm-6'>" . afficheLien($lien) . "</div>";
-        ajouteUnHit($lien[0]);
+        LienUrl::ajouteUnHit($lien[0]);
     }
     $contenuHtml .= "</div>";
 }
@@ -233,7 +233,7 @@ if (!empty($songbooks) && $songbooks->num_rows > 0) {
     while ($songbook = $songbooks->fetch_row()) {
         $idSb = $songbook[0];
         $nomSb = $songbook[1];
-        $imgSb = imageSongbook($idSb);
+        $imgSb = Songbook::imageSongbook($idSb);
         $urlImgVignette = Image::getThumbnailUrl($idSb . "/" . $imgSb, 'sd', 'songbooks');
         $contenuHtml .= "<div class='col-xs-4 col-sm-3 col-md-2 text-center'><a href='../songbook/songbook_voir.php?id=$idSb' class='thumbnail'>";
         $contenuHtml .= "<img src='$urlImgVignette' style='height:120px; object-fit:cover;' alt='SB'><div class='caption'><small>$nomSb</small></div></a></div>";
@@ -294,7 +294,7 @@ function renderStrumsSection($idChanson, $tempo, $isTernaire) {
     $urlBoiteAstrum = "../../html/boiteAstrum/index.html";
     $imageBoiteAstrum = "../../html/boiteAstrum/medias/img/boiteAstrum.png";
     $html = "";
-    $liens = chercheLiensStrumChanson("idChanson", $idChanson);
+    $liens = LienStrumChanson::chercheLiensStrumChanson("idChanson", $idChanson);
     
     if (!empty($liens) && $liens->num_rows > 0) {
         $html .= "<hr><h2 style='color: #2b1d1a; font-weight: bold; margin-bottom: 20px;'>";

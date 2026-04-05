@@ -257,6 +257,21 @@ class Songbook
         }
         return $liste;
     }
+
+    /**
+     * Retourne le nom du fichier image associé au songbook
+     */
+    public static function imageSongbook($idSongbook): string
+    {
+        $db = $_SESSION['mysql'];
+        $maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
+        $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg' OR document.nom LIKE '%.webp') LIMIT 1";
+        $result = $db->query($maRequete);
+        if ($ligne = $result->fetch_row()) {
+            return Document::composeNomVersion($ligne[1], $ligne[4]);
+        }
+        return "";
+    }
 }
 
 // --- FONCTIONS WRAPPERS (POUR COMPATIBILITÉ) ---

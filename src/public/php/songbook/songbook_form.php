@@ -193,7 +193,7 @@ if ($mode == "MAJ") {
         <div class="list-group" style="margin-bottom: 20px;">
 HTML;
     
-    $docsRecueil = chercheDocumentsTableId("songbook", $id);
+    $docsRecueil = Document::chercheDocumentsTableId("songbook", $id);
     while ($doc = $docsRecueil->fetch_row()) {
         $html .= renderDocumentRow($doc, $id);
     }

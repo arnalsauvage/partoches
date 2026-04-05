@@ -114,7 +114,7 @@ $html = <<<HTML
 HTML;
 
 // On cherche s'il existe un PDF déjà généré pour ce songbook
-$docsPdf = chercheDocumentsTableId("songbook", $id);
+$docsPdf = Document::chercheDocumentsTableId("songbook", $id);
 $dernierPdf = null;
 while ($doc = $docsPdf->fetch_row()) {
     if (strpos(strtolower($doc[1]), '.pdf') !== false) {
@@ -123,7 +123,7 @@ while ($doc = $docsPdf->fetch_row()) {
 }
 
 if ($dernierPdf) {
-    $nomFichier = composeNomVersion($dernierPdf[1], $dernierPdf[4]);
+    $nomFichier = Document::composeNomVersion($dernierPdf[1], $dernierPdf[4]);
     $urlPdf = "../../data/songbooks/$id/" . urlencode($nomFichier);
     $html .= <<<HTML
                 <a href="$urlPdf" target="_blank" class="btn btn-sb-action btn-orange-sb shadow" style="background-color: $c_orange; border: none; color: white; text-decoration: none;">
@@ -164,7 +164,7 @@ if (empty($chansons)) {
         $c_interprete = htmlspecialchars($c->getInterprete());
         $c_tonalite = $c->getTonalite();
         
-        $c_img_name = imageTableId("chanson", $c_id);
+        $c_img_name = Document::imageTableId("chanson", $c_id);
         $c_pochette = affichePochette($c_img_name, $c_id, 50, 50);
 
         $html .= <<<HTML

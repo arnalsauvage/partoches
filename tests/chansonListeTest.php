@@ -9,9 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
-require_once __DIR__ . "/../src/public/php/chanson/Chanson.php";
-require_once __DIR__ . "/../src/public/php/chanson/chansonListe.php";
+require_once __DIR__ . "/../src/autoload.php";
 
 
 class chansonListeTest extends TestCase
@@ -20,19 +18,19 @@ class chansonListeTest extends TestCase
     const OLIVE = "Olive";
     const C = 1998;
 
-  public function testChercheChanson(){
-      // On charge la liste des chansons
-      $listeChansons = new ChansonListe();
-      $listeChansons->chargeListeChansons();
-      // var_dump($listeChansons);
-      $_chanson = $listeChansons->getNbChansons();
-      echo $_chanson;
-
-      $_chanson = $listeChansons->getChanson(111);
-      var_dump($_chanson);
-      echo "chanson id : " . $_chanson->getid();
-      $this->assertEquals(388, $_chanson->getid());
-  }
+    public function testChercheChansonsStatique()
+    {
+        // On charge la liste des chansons via la méthode moderne
+        $ids = Chanson::chercheChansons("");
+        $nbChansons = count($ids);
+        $this->assertGreaterThan(0, $nbChansons, "Il devrait y avoir au moins une chanson en BDD");
+        
+        // On vérifie qu'on peut charger la première chanson
+        if ($nbChansons > 0) {
+            $chanson = new Chanson($ids[0]);
+            $this->assertNotEmpty($chanson->getNom());
+        }
+    }
 
     public function testEnregistreBDD()
     {

@@ -275,7 +275,7 @@ if ($_SESSION['vue'] == 'cartes') {
             $contenuHtml .= TblCellule(" ");
         }
         
-        $nomImage = imageTableId(CHANSON, $_id);
+        $nomImage = Document::imageTableId(CHANSON, $_id);
         $imagePochette = affichePochette($nomImage, $_id, 48, 48);
         $contenuHtml .= TblCellule(ancre("$chansonVoir?id=$_id", $imagePochette));
         $contenuHtml .= TblCellule(ancre("$chansonVoir?id=$_id", entreBalise(limiteLongueur($_chanson->getNom(), 21), "EM"), -1, -1, $_chanson->getNom()));
@@ -300,7 +300,7 @@ if ($_SESSION['vue'] == 'cartes') {
 
         if ($largeur_ecran > 700) {
             $contenuHtml .= TblCellule(dateMysqlVersTexte($_chanson->getDatePub()));
-            $nomAuteur = chercheUtilisateur($_chanson->getIdUser());
+            $nomAuteur = Utilisateur::chercheUtilisateur($_chanson->getIdUser());
             $contenuHtml .= celluleFiltrable($nomAuteur[3], "contributeur", $_chanson->getIdUser(), CENTRER);
             $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite");
         }

@@ -17,6 +17,12 @@ if (!isset ($FichierUtilsSi)) {
     // Déclaration des variables globales
     $FichierUtilsSi = 1;
 
+    // --- DÉFINITION DES PRIVILÈGES (Centralisé) ---
+    $GLOBALS["PRIVILEGE_INVITE"] = 0;
+    $GLOBALS["PRIVILEGE_MEMBRE"] = 1;
+    $GLOBALS["PRIVILEGE_EDITEUR"] = 2;
+    $GLOBALS["PRIVILEGE_ADMIN"] = 3;
+
     // Inclusion des différentes librairies
     require_once("FichierIni.php");
     require_once("compteur.php");

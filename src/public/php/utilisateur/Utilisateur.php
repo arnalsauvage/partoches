@@ -4,12 +4,6 @@
  * Gère les profils, les connexions et les privilèges.
  */
 
-$nomTableUtilisateur = "utilisateur";
-$GLOBALS["PRIVILEGE_INVITE"] = 0;
-$GLOBALS["PRIVILEGE_MEMBRE"] = 1;
-$GLOBALS["PRIVILEGE_EDITEUR"] = 2;
-$GLOBALS["PRIVILEGE_ADMIN"] = 3;
-
 require_once dirname(__DIR__, 3) . "/autoload.php";
 
 if (!class_exists('Utilisateur')) {

@@ -137,7 +137,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
     $idChansonDoc = $ligneDoc[6] ?? 0;
     $vignetteChanson = "";
     if ($idChansonDoc > 0) {
-        $vignetteChanson = image(C_RACINE . $_DOSSIER_CHANSONS . $idChansonDoc . "/" . rawurlencode(imageTableId(CHANSON, $idChansonDoc)), 128, 128, CHANSON);
+        $vignetteChanson = image(C_RACINE . $_DOSSIER_CHANSONS . $idChansonDoc . "/" . rawurlencode(Document::imageTableId(CHANSON, $idChansonDoc)), 128, 128, CHANSON);
     }
 
     $lienChanson = "";

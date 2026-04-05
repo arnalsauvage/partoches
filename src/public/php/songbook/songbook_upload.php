@@ -54,8 +54,8 @@ $name_file = renommeFichierChanson($path); // on crée un nom compatible url
 //$name_file = urlencode($name_file);
 
 // On enregistre notre nom de fichier en BDD, on récupère un n°de version
-creeModifieDocument($name_file, $_FILES ['fichierUploade'] ['size'], "songbook", $_POST ['id']);
-$doc = chercheDocumentNomTableId($name_file, "songbook", $_POST ['id']);
+Document::creeModifieDocument($name_file, $_FILES ['fichierUploade'] ['size'], "songbook", $_POST ['id']);
+$doc = Document::chercheDocumentNomTableId($name_file, "songbook", $_POST ['id']);
 $name_file = str_replace(".$ext", "-v" . ($doc [4]), $path) . ".$ext";
 
 // Si le formulaire est validé, on copie le fichier dans le dossier de destination

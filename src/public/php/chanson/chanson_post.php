@@ -8,9 +8,7 @@ const SUPPR = "SUPPR";
 const REGEN_THUMBS = "REGEN_THUMBS";
 const CHANSON = "chanson";
 $nomTable = CHANSON;
-require_once __DIR__ . "/../utilisateur/Utilisateur.php";
-require_once __DIR__ . "/../chanson/Chanson.php";
-require_once __DIR__ . "/../document/Document.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
 require_once __DIR__ . "/../lib/utilssi.php";
 
 // ecritFichierLog("ajaxlog.htm", "entrée dans chanson_post");
@@ -55,7 +53,7 @@ function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest): void
         file_put_contents ($cheminFichier, $file);
         // On met à jour en base de données
         $size = filesize($cheminFichier);
-        $version = creeModifieDocument($nomFichier, $size, "chanson", $id);
+        $version = Document::creeModifieDocument($nomFichier, $size, "chanson", $id);
         // Il faut renommer le doc en lui accolant son numéro de version
         rename($repertoire . $nomFichier, $repertoire . composeNomVersion($nomFichier, $version));
     }
@@ -168,7 +166,7 @@ if ($mode == "MAJ_SONGBPM") {
 
 //  5 - gestion des docs de la chanson
 if ($mode == "SUPPRDOC" && $_SESSION [PRIVILEGE] > 1) {
-    supprimeDocument($_GET ['idDoc']);
+    Document::supprimeDocument($_GET ['idDoc']);
 }
 
 if ($mode == RENDOC && $_SESSION [PRIVILEGE] > 1) {
@@ -206,7 +204,7 @@ if ($mode == SUPPRFIC  && $_SESSION [PRIVILEGE] > 1) {
 if ($mode == RESTAUREDOC) {
     $repertoire = $_DOSSIER_CHANSONS . $_POST ['id'] . "/";
     $size = filesize($repertoire . $_POST [NOM_FIC]);
-    $version = creeModifieDocument($_POST [NOM_FIC], $size, $nomTable, $id);
+    $version = Document::creeModifieDocument($_POST [NOM_FIC], $size, $nomTable, $id);
     rename($repertoire . $_POST [NOM_FIC], $repertoire . composeNomVersion($_POST [NOM_FIC], $version));
 }
 

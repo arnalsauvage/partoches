@@ -16,7 +16,7 @@ $sortie = "";
 // au début et à la fin du fichier actuel.
 
 if (isset ($_GET ['id']) && $_GET ['id'] != "") {
-    $donnee = chercheUtilisateur($_GET ['id']);
+    $donnee = Utilisateur::chercheUtilisateur($_GET ['id']);
     if (($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) || $_SESSION ['user'] == $donnee [1]) {
         $mode = "MAJ";
         $donnee [2] = Chiffrement::decrypt($donnee [2]);

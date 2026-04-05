@@ -431,10 +431,10 @@ class Chanson
     {
         $maRequete = "DELETE FROM chanson WHERE id='" . $this->getId() . "'";
         $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème #1 dans supprimeChanson : " . $_SESSION [self::MYSQL]->error);
-        $result = chercheDocumentsTableId("chanson", $this->getId());
+        $result = Document::chercheDocumentsTableId("chanson", $this->getId());
         while ($ligne = $result->fetch_row()) {
             $id = $ligne [0];
-            supprimeDocument($id);
+            Document::supprimeDocument($id);
         }
     }
 
@@ -731,7 +731,7 @@ public static function getTonaliteEquivalents(string $tonalite): array
     public function afficheCarteChanson(): string
     {
         $_id = $this->getId();
-        $nomImage = imageTableId("chanson", $_id);
+        $nomImage = Document::imageTableId("chanson", $_id);
         $imagePochette = affichePochette($nomImage, $_id, 200, 200);
         $titre = htmlspecialchars(limiteLongueur($this->getNom(), 25));
         $interpreteFull = $this->getInterprete();

@@ -94,14 +94,13 @@ if ($privilege > $GLOBALS["PRIVILEGE_MEMBRE"]) {
 // 8. Paramétrage (Admin)
 $lienParametrage = "";
 if (($user == $_SESSION['loginParam']) || ($privilege > $GLOBALS["PRIVILEGE_EDITEUR"])) {
-    $lienParametrage = "<li><a href=\"../admin/params.php\">Paramétrage</a></li>";
+    $lienParametrage = "<li><a href=\"../admin/params.php\" title=\"Paramétrage\"><i class=\"glyphicon glyphicon-cog\"></i></a></li>";
 }
 
 // ... GESTION DE L'AVATAR ... (inchangé)
 
 
-// --- GESTION DE L'AVATAR ET DU ROLE ---
-$imageUser = !empty($_SESSION['image']) ? $_SESSION['image'] : "defaut.png";
+// --- GESTION DU ROLE ---
 $statutTexte = Utilisateur::statut($privilege);
 
 $roleIcon = match(true) {
@@ -110,16 +109,6 @@ $roleIcon = match(true) {
     $privilege > $GLOBALS["PRIVILEGE_INVITE"]  => "glyphicon-user",      // Membre
     default                                    => "glyphicon-eye-open"   // Invite / Visiteur
 };
-
-// Utilisation de la vignette moderne via Image.php
-$avatarUrl = Image::getThumbnailUrl($_SESSION['id'] . "/" . $imageUser, 'mini', 'utilisateurs');
-
-if (str_contains($avatarUrl, 'icone_arnal.png')) {
-    // Fallback : On utilise l'icône bonhomme si pas d'image
-    $avatarHtml = "<span class='user-avatar-round' title='$user ($statutTexte)'><i class='glyphicon glyphicon-user'></i></span>";
-} else {
-    $avatarHtml = "<img src='$avatarUrl' class='user-avatar-round' alt='$user' title='$user'>";
-}
 
 // Lien connexion / déconnexion
 $extraHtml = "";
@@ -172,7 +161,6 @@ $userNav = <<<HTML
     <ul class="nav navbar-nav navbar-right">
         <li class="navbar-user-info">
             <span class="glyphicon $roleIcon role-icon" title="$user ($statutTexte)"></span>
-            $avatarHtml
             $authLink
         </li>
     </ul>
@@ -221,8 +209,8 @@ HTML;
 }
 $MENU_HTML = $contenu . $extraHtml;
 
-// On affiche le menu automatiquement par défaut pour assurer la compatibilité
-// et restaurer les styles sur toutes les pages.
-if (!isset($pasDeMenu) || !$pasDeMenu) {
+// On n'affiche le menu AUTOMATIQUEMENT que si $pasDeMenu n'est pas défini.
+// Cela permet aux pages de contrôler l'ordre d'affichage (après envoieHead).
+if (!isset($pasDeMenu) || $pasDeMenu === false) {
     echo $MENU_HTML;
 }
