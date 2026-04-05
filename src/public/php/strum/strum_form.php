@@ -54,35 +54,13 @@ $html = <<<HTML
                     <i class="glyphicon glyphicon-music"></i>
                     $pageTitle
                 </h1>
-                <div style="display:flex; align-items:center;">
-                    <div class="checkbox" style="margin:0 20px 0 0; padding-top: 0;">
-                        <label style="font-weight:bold; color:#e67e22; cursor:pointer; font-size: 14px; display: flex; align-items: center; padding-left: 0;">
-                            <input type="checkbox" id="swing" $swingChecked style="position: relative; margin: 0 12px 0 0; width: 18px; height: 18px;"> MODE SWING 🎷
-                        </label>
-                    </div>
-                    <button id="btnAide" class="btn btn-link" title="Aide au formatage" style="color: #D2B48C; font-size: 24px; padding: 0;">
-                        <i class="glyphicon glyphicon-question-sign"></i>
-                    </button>
-                </div>
+                <button id="btnAide" class="btn btn-link" title="Aide au formatage" style="color: #D2B48C; font-size: 24px; padding: 0;">
+                    <i class="glyphicon glyphicon-question-sign"></i>
+                </button>
             </header>
 
             <!-- ZONE D'AIDE (MASQUÉE PAR DÉFAUT) -->
-            <div id="aideBox" class="strum-help-box" style="display:none;">
-                <h4 style="margin-top:0; font-weight:bold; color:#2b1d1a;">Guide de saisie des rythmiques</h4>
-                <p>
-                    <strong>Symboles :</strong><br>
-                    - <code>B</code> ou <code>H</code> : Coup Bas ou Haut (accentué)<br>
-                    - <code>b</code> ou <code>h</code> : Coup Bas ou Haut (doux)<br>
-                    - <code>X</code> : Chunk / Etouffé<br>
-                    - <code>-</code> (tiret) : Silence / Temps non joué
-                </p>
-                <p>
-                    <strong>Unité &amp; Longueur :</strong><br>
-                    - Le plus courant : <strong>8 croches</strong> (Unité 8, Longueur 8).<br>
-                    - Double croches : <strong>Unité 16</strong>. Si sur une mesure, longueur 16. Si sur deux mesures, longueur 32.<br>
-                    - Valse (3/4) : Unité 8, Longueur 6.
-                </p>
-            </div>
+            ... [rest of aideBox code] ...
 
             <!-- FORMULAIRE -->
             <div id="editionStrum">
@@ -93,6 +71,13 @@ $html = <<<HTML
                         <div class="form-group">
                             <label for="strum">Motif de la rythmique (Strum) :</label>
                             <input id="strum" type="text" class="form-control input-lg" style="font-family: monospace; letter-spacing: 2px;" placeholder="Ex: B-BH-HBH" value="$strumPattern">
+                            
+                            <!-- SWING OPTION INTEGRATED -->
+                            <div class="checkbox" style="margin-top: 10px;">
+                                <label style="font-weight:bold; color:#e67e22; cursor:pointer; font-size: 15px; display: flex; align-items: center; padding-left: 0;">
+                                    <input type="checkbox" id="swing" $swingChecked style="position: relative; margin: 0 12px 0 0; width: 20px; height: 20px;"> 🎷 CE RYTHME EST "SWING" (TERNAIRE)
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-6">
