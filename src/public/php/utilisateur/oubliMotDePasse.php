@@ -1,6 +1,5 @@
 <?php
-include_once __DIR__ . "/../lib/utilssi.php";
-include_once "Utilisateur.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
 
 // Initialisation
 $nomEmail = $_SESSION['nomEmailOubliMotDePasse'] ?? '';

@@ -1,8 +1,5 @@
 <?php
-include_once "../chanson/Chanson.php";
-include_once "../document/Document.php";
-include_once "../lib/configMysql.php";
-include_once("../lib/utilssi.php");
+require_once dirname(__DIR__, 3) . "/autoload.php";
 
 // Fonctions de gestion de la chanson
 //init_logger();

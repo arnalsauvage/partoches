@@ -278,14 +278,26 @@ HTML;
         
         $out = "<div class='strum-list-container'><div class='list-group'>";
         $nb = 0;
-        while ($l = $liens->fetch_row()) {
+        while ($l = $liens->fetch_assoc()) {
             $nb++;
-            $s = new Strum((int)($l[4] ?? 0));
-            if ($s->getId() == 0 && !empty($l[1])) $s->chercheStrumParChaine($l[1]);
+            $idStrum = (int)($l['idStrum'] ?? 0);
+            $s = new Strum($idStrum);
+            
+            // Si le strum n'est pas trouvé par son ID, on tente par sa chaîne
+            if ($s->getId() == 0 && !empty($l['strum'])) {
+                $s->chercheStrumParChaine($l['strum']);
+            }
+            
+            // Si toujours rien, on crée un strum "fantôme" pour afficher au moins le motif stocké dans le lien
+            if ($s->getId() == 0 && !empty($l['strum'])) {
+                $s->setStrum($l['strum']);
+                $s->setDescription("Rythmique personnalisée");
+            }
             
             $motif = str_replace(" ", "-", $s->getStrum());
             $badgeSwing = $s->getSwing() ? "<span class='label label-warning'>SWING</span>" : "";
-            $actionDel = "../liens/lienStrumChanson_post.php?id={$l[0]}&amp;mode=DEL&amp;idChanson=$id";
+            $idLien = $l['id'];
+            $actionDel = "../liens/lienStrumChanson_post.php?id=$idLien&amp;mode=DEL&amp;idChanson=$id";
 
             $out .= <<<HTML
             <div class="list-group-item" style="display:flex; justify-content:space-between; align-items:center;">

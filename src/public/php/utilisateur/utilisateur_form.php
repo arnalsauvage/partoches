@@ -3,11 +3,9 @@
  * Formulaire Utilisateur
  */
 
-require_once __DIR__ . "/../lib/utilssi.php";
-require_once __DIR__ . "/../document/Document.php";
-require_once __DIR__ . "/../lib/Image.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
 $pasDeMenu = true;
-require_once __DIR__ . "/../navigation/menu.php";
+require_once PHP_DIR . "/navigation/menu.php";
 
 $mode = "";
 $table = "utilisateur";

@@ -1,26 +1,35 @@
 <?php
 /**
  * Autoloader personnalisé (Django Style)
- * Version All-In-One : Tout est regroupé dans src/
+ * Centralisation des chemins absolus
  */
 
-// --- INITIALISATION DES CONSTANTES GLOBALES ---
-// Le dossier où se trouve l'autoloader (src/)
-$baseAppDir = __DIR__;
-
-// Définit la constante PHP_DIR (pointant vers src/public/php)
+// --- INITIALISATION DES CHEMINS ABSOLUS ---
+//ROOT_DIR pointe vers le dossier src/
+if (!defined('ROOT_DIR')) {
+    define('ROOT_DIR', __DIR__);
+}
+if (!defined('DATA_DIR')) {
+    define('DATA_DIR', ROOT_DIR . '/data');
+}
+if (!defined('CONF_DIR')) {
+    define('CONF_DIR', DATA_DIR . '/conf');
+}
 if (!defined('PHP_DIR')) {
-    define('PHP_DIR', $baseAppDir . '/public/php');
+    define('PHP_DIR', ROOT_DIR . '/public/php');
+}
+if (!defined('LIB_DIR')) {
+    define('LIB_DIR', PHP_DIR . '/lib');
 }
 
 // --- INITIALISATION DE L'ENVIRONNEMENT ---
-// On inclut utilssi.php qui gère session_start(), la connexion MySQL, etc.
-require_once PHP_DIR . '/lib/utilssi.php';
+// On n'inclut utilssi que si nécessaire (évite les conflits en mode PHPUnit)
+if (!isset($FichierUtilsSi) && file_exists(LIB_DIR . '/utilssi.php')) {
+    require_once LIB_DIR . '/utilssi.php';
+}
 
 // --- ENREGISTREMENT DE L'AUTOLOADER ---
 spl_autoload_register(function ($class) {
-    $baseAppDir = __DIR__;
-    
     // Liste des dossiers où tes classes PHP sont rangées
     $subDirs = [
         'chanson', 'document', 'lib', 'liens', 'media', 'navigation', 
@@ -28,7 +37,7 @@ spl_autoload_register(function ($class) {
     ];
 
     foreach ($subDirs as $dir) {
-        $file = $baseAppDir . '/public/php/' . $dir . '/' . $class . '.php';
+        $file = PHP_DIR . '/' . $dir . '/' . $class . '.php';
         
         if (file_exists($file)) {
             require_once $file;
@@ -37,7 +46,7 @@ spl_autoload_register(function ($class) {
     }
     
     // Cas particulier : si la classe est au niveau supérieur dans php/
-    $fallbackFile = $baseAppDir . '/public/php/' . $class . '.php';
+    $fallbackFile = PHP_DIR . '/' . $class . '.php';
     if (file_exists($fallbackFile)) {
         require_once $fallbackFile;
     }

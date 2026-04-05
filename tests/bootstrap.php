@@ -1,11 +1,18 @@
 <?php
 /**
- * Bootstrap pour les tests PHPUnit
+ * Bootstrap pour les tests PHPUnit (Django Style)
  * Version All-In-One (src/)
  */
 
 // On définit que PHPUnit tourne
-define('PHPUNIT_RUNNING', true);
+if (!defined('PHPUNIT_RUNNING')) {
+    define('PHPUNIT_RUNNING', true);
+}
+
+// On force la session AVANT toute inclusion (pour PHPUnit)
+if (session_status() === PHP_SESSION_NONE) {
+    @session_start();
+}
 
 // On charge l'autoloader maison (Django Style)
 require_once __DIR__ . '/../src/autoload.php';
@@ -19,11 +26,3 @@ $_ENV['DATABASE_HOST'] = 'db';
 $_ENV['DATABASE_USER'] = 'root';
 $_ENV['DATABASE_PASSWORD'] = 'root';
 $_ENV['DATABASE_NAME'] = 'dbPartoches';
-
-// On force la session pour les tests
-if (session_status() === PHP_SESSION_NONE) {
-    @session_start();
-}
-
-// On charge utilssi pour avoir les fonctions globales
-require_once __DIR__ . '/../src/public/php/lib/utilssi.php';

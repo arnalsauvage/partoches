@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . "/../lib/utilssi.php";
-require_once __DIR__ . "/../utilisateur/Utilisateur.php";
-require_once __DIR__ . "/../lib/Image.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
 
 /**
  * Gère l'affichage du menu supérieur et l'état de la session utilisateur.
@@ -190,7 +188,7 @@ $contenu .= <<<HTML
             </button>
             <a class="navbar-brand navbar-brand-flex" href="../media/listeMedias.php">
                 <span class="site-title-nav">$titreSite</span>
-                <img src="../../images/navigation/$logoSite" height="40" class="logo" alt="logo">
+                <img src="../../images/navigation/$logoSite" class="logo-nav" alt="logo">
             </a>
         </div>
         <div id="main-menu" class="collapse navbar-collapse">

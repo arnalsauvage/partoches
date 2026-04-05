@@ -1,7 +1,9 @@
 <?php
 use PHPUnit\Framework\TestCase;
 // require_once 'PHPUnit/Autoload.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
 require_once __DIR__ . "/../src/public/php/strum/Strum.php";
 

@@ -1,12 +1,12 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
 
-// Constante pour le dossier des chansons (à adapter si nécessaire)
-// Supposons que $_DOSSIER_CHANSONS soit défini ailleurs ou ici directement.
-// Pour l'exemple, nous allons le définir ici.
-define('_DOSSIER_CHANSONS', 'data/chansons/'); // Chemin relatif depuis la racine du projet
+// --- INITIALISATION (Django Style) ---
+// On remonte 3 niveaux pour trouver l'autoloader : api -> php -> public -> src/autoload.php
+require_once dirname(__DIR__, 3) . '/autoload.php';
 
 try {
+    global $_DOSSIER_CHANSONS;
     $idChanson = $_GET['id'] ?? null;
 
     if (empty($idChanson) || !is_numeric($idChanson)) {
@@ -15,7 +15,8 @@ try {
         exit;
     }
 
-    $chansonDir = __DIR__ . '/../../' . _DOSSIER_CHANSONS . $idChanson . '/';
+    // On utilise le chemin global absolu défini dans params.php (inclus via autoload)
+    $chansonDir = $_DOSSIER_CHANSONS . $idChanson . '/';
     $covers = [];
 
     // Vérifier si le répertoire existe et est lisible
@@ -30,14 +31,10 @@ try {
 
             $extension = pathinfo($file, PATHINFO_EXTENSION);
             if (in_array(strtolower($extension), $allowedExtensions)) {
-                // Construire l'URL relative depuis la racine web
-                $covers[] = '/' . _DOSSIER_CHANSONS . $idChanson . '/' . $file;
+                // Pour le navigateur, on garde un chemin relatif à la racine du domaine
+                $covers[] = "./data/chansons/" . $idChanson . '/' . $file;
             }
         }
-    } else {
-        // Optionnel: retourner un message si le dossier n'existe pas ou n'est pas accessible
-        // echo json_encode(['error' => 'No directory found for this song ID or not readable.']);
-        // exit;
     }
 
     echo json_encode(['local_covers' => $covers]);

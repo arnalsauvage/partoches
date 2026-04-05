@@ -1,7 +1,6 @@
 <?php
-require_once __DIR__ . "/../lib/utilssi.php";
-require_once __DIR__ . "/../navigation/menu.php";
-require_once __DIR__ . "/../utilisateur/Utilisateur.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once PHP_DIR . "/navigation/menu.php";
 
 $nomTable = "utilisateur";
 $utilisateurListe = "utilisateur_liste.php";

@@ -10,13 +10,8 @@ const CHERCHE = 'cherche';
 const CENTRER = "centrer";
 const VAL_FILTRE = "valFiltre";
 const FILTRE = "filtre";
-require_once dirname(__DIR__) . "/lib/utilssi.php";
-require_once __DIR__ . "/../lib/Pagination.php";
-require_once "Chanson.php";
-require_once __DIR__ . "/../document/Document.php";
-$pasDeMenu = true;
-require_once __DIR__ . "/../navigation/menu.php";
-require_once __DIR__ . "/../note/UtilisateurNote.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once PHP_DIR . "/navigation/menu.php";
 
 $chansonForm = "chanson_form.php";
 $chansonPost = "chanson_post.php";

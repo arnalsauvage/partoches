@@ -26,7 +26,7 @@ $_chanson = new Chanson();
 
 function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest): void
 {
-    $repertoire = "../" . $dossierDest . $id . "/";
+    $repertoire = $dossierDest . $id . "/";
     $file = file_get_contents($monUrl);
     $cheminFichier = "vide";
     $nomFichier = simplifieNomFichier($nomFichier);
@@ -59,18 +59,11 @@ function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest): void
         // Il faut renommer le doc en lui accolant son numéro de version
         rename($repertoire . $nomFichier, $repertoire . composeNomVersion($nomFichier, $version));
     }
-/*
-    echo "téléchargement de $monUrl<br>";
-    echo " contenu : $file <br>";
-    echo "vers fichier : $cheminFichier";
-    exit();
-*/
 }
 
 if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
     $id = $_GET ['id'];
     $mode = $_GET ['mode'];
-    //echo "On est en get <br> " ;
 }
 
 // Appel ajax RENDOC
@@ -79,7 +72,6 @@ if (isset ($_POST ['idDoc']) && is_numeric($_POST ['idDoc'])) {
 }
 
 if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
-    //echo "On est en post !!!  \n\n\n ";
     $id = $_POST ['id'];
     $fnom = $_POST ['fnom'];
     $finterprete = $_POST ['finterprete'];
@@ -95,7 +87,7 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     if (isset($_POST ['fidUser'])) {
         $fidUser = $_POST ['fidUser'];
     }
-    $fdate = $_POST['fdate'];
+    $fdate = $_POST['fdate'] ?? date("Y-m-d");
     // NOUVEAU : Convertir la date du formulaire au format MySQL
     $fdate = dateTexteVersMysql($fdate);
     // NOUVEAU : Récupérer le champ cover
@@ -103,10 +95,6 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     // NOUVEAU : Récupérer le champ publication
     $fpublication = isset($_POST['fpublication']) ? 1 : 0;
 }
-
-$chaine = "Mode  : " . $mode;
-//ecritFichierLog("ajaxlog.htm", $chaine);
-
 
 // On gère 5 cas :
 //  1- création d'une chanson,
@@ -117,7 +105,6 @@ $chaine = "Mode  : " . $mode;
 
 //  1- création d'une chanson,
 if ($mode == "INS") {
-    // echo "FHits = " . $fhits;
     $fhits = 0;
     $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
     // NOUVEAU : Définir la cover après la construction de l'objet
@@ -125,9 +112,11 @@ if ($mode == "INS") {
     // NOUVEAU : Définir la publication
     $_chanson->setPublication($fpublication);
     $id = $_chanson->creeChansonBDD();
-    $repertoire = "../". $_DOSSIER_CHANSONS . $id . "/";
+    
+    // Suppression du "../" car $_DOSSIER_CHANSONS est déjà absolu
+    $repertoire = $_DOSSIER_CHANSONS . $id . "/";
     if (!file_exists($repertoire)) {
-        mkdir($repertoire, 0755);
+        mkdir($repertoire, 0755, true);
         echo " -=> Création du repertoire $repertoire réussi<br>";
     }
 }
@@ -151,7 +140,6 @@ if ($mode == "MAJ") {
 actualiseMedias();
 
 //  3 - suppression chanson
-// Gestion de la demande de suppression
 if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
     $_chanson = new Chanson($id);
     $_chanson->supprimeChansonBddFile();
@@ -160,7 +148,6 @@ if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR
 
 //  4 - MAJ des infos depuis une API
 if ($mode == "MAJ_SONGBPM") {
-    // On doit recharger les hits, le user et la date pour qu'ils ne soient remis à zéro
     $_chanson->chercheChanson($id);
     $fhits = $_chanson->getHits();
     $fidUser = $_chanson->getIdUser();
@@ -175,28 +162,21 @@ if ($mode == "MAJ_SONGBPM") {
     $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
     $_chanson->creeModifieChansonBDD();
     $fimage = $_GET ['image'];
-    echo "télécharge fichier" . $fnom . "-" . $finterprete . " depuis url " .$fimage;
+    echo "télécharge fichier " . $fnom . "-" . $finterprete . " depuis url " . $fimage;
     telechargeImageFromUrl($fimage, $fnom . "-" . $finterprete , $id, $_DOSSIER_CHANSONS);
 }
 
 //  5 - gestion des docs de la chanson
-// Gestion de la demande de suppression de document dans la chanson
 if ($mode == "SUPPRDOC" && $_SESSION [PRIVILEGE] > 1) {
-    // 	echo "Appel avec mode = $mode, id = $id, idDoc = " . $_GET ['idDoc'] . " idSongbook = " . $_GET ['idSongbook'];
     supprimeDocument($_GET ['idDoc']);
 }
 
-// Gestion de la demande de renommage de document dans la chanson
 if ($mode == RENDOC && $_SESSION [PRIVILEGE] > 1) {
-//    $log =  "Appel avec idDoc = " . $_POST ['idDoc'] . " nomDoc = " . $_POST ['nomDoc'];
-//    ecritFichierLog("ajaxlog.htm", $log);
     $retour = renommeDocument($_POST ['idDoc'], $_POST ['nomDoc']);
     if ($retour == 1) {
         echo "Tout s'est bien passé";
     } else {
-        {
-            echo "La demande n'a pas été traitée... Erreur " . $retour;
-        }
+        echo "La demande n'a pas été traitée... Erreur " . $retour;
     }
 }
 
@@ -211,7 +191,6 @@ if ($mode == REGEN_THUMBS) {
         $ext = strtolower(pathinfo($nomDoc, PATHINFO_EXTENSION));
         if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
             $relPath = $id . "/" . Document::composeNomVersion($nomDoc, $version);
-            // On force la régénération des deux tailles
             Image::getThumbnailUrl($relPath, 'mini', 'chansons', true);
             Image::getThumbnailUrl($relPath, 'sd', 'chansons', true);
             $count++;
@@ -220,30 +199,31 @@ if ($mode == REGEN_THUMBS) {
     redirection("chanson_form.php?id=$id&msg=OK_REGEN&count=$count");
 }
 
-// Gestion de la demande de suppression de fichier dans la chanson
 if ($mode == SUPPRFIC  && $_SESSION [PRIVILEGE] > 1) {
-    // echo "Appel avec mode = $mode, id = $id, nomFic = " . $_GET ['nomFic'];
     unlink($_GET[NOM_FIC]);
 }
 
 if ($mode == RESTAUREDOC) {
-
-    $repertoire = "../".$_DOSSIER_CHANSONS . $_POST ['id'] . "/";
+    $repertoire = $_DOSSIER_CHANSONS . $_POST ['id'] . "/";
     $size = filesize($repertoire . $_POST [NOM_FIC]);
     $version = creeModifieDocument($_POST [NOM_FIC], $size, $nomTable, $id);
-    // Il faut renommer le doc en lui accolant son numéro de version
     rename($repertoire . $_POST [NOM_FIC], $repertoire . composeNomVersion($_POST [NOM_FIC], $version));
 }
-    resetMediasPartoches(99);
+
+// On actualise l'index des médias
+resetMediasPartoches(99);
 
 // On fait une redirection dans tous les cas, sauf la demande de restauration d'un fichier - appel ajax
 if ($mode != RESTAUREDOC && $mode !=  RENDOC ) {
     redirection($nomTable . "_form.php?id=$id");
 }
 
-function resetMediasPartoches($nombreMedias): void
+/**
+ * Réinitialise l'index des médias (SOLID)
+ */
+function resetMediasPartoches(int $nombreMedias): void
 {
-    require_once __DIR__ . "/../media/Media.php";
-    $medias = new Media();
-    $medias->resetAvecDernieresPartoches($nombreMedias);
+    // Utilisation du Service au lieu du POPO
+    require_once __DIR__ . "/../media/MediaService.php";
+    MediaService::resetMediasDistribues($nombreMedias);
 }

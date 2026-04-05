@@ -12,7 +12,6 @@ const LIENS_LIEN_STRUM_CHANSON_POST_PHP = RETOUR_RACINE . "liens/lienStrumChanso
 const CHEMIN_SONGBOOK_FORM = RETOUR_RACINE . "/songbook/songbook_form.php";
 const JS_CHANSON_FORM_JS = RETOUR_RACINE . RETOUR_RACINE . "js/chansonForm.js?v=25.3.28";
 
-const DIV = "</div>";
 require_once dirname(__DIR__, 3) . "/autoload.php";
 require_once __DIR__ . "/../lib/utilssi.php";
 require_once __DIR__ . "/../utilisateur/Utilisateur.php";
@@ -23,26 +22,21 @@ global $iconePoubelle;
 global $cheminImages;
 global $_DOSSIER_CHANSONS;
 
-$listeSongbooks = [];
 $listeSongbooks = Songbook::listeSongbooks();
 
-// Si l'utilisateur n'est pas authentifié (compte invité) ou n'a pas le droit de modif, on le redirige vers la page _voir
+// Sécurité : Vérification des droits
 if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_EDITEUR"]) {
     $urlRedirection = $table . "_voir.php";
-    if (isset ($_GET ['id']) && is_numeric($_GET ['id']))
-    {
+    if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
         $urlRedirection .= "?id=" . $_GET ['id'];
     }
     redirection($urlRedirection);
 }
 
-// $id, $nom, $interprete, $année, $idUser, $tempo =0, $mesure = "4/4", $pulsation = "binaire", $hits = 0
 $_chanson = new Chanson();
-
 $id = 0;
 
-if (isset ($_POST ['id']))
-{
+if (isset ($_POST ['id'])) {
     $id = intval($_POST ['id']);
 }
 
@@ -58,397 +52,273 @@ if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
 $titrePage = ($mode == "MAJ") ? "Mise à jour - " . $_chanson->getNom() : "Création chanson (Expérimental)";
 
 // --- RENDU HTML ---
-$headHtml = envoieHead($titrePage, "../../css/chansonform.css?v=" . date('His'));
+// Suppression du vieux CSS chansonform.css qui causait des conflits
+$headHtml = envoieHead($titrePage, ""); 
 $pasDeMenu = true;
 require_once "../navigation/menu.php";
 
 $sortie .= "
-<div class='container sb-form-container' style='padding-top: 70px;'>
-  <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;'>
-";
+<div class='container' id='django-config-page' style='padding-top: 20px;'>
+    <div class='header-django'>
+        <h1><i class='glyphicon glyphicon-music'></i> " . ($mode == "MAJ" ? "Mise à jour chanson" : "Nouvelle partition") . "</h1>
+        <div class='actions'>
+            <a href='chanson_liste.php' class='btn-dj btn-dj-default'><i class='glyphicon glyphicon-list'></i> Retour liste</a>
+        </div>
+    </div>
 
+    <div class='content-django' style='border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);'>
+        <div id='tabs-1'>
+            <form id='chanson-form' method='POST' action='". CHANSON_POST_PHP ."' name='Form' class='form-dj-reset' style='background: transparent !important; border: none !important;'>
+                <input type='hidden' name='id' value='" . $_chanson->getId() . "'>
+                
+                <div class='row'>
+                    <div class='col-md-8'>
+                        <div class='form-group-django'>
+                            <label class='label-django'>Titre de la chanson :</label>
+                            <input class='input-django' type='text' id='fnom' name='fnom' value='" . htmlspecialchars($_chanson->getNom(), ENT_QUOTES) . "' size='64' maxlength='128' placeholder='Titre de la chanson' required>
+                        </div>
 
-if ($mode == "MAJ"){
-    $sortie .= sprintf("<H1 style='margin: 0;'> Mise à jour - %s</H1>", $table);
-}
-if ($mode == "INS"){
-    $sortie .= sprintf("<H1 style='margin: 0;'> Création - %s</H1>", $table);
-    $id = 0;
-}
+                        <div class='form-group-django'>
+                            <label class='label-django'>Interprète / Artiste :</label>
+                            <input class='input-django' type='text' id='finterprete' name='finterprete' value='" . htmlspecialchars($_chanson->getInterprete(), ENT_QUOTES) . "' size='64' placeholder='Interprète'>
+                        </div>
 
-$sortie .= "</div>";
+                        <div class='row'>
+                            <div class='col-sm-6'>
+                                <div class='form-group-django'>
+                                    <label class='label-django'>Année de sortie :</label>
+                                    <div class='input-group-django'>
+                                        <input class='input-django' type='number' min='0' max='2100' name='fannee' id='fannee' value='" . $_chanson->getAnnee() . "' data-db-year='" . $_chanson->getAnnee() . "'>
+                                        <span id='yearValidationDot' class='dot' style='width: 12px; height: 12px; border-radius: 50%; display: inline-block; position: absolute; right: 10px; top: 12px; border: 1px solid #ccc;'></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='col-sm-6'>
+                                <div class='form-group-django'>
+                                    <label class='label-django'>Tonalité :</label>
+                                    <input id='input-tonalite' class='input-django' type='text' name='ftonalite' value='" . $_chanson->getTonalite() . "' placeholder='ex: Am, C, F#m'>
+                                </div>
+                            </div>
+                        </div>
 
-// --- Début du premier onglet : Chanson ---
+                        <div class='row'>
+                            <div class='col-sm-6'>
+                                <div class='form-group-django'>
+                                    <label class='label-django'>Tempo (BPM) : <span id='tempo-val' style='font-weight: bold; color: var(--c-accent);'>" . $_chanson->getTempo() . "</span></label>
+                                    <input type='range' id='fader' min='30' max='250' step='1' oninput='document.getElementById(\"tempo-val\").innerHTML = value' name='ftempo' value='" . $_chanson->getTempo() . "' style='width: 100%; margin: 10px 0;'>
+                                </div>
+                            </div>
+                            <div class='col-sm-6'>
+                                <div class='form-group-django'>
+                                    <label class='label-django'>Mesure :</label>
+                                    <input id='input-mesure' class='input-django' type='text' name='fmesure' value='" . $_chanson->getMesure() . "' placeholder='4/4'>
+                                </div>
+                            </div>
+                        </div>
 
-// Ce formulaire ne contient pour l'instant que les champs du premier onglet.
-// Les informations externes (BPM, Année, Visuel) seront ajoutées via des appels API.
+                        <div class='row'>
+                            <div class='col-sm-6'>
+                                <div class='form-group-django'>
+                                    <label class='label-django'>Pulsation :</label>
+                                    <select id='select-pulsation' class='input-django' name='fpulsation'>
+                                        <option value='binaire'" . ($_chanson->getPulsation() == "binaire" ? " selected" : "") . ">Binaire</option>
+                                        <option value='ternaire'" . ($_chanson->getPulsation() == "ternaire" ? " selected" : "") . ">Ternaire</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class='col-sm-6'>
+                                <div class='form-group-django'>
+                                    <label class='label-django'>Date publication :</label>
+                                    <input id='input-date-pub' class='input-django' type='text' name='fdate' value='" . dateMysqlVersTexte($_chanson->getDatePub()) . "'>
+                                </div>
+                            </div>
+                        </div>
 
-$sortie .= "
-    <div id='tabs-1' class='col-lg-12 centrer'>
-        <FORM id='chanson-form' METHOD='POST' ACTION='". CHANSON_POST_PHP ."' name='Form'>
-            <input type=HIDDEN name='id' VALUE='" . $_chanson->getId() . "'>
-            
-            <div class = 'row'>
-                <label class='inline col-sm-3'>Nom :</label><input class= 'col-sm-7' type='text' id='fnom' name='fnom' VALUE='" . htmlspecialchars($_chanson->getNom(), ENT_QUOTES) . "' SIZE='64' MAXLENGTH='128' placeholder='titre de la chanson'><br>
-            </div>
-            <div class = 'row'>
-                <label class='inline col-sm-3'>Interprète :</label><input class = 'col-sm-7' type='text' id='finterprete' name='finterprete' VALUE='" . htmlspecialchars($_chanson->getInterprete(), ENT_QUOTES) . "' SIZE='64'  placeholder='interprète'><br>
-            </div>
-            <div class = 'row'>
-                <label class='inline col-sm-3'>Année de sortie:</label><input class= 'col-sm-7' type='number' min='0' max='2100' name='fannee' id='fannee' VALUE='" . $_chanson->getAnnee() . "' data-db-year='" . $_chanson->getAnnee() . "'>
-                <span id='yearValidationDot' class='ml-2 dot' style='width: 10px; height: 10px; border-radius: 50%; display: inline-block; vertical-align: middle;'></span>
-                ";
-// --- Placeholder pour l'année via Discogs API ---
-$yearFromDiscogsPlaceholder = "[Année via Discogs API]"; // Ceci est un commentaire, donc pas de changement
-$sortie .= "
-            </div>
-            <script>function outputUpdate(vol) {
-                document.querySelector('#tempo').value = vol;
-            }</script>
-            <div class = 'row'>
-                <label class='inline col-sm-3' for='fader'>Tempo (BPM) :</label>
-                <div class = 'col-sm-5'>
-                    <input  type='range' id='fader' min='30' max='250' step='1' oninput='outputUpdate(value)' name='ftempo' value='" . $_chanson->getTempo() . "' >
-                </div>
-                <output class = 'inline col-sm-2' for='fader' id='tempo'>" . $_chanson->getTempo() . "</output>
-                ";
-
-// Affichage d'un lien de recherche Google pour les admins pour trouver le BPM manuellement
-if ($_SESSION['privilege'] >= $GLOBALS["PRIVILEGE_ADMIN"]) { // Ou PRIVILEGE_EDITEUR si tu veux que les éditeurs y aient accès
-    $googleSearchBaseUrl = "https://www.google.com/search?q=";
-    $searchQuery = urlencode($_chanson->getNom() . " " . $_chanson->getInterprete() . " songbpm tunebat bpm");
-    $googleSearchLink = $googleSearchBaseUrl . $searchQuery;
-
-    $sortie .= "<div class='col-sm-12' style='margin-top: 10px;'>";
-    $sortie .= "<a id='btn-search-bpm-google' href='" . $googleSearchLink . "' target='_blank' class='btn btn-info btn-sm'>";
-    $sortie .= "<span class='glyphicon glyphicon-search' aria-hidden='true'></span> Rechercher BPM sur Google";
-    $sortie .= "</a>";
-    $sortie .= "</div>";
-} else {
-    // Si ce n'est pas un admin, on peut laisser un message ou rien
-    $sortie .= "<div class='col-sm-12' style='margin-top: 10px; font-size: 0.8em; color: #999;'>BPM externe non disponible.</div>";
-}
-
-$sortie .= "
-            </div>
-            <div class = 'row'>
-                <label class='inline col-sm-3'>Mesure :</label>
-                <input id='input-mesure' class= 'col-sm-7' type='text' name='fmesure' VALUE='" . $_chanson->getMesure() . "' SIZE='4' MAXLENGTH='128'>
-            </div>
-            <div class = 'row'>
-                <label class='inline col-sm-3'> Pulsation :</label>
-                <select id='select-pulsation' class= 'col-sm-7' name='fpulsation' >
-                    <option value='binaire'";
-                    if ($_chanson->getPulsation() == "binaire") {
-                        $sortie .= " selected";
-                    }
-                    $sortie .= ">binaire
-                    </option>
-                    <option value='ternaire' ";
-                    if ($_chanson->getPulsation() == "ternaire") {
-                        $sortie .= " selected";
-                    }
-                    $sortie .= ">ternaire</option>
-                </select>";
-
-                $sortie .= "
-            </div>
-            <div class = 'row'>
-                <label class='inline col-sm-3'> Tonalité :</label>
-                <input id='input-tonalite' class= 'col-sm-7' type='text' name='ftonalite' VALUE='" . $_chanson->getTonalite() . "' SIZE='10' placeholder='ex :Am ou C ou F#'>
-            </div>
-            <div class = 'row'>
-                <label class='inline col-sm-3'> Date publication :</label>
-                <input id='input-date-pub' class= 'col-sm-7' type='text' name='fdate' VALUE='" . dateMysqlVersTexte($_chanson->getDatePub()) . "' SIZE='10' MAXLENGTH='128'>
-             </div>
-            <div class = 'row'>
-                <label class='inline col-sm-3'> Hits :</label>
-                <input id='input-hits' class= 'col-sm-7' type='number' name='fhits' VALUE='" . $_chanson->getHits() . "' >
-            </div>
-            <!-- Section de sélection de cover DÉPLACÉE À L'INTÉRIEUR DU FORMULAIRE -->
-            <div class='row mt-3'>
-                <label class='inline col-sm-3'>Visuel (Pochette) :</label>
-                <div class='col-sm-9'>
-
-                    <input type='hidden' name='fcover' id='fcover' value='" . htmlspecialchars($_chanson->getCover() ?? '', ENT_QUOTES) . "'>
-
-                    <div id='selectedCoverPreview' style='margin-bottom: 10px; " . (empty($_chanson->getCover()) ? "display:none;" : "") . "'>
-                        <h4>Cover sélectionnée :</h4>
-                        <img id='currentSelectedCover' src='" . htmlspecialchars($_chanson->getCover() ?? '', ENT_QUOTES) . "' alt='Cover sélectionnée' style='max-width:150px; height:auto; border: 2px solid #007bff; border-radius: 5px;'>
-                        <button type='button' id='clearCoverSelection' class='btn btn-warning btn-sm ml-2'>Effacer la sélection</button>";
-                        // La valeur fcover est déjà dans le input caché.
-                        // On n'a pas besoin de la réinitialiser si elle est déjà dans le hidden input.
-                        // On peut mettre à jour la preview ici si fcover n'est pas vide
-                        if (!empty($_chanson->getCover())) {
-                            $sortie .= "<script>$('#selectedCoverPreview').show(); $('#currentSelectedCover').attr('src', '". htmlspecialchars($_chanson->getCover(), ENT_QUOTES) ."');</script>";
-                        }
-$sortie .= "
-                    </div>
-
-                    <div class='cover-selection-section mt-3'>
-                        <h4>Images locales :</h4>
-                        <div id='localCoversContainer' class='d-flex flex-wrap'>
-                            <p id='noLocalCoversMessage' style='display:none;'>Aucune image locale trouvée.</p>
+                        <div class='row'>
+                            <div class='col-sm-6'>
+                                <div class='form-group-django'>
+                                    <label class='label-django'>Auteur / Propriétaire :</label>
+                                    " . selectUtilisateur("nom", "%", "nom", true, $_chanson->getIdUser(), "fidUser") . "
+                                </div>                            </div>
+                            <div class='col-sm-6'>
+                                <div class='form-group-django'>
+                                    <label class='label-django'>Vues (Hits) :</label>
+                                    <input id='input-hits' class='input-django' type='number' name='fhits' value='" . $_chanson->getHits() . "'>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class='cover-selection-section mt-3'>
-                        <h4>Recherche Discogs :</h4>
-                        <button type='button' id='searchDiscogsCovers' class='btn btn-primary btn-sm mb-2'>
-                            <span class='glyphicon glyphicon-search' aria-hidden='true'></span> Rechercher sur Discogs
-                        </button>
-                        <div id='discogsCoversContainer' class='d-flex flex-wrap'>
-                            <p id='noDiscogsCoversMessage' style='display:none;'>Cliquez sur \"Rechercher sur Discogs\" pour trouver des covers.</p>
+                    <div class='col-md-4'>
+                        <div class='section-dj' style='background: #fdfdfd;'>
+                            <div class='section-dj-title'><i class='glyphicon glyphicon-picture'></i> Visuel (Pochette)</div>
+                            <input type='hidden' name='fcover' id='fcover' value='" . htmlspecialchars($_chanson->getCover() ?? '', ENT_QUOTES) . "'>
+
+                            <div id='selectedCoverPreview' class='text-center mb-15' " . (empty($_chanson->getCover()) ? "style='display:none;'" : "") . ">
+                                <img id='currentSelectedCover' src='" . htmlspecialchars($_chanson->getCover() ?? '', ENT_QUOTES) . "' alt='Cover' style='max-width:100%; height:auto; border: 3px solid var(--c-marron-clair); border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);'>
+                                <div class='mt-5'>
+                                    <button type='button' id='clearCoverSelection' class='btn btn-xs btn-danger'><i class='glyphicon glyphicon-remove'></i> Retirer</button>
+                                </div>
+                            </div>
+
+                            <div class='cover-selection-section'>
+                                <h5 style='font-weight: bold; color: #666;'>Images locales</h5>
+                                <div id='localCoversContainer' style='display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px;'>
+                                    <p id='noLocalCoversMessage' style='display:none; font-size: 0.8em; color: #999;'>Aucune image.</p>
+                                </div>
+
+                                <h5 style='font-weight: bold; color: #666;'>Recherche Discogs</h5>
+                                <button type='button' id='searchDiscogsCovers' class='btn btn-block btn-dj btn-dj-info'><i class='glyphicon glyphicon-refresh'></i> Chercher covers</button>
+                                <div id='discogsCoversContainer' style='display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px;'>
+                                    <p id='noDiscogsCoversMessage' style='font-size: 0.8em; color: #999;'>Aucun résultat.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class='footer-save-dj' style='margin-top: 20px;'>
+                            <input type='hidden' name='mode' value='$mode'>
+                            <button id='btn-valider-chanson' type='submit' name='valider' class='btn btn-block btn-lg btn-dj btn-dj-primary' style='font-weight: bold; font-size: 1.2em;'>
+                                <i class='glyphicon glyphicon-floppy-disk'></i> ENREGISTRER
+                            </button>
                         </div>
                     </div>
-
                 </div>
-            </div>
-            <!-- FIN Section de sélection de cover -->
-
-            <div class = 'row'>
-                <label class='inline col-sm-3'> Utilisateur :</label>"
-                        . selectUtilisateur("nom", "%", "login", true, $_chanson->getIdUser()) . "
-                <input type=hidden name='mode' VALUE='$mode'>
-                <label class='inline'> </label><input id='btn-valider-chanson' type='submit' name='valider' VALUE=' Valider ' >
-            </div>
-    </FORM>
+            </form>
+        </div>
+    </div>
+</div>
 ";
-// On sort l'inclusion du script externe du bloc Heredoc pour que PHP l'interprète
+
 $sortie .= "<script src='" . JS_CHANSON_FORM_JS . "'></script>";
 
-            $sortie .= <<<JAVASCRIPT
-    <script>
-    $(document).ready(function() {
-        // Initialisation des onglets jQuery UI
-        $('#tabs').tabs();
+$sortie .= <<<JAVASCRIPT
+<script>
+$(document).ready(function() {
+    // On surcharge le selectUtilisateur pour lui mettre la classe input-django
+    $('select[name="fidUser"]').addClass('input-django');
 
-        // Initialisation de la puce de validation de l'année
-        let initialDbYear = null;
-        let \$fanneeInput = $('input[name="fannee"]');
-        if (\$fanneeInput.length) { // Vérifier si l'élément input[name="fannee"] existe
-            initialDbYear = \$fanneeInput.data('db-year');
+    // --- Fonctions de gestion des covers (Django Style) ---
+    function selectCover(coverUrl, thumbnailUrl = coverUrl) {
+        $('#fcover').val(coverUrl);
+        $('#currentSelectedCover').attr('src', thumbnailUrl);
+        $('#selectedCoverPreview').show();
+        $('.cover-thumbnail').css({'border': '1px solid #ddd', 'transform': 'scale(1)'});
+        $(`img[data-cover-url="\${coverUrl}"]`).css({'border': '3px solid var(--c-accent)', 'transform': 'scale(1.1)'});
+    }
+
+    $('#clearCoverSelection').on('click', function() {
+        $('#fcover').val('');
+        $('#currentSelectedCover').attr('src', '');
+        $('#selectedCoverPreview').hide();
+        $('.cover-thumbnail').css({'border': '1px solid #ddd', 'transform': 'scale(1)'});
+    });
+
+    function renderCovers(containerId, coversArray, isDiscogs = false) {
+        const \$container = \$(containerId);
+        \$container.empty();
+
+        if (coversArray.length > 0) {
+            $('#no' + containerId.replace('#', '') + 'Message').hide();
+            coversArray.forEach(function(cover) {
+                let imageUrl = isDiscogs ? cover.url : cover;
+                let title = isDiscogs ? cover.title + ' (' + cover.year + ') - ' + cover.artist : imageUrl;
+
+                const \$img = \$('<img>')
+                    .attr('src', imageUrl)
+                    .addClass('cover-thumbnail')
+                    .attr('data-cover-url', imageUrl)
+                    .attr('title', title)
+                    .css({
+                        'width': '60px',
+                        'height': '60px',
+                        'object-fit': 'cover',
+                        'cursor': 'pointer',
+                        'border': '1px solid #ddd',
+                        'border-radius': '4px',
+                        'transition': 'all 0.2s'
+                    });
+
+                if ($('#fcover').val() === imageUrl) {
+                    \$img.css({'border': '3px solid var(--c-accent)', 'transform': 'scale(1.1)'});
+                }
+
+                \$container.append(\$img);
+            });
+        } else {
+            $('#no' + containerId.replace('#', '') + 'Message').show();
         }
+    }
 
-        let \$initialYearDot = $('#yearValidationDot');
-        if (\$initialYearDot.length) { // Vérifier si l'élément #yearValidationDot existe
-            if (initialDbYear) {
-                \$initialYearDot.css('background-color', 'lightgray').attr('title', 'Recherche Discogs en attente...');
-            } else {
-                \$initialYearDot.css('background-color', 'gray').attr('title', 'Aucune année de BDD.');
-            }
-        }
+    $(document).on('click', '.cover-thumbnail', function() {
+        selectCover($(this).data('cover-url'));
+    });
 
-        // --- Fonctions de gestion des covers ---
-
-        // Fonction pour sélectionner une cover
-        function selectCover(coverUrl, thumbnailUrl = coverUrl) {
-            $('#fcover').val(coverUrl);
-            $('#currentSelectedCover').attr('src', thumbnailUrl);
-            $('#selectedCoverPreview').show();
-            $('.cover-thumbnail').removeClass('selected').css('border', '1px solid #ddd');
-            $(`img[data-cover-url="\${coverUrl}"]`).addClass('selected').css('border', '2px solid #007bff');
-        }
-
-        // Fonction pour effacer la sélection de la cover
-        $('#clearCoverSelection').on('click', function() {
-            $('#fcover').val('');
-            $('#currentSelectedCover').attr('src', '');
-            $('#selectedCoverPreview').hide();
-            $('.cover-thumbnail').removeClass('selected').css('border', '1px solid #ddd');
-        });
-
-        // Fonction pour rendre les vignettes de cover
-   function renderCovers(containerId, coversArray, isDiscogs = false) {
-            const \$container = \$(containerId);
-            \$container.empty();
-
-            if (coversArray.length > 0) {
-                $('#no' + containerId.replace('#', '') + 'Message').hide();
-                coversArray.forEach(function(cover) {
-                    let imageUrl = isDiscogs ? cover.url : cover;
-                    let title = isDiscogs ? cover.title + ' (' + cover.year + ') - ' + cover.artist : imageUrl;
-
-                    const \$img = \$('<img>')
-                        .attr('src', imageUrl)
-                        .addClass('cover-thumbnail')
-                        .attr('data-cover-url', imageUrl)
-                        .attr('title', title)
-                        .css({
-                            'max-width': '80px',
-                            'height': 'auto',
-                            'margin': '5px',
-                            'cursor': 'pointer',
-                            'border': '1px solid #ddd',
-                            'border-radius': '3px'
-                        });
-
-                    if ($('#fcover').val() === imageUrl) {
-                        \$img.addClass('selected').css('border', '2px solid #007bff');
-                    }
-
-                    \$container.append(\$img);
-                });
-            } else {
-    $('#no' + containerId.replace('#', '') + 'Message').show();
-}
-        }
-
-        // Gestionnaire de clic pour la sélection des vignettes
-        \$(document).on('click', '.cover-thumbnail', function() {
-    const coverUrl = \$(this).data('cover-url');
-            selectCover(coverUrl);
-        });
-
-        // Fonction pour charger les covers locales
-        function loadLocalCovers(chansonId) {
-            if (!chansonId || chansonId === "0") {
-                console.log("ID de chanson manquant ou nul, pas de recherche de covers locales.");
-                $('#noLocalCoversMessage').show();
-                return;
-            }
-            const localCoverUrl = `../api/local_cover_search.php?id=\${chansonId}`;
-            \$.ajax({
-                url: localCoverUrl,
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
+    function loadLocalCovers(chansonId) {
+        if (!chansonId || chansonId === "0") return;
+        $.ajax({
+            url: '../api/local_cover_search.php?id=' + chansonId,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
                 if (data.local_covers && data.local_covers.length > 0) {
                     renderCovers('#localCoversContainer', data.local_covers);
-                } else {
-                    $('#localCoversContainer').empty();
-                    $('#noLocalCoversMessage').show();
                 }
-            },
-                error: function(jqXHR, textStatus, errorThrown) {
-                console.error("Erreur lors de l'appel local_cover_search API:", textStatus, errorThrown);
-                $('#localCoversContainer').empty();
-                $('#noLocalCoversMessage').show();
             }
-            });
-        }
+        });
+    }
 
-        // Fonction pour déclencher la recherche Discogs
-        function fetchDiscogsData(songTitle, artist) {
-            $('#discogsCoversContainer').empty();
-            $('#noDiscogsCoversMessage').show().text('Recherche en cours...');
-
-            if (!songTitle || !artist) {
-                console.log("Titre ou artiste manquant, recherche Discogs annulée.");
-                $('#noDiscogsCoversMessage').text('Titre ou artiste manquant pour la recherche Discogs.');
-                return;
-            }
-
-            let query = songTitle + " " + artist;
-            let discogsProxyUrl = '../api/discogs_proxy.php?q=' + encodeURIComponent(query);
-            console.log("Appel Discogs Proxy : " + discogsProxyUrl);
-
-            \$.ajax({
-                url: discogsProxyUrl,
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                console.log("Réponse Discogs:", data);
+    function fetchDiscogsData(songTitle, artist) {
+        if (!songTitle || !artist) return;
+        $('#noDiscogsCoversMessage').show().text('Recherche...');
+        
+        $.ajax({
+            url: '../api/discogs_proxy.php?q=' + encodeURIComponent(songTitle + " " + artist),
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
                 if (data.discogs_covers && data.discogs_covers.length > 0) {
                     renderCovers('#discogsCoversContainer', data.discogs_covers, true);
-                } else {
-                    $('#discogsCoversContainer').empty();
-                    $('#noDiscogsCoversMessage').show().text('Aucune cover Discogs trouvée.');
-                }
+                    
+                    // Validation année
+                    let firstResult = data.discogs_covers[0];
+                    let year = firstResult.year || '';
+                    let dbYear = $('#fannee').data('db-year');
+                    let \$yearDot = $('#yearValidationDot');
 
-                // Logique de la puce de validation de l'année
-                if (data.discogs_covers && data.discogs_covers.length > 0) { // Utilise le nouveau format discogs_covers
-                    let firstResult = data.discogs_covers[0]; // Utilise le nouveau format
-                        let year = firstResult.year || '';
-
-                        let dbYear = \$('input[name="fannee"]').data('db-year');
-                        let \$yearDot = $('#yearValidationDot');
-
-                        if (year) {
-                            if (parseInt(dbYear) === parseInt(year)) {
-                                \$yearDot.css('background-color', 'green').attr('title', 'Année confirmée par Discogs');
-                            } else {
-                                \$yearDot.css('background-color', 'red').attr('title', 'Année Discogs : ' + year);
-                            }
+                    if (year) {
+                        if (parseInt(dbYear) === parseInt(year)) {
+                            \$yearDot.css('background-color', '#28a745').attr('title', 'Confirmé par Discogs');
                         } else {
-                            \$yearDot.css('background-color', 'gray').attr('title', 'Année Discogs non trouvée');
+                            \$yearDot.css('background-color', '#dc3545').attr('title', 'Discogs suggère : ' + year);
                         }
                     } else {
-                    $('#yearValidationDot').css('background-color', 'gray').attr('title', 'Année Discogs non trouvée');
+                        \$yearDot.css('background-color', '#6c757d');
+                    }
+                } else {
+                    $('#noDiscogsCoversMessage').show().text('Aucun résultat.');
                 }
-            },
-                error: function(jqXHR, textStatus, errorThrown) {
-                console.error("Erreur lors de l'appel Discogs API:", textStatus, errorThrown, jqXHR.responseText);
-                $('#discogsCoversContainer').empty();
-                $('#noDiscogsCoversMessage').show().text('Erreur lors de la recherche Discogs.');
-                $('#yearValidationDot').css('background-color', 'gray').attr('title', 'Erreur de recherche Discogs.');
             }
-            });
-        }
-
-        // Event Listeners
-        let debounceTimer;
-        $('#fnom, #finterprete').on('input', function() {
-            let songTitle = $('#fnom').val().trim();
-            let artist = $('#finterprete').val().trim();
-
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                fetchDiscogsData(songTitle, artist);
-            }, 500);
         });
+    }
 
-        $('#searchDiscogsCovers').on('click', function() {
-            let songTitle = $('#fnom').val().trim();
-            let artist = $('#finterprete').val().trim();
-            fetchDiscogsData(songTitle, artist);
-        });
-
-        // Recherche initiale
-        let initialSongTitle = '';
-        if ($('#fnom').length) {
-            initialSongTitle = $('#fnom').val().trim();
-        }
-
-        let initialArtist = '';
-        if ($('#finterprete').length) {
-            initialArtist = $('#finterprete').val().trim();
-        }
-
-        let chansonId = \$('input[name="id"]').val();
-
-        if (chansonId && chansonId !== "0") {
-            loadLocalCovers(chansonId);
-        }
-
-        if (initialSongTitle || initialArtist) {
-            fetchDiscogsData(initialSongTitle, initialArtist);
-        } else {
-            $('#noDiscogsCoversMessage').show().text('Cliquez sur "Rechercher sur Discogs" pour trouver des covers.');
-        }
-
-        // Gestion de la cover sélectionnée
-        if ($('#fcover').val()) {
-            $('#selectedCoverPreview').show();
-            $('#currentSelectedCover').attr('src', $('#fcover').val());
-        } else {
-            $('#selectedCoverPreview').hide();
-        }
+    $('#fnom, #finterprete').on('blur', function() {
+        fetchDiscogsData($('#fnom').val().trim(), $('#finterprete').val().trim());
     });
+
+    $('#searchDiscogsCovers').on('click', function() {
+        fetchDiscogsData($('#fnom').val().trim(), $('#finterprete').val().trim());
+    });
+
+    // Chargement initial
+    let cId = $('input[name="id"]').val();
+    if (cId && cId !== "0") loadLocalCovers(cId);
+    fetchDiscogsData($('#fnom').val().trim(), $('#finterprete').val().trim());
+});
 </script>
 JAVASCRIPT;
-
-$sortie .= "</div> <!-- Fin .container -->";
 
 // --- AFFICHAGE FINAL ---
 echo $headHtml;
 echo $MENU_HTML;
 echo $sortie;
 echo envoieFooter();
-
-/////////////////////////////////: fonctions //////////////////////////////////////
-///
-/// Les fonctions comme selectUtilisateur, chercheDocumentsTableId, etc.
-/// sont supposées être définies dans les fichiers inclus (utilssi.php, etc.)
-/// et ne sont pas incluses ici pour la lisibilité du refactoring.
-///

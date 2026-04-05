@@ -6,18 +6,9 @@
  * Affiche le détail d'une chanson avec une UX moderne (badges, barre d'outils, lightbox).
  */
 
-require_once __DIR__ . "/../lib/utilssi.php";
-require_once __DIR__ . "/../lib/Image.php";
-require_once __DIR__ . "/../chanson/Chanson.php";
-require_once __DIR__ . "/../document/Document.php";
-require_once __DIR__ . "/../liens/LienStrumChanson.php";
-require_once __DIR__ . "/../liens/LienUrl.php";
-require_once __DIR__ . "/../liens/lienurl_voir.php";
-$pasDeMenu = true;
-require_once __DIR__ . "/../navigation/menu.php";
-require_once __DIR__ . "/../note/UtilisateurNote.php";
-require_once __DIR__ . "/../songbook/Songbook.php";
-require_once __DIR__ . "/../strum/Strum.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once PHP_DIR . "/navigation/menu.php";
+require_once PHP_DIR . "/liens/lienurl_voir.php";
 
 // --- CONSTANTES ET GLOBALES ---
 const CHANSON = "chanson";

@@ -10,8 +10,7 @@ $GLOBALS["PRIVILEGE_MEMBRE"] = 1;
 $GLOBALS["PRIVILEGE_EDITEUR"] = 2;
 $GLOBALS["PRIVILEGE_ADMIN"] = 3;
 
-require_once dirname(__DIR__) . "/lib/utilssi.php";
-require_once dirname(__DIR__) . "/lib/Chiffrement.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
 
 if (!class_exists('Utilisateur')) {
 class Utilisateur

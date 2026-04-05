@@ -41,7 +41,7 @@ $tri = $_GET['tri'] ?? ($typePl == 1 ? 'nom' : 'ordre');
 $sortie .= "<div class='container'>";
 $sortie .= "  <div class='starter-template'>";
 $sortie .= "    <div class='row'>";
-$sortie .= "      <div class='col-xs-12 text-left' style='margin-bottom: 15px;'>";
+$sortie .= "      <div class='col-xs-12 text-left mb-15'>";
 $sortie .= "        <a href='playlist_liste.php' class='btn btn-default btn-sm'><i class='glyphicon glyphicon-arrow-left'></i> Retour aux playlists</a>";
 if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
     global $playlistForm, $cheminImages, $iconeEdit;
@@ -50,21 +50,21 @@ if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
 $sortie .= "      </div>";
 $sortie .= "    </div>";
 
-$sortie .= "    <div class='well' style='background-color: #2b1d1a; color: #F5F5DC; border: 1px solid #D2B48C;'>";
+$sortie .= "    <div class='well playlist-header-well'>";
 $sortie .= "      <div class='row'>";
 $sortie .= "        <div class='col-md-3 text-center'>";
 // Image de la playlist
 $imagePochette = imagePlaylist($idPlaylist);
 if ($imagePochette != "") {
-    $sortie .= "<img src='../data/playlists/$imagePochette' class='img-responsive img-thumbnail' style='max-height: 200px; border: 2px solid #D2B48C;' alt='Pochette'>";
+    $sortie .= "<img src='../data/playlists/$imagePochette' class='img-responsive img-thumbnail playlist-pochette-voir' alt='Pochette'>";
 } else {
-    $sortie .= "<div style='height: 150px; background: #D2B48C; display: flex; align-items: center; justify-content: center; border-radius: 8px;'><i class='glyphicon glyphicon-music' style='font-size: 64px; color: #2b1d1a;'></i></div>";
+    $sortie .= "<div class='playlist-pochette-fallback'><i class='glyphicon glyphicon-music' style='font-size: 64px; color: #2b1d1a;'></i></div>";
 }
 $sortie .= "        </div>";
 $sortie .= "        <div class='col-md-9'>";
-$sortie .= "          <h1 style='color: #D2B48C; margin-top: 0;'>$nomPlaylist</h1>";
-$sortie .= "          <p style='font-size: 1.2em; font-style: italic;'>$description</p>";
-$sortie .= "          <hr style='border-top: 1px solid #D2B48C;'>";
+$sortie .= "          <h1 class='playlist-title-voir'>$nomPlaylist</h1>";
+$sortie .= "          <p class='playlist-desc-voir'>$description</p>";
+$sortie .= "          <hr class='playlist-hr-voir'>";
 $sortie .= "          <p><i class='glyphicon glyphicon-calendar'></i> Créée le $datePub | <i class='glyphicon glyphicon-eye-open'></i> $hits vue(s)</p>";
 $sortie .= "        </div>";
 $sortie .= "      </div>";
@@ -81,7 +81,7 @@ $labels = [
     'bpm' => 'Tempo (BPM)'
 ];
 
-$sortie .= "    <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #8B4513; padding-bottom: 10px;'>";
+$sortie .= "    <div class='playlist-actions-bar'>";
 $sortie .= "        <h2 style='margin: 0;'>Morceaux</h2>";
 $sortie .= "        <div class='btn-group'>";
 $sortie .= "            <button type='button' class='btn btn-sm btn-default dropdown-toggle' data-toggle='dropdown'>";

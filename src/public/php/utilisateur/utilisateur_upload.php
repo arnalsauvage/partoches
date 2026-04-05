@@ -2,8 +2,7 @@
 /**
  * Upload d'avatar utilisateur (Django Style)
  */
-require_once __DIR__ . "/../lib/utilssi.php";
-require_once __DIR__ . "/Utilisateur.php";
+require_once dirname(__DIR__, 3) . "/autoload.php";
 
 // On vérifie que l'utilisateur est connecté
 if (!isset($_SESSION['user'])) {

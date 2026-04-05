@@ -15,6 +15,41 @@
     color: var(--c-marron-clair, #D2B48C);
 }
 
+.logo-nav {
+    height: 32px !important; /* On réduit un peu pour gagner de la place */
+    width: auto !important;
+}
+
+.navbar-user-info {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 15px !important;
+    gap: 12px;
+}
+
+.role-icon {
+    font-size: 16px;
+    color: var(--c-marron-clair, #D2B48C);
+}
+
+.user-avatar-round {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--c-marron-clair, #D2B48C);
+}
+
+.auth-btn {
+    color: white !important;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+.auth-btn:hover {
+    color: var(--c-marron-clair, #D2B48C) !important;
+}
+
 .auth-btn-pointer {
     cursor: pointer;
 }

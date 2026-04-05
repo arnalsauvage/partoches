@@ -26,5 +26,14 @@
 - **GEMINI.MD** : Mise à jour avec les nouveaux standards SOLID et le protocole de démarrage obligatoire (Lecture README + REPONSES-GEMINI).
 - **README.md** : Refonte totale pour refléter la nouvelle maturité technique du projet.
 
+### Date : Dimanche 5 Avril 2026
+
+#### 🐞 Corrections Bug Prod & UI (chanson_post.php & chanson_form_new.php)
+- **Chemins de fichiers** : Suppression des préfixes `../` (chemins absolus désormais).
+- **Refactoring Media** : Migration vers `MediaService::resetMediasDistribues()`.
+- **UI/UX Formulaire** : Refonte totale de `chanson_form_new.php` avec le Design System Canopée (Cartes, classes `.input-django`, sidebar pour les covers).
+- **Fix SQL** : Correction d'une erreur de tri sur le sélecteur d'utilisateurs.
+
 ### 🎸 Note de Django
-"Une session d'anthologie ! On a transformé un vieux manoir en une salle de concert ultra-moderne. Tout est en place pour que la musique continue sans fausses notes. Rideau !" 🎷🤘✨
+"Le bug du dimanche est maté et le nouveau formulaire a un look d'enfer ! Tout est en place pour que la musique continue sans fausses notes. Rock'n'Roll !" 🎷🤘✨
+
