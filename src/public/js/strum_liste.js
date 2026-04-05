@@ -38,6 +38,37 @@ function voirChansonsStrum(idStrum, nomStrum) {
     });
 }
 
+/**
+ * Supprime un strum via AJAX
+ */
+function supprimerStrum(id, nom) {
+    if (!confirm("Voulez-vous vraiment supprimer le rythme [" + nom + "] ?\nCette action est irréversible.")) {
+        return;
+    }
+
+    $.ajax({
+        url: 'strum_post.php',
+        type: 'GET',
+        data: { id: id, mode: 'SUPPR' },
+        success: function(response) {
+            if (response.trim() === "ok") {
+                toastr.success("Le rythme [" + nom + "] a été supprimé.");
+                // Suppression visuelle de la carte avec un petit effet
+                const $card = $('button[onclick*="supprimerStrum(' + id + '"]').closest('.col-sm-6');
+                $card.fadeOut(400, function() {
+                    $(this).remove();
+                    // Mise à jour du compteur si besoin (Optionnel)
+                });
+            } else {
+                toastr.error("Erreur : " + response);
+            }
+        },
+        error: function(xhr, status, error) {
+            toastr.error("Erreur réseau : " + error);
+        }
+    });
+}
+
 // --- LOGIQUE D'ÉDITION (Ancien code conservé et nettoyé) ---
 
 $("button[name='creer']").click(function () {

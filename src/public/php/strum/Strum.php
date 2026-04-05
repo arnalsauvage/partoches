@@ -201,7 +201,7 @@ class Strum
             $html .= " <a href='strum_form.php?id=$id' class='btn btn-sm btn-primary' title='Editer' style='margin-right: 5px;'><i class='glyphicon glyphicon-pencil'></i></a>";
         }
         if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
-            $html .= " <a href='strum_post.php?id=$id&amp;mode=SUPPR' class='btn btn-sm btn-danger' title='Supprimer' onclick='return confirm(\"Supprimer ce strum ?\")'><i class='glyphicon glyphicon-trash'></i></a>";
+            $html .= " <button type='button' class='btn btn-sm btn-danger' title='Supprimer' onclick='supprimerStrum($id, \"$strumDisplay\")'><i class='glyphicon glyphicon-trash'></i></button>";
         }
 
         $html .= "      </div>
