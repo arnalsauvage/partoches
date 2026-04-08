@@ -209,6 +209,7 @@ $contenuHtml .= "  </div>";
 $contenuHtml .= "</div>";
 
 $_RACINE = "../../";
+global $_DOSSIER_CHANSONS;
 $cheminImagesChanson = $_DOSSIER_CHANSONS;
 $_chanson = new Chanson();
 

@@ -72,10 +72,22 @@ if (!isset($configMysql)) {
     $_SESSION ['mysql'] = $mysqli;
 
     // === CHARGEMENT DES PARAMÈTRES EN SESSION (Django) ===
+    // On charge le fichier ini pour les paramètres de session, même si MySQL est géré par l'ENV
+    if (!isset($ini_objet)) {
+        $fichier = dirname(__DIR__, 3) . "/data/conf/params.ini";
+        if (file_exists($fichier)) {
+            $ini_objet = new FichierIni ();
+            $ini_objet->m_load_fichier($fichier);
+        }
+    }
+
     if (isset($ini_objet)) {
         $_SESSION['titreSite'] = $ini_objet->m_valeur("titreSite", "general");
+        $_SESSION['sousTitreSite'] = $ini_objet->m_valeur("sousTitreSite", "general");
         $_SESSION['logoSite'] = $ini_objet->m_valeur("logoSite", "general");
         $_SESSION['loginParam'] = $ini_objet->m_valeur("loginParam", "general");
+        $_SESSION['urlSite'] = $ini_objet->m_valeur("urlSite", "general");
+        $_SESSION['emailAdmin'] = $ini_objet->m_valeur("EmailAdmin", "general");
     }
 }
 //	echo "connexion : $idconnect";

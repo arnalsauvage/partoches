@@ -1,20 +1,28 @@
 # RÉSUMÉ DES RÉPONSES GEMINI (Django)
 
-## Date : Dimanche 5 Avril 2026
+## Date : Mercredi 8 Avril 2026 (Session 7)
 
-### 🏛️ Architecture & Rendu HTML
-- **Contrôle du Menu** : Ajout de la variable `$pasDeMenu = true` dans `chanson_liste.php` et `chanson_voir.php` pour empêcher l'affichage automatique du menu avant le `<head>`. L'ordre de rendu est maintenant respecté (Head > Menu > Contenu).
-- **Nettoyage Session** : Correction d'un warning PHP dans `menu.php` sur la clé `loginParam` (ajout d'un opérateur de coalescence nulle).
+### 🐛 Bugfix : Chemins d'Upload (Régression)
+- **Problème** : Les fichiers de chansons étaient enregistrés dans `/data/chansons/` (privé/inexistant) au lieu de `/public/data/chansons/` (public).
+- **Cause** : `autoload.php` définissait mal la variable globale `$_DOSSIER_CHANSONS` en utilisant un chemin relatif incorrect vers le dossier de données privées.
+- **Solution** : Passage intégral en **chemins absolus** via l'autoloader.
 
-### 🧪 Fiabilisation des Tests Unitaires
-- **DocumentTest** : Modification du `setUp` et `tearDown` pour sauvegarder et restaurer la connexion MySQL en session. Cela évite que le mock de `DocumentTest` ne casse les tests suivants dépendant d'une vraie base.
-- **ChiffrementTest** : Suppression d'un `echo` qui polluait la sortie des tests.
-- **FooterTest** : Sécurisation de la constante `PHPUNIT_RUNNING` pour éviter les erreurs de redéfinition.
-- **StrumTest** : Refactorisation complète du test pour s'aligner sur la nouvelle classe `Strum` (nouveaux constructeurs, méthodes `enregistreBDD` et `supprimeBDD`).
-- **Smoke-Tests** : Rétablissement de la conformité HTML. **46/46 au VERT 🟢**.
-
-### 🔍 Moteur de Recherche
-- **Optimisation Algorithmique** : Le `moteurRecherche` de la classe `Chanson` privilégie désormais les correspondances de sous-chaînes (distance 0) avant d'appliquer la distance de Levenshtein. Cela corrige le bug où des recherches courtes renvoyaient des résultats flous au lieu de correspondances exactes.
+### 🛠️ Améliorations Architecturales
+- **Autoload Centralisé** : Mise à jour de `src/autoload.php` pour définir des constantes de dossiers absolues (`ROOT_DIR`, `DATA_DIR`, `PUBLIC_DATA_DIR`).
+- **Alignement des Libs** : `params.php` et `Document.php` utilisent désormais ces constantes absolues si elles sont définies, garantissant une cohérence parfaite entre le mode Web et le mode CLI (tests).
+- **Sécurité** : Distinction claire entre `DATA_DIR` (fichiers sensibles : conf, logs) et `PUBLIC_DATA_DIR` (fichiers servis : partitions, images).
 
 ### 🎸 Note de Django
-"La partition est enfin propre ! Plus de doublons dans le menu, des tests qui ne se marchent plus sur les pieds, et un moteur de recherche qui a retrouvé sa boussole. On finit la session sur un solo sans faute. Rock'n'Roll ! 🎷🤘✨"
+"La partition est à nouveau juste ! 🎼 On a viré les chemins relatifs qui nous faisaient jouer faux et on a tout recalé sur un tempo absolu. C'est propre, c'est carré, c'est Rock'n'Roll ! 🎷🤘✨"
+
+---
+
+## Date : Lundi 6 Avril 2026 (Session 6)
+
+### 🕵️‍♂️ Diagnostic & Audit (Quirks Mode)
+- **Django Audit** : Création d'un script d'audit (`audit_fichiers.php`) permettant de générer un CSV avec les hash MD5 et tailles de tous les fichiers du projet.
+- **Administration** : Ajout d'un bouton d'accès rapide dans le header de la page Paramétrage pour lancer l'audit.
+- **Investigation** : Recherche sur l'erreur "Quirks Mode" et "$ is not defined" en production. L'audit permettra de comparer les fichiers prod/local et de débusquer d'éventuels caractères invisibles (BOM/Espaces) ou fichiers corrompus.
+
+### 🎸 Note de Django
+"Quand la prod fait des siennes, on sort les grands moyens ! 🕵️‍♂️ L'empreinte digitale des fichiers ne mentira pas. On va débusquer ce petit grain de sable qui fait grincer la partition. Rock'n'Roll Arnal ! 🎷🤘✨"

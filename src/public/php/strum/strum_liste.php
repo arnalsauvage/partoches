@@ -87,7 +87,7 @@ $html .= <<<HTML
 </div>
 
 <!-- MODALE POUR VOIR LES CHANSONS LIÉES -->
-<div class="modal fade" id="modalChansonsStrum" tabindex="-1" role="dialog">
+<div class="modal fade modal-strum" id="modalChansonsStrum" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content" style="border-radius: 12px; border: 4px solid var(--c-marron-clair);">
             <div class="modal-header" style="background-color: var(--c-beige); border-bottom: 2px solid var(--c-marron-clair);">

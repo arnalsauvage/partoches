@@ -5,8 +5,6 @@ require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 $donnee = null;
 $_login = "";
 
-$sortie = envoieHead("Partoches", "../../css/index.css?v=26.3.05");
-$sortie .= "<body>";
 // Si l'utilisateur a demandé la déconnexion, on efface les infos de la session
 if (isset ($_GET ['logoff'])) {
     unset ($_SESSION ['user']);

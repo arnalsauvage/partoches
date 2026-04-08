@@ -22,41 +22,66 @@ global $_DOSSIER_CHANSONS;
 $nomTable = "chanson";
 $_chanson = new Chanson();
 
-function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest): void
+/**
+ * Télécharge une image depuis une URL, la redimensionne (max 400x400),
+ * la convertit en WebP et l'enregistre comme document de la chanson.
+ */
+function telechargeImageFromUrl($monUrl, $nomFichier, $id, $dossierDest): string
 {
+    require_once __DIR__ . "/../lib/Image.php";
+    
     $repertoire = $dossierDest . $id . "/";
-    $file = file_get_contents($monUrl);
-    $cheminFichier = "vide";
-    $nomFichier = simplifieNomFichier($nomFichier);
-
-    $isImageJpg = (bin2hex($file[0]) == 'ff' && bin2hex($file[1]) == 'd8');
-    if ($isImageJpg){
-        $nomFichier .= ".jpg";
-        $cheminFichier = $repertoire . $nomFichier;
+    if (!file_exists($repertoire)) {
+        mkdir($repertoire, 0755, true);
     }
 
-    $isImagePng = (bin2hex($file[0]) == '89' && $file[1] == 'P' && $file[2] == 'N' && $file[3] == 'G');
-    if ($isImagePng){
-        $nomFichier .= ".png";
-        $cheminFichier = $repertoire . $nomFichier;
+    // On télécharge le contenu
+    $fileData = @file_get_contents($monUrl);
+    if (!$fileData) return "";
+
+    // On utilise un fichier temporaire pour le traitement
+    $tmpFile = tempnam(sys_get_temp_dir(), 'chanson_cover_');
+    file_put_contents($tmpFile, $fileData);
+
+    $img = Image::load($tmpFile);
+    if (!$img) {
+        unlink($tmpFile);
+        return "";
     }
 
-    $isImageWebp = (substr($file, 0, 4) == 'RIFF' && substr($file, 8, 4) == 'WEBP');
-    if ($isImageWebp){
-        $nomFichier .= ".webp";
-        $cheminFichier = $repertoire . $nomFichier;
+    // Redimensionnement (Max 400x400)
+    $resized = Image::resizeToLimit($img, 400, 400);
+    if ($resized) {
+        imagedestroy($img);
+        $img = $resized;
     }
 
-    if ($cheminFichier <> "vide")
-    {
-        // On  enregistre le fichier sur disque
-        file_put_contents ($cheminFichier, $file);
-        // On met à jour en base de données
-        $size = filesize($cheminFichier);
-        $version = Document::creeModifieDocument($nomFichier, $size, "chanson", $id);
-        // Il faut renommer le doc en lui accolant son numéro de version
-        rename($repertoire . $nomFichier, $repertoire . composeNomVersion($nomFichier, $version));
+    // Nom de fichier propre (forcé en webp)
+    $nomBase = simplifieNomFichier($nomFichier);
+    $nomFichierFinal = $nomBase . ".webp";
+    
+    // Sauvegarde en WebP (qualité 75)
+    $cheminFinalTmp = $tmpFile . ".webp";
+    $success = Image::save($img, $cheminFinalTmp, 'webp', 75);
+    imagedestroy($img);
+    unlink($tmpFile);
+
+    if ($success) {
+        $size = filesize($cheminFinalTmp);
+        $version = Document::creeModifieDocument($nomFichierFinal, $size, "chanson", $id);
+        
+        $nomVersionne = Document::composeNomVersion($nomFichierFinal, $version);
+        $destinationDefinitive = $repertoire . $nomVersionne;
+        
+        if (rename($cheminFinalTmp, $destinationDefinitive)) {
+            chmod($destinationDefinitive, 0644);
+            // Retourne le chemin relatif web pour la colonne 'cover' de la table chanson
+            return "../../data/chansons/" . $id . "/" . $nomVersionne;
+        }
     }
+
+    if (file_exists($cheminFinalTmp)) unlink($cheminFinalTmp);
+    return "";
 }
 
 if (isset ($_GET ['id']) && is_numeric($_GET ['id'])) {
@@ -94,42 +119,44 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
     $fpublication = isset($_POST['fpublication']) ? 1 : 0;
 }
 
-// On gère 5 cas :
-//  1- création d'une chanson,
-//  2 - modif,
-//  3 - suppression chanson
-//  4 - MAJ des infos depuis une API
-//  5 - suppression d'un doc de la chanson
-
 //  1- création d'une chanson,
 if ($mode == "INS") {
     $fhits = 0;
     $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
-    // NOUVEAU : Définir la cover après la construction de l'objet
-    $_chanson->setCover($fcover);
-    // NOUVEAU : Définir la publication
     $_chanson->setPublication($fpublication);
     $id = $_chanson->creeChansonBDD();
+
+    // Si une cover URL est fournie, on la télécharge maintenant qu'on a l'ID
+    if ($fcover && str_starts_with($fcover, 'http')) {
+        $localCover = telechargeImageFromUrl($fcover, "pochette-" . $fnom, $id, $_DOSSIER_CHANSONS);
+        if ($localCover) $_chanson->setCover($localCover);
+    } else {
+        $_chanson->setCover($fcover);
+    }
     
-    // Suppression du "../" car $_DOSSIER_CHANSONS est déjà absolu
+    $_chanson->creeModifieChansonBDD(); // Seconde passe pour l'ID et la cover locale
+    
     $repertoire = $_DOSSIER_CHANSONS . $id . "/";
     if (!file_exists($repertoire)) {
         mkdir($repertoire, 0755, true);
-        echo " -=> Création du repertoire $repertoire réussi<br>";
     }
 }
 
 //  2 - modif,
 if ($mode == "MAJ") {
     if ($_SESSION [PRIVILEGE] < 3) {
-        // On doit recharger les hits pour qu'ils ne soient remis à zéro
         $_chanson->chercheChanson($id);
         $fhits = $_chanson->getHits();
     }
+    
+    // Si c'est une nouvelle URL externe, on la télécharge et on l'optimise
+    if ($fcover && str_starts_with($fcover, 'http')) {
+        $localCover = telechargeImageFromUrl($fcover, "pochette-" . $fnom, $id, $_DOSSIER_CHANSONS);
+        if ($localCover) $fcover = $localCover;
+    }
+
     $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
-    // NOUVEAU : Définir la cover après la construction de l'objet
     $_chanson->setCover($fcover);
-    // NOUVEAU : Définir la publication
     $_chanson->setPublication($fpublication);
     $_chanson->creeModifieChansonBDD();
 }

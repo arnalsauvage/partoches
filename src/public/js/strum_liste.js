@@ -12,7 +12,7 @@ $(document).ready(function() {
 /**
  * Ouvre la modale pour voir les chansons liées à un strum
  */
-function voirChansonsStrum(idStrum, nomStrum) {
+window.voirChansonsStrum = function(idStrum, nomStrum) {
     const $modal = $('#modalChansonsStrum');
     const $title = $('#modalStrumNom');
     const $body = $('#modalChansonsBody');
@@ -41,7 +41,7 @@ function voirChansonsStrum(idStrum, nomStrum) {
 /**
  * Supprime un strum via AJAX
  */
-function supprimerStrum(id, nom) {
+window.supprimerStrum = function(id, nom) {
     if (!confirm("Voulez-vous vraiment supprimer le rythme [" + nom + "] ?\nCette action est irréversible.")) {
         return;
     }
@@ -57,7 +57,6 @@ function supprimerStrum(id, nom) {
                 const $card = $('button[onclick*="supprimerStrum(' + id + '"]').closest('.col-sm-6');
                 $card.fadeOut(400, function() {
                     $(this).remove();
-                    // Mise à jour du compteur si besoin (Optionnel)
                 });
             } else {
                 toastr.error("Erreur : " + response);

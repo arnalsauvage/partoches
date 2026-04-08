@@ -33,6 +33,8 @@ $_SESSION ['sousTitreSite'] = $sousTitreSite;
 // Niveau de log : on écrit à partir de DEBUG / INFO / WARNING / ERROR
 $niveauDeLog = $ini_objet->m_valeur("niveauDeLog", "general");
 
-$_DOSSIER_DATA = __DIR__ . "/../../data/";
-$_DOSSIER_CHANSONS = $_DOSSIER_DATA . "chansons/";
-$_DOSSIER_SONGBOOKS = $_DOSSIER_DATA . "songbooks/";
+// On utilise les chemins globaux absolus définis dans autoload.php si disponibles
+$_DOSSIER_DATA = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/' : __DIR__ . "/../../data/";
+$_DOSSIER_CHANSONS = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/chansons/' : $_DOSSIER_DATA . "chansons/";
+$_DOSSIER_SONGBOOKS = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/songbooks/' : $_DOSSIER_DATA . "songbooks/";
+$_DOSSIER_UTILISATEURS = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/utilisateurs/' : $_DOSSIER_DATA . "utilisateurs/";

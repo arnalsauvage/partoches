@@ -24,16 +24,15 @@ if (!isset ($FichierUtilsSi)) {
     $GLOBALS["PRIVILEGE_ADMIN"] = 3;
 
     // Inclusion des différentes librairies
-    require_once("FichierIni.php");
-    require_once("compteur.php");
-    require_once("configMysql.php");
-    include_once "config-images.php";
-    require_once("formulaire.php");
-    require_once("html.php");
-    require_once("mysql.php");
-    include_once("params.php");
-    include_once("tableHtml.php");
-    require_once("Chiffrement.php");
+    require_once(__DIR__ . "/FichierIni.php");
+    require_once(__DIR__ . "/compteur.php");
+    require_once(__DIR__ . "/configMysql.php");
+    include_once(__DIR__ . "/config-images.php");
+    require_once(__DIR__ . "/formulaire.php");
+    require_once(__DIR__ . "/html.php");
+    require_once(__DIR__ . "/mysql.php");
+    include_once(__DIR__ . "/tableHtml.php");
+    require_once(__DIR__ . "/Chiffrement.php");
     if (!isset ($_SESSION ["privilege"])) {
         $_SESSION ["privilege"] = 0;
     }
