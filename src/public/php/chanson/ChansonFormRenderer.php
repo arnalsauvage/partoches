@@ -300,12 +300,16 @@ HTML;
             $actionDel = "../liens/lienStrumChanson_post.php?id=$idLien&amp;mode=DEL&amp;idChanson=$id";
 
             $out .= <<<HTML
-            <div class="list-group-item" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="list-group-item" style="display:flex; justify-content:space-between; align-items:center; padding: 12px 15px;">
                 <div>
-                    <code style="font-size: 1.2em; color: #8B4513;">$motif</code> $badgeSwing<br>
-                    <small class="text-muted">{$s->getLongueur()} {$s->renvoieUniteEnFrancais()} - {$s->getDescription()}</small>
+                    <code style="font-size: 1.3em; color: #8B4513; background: #fdf5e6; padding: 2px 6px; border-radius: 4px;">$motif</code> $badgeSwing<br>
+                    <small class="text-muted" style="display:inline-block; margin-top: 5px;">{$s->getLongueur()} {$s->renvoieUniteEnFrancais()} - {$s->getDescription()}</small>
                 </div>
-                <a href="$actionDel" class="btn btn-xs btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
+                <div style="margin-left: 15px;">
+                    <a href="$actionDel" class="btn btn-sm btn-danger" title="Supprimer cette rythmique" onclick="return confirm('Supprimer ce strum ?')">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </a>
+                </div>
             </div>
 HTML;
         }
@@ -322,13 +326,15 @@ HTML;
         $actionPostStrum = "../liens/lienStrumChanson_post.php";
 
         $out .= <<<HTML
-        <div class="strum-add-box">
-            <form action="$actionPostStrum" method="post" class="form-inline">
+        <div class="strum-add-box" style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+            <form action="$actionPostStrum" method="post" class="form-inline" style="display: flex; align-items: center; gap: 10px; justify-content: center;">
                 <input type="hidden" name="idChanson" value="$id">
                 <input type="hidden" name="mode" value="NEW">
-                <label>Ajouter :</label>
-                <select name="idStrum" class="form-control js-example-basic-single" style="width:250px;">$optStrums</select>
-                <button class="btn btn-success"><i class="glyphicon glyphicon-plus"></i></button>
+                <label style="color: #666;">Ajouter une rythmique :</label>
+                <select name="idStrum" class="form-control js-example-basic-single" style="min-width:250px;">$optStrums</select>
+                <button class="btn btn-success" style="padding: 6px 20px;">
+                    <i class="glyphicon glyphicon-plus"></i> AJOUTER
+                </button>
             </form>
         </div></div>
 HTML;

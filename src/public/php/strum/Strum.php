@@ -173,35 +173,35 @@ class Strum
         $res = $db->query("SELECT COUNT(*) FROM lienstrumchanson WHERE idStrum = $id");
         $count = ($res) ? $res->fetch_row()[0] : 0;
 
-        $badgeSwing = $this->_swing ? "<span class='label label-warning' style='background-color: #f39c12; margin-left: 5px;'>SWING</span>" : "";
+        $badgeSwing = $this->_swing ? "<span class='label label-warning' style='background-color: #d35400; color: white; margin-left: 5px; font-weight: bold;'>SWING</span>" : "";
 
         $html = "
         <div class='col-sm-6 col-md-4 col-lg-3'>
-            <div class='thumbnail strum-card'>
-                <div class='strum-card-header'>
-                    <h2>$strumDisplay</h2>
+            <div class='thumbnail strum-card' style='border: 2px solid #D2B48C; border-radius: 12px; transition: all 0.3s ease; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); background: #fff;'>
+                <div class='strum-card-header' style='background: #fdfaf5; border-bottom: 1px solid #D2B48C; padding: 15px; text-align: center;'>
+                    <h2 style='margin: 0; font-weight: 800; color: #5d4037; font-family: \"Courier New\", Courier, monospace; letter-spacing: 2px;'>$strumDisplay</h2>
                 </div>
-                <div class='strum-card-body'>
-                    <p class='strum-card-desc' style='height: 40px; overflow: hidden;'>$desc</p>
-                    <div style='margin-bottom: 15px;'>
-                        <span class='label label-default' style='background-color: #777;'>$longueur $unite</span>
+                <div class='strum-card-body' style='padding: 15px;'>
+                    <p class='strum-card-desc' style='height: 40px; overflow: hidden; color: #795548; font-size: 0.9em; line-height: 1.2; margin-bottom: 15px;'>$desc</p>
+                    <div style='margin-bottom: 20px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px;'>
+                        <span class='label' style='background-color: #8d6e63; color: white; padding: 4px 8px;'>$longueur $unite</span>
                         $badgeSwing
-                        <button class='label strum-badge-pop' onclick='voirChansonsStrum($id, \"$strumDisplay\")' title='Voir les chansons liées'>
+                        <button class='label' onclick='voirChansonsStrum($id, \"$strumDisplay\")' title='Voir les chansons liées' style='background-color: #5d4037; color: white; border: none; padding: 4px 10px; cursor: pointer; border-radius: 4px;'>
                             $count <i class='glyphicon glyphicon-music'></i>
                         </button>
                     </div>
                     
-                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px;'>
+                    <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed #D2B48C; padding-top: 15px;'>
                         <a title='Ouvrir dans la Boîte à Strum' href='$urlBoiteAstrum?strum=$strumDisplay$swingParam' style='text-decoration: none;'>
-                            <img src='$imageBoiteAstrum' alt='Boîte à Strum' height='35' style='border-radius: 4px;'>
+                            <img src='$imageBoiteAstrum' alt='Boîte à Strum' height='40' style='border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
                         </a>
-                        <div class='btn-group'>";
+                        <div style='display: flex; gap: 10px;'>";
         
         if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
-            $html .= " <a href='strum_form.php?id=$id' class='btn btn-sm btn-primary' title='Editer' style='margin-right: 5px;'><i class='glyphicon glyphicon-pencil'></i></a>";
+            $html .= " <a href='strum_form.php?id=$id' class='btn btn-md' title='Editer' style='background-color: #8B4513; color: white; border: none; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);'><i class='glyphicon glyphicon-pencil' style='font-size: 1.2em;'></i></a>";
         }
         if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
-            $html .= " <button type='button' class='btn btn-sm btn-danger' title='Supprimer' onclick='supprimerStrum($id, \"$strumDisplay\")'><i class='glyphicon glyphicon-trash'></i></button>";
+            $html .= " <button type='button' class='btn btn-md btn-danger' title='Supprimer' onclick='supprimerStrum($id, \"$strumDisplay\")' style='width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);'><i class='glyphicon glyphicon-trash' style='font-size: 1.2em;'></i></button>";
         }
 
         $html .= "      </div>

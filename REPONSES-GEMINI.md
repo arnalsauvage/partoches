@@ -2,18 +2,22 @@
 
 ## Date : Mercredi 8 Avril 2026 (Session 7)
 
-### 🐛 Bugfix : Chemins d'Upload (Régression)
-- **Problème** : Les fichiers de chansons étaient enregistrés dans `/data/chansons/` (privé/inexistant) au lieu de `/public/data/chansons/` (public).
-- **Cause** : `autoload.php` définissait mal la variable globale `$_DOSSIER_CHANSONS` en utilisant un chemin relatif incorrect vers le dossier de données privées.
-- **Solution** : Passage intégral en **chemins absolus** via l'autoloader.
+### 🐛 Bugfix & Robustesse : Chemins Absolus
+- **Problème** : Régression sur les chemins d'upload (fichiers perdus dans `/data/`).
+- **Solution** : Passage intégral en **chemins absolus** dans `autoload.php`, `params.php` et `Document.php` via `ROOT_DIR` et `PUBLIC_DATA_DIR`.
 
-### 🛠️ Améliorations Architecturales
-- **Autoload Centralisé** : Mise à jour de `src/autoload.php` pour définir des constantes de dossiers absolues (`ROOT_DIR`, `DATA_DIR`, `PUBLIC_DATA_DIR`).
-- **Alignement des Libs** : `params.php` et `Document.php` utilisent désormais ces constantes absolues si elles sont définies, garantissant une cohérence parfaite entre le mode Web et le mode CLI (tests).
-- **Sécurité** : Distinction claire entre `DATA_DIR` (fichiers sensibles : conf, logs) et `PUBLIC_DATA_DIR` (fichiers servis : partitions, images).
+### 🖼️ Optimisation des Médias
+- **Covers Discogs** : Les illustrations choisies via Discogs sont désormais téléchargées localement, redimensionnées (max 400x400) et converties en **WebP** pour une performance maximale.
+
+### 🎨 Design System & UI (Canopée Style)
+- **Songbook Form** : Modernisation du formulaire de création/édition des recueils.
+- **Répertoire des Strums** : 
+    - Remplacement du bleu par la palette **Bois Canopée** (Marron/Terre).
+    - Agrandissement et espacement des boutons de gestion (Modifier/Supprimer) pour une meilleure ergonomie.
+- **Administration** : Correction du décalage (padding-top) sur la page de paramétrage.
 
 ### 🎸 Note de Django
-"La partition est à nouveau juste ! 🎼 On a viré les chemins relatifs qui nous faisaient jouer faux et on a tout recalé sur un tempo absolu. C'est propre, c'est carré, c'est Rock'n'Roll ! 🎷🤘✨"
+"La partition est impeccable, le son est chaud et boisé, et l'orchestre joue parfaitement en mesure ! 🎼 On a dompté les chemins, optimisé les images et donné un look d'enfer au répertoire des strums. C'est du grand art, Arnal ! 🎷🤘✨"
 
 ---
 

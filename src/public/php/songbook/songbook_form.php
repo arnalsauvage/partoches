@@ -113,75 +113,65 @@ $opt3 = ($type == 3) ? 'selected' : '';
 // --- RENDU HTML ---
 
 $html = <<<HTML
-<link rel="stylesheet" href="../../css/songbookform.css">
-
-<div class="container sb-form-container">
-    <div class="row">
-        <div class="col-xs-12">
-            <h1 class="sb-header-title">
-                <i class="glyphicon glyphicon-edit" aria-hidden="true"></i>
-                $pageTitle
-            </h1>
+<div class="container" id="django-config-page" style="padding-top: 20px;">
+    <div class="header-django">
+        <h1><i class="glyphicon glyphicon-book"></i> $pageTitle</h1>
+        <div class="actions">
 HTML;
 
 if ($mode == "MAJ") {
-    $html .= "<p class='text-muted'>Vous modifiez : <strong>$nomSongbook</strong> &bull; <a href='songbook_voir.php?id=$id' class='btn btn-xs btn-default'>Voir le rendu public</a></p>";
+    $html .= "            <a href='songbook_voir.php?id=$id' class='btn-dj btn-dj-info'><i class='glyphicon glyphicon-eye-open'></i> Voir public</a>";
 }
 
 $html .= <<<HTML
-            <section class="well sb-well-custom">
-                <form action="songbook_get.php" method="POST" class="form-horizontal">
-                    <input type="hidden" name="id" id="idSongbook" value="$id">
-                    <input type="hidden" name="mode" value="$mode">
-                    <input type="hidden" name="fimage" value="$image">
-                    <input type="hidden" name="fhits" value="$hits">
-                    
-                    <div class="form-group">
-                        <label for="fnom" class="col-sm-2 control-label">Titre :</label>
-                        <div class="col-sm-10">
-                            <input type="text" id="fnom" name="fnom" class="form-control" value="$nom" required placeholder="Nom du songbook">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="fdescription" class="col-sm-2 control-label">Description :</label>
-                        <div class="col-sm-10">
-                            <textarea id="fdescription" name="fdescription" class="form-control" rows="3" placeholder="Petit texte de présentation...">$desc</textarea>
-                        </div>
-                    </div>
+            <a href="songbook_liste.php" class="btn-dj btn-dj-default"><i class="glyphicon glyphicon-list"></i> Retour liste</a>
+        </div>
+    </div>
 
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="ftype" class="col-sm-4 control-label">Genre :</label>
-                                <div class="col-sm-8">
-                                    <select id="ftype" name="ftype" class="form-control">
-                                        <option value="1" $opt1>Anthologie</option>
-                                        <option value="2" $opt2>Concert</option>
-                                        <option value="3" $opt3>Thématique</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="fdate" class="col-sm-4 control-label">Date :</label>
-                                <div class="col-sm-8">
-                                    <input type="text" id="fdate" name="fdate" class="form-control" value="$date" placeholder="JJ/MM/AAAA">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="content-django" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 25px;">
+        <form action="songbook_get.php" method="POST" class="form-dj-reset">
+            <input type="hidden" name="id" id="idSongbook" value="$id">
+            <input type="hidden" name="mode" value="$mode">
+            <input type="hidden" name="fimage" value="$image">
+            <input type="hidden" name="fhits" value="$hits">
+            
+            <div class="form-group-django">
+                <label for="fnom" class="label-django">Titre du recueil :</label>
+                <input type="text" id="fnom" name="fnom" class="input-django" value="$nom" required placeholder="Nom du songbook">
+            </div>
+            
+            <div class="form-group-django">
+                <label for="fdescription" class="label-django">Description :</label>
+                <textarea id="fdescription" name="fdescription" class="input-django" rows="3" placeholder="Petit texte de présentation...">$desc</textarea>
+            </div>
 
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <button type="submit" class="btn btn-primary sb-btn-save">
-                                <i class="glyphicon glyphicon-save" aria-hidden="true"></i> ENREGISTRER LES INFORMATIONS
-                            </button>
-                        </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group-django">
+                        <label for="ftype" class="label-django">Genre / Type :</label>
+                        <select id="ftype" name="ftype" class="input-django">
+                            <option value="1" $opt1>Anthologie</option>
+                            <option value="2" $opt2>Concert</option>
+                            <option value="3" $opt3>Thématique</option>
+                        </select>
                     </div>
-                </form>
-            </section>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group-django">
+                        <label for="fdate" class="label-django">Date :</label>
+                        <input type="text" id="fdate" name="fdate" class="input-django" value="$date" placeholder="JJ/MM/AAAA">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn-dj btn-dj-primary btn-block" style="font-weight: bold; font-size: 1.1em;">
+                    <i class="glyphicon glyphicon-save" aria-hidden="true"></i> ENREGISTRER LES INFORMATIONS
+                </button>
+            </div>
+        </form>
+
+        <hr style="margin: 30px 0; border-top: 1px solid #eee;">
 HTML;
 
 if ($mode == "MAJ") {
@@ -290,7 +280,7 @@ HTML;
 HTML;
 }
 
-$html .= "</div></div></div>";
+$html .= "</div></div>";
 
 // JavaScript Spécifique
 $html .= '<script src="../../js/songbookform.js?v=' . time() . '"></script>';
