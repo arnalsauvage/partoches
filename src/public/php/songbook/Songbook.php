@@ -3,6 +3,7 @@ const DATA_SONGBOOKS = "../../data/songbooks/";
 
 require_once dirname(__DIR__) . "/lib/utilssi.php";
 require_once dirname(__DIR__) . "/document/Document.php";
+require_once dirname(__DIR__) . "/liens/lienDocSongbook.php";
 require_once dirname(__DIR__) . "/lib/Image.php";
 require_once dirname(__DIR__) . "/lib/pdf.php";
 

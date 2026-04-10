@@ -128,6 +128,29 @@ class LienDocSongbook
     }
 
     /**
+     * Supprime tous les liens d'un songbook
+     */
+    public static function supprimeliensDocSongbookDuSongbook($idSongbook)
+    {
+        $db = $_SESSION['mysql'];
+        $maRequete = "DELETE FROM liendocsongbook WHERE idSongbook='$idSongbook'";
+        return $db->query($maRequete) or die ("Problème #1 dans supprimeliensDocSongbookDuSongbook : " . $db->error);
+    }
+
+    /**
+     * Supprime un lien par Document et Songbook
+     */
+    public static function supprimeLienIdDocIdSongbook($idDoc, $idSongbook)
+    {
+        $lien = self::chercheLienParIdSongbookIdDoc($idSongbook, $idDoc);
+        if ($lien) {
+            self::supprimeLienDocSongbook($lien[0]);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Ordonne les liens d'un songbook de 1 à n
      */
     public static function ordonneLiensSongbook($idSongbook)
@@ -198,6 +221,16 @@ if (!function_exists('supprimeLienDocSongbook')) {
 if (!function_exists('supprimeliensDocSongbookDuDocument')) {
     function supprimeliensDocSongbookDuDocument($idDoc) {
         return LienDocSongbook::supprimeliensDocSongbookDuDocument($idDoc);
+    }
+}
+if (!function_exists('supprimeliensDocSongbookDuSongbook')) {
+    function supprimeliensDocSongbookDuSongbook($idSongbook) {
+        return LienDocSongbook::supprimeliensDocSongbookDuSongbook($idSongbook);
+    }
+}
+if (!function_exists('supprimeLienIdDocIdSongbook')) {
+    function supprimeLienIdDocIdSongbook($idDoc, $idSongbook) {
+        return LienDocSongbook::supprimeLienIdDocIdSongbook($idDoc, $idSongbook);
     }
 }
 if (!function_exists('ordonneLiensSongbook')) {

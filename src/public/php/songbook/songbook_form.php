@@ -2,6 +2,7 @@
 require_once dirname(__DIR__) . "/lib/utilssi.php";
 $headHtml = envoieHead("Songbook - Formulaire", "../../css/index.css");
 echo $headHtml;
+echo '<link rel="stylesheet" href="../../css/songbookform.css?v=' . time() . '">';
 $pasDeMenu = true;
 require_once PHP_DIR . "/navigation/menu.php";
 echo $MENU_HTML;
@@ -22,16 +23,18 @@ function renderDocumentRow($doc, $idSongbook): string {
     $iconePath = "../../images/icones/$ext.png";
     $icone = file_exists($iconePath) ? $iconePath : "../../images/icones/fichier.png";
     $poids = intval($taille/1024);
-    
+
     return <<<HTML
         <div class="list-group-item sb-list-item">
-            <div>
-                <img src="$icone" width="24" alt="Icône $ext" style="margin-right: 10px;">
+            <div class="sb-handle-icon">
+                <img src="$icone" width="32" alt="Icône $ext">
+            </div>
+            <div class="sb-item-content">
                 <a href="$url" target="_blank" rel="noopener"><strong>$fichierCourt</strong></a>
                 <span class="text-muted small">($poids ko)</span>
             </div>
             <a href="songbook_get.php?id=$idSongbook&amp;idDoc=$idDoc&amp;nomFic=$fichierCourt&amp;mode=SUPPRFIC"
-               class="btn btn-xs btn-danger"
+               class="btn btn-link sb-remove-btn"
                title="Supprimer ce fichier"
                aria-label="Supprimer le fichier $fichierCourt"
                onclick="return confirm('Supprimer ce fichier ?')">
@@ -46,21 +49,19 @@ function renderSommaireRow($docLien, $idSongbook, $index): string {
     $nomFic = composeNomVersion($docLien[1], $docLien[4]);
     return <<<HTML
         <li class="ui-state-default sb-sortable-item" data-index="$idDoc" data-position="$index">
-            <span>
-                <i class="glyphicon glyphicon-menu-hamburger text-muted" style="margin-right: 15px;" aria-hidden="true"></i>
+            <i class="glyphicon glyphicon-menu-hamburger sb-handle-icon" aria-hidden="true"></i>
+            <span class="sb-item-content">
                 <strong>$index.</strong> $nomFic
             </span>
             <a href="songbook_get.php?id=$idSongbook&amp;idDoc=$idDoc&amp;mode=SUPPRDOC"
-               class="btn btn-link btn-xs text-danger"
+               class="btn btn-link sb-remove-btn"
                title="Retirer du recueil"
-               aria-label="Retirer $nomFic du recueil"
-               style="margin-left: auto;">
+               aria-label="Retirer $nomFic du recueil">
                 <i class="glyphicon glyphicon-remove" aria-hidden="true"></i>
             </a>
         </li>
 HTML;
 }
-
 // 1. SÉCURITÉ ET DROITS
 $privilege = $_SESSION['privilege'] ?? 0;
 $lvlEditeur = $GLOBALS["PRIVILEGE_EDITEUR"] ?? 2;

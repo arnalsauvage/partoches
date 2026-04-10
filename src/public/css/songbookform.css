@@ -76,23 +76,100 @@
     margin-top: 40px;
 }
 
-.sb-list-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+/* --- LISTE SORTABLE ET LIST-GROUP (Cartouches robustes) --- */
+
+#sortable, .list-group {
+    padding: 0;
+    margin: 25px 0;
+    list-style: none;
 }
 
-.sb-sortable-item {
-    background: white;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    cursor: move;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+#sortable .sb-sortable-item, .sb-list-item {
+    background: white !important;
+    padding: 0 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 15px !important;
+    margin-bottom: 15px !important;
+    
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    
+    min-height: 90px !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
 }
+
+.sb-sortable-item { cursor: move; }
+
+/* 1. Zone de gauche (Poignée / Icône) */
+#sortable .sb-handle-icon, .sb-list-item .sb-handle-icon {
+    width: 80px !important;
+    min-width: 80px !important;
+    background-color: #f9f9f9 !important;
+    border-right: 1px solid #eee !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #D2B48C !important;
+    font-size: 28px !important;
+    flex-shrink: 0 !important;
+    position: static !important;
+    float: none !important;
+    margin: 0 !important;
+}
+
+/* 2. Zone centrale (Titre / Contenu) */
+#sortable .sb-item-content, .sb-list-item .sb-item-content {
+    flex-grow: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 30px !important;
+    font-size: 22px !important;
+    color: #2b1d1a !important;
+    min-width: 0 !important;
+    background: white !important;
+    position: static !important;
+    float: none !important;
+}
+
+#sortable .sb-item-content strong, .sb-list-item .sb-item-content strong {
+    color: #8B4513 !important;
+    margin-right: 20px !important;
+    font-size: 28px !important;
+    font-family: serif !important;
+    flex-shrink: 0 !important;
+}
+
+/* 3. Zone de droite (Bouton supprimer) */
+#sortable .sb-remove-btn, .sb-list-item .sb-remove-btn {
+    width: 100px !important;
+    min-width: 100px !important;
+    background-color: #fff5f5 !important;
+    border-left: 1px solid #fee2e2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #d9534f !important;
+    font-size: 35px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transition: all 0.2s !important;
+    flex-shrink: 0 !important;
+    position: static !important;
+    float: none !important;
+}
+
+#sortable .sb-remove-btn:hover, .sb-list-item .sb-remove-btn:hover {
+    background-color: #fee2e2 !important;
+    color: #b91c1c !important;
+    text-decoration: none !important;
+}
+
+/* --- RECHERCHE ET AJOUT --- */
 
 .sb-add-box {
     margin-top: 30px;
