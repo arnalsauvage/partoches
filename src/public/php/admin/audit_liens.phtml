@@ -1,0 +1,156 @@
+<div class="container-fluid container-django">
+    <div class="header-admin-dj">
+        <h1 class="title-admin-dj"><span class="glyphicon glyphicon-link"></span> Chasse aux Fausses Notes</h1>
+        <p class="subtitle-admin-dj">Audit et vérification de la validité des liens externes.</p>
+    </div>
+
+    <div class="actions-bar-dj">
+        <button id="btn-start-audit" class="btn-django btn-primary-dj">
+            <span class="glyphicon glyphicon-play"></span> Lancer l'Audit Global
+        </button>
+        <span id="audit-progress" class="status-text-dj" style="display:none; margin-left: 15px;">
+            Vérification en cours... <span id="progress-count">0</span> / <?= count($liens) ?>
+        </span>
+    </div>
+
+    <div class="card-django mt-4">
+        <table class="table table-hover table-django" id="table-audit">
+            <thead>
+                <tr>
+                    <th>Chanson</th>
+                    <th>Type</th>
+                    <th>URL</th>
+                    <th class="text-center">Statut</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($liens as $lien): ?>
+                <tr data-id="<?= $lien['id'] ?>" data-url="<?= htmlspecialchars($lien['url']) ?>" class="row-lien">
+                    <td>
+                        <strong><?= htmlspecialchars($lien['chanson_nom']) ?></strong><br>
+                        <small class="text-muted"><?= htmlspecialchars($lien['description']) ?></small>
+                    </td>
+                    <td><span class="badge badge-info"><?= htmlspecialchars($lien['type']) ?></span></td>
+                    <td class="url-cell">
+                        <a href="<?= htmlspecialchars($lien['url']) ?>" target="_blank" class="link-dj">
+                            <?= strlen($lien['url']) > 50 ? substr($lien['url'], 0, 47) . '...' : htmlspecialchars($lien['url']) ?>
+                        </a>
+                    </td>
+                    <td class="text-center status-cell">
+                        <span class="status-dot status-pending" title="En attente"></span>
+                    </td>
+                    <td class="text-right">
+                        <a href="../chanson/chanson_form.php?id=<?= $lien['chanson_id'] ?>" class="btn-action-dj" title="Éditer la chanson">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .status-dot {
+        height: 12px;
+        width: 12px;
+        background-color: #bbb;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .status-pending { background-color: #9e9e9e; }
+    .status-checking { background-color: #2196f3; animation: blink 1s infinite; }
+    .status-ok { background-color: #4caf50; box-shadow: 0 0 5px #4caf50; }
+    .status-error { background-color: #f44336; box-shadow: 0 0 5px #f44336; }
+    .status-warning { background-color: #ff9800; }
+
+    @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0.3; }
+        100% { opacity: 1; }
+    }
+
+    .row-checking { background-color: rgba(33, 150, 243, 0.05); }
+    .row-dead { background-color: rgba(244, 67, 54, 0.05); }
+</style>
+
+<script>
+$(document).ready(function() {
+    let isAuditing = false;
+    let totalLiens = $('.row-lien').length;
+    let checkedCount = 0;
+
+    $('#btn-start-audit').on('click', function() {
+        if (isAuditing) return;
+        
+        isAuditing = true;
+        $(this).prop('disabled', true).addClass('btn-disabled');
+        $('#audit-progress').show();
+        checkedCount = 0;
+        
+        processNextLien();
+    });
+
+    function processNextLien() {
+        let $nextRow = $('.row-lien').not('.checked').first();
+        
+        if ($nextRow.length === 0) {
+            finishAudit();
+            return;
+        }
+
+        let id = $nextRow.data('id');
+        let url = $nextRow.data('url');
+        let $statusCell = $nextRow.find('.status-cell');
+        let $dot = $statusCell.find('.status-dot');
+
+        $nextRow.addClass('row-checking');
+        $dot.attr('class', 'status-dot status-checking').attr('title', 'Vérification...');
+
+        $.ajax({
+            url: 'audit_liens.php',
+            method: 'POST',
+            data: {
+                action: 'check_url',
+                url: url
+            },
+            dataType: 'json',
+            success: function(response) {
+                $nextRow.removeClass('row-checking').addClass('checked');
+                checkedCount++;
+                $('#progress-count').text(checkedCount);
+
+                if (response.code === 200) {
+                    $dot.attr('class', 'status-dot status-ok').attr('title', 'OK (200)');
+                } else if (response.code === 404) {
+                    $dot.attr('class', 'status-dot status-error').attr('title', 'Lien Mort (404)');
+                    $nextRow.addClass('row-dead');
+                } else if (response.code === 0) {
+                    $dot.attr('class', 'status-dot status-error').attr('title', 'Inaccessible / Timeout');
+                    $nextRow.addClass('row-dead');
+                } else {
+                    $dot.attr('class', 'status-dot status-warning').attr('title', 'Code HTTP: ' + response.code);
+                }
+
+                // Petit délai pour ne pas saturer le serveur
+                setTimeout(processNextLien, 100);
+            },
+            error: function() {
+                $nextRow.removeClass('row-checking').addClass('checked');
+                $dot.attr('class', 'status-dot status-error').attr('title', 'Erreur AJAX');
+                processNextLien();
+            }
+        });
+    }
+
+    function finishAudit() {
+        isAuditing = false;
+        $('#btn-start-audit').prop('disabled', false).removeClass('btn-disabled').html('<span class="glyphicon glyphicon-repeat"></span> Relancer l\'Audit');
+        $('#audit-progress').html('<strong>Audit terminé !</strong> ' + checkedCount + ' liens vérifiés.');
+        
+        toastr.success('Audit des liens terminé !');
+    }
+});
+</script>

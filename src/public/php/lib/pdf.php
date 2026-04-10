@@ -25,6 +25,8 @@ class SongbookPdf extends TcpdfFpdi
     public function __construct()
     {
         parent::__construct();
+        // Désactive l'en-tête par défaut de TCPDF (qui trace une ligne noire)
+        $this->setPrintHeader(false);
         $this->SetAutoPageBreak(true, 15);
     }
 
