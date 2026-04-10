@@ -4,13 +4,16 @@ const NOM_FIC = 'nomFic';
 const ID_DOC = 'idDoc';
 const ID_SONGBOOK = 'id';
 include_once __DIR__ . "/../lib/utilssi.php";
-include_once __DIR__ . "/../navigation/menu.php";
+$id = (int)($_POST[ID_SONGBOOK] ?? ($_GET[ID_SONGBOOK] ?? 0));
+$mode = $_POST['mode'] ?? ($_GET['mode'] ?? '');
+
+// Si on est en mode génération PDF (AJAX), on ne veut SURTOUT PAS inclure le menu HTML
+if ($mode !== 'GENEREPDF') {
+    include_once __DIR__ . "/../navigation/menu.php";
+}
 include_once("Songbook.php");
 include_once __DIR__ . "/../liens/lienDocSongbook.php";
 $nomTable = "songbook";
-
-$id = (int)($_POST[ID_SONGBOOK] ?? ($_GET[ID_SONGBOOK] ?? 0));
-$mode = $_POST['mode'] ?? ($_GET['mode'] ?? '');
 
 // Les modifs sont réservées aux utilisateurs authentifiés et habilités
 if (($_SESSION[PRIVILEGE] ?? 0) <= $GLOBALS["PRIVILEGE_INVITE"]) {
@@ -93,13 +96,28 @@ if ($mode == "SUPPRFICPOU" && $_SESSION [PRIVILEGE] > 1) {
 
 // Ce cas est appelé en ajax, donc on ne redirigera pas
 if ($mode == "GENEREPDF" && $id) {
+    error_log("Génération PDF demandée pour Songbook ID: " . $id);
     // On désactive l'affichage des erreurs et on capture la sortie pour ne pas corrompre le JSON
     ini_set('display_errors', '0');
+    error_reporting(E_ALL);
+    
     ob_start();
+    error_log("Appel de CreeSongBookPdf...");
     $results = CreeSongBookPdf($id);
-    ob_end_clean();
+    error_log("CreeSongBookPdf terminé. Succès: " . ($results['success'] ? 'OUI' : 'NON'));
+    
+    $extraOutput = ob_get_clean();
+    if (!empty($extraOutput)) {
+        error_log("Sortie inattendue détectée pendant la génération: " . $extraOutput);
+    }
+    
+    // NETTOYAGE ULTIME : On vide tout ce qui a pu être envoyé avant (par des inclusions ou des notices)
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    ob_start();
 
-    header('Content-Type: application/json');
+    header('Content-Type: application/json; charset=utf-8');
     echo json_encode($results);
     exit; // ON ARRÊTE TOUT ICI
 }

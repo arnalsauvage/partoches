@@ -34,6 +34,15 @@ $(document).ready(function () {
         });
     }
 
+    // --- SÉCURITÉ MODALES (Django Style) ---
+    // Force la suppression du voile sombre quand on ferme une modale
+    $(document).on('click', '[data-dismiss="modal"]', function() {
+        console.log("BOUTON FERMER CLIQUÉ : Nettoyage forcé du voile sombre...");
+        $('#modalPdfReport').modal('hide');
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open').css('padding-right', '');
+    });
+
     // Fonction globale pour la génération PDF
     window.genereUnPdf = function(id) {
         if (typeof toastr !== 'undefined') toastr.info("Génération du PDF en cours...");
@@ -44,37 +53,55 @@ $(document).ready(function () {
         $reportBody.html('<div class="alert alert-info"><span class="glyphicon glyphicon-refresh spin"></span> Travail en cours, veuillez patienter (cela peut prendre 30s)...</div>');
         $modal.modal('show');
         
+        console.log("Démarrage AJAX pour songbook ID:", id);
         $.ajax({
             type: "POST",
             url: "songbook_get.php",
             data: { id: id, mode: "GENEREPDF" },
             success: function (response) {
-                console.log("Réponse reçue :", response);
+                console.log("RETOUR SERVEUR BRUT :", response);
                 let data = null;
                 
                 if (typeof response === 'object') {
+                    console.log("La réponse est déjà un objet JSON.");
                     data = response;
                 } else {
+                    console.log("La réponse est une chaîne, tentative de parsing...");
                     try {
-                        let jsonStart = response.indexOf('{');
-                        let jsonEnd = response.lastIndexOf('}');
-                        if (jsonStart !== -1 && jsonEnd !== -1) {
-                            data = JSON.parse(response.substring(jsonStart, jsonEnd + 1));
-                        }
+                        data = JSON.parse(response);
                     } catch (e) {
-                        console.error("Erreur parsing JSON manuel", e);
+                        console.warn("Échec du parsing JSON direct, tentative de nettoyage...");
+                        try {
+                            let jsonStart = response.indexOf('{');
+                            let jsonEnd = response.lastIndexOf('}');
+                            if (jsonStart !== -1 && jsonEnd !== -1) {
+                                let cleaned = response.substring(jsonStart, jsonEnd + 1);
+                                console.log("JSON nettoyé trouvé :", cleaned);
+                                data = JSON.parse(cleaned);
+                            }
+                        } catch (e2) {
+                            console.error("Échec définitif du parsing JSON", e2);
+                        }
                     }
                 }
 
                 if (data && data.success) {
-                    if (typeof toastr !== 'undefined') toastr.success("Génération réussie !");
+                    const hasWarnings = data.has_warnings || (data.skipped && data.skipped.length > 0);
+                    const alertClass = hasWarnings ? 'alert-warning' : 'alert-success';
+                    const iconClass = hasWarnings ? 'glyphicon-warning-sign' : 'glyphicon-ok';
+                    const titleText = hasWarnings ? 'Génération avec avertissements' : 'PDF généré avec succès !';
+
+                    if (typeof toastr !== 'undefined') {
+                        if (hasWarnings) toastr.warning("Génération terminée avec des morceaux manquants.");
+                        else toastr.success("Génération réussie !");
+                    }
                     
-                    let html = '<div class="alert alert-success">';
-                    html += '<h4><i class="glyphicon glyphicon-ok"></i> PDF généré avec succès !</h4>';
+                    let html = '<div class="alert ' + alertClass + '">';
+                    html += '<h4><i class="glyphicon ' + iconClass + '"></i> ' + titleText + '</h4>';
                     html += '<p>Le fichier <strong>' + data.file + '</strong> est prêt.</p>';
                     
                     if (data.skipped && data.skipped.length > 0) {
-                        html += '<hr><p><strong>Note :</strong> ' + data.skipped.length + ' morceau(x) ont été ignorés (incompatibles) :</p><ul class="small">';
+                        html += '<hr><p><strong>Attention :</strong> ' + data.skipped.length + ' morceau(x) ont été ignorés (incompatibles ou introuvables) :</p><ul class="small">';
                         data.skipped.forEach(s => html += '<li>' + s + '</li>');
                         html += '</ul>';
                     }

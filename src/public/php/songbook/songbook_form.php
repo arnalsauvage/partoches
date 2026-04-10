@@ -259,9 +259,11 @@ HTML;
             <i class="glyphicon glyphicon-refresh" aria-hidden="true"></i> RÉGÉNÉRER LE PDF COMPLET
         </button>
     </footer>
+HTML;
 
-    <!-- Modal pour le rapport de génération -->
-    <div class="modal fade" id="modalPdfReport" tabindex="-1" role="dialog" aria-labelledby="modalPdfReportLabel">
+    // Modal pour le rapport de génération (Placée en dehors du container principal pour le Z-INDEX)
+    $modalPdf = <<<HTML
+    <div class="modal" id="modalPdfReport" tabindex="-1" role="dialog" aria-labelledby="modalPdfReportLabel">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -283,7 +285,9 @@ HTML;
 $html .= "</div></div>";
 
 // JavaScript Spécifique
-$html .= '<script src="../../js/songbookform.js?v=' . time() . '"></script>';
+$jsSpecifique = '<script src="../../js/songbookform.js?v=' . time() . '"></script>';
 
 echo $html;
+echo $modalPdf ?? '';
+echo $jsSpecifique;
 echo envoieFooter();

@@ -114,6 +114,14 @@ if (!isset($FichierHtml)) {
         return implode($tableau);
     }
 
+    /**
+     * Alias pour envoieHead (historique)
+     */
+    function envoieEntete($titrePage = "", $feuilleCss = "")
+    {
+        return envoieHead($titrePage, $feuilleCss);
+    }
+
     function envoieHead($titrePage, $feuilleCss)
     {
         $siteTitle = $_SESSION['titreSite'] ?? 'Partoches Canopée';
@@ -121,6 +129,10 @@ if (!isset($FichierHtml)) {
         
         $relPath = (strpos($_SERVER['PHP_SELF'], '/php/') !== false) ? "../../" : "";
         $v = time();
+
+        // Utilisation des constantes de l'autoloader
+        $vendorUrl = defined('VENDOR_URL') ? VENDOR_URL : "{$relPath}vendor";
+        $publicUrl = defined('PUBLIC_URL') ? PUBLIC_URL : "{$relPath}";
 
         $head = <<<HTML
 <!doctype html>
@@ -130,19 +142,36 @@ if (!isset($FichierHtml)) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{$relPath}favicon.ico" type="image/x-icon">
-    <link href="{$relPath}css/bootstrap.min.css" rel="stylesheet">
-    <link href="{$relPath}css/jquery-ui.1.12.1.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{$relPath}css/styles-communs.css?v=$v">
-    <link rel="stylesheet" type="text/css" href="{$relPath}css/composants-canopee.css?v=$v">
-    <link rel="stylesheet" type="text/css" href="{$relPath}css/params.css?v=$v">
+    
+    <!-- Vendor CSS -->
+    <link href="{$vendorUrl}/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{$vendorUrl}/css/jquery-ui.1.12.1.css" rel="stylesheet">
+    <link href="{$vendorUrl}/css/toastr.min.css" rel="stylesheet" type="text/css">
+    
+    <!-- Design System Canopée -->
+    <link rel="stylesheet" type="text/css" href="{$publicUrl}/css/styles-communs.css?v=$v">
+    <link rel="stylesheet" type="text/css" href="{$publicUrl}/css/composants-canopee.css?v=$v">
+    <link rel="stylesheet" type="text/css" href="{$publicUrl}/css/params.css?v=$v">
     <link rel="stylesheet" media="screen" type="text/css" title="resolution" href="$feuilleCss" />
     
-    <script src="{$relPath}js/jquery-1.12.4.min.js"></script>
-    <script src="{$relPath}js/utilsJquery.js"></script>
-    <script src="{$relPath}js/jquery-ui.1.12.1.min.js"></script>
-    <script src="{$relPath}js/bootstrap.3.2.0.min.js"></script>
-    <link href="{$relPath}css/toastr.min.css" rel="stylesheet" type="text/css">
-    <script src="{$relPath}js/toastr.min.js"></script>
+    <style>
+        /* Django CSS Fix : On s'assure que le voile sombre ne reste jamais bloqué */
+        body:not(.modal-open) .modal-backdrop { display: none !important; }
+        .modal-backdrop { z-index: 1040 !important; }
+        .modal { z-index: 1050 !important; }
+    </style>
+
+    <!-- Vendor JS (Ordre CRITIQUE) -->
+    <script src="{$vendorUrl}/js/jquery-1.12.4.min.js"></script>
+    <script src="{$vendorUrl}/js/jquery-ui.1.12.1.min.js"></script>
+    <script src="{$vendorUrl}/js/bootstrap.min.js"></script>
+    <script src="{$vendorUrl}/js/toastr.min.js"></script>
+    
+    <!-- Scripts locaux -->
+    <script src="{$publicUrl}/js/utilsJquery.js"></script>
+    <script src="{$publicUrl}/js/precise-star-rating.js"></script>
+    
+    <!-- Select2 (CDN) -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     
@@ -170,6 +199,9 @@ HTML;
             </div>
 HTML;
         }
+
+        $relPath = (strpos($_SERVER['PHP_SELF'], '/php/') !== false) ? "../../" : "";
+        $publicUrl = defined('PUBLIC_URL') ? PUBLIC_URL : "{$relPath}";
 
         $retour = <<<HTML
 <footer class="site-footer">
@@ -201,7 +233,6 @@ HTML;
     </div>
   </div>
 </div>
-<script src="../../js/precise-star-rating.js"></script>
 </body>
 </html>
 HTML;

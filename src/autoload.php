@@ -14,6 +14,11 @@ if (!defined('DATA_DIR')) {
 }
 if (!defined('PUBLIC_DIR')) {
     define('PUBLIC_DIR', ROOT_DIR . '/public');
+    define('VENDOR_DIR', PUBLIC_DIR . '/vendor');
+    
+    // Chemins URL (pour le frontend)
+    define('PUBLIC_URL', ''); // Le serveur pointe déjà sur src/public/
+    define('VENDOR_URL', '/vendor');
 }
 if (!defined('PUBLIC_DATA_DIR')) {
     define('PUBLIC_DATA_DIR', PUBLIC_DIR . '/data'); // Données accessibles via le web

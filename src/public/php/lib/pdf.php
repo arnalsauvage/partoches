@@ -1,22 +1,25 @@
 <?php
 /**
  * Gestion de la génération des Songbooks en PDF.
- * Utilise FPDF et FPDI.
+ * Utilise TCPDF et FPDI (isolés dans vendor/php).
  */
 
-require_once 'fpdf/fpdf.php';
-require_once 'fpdi/autoload.php';
-require_once 'fpdi/Fpdi.php';
+// On s'assure d'avoir nos constantes de chemins absolus
+require_once __DIR__ . '/../../../autoload.php';
 
-use setasign\Fpdi\Fpdi;
+require_once VENDOR_DIR . '/php/tcpdf/tcpdf.php';
+require_once VENDOR_DIR . '/php/fpdi/autoload.php';
+
+use setasign\Fpdi\TcpdfFpdi;
 
 /**
  * Classe de rendu PDF personnalisée pour les Songbooks.
  * Responsabilité : Dessiner les éléments graphiques du document.
+ * Utilise TCPDF via FPDI pour supporter les PDF version 1.5+.
  */
-class SongbookPdf extends Fpdi
+class SongbookPdf extends TcpdfFpdi
 {
-    public const FONT_ARIAL = 'Arial';
+    public const FONT_SANS = 'helvetica';
     public const LOGO_DEFAULT = '../../images/icones/top5.png';
 
     public function __construct()
@@ -32,7 +35,7 @@ class SongbookPdf extends Fpdi
     {
         if ($this->PageNo() > 2) {
             $this->SetY(-15);
-            $this->SetFont(self::FONT_ARIAL, 'I', 8);
+            $this->SetFont(self::FONT_SANS, 'I', 8);
             $this->Cell(0, 10, 'Page ' . $this->PageNo(), 0, 0, 'C');
         }
     }
@@ -49,7 +52,7 @@ class SongbookPdf extends Fpdi
         }
 
         $this->SetY(260);
-        $this->SetFont(self::FONT_ARIAL, 'B', 10);
+        $this->SetFont(self::FONT_SANS, 'B', 10);
         $this->SetTextColor(50, 50, 50);
         $this->Cell(0, 12, (function_exists('mb_convert_encoding') ? mb_convert_encoding($title, 'ISO-8859-1', 'UTF-8') : utf8_decode($title)) . " - v" . $version . " du " . $date, 0, 0, "C");
     }
@@ -62,7 +65,7 @@ class SongbookPdf extends Fpdi
         $this->AddPage();
         
         // Titre Sommaire
-        $this->SetFont(self::FONT_ARIAL, 'B', 20);
+        $this->SetFont(self::FONT_SANS, 'B', 20);
         $this->SetTextColor(50, 50, 50);
         $this->Cell(30, 10, ' ', 0, 0, "C");
         $this->Cell(150, 10, 'Sommaire', 1, 1, "C");
@@ -86,7 +89,7 @@ class SongbookPdf extends Fpdi
             $lineHeight = 7;
         }
 
-        $this->SetFont(self::FONT_ARIAL, 'B', $lineHeight);
+        $this->SetFont(self::FONT_SANS, 'B', $lineHeight);
         $this->Cell(10, $lineHeight / 2, " ", 0, 1, "L");
 
         $songCount = 0;
@@ -94,7 +97,7 @@ class SongbookPdf extends Fpdi
             if ($songCount > 0 && $songCount % $maxSongsPerPage == 0 && $totalSongs > $maxSongsPerPage) {
                 $this->AddPage();
                 $this->SetY(20);
-                $this->SetFont(self::FONT_ARIAL, 'B', $lineHeight);
+                $this->SetFont(self::FONT_SANS, 'B', $lineHeight);
             }
             
             $pageNumber = $pageNumbers[$index] ?? '?';
@@ -112,15 +115,22 @@ class SongbookPdf extends Fpdi
             return 0;
         }
 
-        $pageCount = $this->setSourceFile($filePath);
-        for ($i = 1; $i <= $pageCount; $i++) {
-            $templateId = $this->ImportPage($i);
-            $size = $this->getTemplatesize($templateId);
-            $this->AddPage('P', [$size['width'], $size['height']]);
-            $this->useTemplate($templateId);
+        // Tentative d'import
+        try {
+            $pageCount = $this->setSourceFile($filePath);
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $templateId = $this->ImportPage($i);
+                $size = $this->getTemplatesize($templateId);
+                $this->AddPage('P', [$size['width'], $size['height']]);
+                $this->useTemplate($templateId);
+            }
+            return (int)$pageCount;
+        } catch (Exception $e) {
+            // Si ça échoue ici, c'est probablement que le fichier est corrompu 
+            // ou que même la conversion a échoué.
+            error_log("Erreur critique appendPdfFile : " . $e->getMessage());
+            throw $e;
         }
-        
-        return (int)$pageCount;
     }
 }
 
@@ -133,12 +143,18 @@ class SongbookPdfService
     private string $chansonsDir;
     private string $songbooksDir;
     private string $logFile;
+    private string $tempDir;
     
     public function __construct()
     {
         $this->chansonsDir = __DIR__ . "/../../data/chansons/";
         $this->songbooksDir = __DIR__ . "/../../data/songbooks/";
         $this->logFile = __DIR__ . "/../../../data/logs/songbook_gen.log";
+        $this->tempDir = __DIR__ . "/../../../data/temp/";
+        
+        if (!is_dir($this->tempDir)) {
+            mkdir($this->tempDir, 0777, true);
+        }
     }
 
     private function log(string $message): void
@@ -146,12 +162,42 @@ class SongbookPdfService
         $date = date("Y-m-d H:i:s");
         $formattedMessage = "[$date] $message\n";
         file_put_contents($this->logFile, $formattedMessage, FILE_APPEND);
-        error_log("SongbookGen: $message"); // Doublon dans le log serveur classique
+        error_log("SongbookGen: $message");
+    }
+
+    /**
+     * Utilise Ghostscript pour rendre un PDF compatible (v1.4)
+     * Retourne le chemin du fichier compatible (original ou temporaire)
+     */
+    private function ensureCompatibility(string $filePath): string
+    {
+        $this->log("Vérification compatibilité PDF : " . basename($filePath));
+        
+        // On crée un fichier temporaire pour la version compatible
+        $compatPath = $this->tempDir . "compat_" . md5($filePath) . ".pdf";
+        
+        // Commande Ghostscript pour forcer la version 1.4 et compresser
+        // -dCompatibilityLevel=1.4 force la version compatible avec FPDI
+        // -dPDFSETTINGS=/ebook est un bon compromis qualité/poids
+        $cmd = "gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=" . escapeshellarg($compatPath) . " " . escapeshellarg($filePath) . " 2>&1";
+        
+        $output = [];
+        $returnVar = 0;
+        exec($cmd, $output, $returnVar);
+
+        if ($returnVar === 0 && file_exists($compatPath) && filesize($compatPath) > 0) {
+            $this->log("  -> ✅ Conversion Ghostscript réussie (v1.4).");
+            return $compatPath;
+        }
+
+        $this->log("  -> ⚠️ Échec conversion Ghostscript (Code: $returnVar). On tente l'original.");
+        if (!empty($output)) $this->log("     Logs GS: " . implode(" ", $output));
+        
+        return $filePath;
     }
 
     /**
      * Génère le fichier PDF final et met à jour la BDD
-     * Retourne un tableau avec le statut et les détails
      */
     public function create(
         int $id,
@@ -164,16 +210,17 @@ class SongbookPdfService
         array $docVersions
     ): array {
         $this->log("--- DÉBUT GÉNÉRATION SONGBOOK #$id ($title) ---");
-        $this->log("Nombre de chansons demandées : " . count($songNames));
         
         $pdf = new SongbookPdf();
         $dateStr = date("d/m/Y");
         $results = [
             'success' => false,
+            'has_warnings' => false,
             'errors' => [],
             'warnings' => [],
             'skipped' => [],
-            'file' => ''
+            'file' => '',
+            'temp_files' => []
         ];
 
         // 1. Couverture
@@ -181,19 +228,18 @@ class SongbookPdfService
         $coverPath = $this->songbooksDir . $id . "/" . $coverImage;
         if (!empty($coverImage) && file_exists($coverPath)) {
             try {
-                $this->log("Image de couverture trouvée : $coverImage");
                 $coverPath = $this->ensurePdfCompatibleImage($coverPath);
                 $pdf->addCover($coverPath, $title, $version + 1, $dateStr);
-                $this->log("Couverture ajoutée au PDF.");
+                $this->log("Couverture ajoutée.");
             } catch (Exception $e) {
-                $this->log("ERREUR COUVERTURE : " . $e->getMessage());
                 $results['warnings'][] = "Erreur image couverture : " . $e->getMessage();
+                $results['has_warnings'] = true;
                 $pdf->AddPage();
             }
         } else {
-            $this->log("Pas d'image de couverture (chemin : $coverPath)");
             $pdf->AddPage();
-            $results['warnings'][] = "Pas d'image de couverture trouvée.";
+            $results['warnings'][] = "Pas d'image de couverture.";
+            $results['has_warnings'] = true;
         }
 
         // 2. Chansons
@@ -210,39 +256,44 @@ class SongbookPdfService
             $fullFileName = composeNomVersion($fileName, $docVersion);
             $filePath = $this->chansonsDir . $songId . "/" . $fullFileName;
 
-            $this->log("[$index] Traitement : $songName (Fichier : $fullFileName)");
-
             if (!file_exists($filePath)) {
-                $this->log("  -> ❌ Fichier introuvable à l'adresse : $filePath");
                 $results['skipped'][] = "$songName (Fichier introuvable)";
+                $results['has_warnings'] = true;
                 continue;
             }
 
             try {
-                $memBefore = round(memory_get_usage()/1024/1024, 2);
-                $pagesAdded = $pdf->appendPdfFile($filePath);
-                $memAfter = round(memory_get_usage()/1024/1024, 2);
+                // --- PASSAGE PAR GHOSTSCRIPT ---
+                $safePath = $this->ensureCompatibility($filePath);
+                if ($safePath !== $filePath) {
+                    $results['temp_files'][] = $safePath; // On garde trace pour nettoyer après
+                }
+
+                $pagesAdded = $pdf->appendPdfFile($safePath);
                 
                 if ($pagesAdded > 0) {
-                    $this->log("  -> ✅ Ajouté ($pagesAdded page(s)) - RAM: $memAfter Mo");
                     $startPages[] = $currentPage;
                     $validSongs[] = $songName;
                     $currentPage += $pagesAdded;
+                    $this->log("  -> Ajouté : $songName ($pagesAdded pages)");
                 } else {
-                    $this->log("  -> ⚠️ PDF semble vide ou illisible.");
                     $results['skipped'][] = "$songName (PDF vide)";
+                    $results['has_warnings'] = true;
                 }
             } catch (Exception $e) {
-                $this->log("  -> ❌ ERREUR : " . $e->getMessage());
-                $results['skipped'][] = "$songName (Erreur : " . $e->getMessage() . ")";
+                $this->log("  -> ❌ Erreur sur $songName : " . $e->getMessage());
+                $results['skipped'][] = "$songName (" . $e->getMessage() . ")";
+                $results['has_warnings'] = true;
             }
-            
-            if ($index % 20 == 0) gc_collect_cycles();
+        }
+
+        // Nettoyage des fichiers temporaires GS
+        foreach ($results['temp_files'] as $temp) {
+            if (file_exists($temp)) unlink($temp);
         }
 
         if (empty($validSongs)) {
-            $this->log("ÉCHEC : Aucune chanson valide ajoutée.");
-            $results['errors'][] = "Aucune chanson valide n'a pu être ajoutée.";
+            $results['errors'][] = "Aucune chanson valide ajoutée.";
             return $results;
         }
 
@@ -254,6 +305,7 @@ class SongbookPdfService
         } catch (Exception $e) {
             $this->log("ERREUR SOMMAIRE : " . $e->getMessage());
             $results['warnings'][] = "Erreur sommaire : " . $e->getMessage();
+            $results['has_warnings'] = true;
         }
 
         // 4. Sortie et Enregistrement

@@ -1,5 +1,20 @@
 # RÉSUMÉ DES RÉPONSES GEMINI (Django)
 
+## Date : Jeudi 9 Avril 2026 (Session 8)
+
+### 🎼 Upgrade des Outils PDF & Organisation Vendor
+- **Dossier Centralisé** : Création de `src/public/vendor/` regroupant toutes les dépendances (PHP, CSS, JS, Fonts).
+- **Chemins Absolus** : Intégration de `VENDOR_DIR` et `VENDOR_URL` dans `autoload.php`.
+- **Moteur PDF Moderne** : Migration vers **TCPDF + FPDI** pour supporter nativement les PDF 1.5+ (flux compressés).
+- **UI/UX Améliorée** : 
+    - Gestion des alertes "Warning" (orange) en cas de morceaux manquants.
+    - Stabilisation du focus lors de la génération (modale de rapport).
+
+### 🎸 Note de Django
+"L'orchestre a maintenant une loge toute neuve et des instruments de pointe ! 🎷 Le son est pur, même avec les partitions les plus modernes. C'est du grand art, Arnal ! 🤘✨"
+
+---
+
 ## Date : Mercredi 8 Avril 2026 (Session 7)
 
 ### 🐛 Bugfix & Robustesse : Chemins Absolus
