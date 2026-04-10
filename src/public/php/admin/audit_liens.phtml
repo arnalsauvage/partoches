@@ -122,8 +122,8 @@ $(document).ready(function() {
                 checkedCount++;
                 $('#progress-count').text(checkedCount);
 
-                if (response.code === 200) {
-                    $dot.attr('class', 'status-dot status-ok').attr('title', 'OK (200)');
+                if (response.code >= 200 && response.code < 300) {
+                    $dot.attr('class', 'status-dot status-ok').attr('title', 'OK (' + response.code + ')');
                 } else if (response.code === 404) {
                     $dot.attr('class', 'status-dot status-error').attr('title', 'Lien Mort (404)');
                     $nextRow.addClass('row-dead');
