@@ -114,39 +114,69 @@ class AdminService
      */
     public function exportDatabase()
     {
-        // 1. Récupération des infos de connexion depuis la config du projet
-        $host = $_ENV['DATABASE_HOST'] ?? 'db';
-        $user = $_ENV['DATABASE_USER'] ?? 'root';
-        $pass = $_ENV['DATABASE_PASSWORD'] ?? 'root';
-        $dbname = $_ENV['DATABASE_NAME'] ?? 'dbPartoches';
+        // 1. Récupération des infos de connexion (Identique à configMysql.php pour la cohérence)
+        $host = $_ENV['DATABASE_HOST'] ?? $_SERVER['DATABASE_HOST'] ?? null;
+        $dbname = $_ENV['DATABASE_NAME'] ?? $_SERVER['DATABASE_NAME'] ?? null;
+        $user = $_ENV['DATABASE_USER'] ?? $_SERVER['DATABASE_USER'] ?? null;
+        $pass = $_ENV['DATABASE_PASSWORD'] ?? $_SERVER['DATABASE_PASSWORD'] ?? null;
+
+        if (!$host) {
+            $fichier = __DIR__ . "/../../../data/conf/params.ini";
+            if (file_exists($fichier)) {
+                $ini = new FichierIni();
+                $ini->m_load_fichier($fichier);
+                $host = $ini->m_valeur("monServeur", "mysql");
+                $dbname = $ini->m_valeur("maBase", "mysql");
+                $user = $ini->m_valeur("login", "mysql");
+                $pass = $ini->m_valeur("motDePasse", "mysql");
+            }
+        }
+
+        $host = $host ?: "localhost";
+        $dbname = $dbname ?: "dbPartoches";
+        $user = $user ?: "root";
+        $pass = $pass ?: "";
 
         $tempDir = __DIR__ . '/../../../data/backups/';
-        if (!is_dir($tempDir)) mkdir($tempDir, 0777, true);
+        if (!is_dir($tempDir)) {
+            if (!mkdir($tempDir, 0777, true)) {
+                error_log("AdminService::exportDatabase : Impossible de créer le dossier $tempDir");
+                return false;
+            }
+        }
 
         $filename = "backup_partoches_" . date('Y-m-d_H-i-s') . ".sql";
         $filePath = $tempDir . $filename;
         $gzPath = $filePath . ".gz";
 
-        // 2. Commande mysqldump
-        // Note: On utilise --column-statistics=0 pour la compatibilité avec certains serveurs
-        $cmd = "mysqldump -h " . escapeshellarg($host) . " -u " . escapeshellarg($user) . " -p" . escapeshellarg($pass) . " " . escapeshellarg($dbname) . " --no-tablespaces > " . escapeshellarg($filePath);
+        // 2. Commande mysqldump avec capture d'erreurs
+        $cmd = "mysqldump -h " . escapeshellarg($host) . " -u " . escapeshellarg($user) . " -p" . escapeshellarg($pass) . " " . escapeshellarg($dbname) . " --no-tablespaces 2>&1 > " . escapeshellarg($filePath);
         
         exec($cmd, $output, $returnVar);
 
-        if ($returnVar !== 0 || !file_exists($filePath)) {
+        if ($returnVar !== 0 || !file_exists($filePath) || filesize($filePath) === 0) {
+            $errorMsg = implode("\n", $output);
+            error_log("AdminService::exportDatabase failed (code $returnVar) : " . $errorMsg);
+            if (file_exists($filePath)) unlink($filePath);
             return false;
         }
 
         // 3. Compression Gzip via PHP
         $fp = fopen($filePath, 'r');
         $gz = gzopen($gzPath, 'w9');
+        if (!$gz) {
+            error_log("AdminService::exportDatabase : Impossible de créer le fichier compressé $gzPath");
+            fclose($fp);
+            unlink($filePath);
+            return false;
+        }
+
         while (!feof($fp)) {
             gzwrite($gz, fread($fp, 1024 * 512));
         }
         gzclose($gz);
         fclose($fp);
 
-        // Nettoyage du fichier SQL non compressé
         unlink($filePath);
 
         return $gzPath;
