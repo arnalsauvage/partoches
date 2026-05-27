@@ -12,7 +12,7 @@ if ($mode !== 'GENEREPDF') {
     include_once __DIR__ . "/../navigation/menu.php";
 }
 include_once("Songbook.php");
-include_once __DIR__ . "/../liens/lienDocSongbook.php";
+include_once __DIR__ . "/../liens/LienDocSongbook.php";
 $nomTable = "songbook";
 
 // Les modifs sont réservées aux utilisateurs authentifiés et habilités

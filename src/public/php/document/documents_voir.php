@@ -8,7 +8,7 @@ const C_RACINE = "../../";
 require_once dirname(__DIR__) . "/lib/utilssi.php";
 require_once __DIR__ . "/../lib/Pagination.php";
 require_once __DIR__ . "/../document/Document.php";
-require_once __DIR__ . "/../liens/lienDocSongbook.php";
+require_once __DIR__ . "/../liens/LienDocSongbook.php";
 require_once __DIR__ . "/../navigation/menu.php";
 require_once __DIR__ . "/../songbook/Songbook.php";
 $table = "songbook";

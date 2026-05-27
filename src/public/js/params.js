@@ -42,6 +42,43 @@ $(document).ready(function(){
         });
     });
 
+    // --- EXPORT BDD ---
+    $(document).on('click', '#btnExportDb', function(e){
+        e.preventDefault();
+        console.log("Clic sur Export BDD détecté");
+        
+        if (!confirm('Voulez-vous exporter et télécharger une sauvegarde compressée de la base de données ?')) return;
+        
+        var btn = $(this);
+        var oldHtml = btn.html();
+        btn.prop('disabled', true).html('<span class="glyphicon glyphicon-refresh spin"></span> Export en cours...');
+        
+        console.log("Lancement du formulaire d'export...");
+        
+        // On utilise un formulaire temporaire pour forcer le téléchargement
+        var form = $('<form>', {
+            action: window.location.href,
+            method: 'POST'
+        });
+        
+        form.append($('<input>', {
+            name: 'action',
+            value: 'export_db',
+            type: 'hidden'
+        }));
+        
+        $('body').append(form);
+        form.submit();
+        form.remove();
+        
+        console.log("Formulaire soumis.");
+        
+        // On remet le bouton après un petit délai
+        setTimeout(function(){
+            btn.prop('disabled', false).html(oldHtml);
+        }, 5000);
+    });
+
     // --- RÉGÉNÉRATION MÉDIAS ---
     $('#btnRegenMedias').click(function(){
         if (!confirm('Voulez-vous vraiment régénérer tout le catalogue des médias ? Cela peut prendre quelques secondes.')) return;

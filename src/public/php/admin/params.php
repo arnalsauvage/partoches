@@ -45,6 +45,30 @@ if (isset($_POST['action'])) {
             MediaService::resetMediaTable(); 
             echo "✅ Catalogue regenere avec succes !";
             break;
+        case 'export_db':
+            $filePath = $adminService->exportDatabase();
+            if ($filePath && file_exists($filePath)) {
+                // On vide les tampons pour éviter de corrompre le fichier binaire
+                if (ob_get_level()) ob_end_clean();
+                
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($filePath));
+                readfile($filePath);
+                
+                // On peut supprimer le fichier temporaire après envoi si on veut, 
+                // mais le garder en backup local sur le serveur n'est pas une mauvaise idée.
+                // unlink($filePath);
+                exit;
+            } else {
+                http_response_code(500);
+                echo "❌ Erreur lors de l'export de la base de données. Verifiez les permissions du dossier data/backups et la presence de mysqldump.";
+            }
+            break;
     }
     exit;
 }

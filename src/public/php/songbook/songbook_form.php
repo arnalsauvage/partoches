@@ -8,7 +8,7 @@ require_once PHP_DIR . "/navigation/menu.php";
 echo $MENU_HTML;
 require_once PHP_DIR . "/songbook/Songbook.php";
 require_once PHP_DIR . "/document/Document.php";
-require_once PHP_DIR . "/liens/lienDocSongbook.php";
+require_once PHP_DIR . "/liens/LienDocSongbook.php";
 
 /**
  * Fonctions Helpers de rendu (Clean Code / DRY)

@@ -56,16 +56,18 @@ if ($listeSongbooks) {
         if ($liensChansons) {
             while ($lien = $liensChansons->fetch_row()) {
                 $docInfo = chercheDocument($lien[1]); // [6] est l'idChanson
-                $idChanson = $docInfo[6];
-                if (isset($titresChansons[$idChanson])) {
-                    $nomChanson = htmlspecialchars(limiteLongueur($titresChansons[$idChanson], 50));
-                    $trackListHtml .= <<<HTML
-                    <li class="songbook-track-item">
-                        <a href="../chanson/chanson_voir.php?id=$idChanson" title="Voir la fiche">
-                            <i class="glyphicon glyphicon-music" style="color: #D2B48C; margin-right: 5px;"></i> $nomChanson
-                        </a>
-                    </li>
+                if (is_array($docInfo)) {
+                    $idChanson = $docInfo[6];
+                    if (isset($titresChansons[$idChanson])) {
+                        $nomChanson = htmlspecialchars(limiteLongueur($titresChansons[$idChanson], 50));
+                        $trackListHtml .= <<<HTML
+                        <li class="songbook-track-item">
+                            <a href="../chanson/chanson_voir.php?id=$idChanson" title="Voir la fiche">
+                                <i class="glyphicon glyphicon-music" style="color: #D2B48C; margin-right: 5px;"></i> $nomChanson
+                            </a>
+                        </li>
 HTML;
+                    }
                 }
             }
         }

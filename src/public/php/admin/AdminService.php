@@ -107,4 +107,48 @@ class AdminService
         }
         return $count;
     }
+
+    /**
+     * Exporte la base de données au format SQL compressé (GZ).
+     * @return string|false Chemin vers le fichier généré ou false si erreur
+     */
+    public function exportDatabase()
+    {
+        // 1. Récupération des infos de connexion depuis la config du projet
+        $host = $_ENV['DATABASE_HOST'] ?? 'db';
+        $user = $_ENV['DATABASE_USER'] ?? 'root';
+        $pass = $_ENV['DATABASE_PASSWORD'] ?? 'root';
+        $dbname = $_ENV['DATABASE_NAME'] ?? 'dbPartoches';
+
+        $tempDir = __DIR__ . '/../../../data/backups/';
+        if (!is_dir($tempDir)) mkdir($tempDir, 0777, true);
+
+        $filename = "backup_partoches_" . date('Y-m-d_H-i-s') . ".sql";
+        $filePath = $tempDir . $filename;
+        $gzPath = $filePath . ".gz";
+
+        // 2. Commande mysqldump
+        // Note: On utilise --column-statistics=0 pour la compatibilité avec certains serveurs
+        $cmd = "mysqldump -h " . escapeshellarg($host) . " -u " . escapeshellarg($user) . " -p" . escapeshellarg($pass) . " " . escapeshellarg($dbname) . " --no-tablespaces > " . escapeshellarg($filePath);
+        
+        exec($cmd, $output, $returnVar);
+
+        if ($returnVar !== 0 || !file_exists($filePath)) {
+            return false;
+        }
+
+        // 3. Compression Gzip via PHP
+        $fp = fopen($filePath, 'r');
+        $gz = gzopen($gzPath, 'w9');
+        while (!feof($fp)) {
+            gzwrite($gz, fread($fp, 1024 * 512));
+        }
+        gzclose($gz);
+        fclose($fp);
+
+        // Nettoyage du fichier SQL non compressé
+        unlink($filePath);
+
+        return $gzPath;
+    }
 }

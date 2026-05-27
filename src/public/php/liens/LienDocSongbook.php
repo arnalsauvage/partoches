@@ -213,6 +213,11 @@ if (!function_exists('modifielienDocSongbook')) {
         return LienDocSongbook::modifielienDocSongbook($id, $idDocument, $idSongbook, $ordre);
     }
 }
+if (!function_exists('modifieOrdreLienDocSongbook')) {
+    function modifieOrdreLienDocSongbook($idDocument, $idSongbook, $ordre) {
+        return LienDocSongbook::modifieOrdreLienDocSongbook($idDocument, $idSongbook, $ordre);
+    }
+}
 if (!function_exists('supprimeLienDocSongbook')) {
     function supprimeLienDocSongbook($id) {
         return LienDocSongbook::supprimeLienDocSongbook($id);
