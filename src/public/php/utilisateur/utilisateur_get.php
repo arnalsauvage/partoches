@@ -1,48 +1,82 @@
 <?php
+/**
+ * Traitement des actions utilisateur (MAJ, INS, SUPPR)
+ */
 require_once dirname(__DIR__, 3) . "/autoload.php";
 require_once PHP_DIR . "/navigation/menu.php";
 
-$nomTable = "utilisateur";
 $utilisateurListe = "utilisateur_liste.php";
 
-// require_once ("params.php");
-$sortie = envoieHead("Menu", "../../css/index.css?v=25.3.28");
-$table = "utilisateur";
-entreBalise("Utilisateurs", "H1");
+// Récupération sécurisée du mode et de l'id
+$mode = $_POST['mode'] ?? $_GET['mode'] ?? '';
+$idTarget = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
 
-//var_dump( $_POST);
-$mode = $_POST ['mode'];
+// --- VÉRIFICATION DES DROITS ---
+$isAdmin = estAdmin();
+$isSelf = ((int)$_SESSION['id'] === $idTarget);
 
-$fimage = "/utilisateur/" . $_POST ['fimage'];
-// Un non-admin ne peut changer ses privilèges
-if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-    $fprivilege = $_SESSION ['privilege'];
-    // ne peut changer son nombre de connexions, il faut donc charger la valeur, elle n'est pas passée par le formulaire
-    $fnbreLogins = Utilisateur::chercheUtilisateur($_SESSION ['id']);
-    $fnbreLogins = $fnbreLogins[11];
-}
-else
-{
-    $fprivilege = $_POST ['fprivilege'];
-    $fnbreLogins = $_POST ['fnbreLogins'];
+if (!$isAdmin && !$isSelf) {
+    // Si on n'est pas admin et qu'on ne se modifie pas soi-même, on n'a rien à faire ici
+    redirection($utilisateurListe . "?msg=AUTH_DENIED");
+    exit();
 }
 
-// On gère 3 cas : création d'utilisateur, modif ou suppressions
+// Un non-admin ne peut jamais supprimer (même lui-même via ce script)
+if ($mode == "SUPPR" && !$isAdmin) {
+    redirection($utilisateurListe . "?msg=AUTH_DENIED");
+    exit();
+}
+
+// Un admin ne peut pas se supprimer lui-même (sécurité)
+if ($mode == "SUPPR" && $isSelf) {
+    redirection($utilisateurListe . "?msg=AUTH_DENIED");
+    exit();
+}
+
+// --- TRAITEMENT ---
+
 if ($mode == "MAJ") {
-    modifieUtilisateur($_POST ['id'], $_POST ['flogin'], $_POST ['fmdp'], $_POST ['fprenom'], $_POST ['fnom'],
-        $_POST ['fimage'], $_POST ['fsite'], $_POST ['femail'], $_POST ['fsignature'], $fnbreLogins,
-        $fprivilege);
+    // Récupération des données du formulaire
+    $flogin = $_POST['flogin'] ?? '';
+    $fmdp = $_POST['fmdp'] ?? '';
+    $fprenom = $_POST['fprenom'] ?? '';
+    $fnom = $_POST['fnom'] ?? '';
+    $fimage = $_POST['fimage'] ?? '';
+    $fsite = $_POST['fsite'] ?? '';
+    $femail = $_POST['femail'] ?? '';
+    $fsignature = $_POST['fsignature'] ?? '';
+
+    // Gestion des privilèges et compteurs (Seul l'admin peut les changer)
+    if ($isAdmin) {
+        $fprivilege = (int)($_POST['fprivilege'] ?? 0);
+        $fnbreLogins = (int)($_POST['fnbreLogins'] ?? 0);
+    } else {
+        // On récupère les valeurs actuelles pour ne pas les écraser
+        $current = Utilisateur::chercheUtilisateur($idTarget);
+        $fnbreLogins = $current[10] ?? 0;
+        $fprivilege = $current[11] ?? 0;
+    }
+
+    modifieUtilisateur($idTarget, $flogin, $fmdp, $fprenom, $fnom, $fimage, $fsite, $femail, $fsignature, $fnbreLogins, $fprivilege);
 }
 
-// Gestion de la demande de suppression
-if ($_POST ['$id'] && $mode == "SUPPR") {
-    if ($_SESSION ['privilege'] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
-        supprimeUtilisateur($_POST ['id']);
-    }
+if ($mode == "SUPPR" && $isAdmin && $idTarget > 0) {
+    supprimeUtilisateur($idTarget);
 }
-if ($mode == "INS") {
-    // Entrer une nouvelle fiche utilisateur
-    creeUtilisateur($_POST ['flogin'], $_POST ['fmdp'], $_POST ['fprenom'], $_POST ['fnom'],
-        $_POST ['fimage'], $_POST ['fsite'], $_POST ['femail'], $_POST ['fsignature'], $_POST ['fprivilege']);
+
+if ($mode == "INS" && $isAdmin) {
+    // Création (Seul l'admin peut créer)
+    $flogin = $_POST['flogin'] ?? '';
+    $fmdp = $_POST['fmdp'] ?? '';
+    $fprenom = $_POST['fprenom'] ?? '';
+    $fnom = $_POST['fnom'] ?? '';
+    $fimage = $_POST['fimage'] ?? '';
+    $fsite = $_POST['fsite'] ?? '';
+    $femail = $_POST['femail'] ?? '';
+    $fsignature = $_POST['fsignature'] ?? '';
+    $fprivilege = (int)($_POST['fprivilege'] ?? 0);
+
+    creeUtilisateur($flogin, $fmdp, $fprenom, $fnom, $fimage, $fsite, $femail, $fsignature, $fprivilege);
 }
+
 redirection($utilisateurListe);

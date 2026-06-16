@@ -342,13 +342,25 @@ class Utilisateur
         };
 
         $actionsAdmin = "";
-        if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
+        $isSelf = (int)($_SESSION['id'] ?? 0) === (int)$this->_id;
+        $isAdmin = estAdmin();
+
+        // Tout le monde peut se modifier soi-même. 
+        // Seul l'admin peut modifier les autres ou supprimer.
+        if ($isAdmin || $isSelf) {
             $urlEdit = "utilisateur_form.php?id=$id";
-            $urlSuppr = "utilisateur_get.php?id=$id&amp;mode=SUPPR";
+            $btnSuppr = "";
+            
+            // Seul un admin peut supprimer, et jamais lui-même depuis la liste
+            if ($isAdmin && !$isSelf) {
+                $urlSuppr = "utilisateur_get.php?id=$id&amp;mode=SUPPR";
+                $btnSuppr = "<a href=\"$urlSuppr\" class=\"btn btn-xs btn-danger\" title=\"Supprimer\" onclick=\"return confirm('Supprimer cet utilisateur ?')\"><i class=\"glyphicon glyphicon-trash\"></i></a>";
+            }
+
             $actionsAdmin = <<<HTML
             <div class="user-card-actions">
                 <a href="$urlEdit" class="btn btn-xs btn-primary" title="Modifier"><i class="glyphicon glyphicon-pencil"></i></a>
-                <a href="$urlSuppr" class="btn btn-xs btn-danger" title="Supprimer" onclick="return confirm('Supprimer cet utilisateur ?')"><i class="glyphicon glyphicon-trash"></i></a>
+                $btnSuppr
             </div>
 HTML;
         }

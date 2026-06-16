@@ -10,7 +10,15 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-$id = (int)$_SESSION['id'];
+$isAdmin = estAdmin();
+$idFromForm = (int)($_POST['id'] ?? 0);
+$idSession = (int)$_SESSION['id'];
+
+// Si on est admin, on respecte l'ID du formulaire s'il est présent.
+// Sinon, on ne peut uploader que pour soi-même.
+$id = ($isAdmin && $idFromForm > 0) ? $idFromForm : $idSession;
+$isSelf = ($id === $idSession);
+
 // Le dossier des images utilisateur est dans src/public/images/utilisateur/
 // Depuis src/public/php/utilisateur/, c'est ../../images/utilisateur/
 $dossier_cible = __DIR__ . "/../../images/utilisateur/";
@@ -86,7 +94,9 @@ if (move_uploaded_file($_FILES['fichierUploade']['tmp_name'], $destination)) {
             $u[11]  // privilege
         );
         
-        $_SESSION['image'] = "/utilisateur/" . $name_file;
+        if ($isSelf) {
+            $_SESSION['image'] = "/utilisateur/" . $name_file;
+        }
         header("Location: utilisateur_form.php?id=$id&msg=OK_UPLOAD");
         exit();
     }
