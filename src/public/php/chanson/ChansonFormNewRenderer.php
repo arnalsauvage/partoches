@@ -302,7 +302,7 @@ class ChansonFormNewRenderer
 
     private static function inlineScript(): string
     {
-        return <<<JAVASCRIPT
+        return <<<'JAVASCRIPT'
 <script>
 $(document).ready(function() {
     $('select[name="fidUser"]').addClass('input-django');
@@ -313,7 +313,7 @@ $(document).ready(function() {
         $('#currentSelectedCover').attr('src', thumbnailUrl);
         $('#selectedCoverPreview').removeClass('hidden-element');
         $('.cover-thumbnail').removeClass('selected-cover');
-        $(`img[data-cover-url="\${coverUrl}"]`).addClass('selected-cover');
+        $(`img[data-cover-url="${coverUrl}"]`).addClass('selected-cover');
     }
 
     $('#clearCoverSelection').on('click', function() {
