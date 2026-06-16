@@ -36,8 +36,8 @@ function chercheLienChansonPlaylist($id)
  */
 function nombreDeLiensDeLaPlaylist($idPlaylist)
 {
-    $maRequete = "SELECT * FROM lienchansonplaylist WHERE idPlaylist = '$idPlaylist'";
-    $result = $_SESSION['mysql']->query($maRequete) or die ("Problème nombreDeLiensDeLaPlaylist #1 : " . $_SESSION ['mysql']->error);
+    $maRequete = "SELECT * FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'";
+    $result = $_SESSION['mysql']->query($maRequete) or die ("Problème nombreDeLiensDeLaPlaylist #1 : " . $_SESSION['mysql']->error);
     $row_cnt = $result->num_rows;
     return ($row_cnt);
 }
@@ -45,7 +45,7 @@ function nombreDeLiensDeLaPlaylist($idPlaylist)
 // Cherche un lienChansonPlaylist et le renvoie s'il existe
 function chercheLienParIdPlaylistIdChanson($idPlaylist, $idChanson)
 {
-    $maRequete = "SELECT * FROM lienchansonplaylist WHERE idChanson = '$idChanson' AND idPlaylist = '$idPlaylist'";
+    $maRequete = "SELECT * FROM lienchansonplaylist WHERE id_chanson = '$idChanson' AND id_playlist = '$idPlaylist'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheIdPlaylistIdChanson #1 : " . $_SESSION ['mysql']->error);
     // renvoie la ligne sélectionnée : id, nom, interprète, année
     if (($ligne = $result->fetch_row()))
@@ -57,7 +57,7 @@ function chercheLienParIdPlaylistIdChanson($idPlaylist, $idChanson)
 // Cherche le nieme lienChansonPlaylist  d'un Playlistet le renvoie s'il existe
 function chercheLienParIdPlaylistOrdre($idPlaylist, $ordre)
 {
-    $maRequete = "SELECT * FROM lienchansonplaylist WHERE ordre = '$ordre' AND idPlaylist = '$idPlaylist'";
+    $maRequete = "SELECT * FROM lienchansonplaylist WHERE ordre = '$ordre' AND id_playlist = '$idPlaylist'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienParIdPlaylistOrdre #1 : " . $_SESSION ['mysql']->error);
     // renvoie la ligne sélectionnée : id, nom, interprète, année
     if (($ligne = $result->fetch_row()))
@@ -73,11 +73,11 @@ function creelienChansonPlaylist($idChanson, $idPlaylist)
     $idPlaylist = (int)$idPlaylist;
     
     // On compte proprement en SQL
-    $res = $_SESSION['mysql']->query("SELECT COUNT(*) FROM lienchansonplaylist WHERE idPlaylist = '$idPlaylist'");
+    $res = $_SESSION['mysql']->query("SELECT COUNT(*) FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'");
     $row = $res->fetch_row();
     $nb = $row[0] + 1;
 
-    $maRequete = "INSERT INTO lienchansonplaylist (id, idChanson, idPlaylist, ordre) VALUES (NULL, '$idChanson', '$idPlaylist', '$nb')";
+    $maRequete = "INSERT INTO lienchansonplaylist (id, id_chanson, id_playlist, ordre) VALUES (NULL, '$idChanson', '$idPlaylist', '$nb')";
     $_SESSION ['mysql']->query($maRequete) or die ("Problème creelienChansonPlaylist#1 : " . $_SESSION ['mysql']->error);
 }
 
@@ -85,7 +85,7 @@ function creelienChansonPlaylist($idChanson, $idPlaylist)
 function modifielienChansonPlaylist($id, $idChanson, $idPlaylist, $ordre)
 {
     $maRequete = "UPDATE  lienchansonplaylist
-	SET idChanson = '$idChanson', idPlaylist = '$idPlaylist', ordre = '$ordre'
+	SET id_chanson = '$idChanson', id_playlist = '$idPlaylist', ordre = '$ordre'
 	WHERE id='$id'";
 // 	echo $maRequete . "<br>";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifielienChansonPlaylist #1 : " . $_SESSION ['mysql']->error);
@@ -107,7 +107,7 @@ function supprimelienIdChansonIdPlaylist($idChanson, $idPlaylist)
 {
     // On supprime les enregistrements dans lienChansonPlaylist
     $maRequete = "DELETE FROM lienchansonplaylist
-	WHERE idChanson = '$idChanson' AND idPlaylist = '$idPlaylist'";
+	WHERE id_chanson = '$idChanson' AND id_playlist = '$idPlaylist'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimelienChansonPlaylist : " . $_SESSION ['mysql']->error);
     // On réordonne la liste
     ordonneLiensPlaylist($idPlaylist);
@@ -118,7 +118,7 @@ function supprimeliensChansonPlaylistDeLaChanson($idChanson)
 {
     // On supprime les enregistrements dans lienChansonPlaylist
     $maRequete = "DELETE FROM lienchansonplaylist
-	WHERE idChanson ='$idChanson'";
+	WHERE id_chanson ='$idChanson'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimeliensChansonPlaylistDeLaChanson : " . $_SESSION ['mysql']->error);
 }
 
@@ -127,7 +127,7 @@ function supprimeliensChansonPlaylistDeLaPlaylist($idPlaylist)
 {
     // On supprime les enregistrements dans lienChansonPlaylist
     $maRequete = "DELETE FROM lienchansonplaylist
-	WHERE idPlaylist ='$idPlaylist'";
+	WHERE id_playlist ='$idPlaylist'";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimeliensChansonPlaylistDeLaPlaylist : " . $_SESSION ['mysql']->error);
 }
 
@@ -154,7 +154,7 @@ function infoslienChansonPlaylist($id)
 function ordonneLiensPlaylist($idPlaylist)
 {
     // Récupérer la liste des liens triés par ordre
-    $lignes = chercheLiensChansonPlaylist('idPlaylist', $idPlaylist, "ordre", true);
+    $lignes = chercheLiensChansonPlaylist('id_playlist', $idPlaylist, "ordre", true);
 
     // Les stocker dans un tableau
     $numero = 1;

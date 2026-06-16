@@ -1,0 +1,90 @@
+/* 
+   DESIGN SYSTEM : CANOPÉE
+   Spécifique au Formulaire de Playlist
+*/
+
+.playlist-form-container {
+    padding-top: 20px;
+}
+
+.playlist-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 20px; 
+    border-bottom: 2px solid var(--c-accent); 
+    padding-bottom: 10px;
+}
+
+.playlist-title {
+    margin: 0; 
+    color: var(--c-marron-fonce);
+}
+
+.playlist-header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.tabs-django {
+    margin-top: 15px;
+}
+
+.playlist-config-well {
+    background-color: var(--c-beige); 
+    border: 1px solid var(--c-marron-clair); 
+    border-radius: 12px; 
+    margin-top: 15px;
+}
+
+.playlist-type-select {
+    background-color: var(--c-marron-fonce); 
+    color: var(--c-beige); 
+    font-weight: bold;
+}
+
+.dynamic-options-well {
+    border: 2px solid var(--c-accent); 
+    background-color: #fff;
+}
+
+.dynamic-options-title {
+    color: var(--c-accent); 
+    margin-top: 0;
+}
+
+.btn-save-playlist {
+    background-color: var(--c-marron-fonce); 
+    color: var(--c-beige); 
+    border: 1px solid var(--c-marron-clair); 
+    padding: 10px 40px;
+}
+
+.btn-save-playlist:hover {
+    background-color: var(--c-accent);
+    color: #fff;
+}
+
+.playlist-songs-table {
+    background: white; 
+    border: 1px solid #ddd;
+}
+
+.playlist-songs-table thead tr {
+    background: var(--c-marron-fonce); 
+    color: var(--c-beige);
+}
+
+.add-song-well {
+    background-color: var(--c-marron-fonce); 
+    color: var(--c-beige);
+}
+
+.btn-add-song {
+    background-color: var(--c-accent); 
+    border: none;
+}
+
+.mt-10 { margin-top: 10px; }
+.mt-15 { margin-top: 15px; }
+.mt-20 { margin-top: 20px; }

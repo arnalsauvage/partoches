@@ -71,6 +71,8 @@ class SongbookSmokeTest extends TestCase
             'Upload Chanson' => ['/php/chanson/chanson_upload.php', []],
             'Form Utilisateur (Edit ID 1)' => ['/php/utilisateur/utilisateur_form.php', ['id' => 1]],
             'Form Songbook (Edit ID 40)' => ['/php/songbook/songbook_form.php', ['id' => 40]],
+            'Form Playlist (New)' => ['/php/playlist/playlist_form.php', []],
+            'Form Playlist (Edit ID 3)' => ['/php/playlist/playlist_form.php', ['id' => 3]],
             'Liste Documents Admin' => ['/php/document/documents_voir.php', []],
 
             // --- PAGES HTML ET OUTILS ---

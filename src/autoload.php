@@ -18,7 +18,7 @@ if (!defined('PUBLIC_DIR')) {
     
     // Chemins URL (pour le frontend)
     define('PUBLIC_URL', ''); // Le serveur pointe déjà sur src/public/
-    define('VENDOR_URL', '/vendor');
+    define('VENDOR_URL', '');
 }
 if (!defined('PUBLIC_DATA_DIR')) {
     define('PUBLIC_DATA_DIR', PUBLIC_DIR . '/data'); // Données accessibles via le web
