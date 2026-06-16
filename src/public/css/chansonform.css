@@ -10,6 +10,94 @@
     text-align: center;
 }
 
+/* --- NOUVEAU FORMULAIRE CHANSON (ChansonFormNewRenderer) --- */
+.card-shadow-django {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.form-chanson-new {
+    background: transparent !important;
+    border: none !important;
+}
+
+.year-validation-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    border: 1px solid #ccc;
+}
+
+.tempo-value {
+    font-weight: bold;
+    color: var(--c-accent);
+}
+
+.tempo-slider {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.cover-section-dj {
+    background: #fdfdfd;
+}
+
+.img-cover-preview {
+    max-width: 100%;
+    height: auto;
+    border: 3px solid var(--c-marron-clair);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.cover-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.selected-cover {
+    border: 3px solid var(--c-accent) !important;
+    transform: scale(1.1);
+}
+
+.cover-section-subtitle {
+    font-weight: bold;
+    color: #666;
+}
+
+.covers-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.no-covers-message {
+    font-size: 0.8em;
+    color: #999;
+}
+
+.btn-save-chanson {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.hidden-element {
+    display: none !important;
+}
+
+.mt-10 { margin-top: 10px; }
+.mt-20 { margin-top: 20px; }
+.mb-15 { margin-bottom: 15px; }
+
 /* --- GESTION DES MODALES --- */
 .modal {
     display: none;

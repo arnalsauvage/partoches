@@ -373,24 +373,24 @@ class Chanson
             $this->setId($_SESSION [self::MYSQL]->insert_id);
             return $this->getId();
         } else {
-            $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
-            $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
-            $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
-            $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
-            $maRequete = sprintf("UPDATE  chanson SET nom = '%s', interprete = '%s', annee = '%s',
-            idUser = %s, tempo = '%s', mesure='%s', pulsation='%s', 
-            hits='%s', tonalite='%s', datePub='%s', cover='%s', publication=%s WHERE id='%s'", 
-                $this->_nom,
-                $this->_interprete,
-                $this->_annee,
+            $nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
+            $interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
+            $annee = (int)$this->_annee;
+            $cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
+            $maRequete = sprintf("UPDATE  chanson SET nom = '%s', interprete = '%s', annee = '%d',
+            idUser = %d, tempo = '%d', mesure='%s', pulsation='%s', 
+            hits='%d', tonalite='%s', datePub='%s', cover='%s', publication=%d WHERE id='%d'", 
+                $nom,
+                $interprete,
+                $annee,
                 $this->_idUser,
                 $this->_tempo,
-                $this->_mesure,
-                $this->_pulsation,
+                $_SESSION [self::MYSQL]->real_escape_string($this->_mesure),
+                $_SESSION [self::MYSQL]->real_escape_string($this->_pulsation),
                 $this->_hits,
-                $this->_tonalite,
-                $this->_datePub,
-                $this->_cover,
+                $_SESSION [self::MYSQL]->real_escape_string($this->_tonalite),
+                $_SESSION [self::MYSQL]->real_escape_string($this->_datePub),
+                $cover,
                 $this->_publication,
                 $this->_id);
             $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème modif dans creeModifieChanson #1 : " . $_SESSION [self::MYSQL]->error . " requete : " . $maRequete);
@@ -401,10 +401,10 @@ class Chanson
     // Cree une chanson et renvoie l'id de la chanson créée
     public function creeChansonBDD()
     {
-        $this->_nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
-        $this->_interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
-        $this->_annee = $_SESSION [self::MYSQL]->real_escape_string($this->_annee);
-        $this->_cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
+        $nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
+        $interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
+        $annee = (int)$this->_annee;
+        $cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
         
         // On n'écrase la date que si elle est vide ou par défaut
         if (empty($this->_datePub) || $this->_datePub == '0000-00-00') {
@@ -419,17 +419,17 @@ class Chanson
         $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite, cover, publication)
 	        VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', 
 	        '%s', '%s' ,  '%s', '%s', '%s', %s)", 
-            $this->_nom,
-            $this->_interprete,
-            $this->_annee,
+            $nom,
+            $interprete,
+            $annee,
             $this->_idUser,
             $this->_tempo,
-            $this->_mesure,
-            $this->_pulsation,
-            $this->_datePub,
+            $_SESSION [self::MYSQL]->real_escape_string($this->_mesure),
+            $_SESSION [self::MYSQL]->real_escape_string($this->_pulsation),
+            $_SESSION [self::MYSQL]->real_escape_string($this->_datePub),
             $this->_hits,
-            $this->_tonalite,
-            $this->_cover,
+            $_SESSION [self::MYSQL]->real_escape_string($this->_tonalite),
+            $cover,
             $this->_publication);
         $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème creeChansonBDD#1 : " . $_SESSION [self::MYSQL]->error);
         $this->setId($_SESSION [self::MYSQL]->insert_id);
