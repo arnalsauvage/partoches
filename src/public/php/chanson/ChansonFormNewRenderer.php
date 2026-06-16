@@ -155,12 +155,11 @@ class ChansonFormNewRenderer
         });
 
         // Publication
-        $checkedPub = ($_chanson->getPublication() === 1) ? ' checked' : '';
+        $checkedPub = ($_chanson->getPublication() == 1) ? ' checked' : '';
         $html .= "<div class='row'><div class='col-sm-12'>";
         $html .= "<div class='form-group-django'>";
-        $html .= "<label class='label-django' for='fpublication'>Publication :</label>";
-        $html .= "<input type='checkbox' id='fpublication' name='fpublication' value='1'{$checkedPub}>";
-        $html .= "<span class='text-muted small'> (Visible par tous si coché)</span>";
+        $html .= "<input type='checkbox' id='fpublication' name='fpublication' value='1'{$checkedPub} class='checkbox-django'>";
+        $html .= "<label class='label-django label-inline-django' for='fpublication'>Publication <span class='text-muted small' style='font-weight: normal;'>(Visible par tous si coché)</span></label>";
         $html .= "</div></div></div>";
 
         // Auteur / Hits

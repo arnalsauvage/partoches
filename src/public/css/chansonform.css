@@ -90,6 +90,23 @@
     font-size: 1.2em;
 }
 
+.label-inline-django {
+    display: inline-block !important;
+    margin-bottom: 0 !important;
+    vertical-align: middle;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.checkbox-django {
+    width: 18px !important;
+    height: 18px !important;
+    vertical-align: middle;
+    margin: 0 !important;
+    cursor: pointer;
+    display: inline-block !important;
+}
+
 .hidden-element {
     display: none !important;
 }
