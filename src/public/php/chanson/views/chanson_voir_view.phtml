@@ -1,0 +1,185 @@
+<?php
+/**
+ * VUE : chanson_voir_view.phtml
+ * Template HTML pour la fiche d'une chanson.
+ */
+?>
+<div class="container chanson-voir-container">
+    <div class="starter-template">
+        
+        <!-- Navigation -->
+        <div class="row">
+            <div class="col-xs-12 text-left mb-15">
+                <a href="chanson_liste.php" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-arrow-left"></i> Retour</a>
+                <?php if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])): ?>
+                    <a href="chanson_form.php?id=<?= $id ?>" class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-pencil"></i> Modifier</a>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="row">
+            <section class="col-sm-8 text-left">
+                <h2 class="mt-0"><?= htmlentities($chanson->getNom()) ?> 
+                    <button class="btn btn-xs btn-link" onclick="copyUrlToClipboard()" title="Copier le lien"><i class="glyphicon glyphicon-link"></i></button>
+                    <span id="copy-success" class="hidden-element"><i class="glyphicon glyphicon-ok"></i> Copié !</span>
+                </h2>
+                <h3 class="mt-0"><?= htmlentities($chanson->getInterprete()) ?></h3>
+                
+                <div class="mt-15">
+                    <?php $urlBase = "chanson_liste.php?filtre="; ?>
+                    <a href="<?= $urlBase ?>annee&amp;valFiltre=<?= $chanson->getAnnee() ?>" class="label label-success badge-tech"><i class="glyphicon glyphicon-calendar"></i> <?= $chanson->getAnnee() ?></a>
+                    <a href="<?= $urlBase ?>tonalite&amp;valFiltre=<?= urlencode($chanson->getTonalite() ?: '?') ?>" class="label label-primary badge-tech"><i class="glyphicon glyphicon-music"></i> <?= $chanson->getTonalite() ?: '?' ?></a>
+                    <a href="<?= $urlBase ?>tempo_famille&amp;valFiltre=<?= urlencode($tempoInfo['name']) ?>" class="label label-info badge-tech"><i class="glyphicon glyphicon-time"></i> <?= $chanson->getTempo() ?> <span class="tempo-label"><?= $tempoInfo['label'] ?></span></a>
+                    <a href="<?= $urlBase ?>mesure&amp;valFiltre=<?= urlencode($chanson->getMesure()) ?>" class="label label-default badge-tech"><i class="glyphicon glyphicon-equalizer"></i> <?= $chanson->getMesure() ?></a>
+                    <a href="<?= $urlBase ?>pulsation&amp;valFiltre=<?= urlencode($chanson->getPulsation()) ?>" class="label label-warning badge-tech"><i class="glyphicon <?= ($chanson->getPulsation() === 'ternaire') ? 'glyphicon-refresh' : 'glyphicon-option-vertical' ?>"></i> <?= $chanson->getPulsation() ?></a>
+                </div>
+
+                <div class="action-bar">
+                    <a href="https://www.youtube.com/results?search_query=<?= urlencode($chanson->getNom().' '.$chanson->getInterprete()) ?>" target="_blank" class="action-item" title="Sur YouTube"><img src="../../images/icones/youtube.png" class="action-icon" alt="YT"></a>
+                    <a href="https://fr.wikipedia.org/w/index.php?search=<?= urlencode($chanson->getNom().' '.$chanson->getInterprete()) ?>" target="_blank" class="action-item" title="Sur Wikipedia"><img src="../../images/icones/wikipedia.png" class="action-icon" alt="W"></a>
+                    <button class="action-item" title="QR Code" onclick="openQRModal()"><i class="glyphicon glyphicon-qrcode qr-icon"></i></button>
+                    <div class="action-item flex-right">
+                        <?php if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])): ?>
+                            <?= UtilisateurNote::starBarUtilisateur("chanson", $id, 5, 25) ?>
+                        <?php endif; ?>
+                        <div class="ml-10"><?= UtilisateurNote::starBar("chanson", $id, 5, 25) ?></div>
+                    </div>
+                </div>
+                <p class="text-muted mt-10">Publiée le <?= dateMysqlVersTexte($chanson->getDatePub()) ?> par <?= $auteur ?> • Vue <?= $chanson->getHits() ?> fois</p>
+            </section>
+
+            <section class="col-sm-4 text-center">
+                <?php 
+                    $monImage = Document::imageTableId("chanson", $id);
+                    if (!empty($monImage)):
+                        $urlOriginale = "../../data/chansons/$id/$monImage";
+                        $urlThumbnail = Image::getThumbnailUrl("$id/$monImage", 'sd');
+                ?>
+                    <div class="pochette-container" onclick="openLightbox('<?= $urlOriginale ?>')">
+                        <img src="<?= $urlThumbnail ?>" alt="pochette" class="img-thumbnail img-responsive center-block shadow-lg" style="max-width: 300px;">
+                    </div>
+                <?php endif; ?>
+            </section>
+        </div>
+
+        <!-- Documents -->
+        <?php if (!empty($documents)): ?>
+            <hr><h2><i class="glyphicon glyphicon-file"></i> Documents</h2>
+            <div class="row">
+                <?php foreach ($documents as $row): 
+                    $ext = strtolower(pathinfo($row[1], PATHINFO_EXTENSION));
+                    if ($nbImages === 1 && in_array($ext, ['jpg', 'png', 'webp'])) continue;
+                    $nomSais = pathinfo($row[1], PATHINFO_FILENAME);
+                    $iconUrl = file_exists(ICONES . $ext . ".png") ? ICONES . $ext . ".png" : "../images/icones/fichier.png";
+                ?>
+                    <div class="col-xs-6 col-sm-3 col-md-2 text-center mb-20">
+                        <a href="<?= Document::lienUrlAffichageDocument($row[0]) ?>" target="_blank" class="thumbnail doc-link">
+                            <?= image($iconUrl, 32, 32, "icone") ?><br><small class="text-truncate"><?= $nomSais ?></small>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Médias -->
+        <?php if (!empty($medias)): ?>
+            <hr><div class="row">
+                <?php foreach ($medias as $row): 
+                    $ext = strtolower(pathinfo($row[1], PATHINFO_EXTENSION));
+                    $nom = pathinfo($row[1], PATHINFO_FILENAME);
+                    $url = Document::lienUrlAffichageDocument($row[0]);
+                ?>
+                    <div class="col-xs-12 col-sm-6 col-md-4 text-center mb-20">
+                        <div class="well well-sm">
+                            <strong><?= $nom ?></strong><br>
+                            <?php if (in_array($ext, ['mp3', 'm4a', 'aac'])): ?>
+                                <audio controls class="w-100 mt-10"><source src="<?= $url ?>" type="audio/<?= ($ext === 'aac' ? 'mpeg' : 'mp3') ?>"></audio>
+                            <?php else: ?>
+                                <video width="100%" controls class="mt-10"><source src="<?= $url ?>" type="video/mp4"></video>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Strums -->
+        <?php if (!empty($strums)): ?>
+            <hr><h2 class="chanson-section-title"><i class="glyphicon glyphicon-music"></i> Rythmique</h2>
+            <?php foreach ($strums as $s): 
+                $nomStrum = str_replace(" ", "-", $s->getStrum());
+                $urlStrum = "../../html/boiteAstrum/index.html?strum=$nomStrum&amp;tempo=".$chanson->getTempo()."&amp;ternaire=".($chanson->getPulsation() === 'ternaire' ? 'true' : 'false');
+            ?>
+                <div class="well strum-well">
+                    <div class="strum-badge">
+                        <span class="strum-label">Strum</span>
+                        <span class="strum-name"><?= $nomStrum ?></span>
+                    </div>
+                    <div class="strum-content">
+                        <p class="strum-desc"><?= $s->getDescription() ?></p>
+                        <a href="<?= $urlStrum ?>" target="_blank" class="btn btn-strum-play">
+                            <img src="../../html/boiteAstrum/medias/img/boiteAstrum.png" alt="Strum" height="32"> écoute-le sur la boîte à strum !
+                        </a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <!-- Liens -->
+        <?php if ($liens && $liens->num_rows > 0): ?>
+            <hr><h2><i class="glyphicon glyphicon-link"></i> Liens associés</h2>
+            <div class="row">
+                <?php while ($l = $liens->fetch_row()): 
+                    LienUrl::ajouteUnHit($l[0]);
+                ?>
+                    <div class="col-sm-6"><?= afficheLien($l) ?></div>
+                <?php endwhile; ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Songbooks -->
+        <?php if ($songbooks && $songbooks->num_rows > 0): ?>
+            <hr><h2><i class="glyphicon glyphicon-book"></i> Songbooks associés</h2>
+            <div class="row">
+                <?php while ($sb = $songbooks->fetch_row()): 
+                    $idSb = $sb[0];
+                    $imgSb = Songbook::imageSongbook($idSb);
+                    $urlThumb = Image::getThumbnailUrl("$idSb/$imgSb", 'sd', 'songbooks');
+                ?>
+                    <div class="col-xs-4 col-sm-3 col-md-2 text-center">
+                        <a href="../songbook/songbook_voir.php?id=<?= $idSb ?>" class="thumbnail sb-thumb">
+                            <img src="<?= $urlThumb ?>" class="sb-img-voir" alt="SB">
+                            <div class="caption"><small class="text-truncate"><?= $sb[1] ?></small></div>
+                        </a>
+                    </div>
+                <?php endwhile; ?>
+            </div>
+        <?php endif; ?>
+
+    </div>
+</div>
+
+<!-- Modales -->
+<div id="lightboxModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg"><div class="modal-content text-center" style="background:transparent; border:none; box-shadow:none;">
+    <button type="button" class="close" data-dismiss="modal" style="color:white; font-size:40px; opacity:1;">&times;</button>
+    <img id="lightboxImg" src="" alt="" class="img-responsive center-block" style="max-height:90vh; border:5px solid white;">
+  </div></div>
+</div>
+<div id="qrModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content" style="border-radius:15px;"><div class="modal-body text-center">
+    <?= generateQRCode("http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'], 200) ?>
+  </div></div></div>
+</div>
+
+<script>
+    function copyUrlToClipboard() {
+        const dummy = document.createElement('input');
+        document.body.appendChild(dummy);
+        dummy.value = window.location.href; dummy.select(); document.execCommand('copy');
+        document.body.removeChild(dummy); $('#copy-success').removeClass('hidden-element').fadeIn().delay(2000).fadeOut();
+    }
+    function openLightbox(url) { $('#lightboxImg').attr('src', url); $('#lightboxModal').modal('show'); }
+    function openQRModal() { $('#qrModal').modal('show'); }
+</script>
