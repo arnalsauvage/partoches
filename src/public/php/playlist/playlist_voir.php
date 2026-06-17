@@ -110,6 +110,7 @@ if ($lignes->num_rows > 0) {
         // On récupère la carte et on adapte les liens (car on est dans /php/playlist/)
         $card = $_chanson->afficheCarteChanson();
         $card = str_replace("href='chanson_voir.php", "href='../chanson/chanson_voir.php", $card);
+        $card = str_replace("href='chanson_form.php", "href='../chanson/chanson_form.php", $card);
         $card = str_replace("href='?filtre", "href='../chanson/chanson_liste.php?filtre", $card);
         
         $sortie .= $card;
