@@ -19,9 +19,9 @@ $idSession = (int)$_SESSION['id'];
 $id = ($isAdmin && $idFromForm > 0) ? $idFromForm : $idSession;
 $isSelf = ($id === $idSession);
 
-// Le dossier des images utilisateur est dans src/public/images/utilisateur/
-// Depuis src/public/php/utilisateur/, c'est ../../images/utilisateur/
-$dossier_cible = __DIR__ . "/../../images/utilisateur/";
+// Le dossier des images utilisateur est dans src/public/data/utilisateurs/
+// Depuis src/public/php/utilisateur/, c'est ../../data/utilisateurs/
+$dossier_cible = __DIR__ . "/../../data/utilisateurs/";
 
 // 1. Gestion des erreurs d'upload natives de PHP
 if (!isset($_FILES['fichierUploade'])) {
