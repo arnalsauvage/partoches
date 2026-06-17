@@ -78,8 +78,8 @@ $lienLiens = "<li><a href=\"../liens/lienurl_liste.php\">Liens</a></li>";
 // 6. Outils (Tous)
 $lienOutils = <<<HTML
     <li>
-        <a href="../../html/diagrammes/" target="_blank">
-            <img height="24" alt="outils" src="../../images/icones/diagramme.png"> Outils
+        <a href="../../html/diagrammes/">
+            <i class="glyphicon glyphicon-wrench"></i> Outils
         </a>
     </li>
 HTML;
