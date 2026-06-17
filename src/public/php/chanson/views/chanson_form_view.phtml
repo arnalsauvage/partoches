@@ -1,0 +1,293 @@
+<?php
+/**
+ * VUE : chanson_form_view.phtml
+ * Template HTML pour le formulaire de chanson.
+ */
+?>
+<div class='container sb-form-container' id='django-config-page'>
+    <div class='header-django'>
+        <h1><i class='glyphicon glyphicon-music'></i> <?= ($mode === 'MAJ') ? 'Mise à jour chanson' : 'Nouvelle partition' ?></h1>
+        <div class='actions'>
+            <a href='chanson_form_classic.php?id=<?= $chanson->getId() ?>' class='btn-dj btn-dj-info'>
+                <i class='glyphicon glyphicon-time'></i> Formulaire classique
+            </a>
+            <a href='chanson_liste.php' class='btn-dj btn-dj-default'>
+                <i class='glyphicon glyphicon-list'></i> Retour liste
+            </a>
+        </div>
+    </div>
+
+    <div class='content-django card-shadow-django'>
+        <div id='tabs'>
+            <ul>
+                <li><a href='#tabs-1'>Infos Générales</a></li>
+                <li><a href='#tabs-2'>Fichiers & Textes</a></li>
+                <li><a href='#tabs-3'>Rythmiques</a></li>
+                <li><a href='#tabs-4'>Liens & Vidéos</a></li>
+            </ul>
+
+            <div id='tabs-1'>
+                <form id='chanson-form' method='POST' action='chanson_post.php' name='Form' class='form-dj-reset form-chanson-new'>
+                    <input type='hidden' name='id' value='<?= $chanson->getId() ?>'>
+                    <div class='row'>
+                        <div class='col-md-8'>
+                            <!-- Titre -->
+                            <div class='form-group-django'>
+                                <label class='label-django' for='fnom'>Titre de la chanson :</label>
+                                <input class='input-django' type='text' id='fnom' name='fnom' value='<?= htmlspecialchars($chanson->getNom(), ENT_QUOTES) ?>' size='64' maxlength='128' placeholder='Titre de la chanson' required>
+                            </div>
+
+                            <!-- Interprète -->
+                            <div class='form-group-django'>
+                                <label class='label-django' for='finterprete'>Interprète / Artiste :</label>
+                                <input class='input-django' type='text' id='finterprete' name='finterprete' value='<?= htmlspecialchars($chanson->getInterprete(), ENT_QUOTES) ?>' size='64' placeholder='Interprète'>
+                            </div>
+
+                            <!-- Année / Tonalité -->
+                            <div class='row'>
+                                <div class='col-sm-6'>
+                                    <div class='form-group-django'>
+                                        <label class='label-django'>Année de sortie :</label>
+                                        <div class='input-group-django'>
+                                            <input class='input-django' type='number' min='0' max='2100' name='fannee' id='fannee' value='<?= (int)$chanson->getAnnee() ?>' data-db-year='<?= (int)$chanson->getAnnee() ?>'>
+                                            <span id='yearValidationDot' class='dot year-validation-dot'></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class='col-sm-6'>
+                                    <div class='form-group-django'>
+                                        <label class='label-django'>Tonalité :</label>
+                                        <input id='input-tonalite' class='input-django' type='text' name='ftonalite' value='<?= htmlspecialchars($chanson->getTonalite(), ENT_QUOTES) ?>' placeholder='ex: Am, C, F#m'>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tempo / Mesure -->
+                            <div class='row'>
+                                <div class='col-sm-6'>
+                                    <div class='form-group-django'>
+                                        <label class='label-django'>Tempo (BPM) : <span id='tempo-val' class='tempo-value'><?= (int)$chanson->getTempo() ?></span></label>
+                                        <input type='range' id='fader' min='30' max='250' step='1' oninput='document.getElementById("tempo-val").innerHTML = value' name='ftempo' value='<?= (int)$chanson->getTempo() ?>' class='tempo-slider'>
+                                    </div>
+                                </div>
+                                <div class='col-sm-6'>
+                                    <div class='form-group-django'>
+                                        <label class='label-django'>Mesure :</label>
+                                        <input id='input-mesure' class='input-django' type='text' name='fmesure' value='<?= htmlspecialchars($chanson->getMesure(), ENT_QUOTES) ?>' placeholder='4/4'>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pulsation / Date -->
+                            <div class='row'>
+                                <div class='col-sm-6'>
+                                    <div class='form-group-django'>
+                                        <label class='label-django'>Pulsation :</label>
+                                        <select id='select-pulsation' class='input-django' name='fpulsation'>
+                                            <option value='binaire' <?= ($chanson->getPulsation() === 'binaire') ? 'selected' : '' ?>>Binaire</option>
+                                            <option value='ternaire' <?= ($chanson->getPulsation() === 'ternaire') ? 'selected' : '' ?>>Ternaire</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class='col-sm-6'>
+                                    <div class='form-group-django'>
+                                        <label class='label-django'>Date publication :</label>
+                                        <input id='input-date-pub' class='input-django' type='text' name='fdate' value='<?= dateMysqlVersTexte($chanson->getDatePub()) ?>'>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Publication -->
+                            <div class='row'>
+                                <div class='col-sm-12'>
+                                    <div class='form-group-django'>
+                                        <input type='checkbox' id='fpublication' name='fpublication' value='1' <?= ($chanson->getPublication() == 1) ? 'checked' : '' ?> class='checkbox-django'>
+                                        <label class='label-django label-inline-django' for='fpublication'>Publication <span class='text-muted small' style='font-weight: normal;'>(Visible par tous si coché)</span></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Auteur / Hits -->
+                            <div class='row'>
+                                <div class='col-sm-6'>
+                                    <div class='form-group-django'>
+                                        <label class='label-django'>Auteur / Propriétaire :</label>
+                                        <?= Utilisateur::selectUtilisateur('nom', '%', 'login', true, $chanson->getIdUser(), 'fidUser') ?>
+                                    </div>
+                                </div>
+                                <div class='col-sm-6'>
+                                    <div class='form-group-django'>
+                                        <label class='label-django'>Vues (Hits) :</label>
+                                        <input id='input-hits' class='input-django' type='number' name='fhits' value='<?= (int)$chanson->getHits() ?>'>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Colonne droite : Pochette -->
+                        <div class='col-md-4'>
+                            <div class='section-dj carte-canopee cover-section-dj'>
+                                <div class='section-dj-title caption'><i class='glyphicon glyphicon-picture'></i> Visuel (Pochette)</div>
+                                <input type='hidden' name='fcover' id='fcover' value='<?= htmlspecialchars($chanson->getCover() ?? '', ENT_QUOTES) ?>'>
+
+                                <?php $cover = $chanson->getCover(); ?>
+                                <div id='selectedCoverPreview' class='text-center mb-15 <?= empty($cover) ? "hidden-element" : "" ?>'>
+                                    <img id='currentSelectedCover' src='<?= htmlspecialchars($cover ?? '', ENT_QUOTES) ?>' alt='Cover' class='img-cover-preview'>
+                                    <div class='mt-5'><button type='button' id='clearCoverSelection' class='btn btn-xs btn-danger'><i class='glyphicon glyphicon-remove'></i> Retirer</button></div>
+                                </div>
+
+                                <div class='cover-selection-section caption'>
+                                    <h5 class='cover-section-subtitle'>Images locales</h5>
+                                    <div id='localCoversContainer' class='covers-container mb-15'>
+                                        <p id='noLocalCoversMessage' class='no-covers-message hidden-element'>Aucune image.</p>
+                                    </div>
+                                    <h5 class='cover-section-subtitle'>Recherche Discogs</h5>
+                                    <button type='button' id='searchDiscogsCovers' class='btn btn-block btn-dj btn-dj-info'><i class='glyphicon glyphicon-refresh'></i> Chercher covers</button>
+                                    <div id='discogsCoversContainer' class='covers-container mt-10'>
+                                        <p id='noDiscogsCoversMessage' class='no-covers-message'>Aucun résultat.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class='footer-save-dj mt-20'>
+                                <input type='hidden' name='mode' value='<?= ($chanson->getId() > 0) ? "MAJ" : "INS" ?>'>
+                                <button id='btn-valider-chanson' type='submit' class='btn btn-block btn-lg btn-dj btn-dj-primary btn-save-chanson'>
+                                    <i class='glyphicon glyphicon-floppy-disk'></i> ENREGISTRER
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div id='tabs-2'>
+                <?php if ($chanson->getId() > 0): ?>
+                    <?= ChansonFormRenderer::renderFiles($chanson->getId(), $context['dossierChanson'] ?? '/', $context['iconePoubelle'] ?? '', $context['cheminImages'] ?? '', $context['listeSongbooks'] ?? [], $chanson) ?>
+                    <?= ChansonFormRenderer::renderTrash($chanson->getId(), $context['dossierChanson'] ?? '/', $context['iconePoubelle'] ?? '', $context['cheminImages'] ?? '', $chanson) ?>
+                <?php else: ?>
+                    <div class='alert alert-info'>Enregistrez d'abord la chanson pour pouvoir y ajouter des fichiers.</div>
+                <?php endif; ?>
+            </div>
+
+            <div id='tabs-3'>
+                <?= ChansonFormRenderer::renderStrums($chanson) ?>
+            </div>
+
+            <div id='tabs-4'>
+                <?= ChansonFormRenderer::renderLinks($chanson->getId()) ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src='../../js/chansonForm.js?v=25.3.28'></script>
+<script>
+$(document).ready(function() {
+    var activeTab = sessionStorage.getItem('chansonFormActiveTab') || 0;
+    $("#tabs").tabs({
+        active: parseInt(activeTab),
+        activate: function(event, ui) {
+            sessionStorage.setItem('chansonFormActiveTab', ui.newTab.index());
+        }
+    });
+
+    $('select[name="fidUser"]').addClass('input-django');
+
+    // --- Gestion des pochettes ---
+    function selectCover(coverUrl, thumbnailUrl = coverUrl) {
+        $('#fcover').val(coverUrl);
+        $('#currentSelectedCover').attr('src', thumbnailUrl);
+        $('#selectedCoverPreview').removeClass('hidden-element');
+        $('.cover-thumbnail').removeClass('selected-cover');
+        $(`img[data-cover-url="${coverUrl}"]`).addClass('selected-cover');
+    }
+
+    $('#clearCoverSelection').on('click', function() {
+        $('#fcover').val('');
+        $('#currentSelectedCover').attr('src', '');
+        $('#selectedCoverPreview').addClass('hidden-element');
+        $('.cover-thumbnail').removeClass('selected-cover');
+    });
+
+    function renderCovers(containerId, coversArray, isDiscogs = false) {
+        const $container = $(containerId);
+        $container.empty();
+        if (coversArray.length > 0) {
+            $('#no' + containerId.replace('#', '') + 'Message').addClass('hidden-element');
+            coversArray.forEach(function(cover) {
+                let imageUrl = isDiscogs ? cover.url : cover;
+                let title = isDiscogs ? cover.title + ' (' + cover.year + ') - ' + cover.artist : imageUrl;
+                const $img = $('<img>')
+                    .attr('src', imageUrl)
+                    .addClass('cover-thumbnail')
+                    .attr('data-cover-url', imageUrl)
+                    .attr('title', title);
+                if ($('#fcover').val() === imageUrl) {
+                    $img.addClass('selected-cover');
+                }
+                $container.append($img);
+            });
+        } else {
+            $('#no' + containerId.replace('#', '') + 'Message').removeClass('hidden-element');
+        }
+    }
+
+    $(document).on('click', '.cover-thumbnail', function() {
+        selectCover($(this).data('cover-url'));
+    });
+
+    function loadLocalCovers(chansonId) {
+        if (!chansonId || chansonId === "0") return;
+        $.ajax({
+            url: '../api/local_cover_search.php?id=' + chansonId,
+            type: 'GET', dataType: 'json',
+            success: function(data) {
+                if (data.local_covers && data.local_covers.length > 0) {
+                    renderCovers('#localCoversContainer', data.local_covers);
+                }
+            }
+        });
+    }
+
+    function fetchDiscogsData(songTitle, artist) {
+        if (!songTitle || !artist) return;
+        $('#noDiscogsCoversMessage').removeClass('hidden-element').text('Recherche...');
+        $.ajax({
+            url: '../api/discogs_proxy.php?q=' + encodeURIComponent(songTitle + " " + artist),
+            type: 'GET', dataType: 'json',
+            success: function(data) {
+                if (data.discogs_covers && data.discogs_covers.length > 0) {
+                    renderCovers('#discogsCoversContainer', data.discogs_covers, true);
+                    let firstResult = data.discogs_covers[0];
+                    let year = firstResult.year || '';
+                    let dbYear = $('#fannee').data('db-year');
+                    let $yearDot = $('#yearValidationDot');
+                    if (year) {
+                        if (parseInt(dbYear) === parseInt(year)) {
+                            $yearDot.css('background-color', '#28a745').attr('title', 'Confirmé par Discogs');
+                        } else {
+                            $yearDot.css('background-color', '#dc3545').attr('title', 'Discogs suggère : ' + year);
+                        }
+                    } else {
+                        $yearDot.css('background-color', '#6c757d');
+                    }
+                } else {
+                    $('#noDiscogsCoversMessage').removeClass('hidden-element').text('Aucun résultat.');
+                }
+            }
+        });
+    }
+
+    $('#fnom, #finterprete').on('blur', function() {
+        fetchDiscogsData($('#fnom').val().trim(), $('#finterprete').val().trim());
+    });
+
+    $('#searchDiscogsCovers').on('click', function() {
+        fetchDiscogsData($('#fnom').val().trim(), $('#finterprete').val().trim());
+    });
+
+    let cId = $('input[name="id"]').val();
+    if (cId && cId !== "0") loadLocalCovers(cId);
+    fetchDiscogsData($('#fnom').val().trim(), $('#finterprete').val().trim());
+});
+</script>

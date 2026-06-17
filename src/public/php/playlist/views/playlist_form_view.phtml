@@ -1,0 +1,294 @@
+<?php
+/**
+ * VUE : playlist_form_view.phtml
+ * Template HTML pour le formulaire de playlist.
+ */
+?>
+<div class='container playlist-form-container'>
+    <div class="playlist-header">
+        <h1 class="playlist-title"><?= ($mode === "MAJ" ? "Mise à jour" : "Création") ?> Playlist</h1>
+        <div class="playlist-header-actions">
+            <a href="playlist_liste.php" class="btn btn-default btn-sm"><i class='glyphicon glyphicon-arrow-left'></i> Retour à la liste</a>
+            <?php if ($mode === "MAJ"): ?>
+                <a href='playlist_voir.php?id=<?= $id ?>' class='btn btn-info btn-sm'><i class='glyphicon glyphicon-eye-open'></i> Voir</a>
+            <?php endif; ?>
+        </div>
+    </div>
+    
+    <?php if ($message): ?>
+        <div class='alert alert-success'><?= $message ?></div>
+    <?php endif; ?>
+
+    <div id='tabs'>
+        <ul>
+            <li><a href='#tabs-1'><i class='glyphicon glyphicon-info-sign'></i> Configuration</a></li>
+            <?php if ($typePl == 0): ?>
+                <li><a href='#tabs-2'><i class='glyphicon glyphicon-music'></i> Morceaux</a></li>
+            <?php endif; ?>
+        </ul>
+
+        <div id='tabs-1'>
+            <form method="POST" action="playlist_get.php">
+                <input type="hidden" name="id" value="<?= $id ?>">
+                <input type="hidden" name="mode" value="<?= $mode ?>">
+                
+                <div class="well playlist-config-well">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Nom de la playlist :</label>
+                                <input type="text" name="fnom" class="form-control" value="<?= htmlspecialchars($playlist['nom'] ?? '') ?>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Description :</label>
+                                <textarea name="fdescription" class="form-control" rows="3"><?= htmlspecialchars($playlist['description'] ?? '') ?></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Type :</label>
+                                <select name="ftype" id="playlist_type" class="form-control playlist-type-select">
+                                    <option value="0" <?= ($typePl == 0) ? 'selected' : '' ?>>📝 Manuelle</option>
+                                    <option value="1" <?= ($typePl == 1) ? 'selected' : '' ?>>🤖 Dynamique</option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Date :</label>
+                                        <?php $readonlyDate = ($_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) ? 'readonly' : ''; ?>
+                                        <input type="text" name="fdate" class="form-control" value="<?= dateMysqlVersTexte($playlist['date'] ?? date('Y-m-d')) ?>" <?= $readonlyDate ?>>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Hits :</label>
+                                        <input type="text" name="fhits" class="form-control" value="<?= $playlist['hits'] ?? 0 ?>" <?= $readonlyDate ?>>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="well playlist-config-well">
+                    <h3 class="dynamic-options-title" style="margin-top: 0;"><i class="glyphicon glyphicon-picture"></i> Visuel de la Playlist</h3>
+                    <p class="small text-muted mb-15">Sélectionnez jusqu'à 4 pochettes pour composer la mosaïque. Si vous n'en sélectionnez aucune, les 4 premières chansons seront utilisées.</p>
+                    
+                    <input type="hidden" name="fimage" id="fimage" value="<?= htmlspecialchars($playlist['image'] ?? '') ?>">
+                    
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <h5 style="font-weight:bold;">Pochette actuelle</h5>
+                            <?php if (!empty($playlist['image'])): ?>
+                                <img src='/data/playlists/<?= $playlist['image'] ?>' alt='Cover' class='img-responsive img-thumbnail' style='max-width:150px;'>
+                            <?php else: ?>
+                                <div style='width:150px; height:150px; background:#2b1d1a; margin: 0 auto; border-radius:4px; display:flex; align-items:center; justify-content:center;'><i class='glyphicon glyphicon-music' style='color:#D2B48C; font-size:48px;'></i></div>
+                            <?php endif; ?>
+                            <div class="mt-10">
+                                <button type="button" id="btnClearMosaic" class="btn btn-xs btn-danger">Effacer (Mosaïque Auto)</button>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h5 style="font-weight:bold;">Pochettes disponibles dans cette playlist</h5>
+                            <div id="mosaic-builder-container" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                <?php if ($id > 0): ?>
+                                    <?php 
+                                    $availableCovers = PlaylistFormService::getPlaylistContextualCovers($id, 50);
+                                    if (empty($availableCovers)): ?>
+                                        <p class='text-muted small'>Aucune pochette trouvée dans les chansons de cette playlist.</p>
+                                    <?php else: ?>
+                                        <?php foreach ($availableCovers as $covUrl): 
+                                            $thumbUrl = $covUrl;
+                                            if (str_contains($covUrl, '/data/chansons/')) $thumbUrl = "/data/vignettes/" . basename($covUrl);
+                                        ?>
+                                            <img src='<?= $thumbUrl ?>' class='mosaic-thumbnail' data-url='<?= $covUrl ?>' style='width:60px; height:60px; object-fit:cover; border:2px solid transparent; cursor:pointer; border-radius:4px;' title='Cliquer pour sélectionner/désélectionner'>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <p class='text-muted small'>Enregistrez d'abord la playlist pour voir les pochettes contextuelles.</p>
+                                <?php endif; ?>
+                            </div>
+                            <p class="small text-muted mt-10"><span id="mosaic-count">0</span> / 4 sélectionnée(s)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dynamic_options" class="well dynamic-options-well" style="display: <?= ($typePl == 1) ? 'block' : 'none' ?>;">
+                    <h3 class="dynamic-options-title"><i class="glyphicon glyphicon-cog"></i> Critères automatiques</h3>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Tonalité :</label>
+                            <select name="dyn_tonalite" class="form-control">
+                                <option value="">-- Peu importe --</option>
+                                <?php 
+                                $tonas = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B'];
+                                foreach ($tonas as $t): foreach (['', 'm'] as $m):
+                                    $v = $t.$m;
+                                    $sel = ($criteres['tonalite'] ?? '') == $v ? 'selected' : '';
+                                ?>
+                                    <option value='<?= $v ?>' <?= $sel ?>><?= $v ?></option>
+                                <?php endforeach; endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Tempo :</label>
+                            <select name="dyn_tempo" class="form-control">
+                                <option value="">-- Peu importe --</option>
+                                <?php foreach (['Largo','Adagio','Andante','Moderato','Allegro','Presto'] as $t): ?>
+                                    <option value='<?= $t ?>' <?= ($criteres['tempo_famille'] ?? '') == $t ? 'selected' : '' ?>><?= $t ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Saison :</label>
+                            <select name="dyn_saison" class="form-control">
+                                <option value="">-- Peu importe --</option>
+                                <?php for ($a = date('Y'); $a >= 2018; $a--): ?>
+                                    <option value='<?= $a ?>' <?= ($criteres['saison'] ?? '') == $a ? 'selected' : '' ?>><?= $a ?>-<?= ($a+1) ?></option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Rythmique :</label>
+                            <select name="dyn_strum" class="form-control">
+                                <option value="">-- Peu importe --</option>
+                                <?php 
+                                $db = $_SESSION['mysql'];
+                                $resList = $db->query("SELECT id, strum FROM strum ORDER BY strum ASC");
+                                if ($resList): while($row = $resList->fetch_assoc()): ?>
+                                    <option value='<?= $row['id'] ?>' <?= ($criteres['idStrum'] ?? '') == $row['id'] ? 'selected' : '' ?>><?= htmlspecialchars($row['strum']) ?></option>
+                                <?php endwhile; endif; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-20">
+                    <button type="submit" class="btn btn-lg btn-success btn-save-playlist">
+                        <i class="glyphicon glyphicon-floppy-disk"></i> ENREGISTRER LA CONFIGURATION
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <?php if ($mode === "MAJ" && $typePl == 0): ?>
+            <div id='tabs-2'>
+                <div class="row mt-15">
+                    <div class="col-md-7">
+                        <table class="table table-striped playlist-songs-table">
+                            <thead><tr><th>Ordre</th><th>Titre</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                <?php 
+                                $lignes = chercheLiensChansonPlaylist('id_playlist', $id, "ordre", true);
+                                while ($ligne = $lignes->fetch_row()): 
+                                    $ch = new Chanson((int)$ligne[2]);
+                                ?>
+                                    <tr>
+                                        <td><?= $ligne[3] ?></td>
+                                        <td><strong><?= htmlspecialchars($ch->getNom()) ?></strong></td>
+                                        <td>
+                                            <div class="btn-group btn-group-xs">
+                                                <a href="?id=<?= $id ?>&action=up&rang=<?= $ligne[3] ?>" class="btn btn-default"><i class="glyphicon glyphicon-arrow-up"></i></a>
+                                                <a href="?id=<?= $id ?>&action=down&rang=<?= $ligne[3] ?>" class="btn btn-default"><i class="glyphicon glyphicon-arrow-down"></i></a>
+                                                <a href="?id=<?= $id ?>&action=del&idLien=<?= $ligne[0] ?>" class="btn btn-danger" onclick="return confirm('Enlever ?');"><i class="glyphicon glyphicon-trash"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="well add-song-well">
+                            <h4><i class="glyphicon glyphicon-plus"></i> Ajouter un morceau</h4>
+                            <form method="POST" action="playlist_form.php?id=<?= $id ?>">
+                                <input type="hidden" name="id" value="<?= $id ?>">
+                                <select name="chanson" class="form-control select2">
+                                    <?php 
+                                    $res = $db->query("SELECT id, nom FROM chanson ORDER BY nom ASC");
+                                    while($row = $res->fetch_assoc()): ?>
+                                        <option value='<?= $row['id'] ?>'><?= htmlspecialchars($row['nom']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                                <button type="submit" class="btn btn-primary btn-block mt-10 btn-add-song">AJOUTER LE MORCEAU</button>
+                            </form>
+                        </div>
+                        <div class="well add-song-well" style="background-color: var(--c-accent);">
+                            <h4><i class="glyphicon glyphicon-book"></i> Importer un Songbook</h4>
+                            <p class="small">Ajoute toutes les chansons du recueil sélectionné.</p>
+                            <form method="POST" action="playlist_form.php?id=<?= $id ?>">
+                                <input type="hidden" name="id" value="<?= $id ?>">
+                                <input type="hidden" name="action" value="import_songbook">
+                                <select name="id_songbook" class="form-control select2">
+                                    <?php 
+                                    $resSb = $db->query("SELECT id, nom FROM songbook ORDER BY nom ASC");
+                                    while($row = $resSb->fetch_assoc()): ?>
+                                        <option value='<?= $row['id'] ?>'><?= htmlspecialchars($row['nom']) ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                                <button type="submit" class="btn btn-warning btn-block mt-10" onclick="return confirm('Ajouter toutes les chansons de ce songbook ?');">
+                                    <i class="glyphicon glyphicon-import"></i> IMPORTER TOUT LE SONGBOOK
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var activeTab = sessionStorage.getItem('playlistFormActiveTab') || 0;
+    $("#tabs").tabs({
+        active: parseInt(activeTab),
+        activate: function(event, ui) {
+            sessionStorage.setItem('playlistFormActiveTab', ui.newTab.index());
+        }
+    });
+    if ($.fn.select2) $('.select2').select2({ theme: "bootstrap", width: '100%' });
+    $('#playlist_type').on('change', function() {
+        if ($(this).val() == '1') { $('#dynamic_options').slideDown(); } 
+        else { $('#dynamic_options').slideUp(); }
+    });
+
+    let selectedCovers = [];
+    let currentVal = $('#fimage').val();
+    if (currentVal && currentVal.indexOf(',') !== -1) {
+        selectedCovers = currentVal.split(',');
+        $('.mosaic-thumbnail').each(function() {
+            if (selectedCovers.indexOf($(this).data('url')) > -1) $(this).addClass('selected-cover');
+        });
+        $('#mosaic-count').text(selectedCovers.length);
+    }
+
+    $('.mosaic-thumbnail').on('click', function() {
+        let url = $(this).data('url');
+        let index = selectedCovers.indexOf(url);
+        if (index > -1) {
+            selectedCovers.splice(index, 1);
+            $(this).removeClass('selected-cover');
+        } else {
+            if (selectedCovers.length < 4) {
+                selectedCovers.push(url);
+                $(this).addClass('selected-cover');
+            } else {
+                toastr.warning('Maximum 4 pochettes.');
+            }
+        }
+        $('#fimage').val(selectedCovers.join(','));
+        $('#mosaic-count').text(selectedCovers.length);
+    });
+
+    $('#btnClearMosaic').on('click', function() {
+        selectedCovers = [];
+        $('.mosaic-thumbnail').removeClass('selected-cover');
+        $('#fimage').val('mosaique-automatique');
+        $('#mosaic-count').text(0);
+        toastr.info('Mosaïque effacée. Elle sera regénérée.');
+    });
+});
+</script>
