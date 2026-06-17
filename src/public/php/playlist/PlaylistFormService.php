@@ -157,13 +157,17 @@ class PlaylistFormService
                 // 1. Tenter la nouvelle colonne cover
                 if (!empty($row['cover'])) {
                     $coverUrl = $row['cover'];
+                    // Sécurisation : si la colonne cover a un chemin relatif, on le passe en absolu
+                    if (str_starts_with($coverUrl, '../data/')) {
+                        $coverUrl = str_replace('../data/', '/data/', $coverUrl);
+                    }
                 } else {
                     // 2. Tenter l'ancien système (table document)
                     $idChanson = (int)$row['id'];
                     $nomImage = Document::imageTableId("chanson", $idChanson);
                     if (!empty($nomImage)) {
-                        // Construire le chemin relatif
-                        $coverUrl = "../data/chansons/" . $idChanson . "/" . $nomImage;
+                        // Construire le chemin absolu par rapport à la racine web
+                        $coverUrl = "/data/chansons/" . $idChanson . "/" . $nomImage;
                     }
                 }
 
