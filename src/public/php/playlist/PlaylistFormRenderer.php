@@ -246,8 +246,9 @@ HTML;
                     </table>
                 </div>
                 <div class="col-md-5">
+                    <!-- AJOUT UNITAIRE -->
                     <div class="well add-song-well">
-                        <h4>Ajouter un morceau</h4>
+                        <h4><i class="glyphicon glyphicon-plus"></i> Ajouter un morceau</h4>
                         <form method="POST" action="playlist_form.php?id=$id">
                             <input type="hidden" name="id" value="$id">
                             <select name="chanson" class="form-control select2">
@@ -260,7 +261,29 @@ HTML;
         
         $html .= <<<HTML
                             </select>
-                            <button type="submit" class="btn btn-primary btn-block mt-10 btn-add-song">AJOUTER</button>
+                            <button type="submit" class="btn btn-primary btn-block mt-10 btn-add-song">AJOUTER LE MORCEAU</button>
+                        </form>
+                    </div>
+
+                    <!-- AJOUT PAR SONGBOOK -->
+                    <div class="well add-song-well" style="background-color: var(--c-accent);">
+                        <h4><i class="glyphicon glyphicon-book"></i> Importer un Songbook</h4>
+                        <p class="small">Ajoute toutes les chansons du recueil sélectionné.</p>
+                        <form method="POST" action="playlist_form.php?id=$id">
+                            <input type="hidden" name="id" value="$id">
+                            <input type="hidden" name="action" value="import_songbook">
+                            <select name="id_songbook" class="form-control select2">
+HTML;
+        $resSb = $db->query("SELECT id, nom FROM songbook ORDER BY nom ASC");
+        while($row = $resSb->fetch_assoc()) {
+            $html .= "<option value='".$row['id']."'>".htmlspecialchars($row['nom'])."</option>";
+        }
+
+        $html .= <<<HTML
+                            </select>
+                            <button type="submit" class="btn btn-warning btn-block mt-10" onclick="return confirm('Ajouter toutes les chansons de ce songbook ?');">
+                                <i class="glyphicon glyphicon-import"></i> IMPORTER TOUT LE SONGBOOK
+                            </button>
                         </form>
                     </div>
                 </div>

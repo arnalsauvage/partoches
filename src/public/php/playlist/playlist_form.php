@@ -25,8 +25,12 @@ $message = "";
 
 // --- GESTION DES ACTIONS (AJAX/GET) ---
 if ($id > 0) {
-    // Ajout d'un morceau
-    if (isset($_POST['chanson']) && is_numeric($_POST['chanson'])) {
+    // Import massif depuis un Songbook
+    if (isset($_POST['action']) && $_POST['action'] === 'import_songbook' && isset($_POST['id_songbook'])) {
+        $message = PlaylistFormService::importFromSongbook($id, (int)$_POST['id_songbook']);
+    }
+    // Ajout d'un morceau unitaire
+    elseif (isset($_POST['chanson']) && is_numeric($_POST['chanson'])) {
         $message = PlaylistFormService::addSong($id, (int)$_POST['chanson']);
     }
     // Actions sur les morceaux (up/down/del)

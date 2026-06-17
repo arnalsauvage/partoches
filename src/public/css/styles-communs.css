@@ -83,6 +83,33 @@ body {
     background-color: var(--c-marron-fonce, #2b1d1a);
     color: var(--c-beige, #F5F5DC);
     border-top: 3px solid var(--c-accent, #8B4513);
+    text-align: center;
+}
+
+.footer-content {
+    color: var(--c-beige, #F5F5DC) !important;
+    margin-bottom: 15px;
+}
+
+.footer-content a, .footer-legal a {
+    color: var(--c-marron-clair, #D2B48C) !important;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-content a:hover, .footer-legal a:hover {
+    color: #fff !important;
+    text-decoration: underline;
+}
+
+.footer-legal {
+    font-size: 0.85em;
+    opacity: 0.8;
+}
+
+.footer-legal .separator {
+    margin: 0 10px;
+    color: var(--c-accent);
 }
 
 .footer-social-icons {

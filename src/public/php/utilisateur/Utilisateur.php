@@ -320,7 +320,7 @@ class Utilisateur
     public function afficheCarte(): string
     {
         $id = $this->_id;
-        $login = htmlspecialchars($this->_login);
+        $prenom = htmlspecialchars($this->_prenom);
         $nomComplet = htmlspecialchars($this->_prenom . " " . $this->_nom);
         $image = $this->_image;
         $image = str_replace("/utilisateur", "/", $image);
@@ -334,16 +334,22 @@ class Utilisateur
         $cleanImage = str_replace("utilisateur/", "", $image);
         $urlAvatar = Image::getThumbnailUrl($cleanImage, 'mini', 'utilisateurs');
 
-        $classeStatut = match($this->_privilege) {
-            3 => "label-danger", // Admin
-            2 => "label-warning", // Editeur
-            1 => "label-primary", // Membre
-            default => "label-default" // Invité
-        };
+        $isAdmin = estAdmin();
+
+        // Badge de statut (Seuls les admins voient les grades)
+        $badgeStatut = "";
+        if ($isAdmin) {
+            $classeStatut = match($this->_privilege) {
+                3 => "label-danger", // Admin
+                2 => "label-warning", // Editeur
+                1 => "label-primary", // Membre
+                default => "label-default" // Invité
+            };
+            $badgeStatut = "<span class=\"label $classeStatut\">$statut</span>";
+        }
 
         $actionsAdmin = "";
         $isSelf = (int)($_SESSION['id'] ?? 0) === (int)$this->_id;
-        $isAdmin = estAdmin();
 
         // Tout le monde peut se modifier soi-même. 
         // Seul l'admin peut modifier les autres ou supprimer.
@@ -369,12 +375,11 @@ HTML;
         <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="thumbnail user-card">
                 <div class="user-card-header">
-                    <img src="$urlAvatar" alt="$login" class="user-avatar-big">
-                    <h3>$login</h3>
-                    <span class="label $classeStatut">$statut</span>
+                    <img src="$urlAvatar" alt="$prenom" class="user-avatar-big">
+                    <h3>$prenom</h3>
+                    $badgeStatut
                 </div>
                 <div class="user-card-body">
-                    <p class="user-name">$nomComplet</p>
                     <div class="user-stats">
                         <div class="stat-item" title="Chansons créées">
                             <i class="glyphicon glyphicon-music" style="color: #8B4513;"></i> <strong>$nbChansons</strong> chansons

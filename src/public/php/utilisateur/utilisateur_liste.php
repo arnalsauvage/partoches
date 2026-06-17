@@ -89,8 +89,17 @@ HTML;
 
 // Boucle sur les utilisateurs chargés et triés
 foreach ($users as $u) {
-    // Filtrage visuel (Admin voit tout, Membre ne voit que les autres ou lui-même)
-    if (($privilegeSession > $GLOBALS["PRIVILEGE_MEMBRE"]) || $userSession == $u->getLogin()) {
+    $uPrivilege = $u->getPrivilege();
+    
+    // Règle de filtrage : 
+    // 1. Un admin voit tout.
+    // 2. Un non-admin ne voit que les non-admins (Membre/Editeur/Invité).
+    // 3. Cas particulier : on affiche toujours sa propre carte.
+    
+    $isSelf = ($userSession == $u->getLogin());
+    $isAdminUser = ($uPrivilege >= $GLOBALS["PRIVILEGE_ADMIN"]);
+
+    if ($privilegeSession >= $GLOBALS["PRIVILEGE_ADMIN"] || $isSelf || !$isAdminUser) {
         $html .= $u->afficheCarte();
     }
 }
