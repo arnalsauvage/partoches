@@ -142,7 +142,7 @@ HTML;
 HTML;
         
         if (!empty($image)) {
-            $html .= "<img src='../data/playlists/$image' alt='Cover' class='img-responsive img-thumbnail' style='max-width:150px;'>";
+            $html .= "<img src='/data/playlists/$image' alt='Cover' class='img-responsive img-thumbnail' style='max-width:150px;'>";
         } else {
             $html .= "<div style='width:150px; height:150px; background:#2b1d1a; margin: 0 auto; border-radius:4px; display:flex; align-items:center; justify-content:center;'><i class='glyphicon glyphicon-music' style='color:#D2B48C; font-size:48px;'></i></div>";
         }

@@ -145,10 +145,11 @@ function afficheCartePlaylist($ligne): string
     $nom = htmlspecialchars($ligne['nom'] ?? $ligne[1] ?? '');
     $description = htmlspecialchars(limiteLongueur($ligne['description'] ?? $ligne[2] ?? '', 60));
     $date = dateMysqlVersTexte($ligne['date_creation'] ?? $ligne['date'] ?? $ligne[3] ?? '');
-    $hits = $ligne['hits'] ?? $ligne[8] ?? $ligne[5] ?? 0;
+    $hits = $ligne['hits'] ?? $ligne[8] ?? 0;
     
     // 1. On tente d'utiliser l'image directe (mosaïque ou upload)
-    $imagePochette = $ligne['image'] ?? $ligne[4] ?? '';
+    // L'index 7 correspond à la colonne 'image' dans la table playlist
+    $imagePochette = $ligne['image'] ?? $ligne[7] ?? '';
     
     // 2. Fallback sur le système document si vide
     if (empty($imagePochette)) {
@@ -159,10 +160,10 @@ function afficheCartePlaylist($ligne): string
     
     $htmlImage = "";
     if (!empty($imagePochette)) {
-        // Déterminer le dossier (data/playlists/ pour les mosaïques, ou relatif pour legacy)
+        // Construction du chemin absolu pour la prod et le local
         $src = $imagePochette;
         if (!str_contains($src, '/')) {
-            $src = "../data/playlists/" . $src;
+            $src = "/data/playlists/" . $src;
         }
         $htmlImage = "<img src='$src' alt='Pochette' class='img-responsive'>";
     } else {
@@ -216,6 +217,9 @@ function getMorceauxPlaylist($idPlaylist, $tri = 'ordre')
     // Si la playlist est dynamique
     $type = $donnee['type'] ?? $donnee[7] ?? 0;
     if ($type == 1 || $type == 'dynamique') {
+        // Le tri par "ordre" n'existe pas en dynamique, on bascule sur le nom
+        if ($tri === 'ordre') $orderBy = 'c.nom ASC';
+        
         $criteresStr = $donnee['criteres'] ?? $donnee[8] ?? "[]";
         $criteres = json_decode($criteresStr, true);
         $conditions = ["1=1"]; // Condition de base
