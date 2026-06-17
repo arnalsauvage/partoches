@@ -54,12 +54,34 @@ class ChansonFormNewRenderer
         $html  = "<div class='container sb-form-container' id='django-config-page'>";
         $html .= self::renderHeader($mode);
         $html .= "<div class='content-django card-shadow-django'>";
+        
+        $html .= "<div id='tabs'>";
+        $html .= "<ul>";
+        $html .= "<li><a href='#tabs-1'>Infos Générales</a></li>";
+        $html .= "<li><a href='#tabs-2'>Fichiers & Textes</a></li>";
+        $html .= "<li><a href='#tabs-3'>Rythmiques</a></li>";
+        $html .= "<li><a href='#tabs-4'>Liens & Vidéos</a></li>";
+        $html .= "</ul>";
+
         $html .= "<div id='tabs-1'>";
         $html .= self::renderForm($_chanson, $mode);
+        $html .= "</div>"; // Fin tabs-1
+
+        $html .= "<div id='tabs-2'>";
         $html .= self::renderFilesTab($_chanson, $context);
+        $html .= "</div>"; // Fin tabs-2
+
+        $html .= "<div id='tabs-3'>";
         $html .= self::renderStrumTab($_chanson);
+        $html .= "</div>"; // Fin tabs-3
+
+        $html .= "<div id='tabs-4'>";
         $html .= self::renderLinksTab($_chanson->getId());
-        $html .= "</div></div></div>";
+        $html .= "</div>"; // Fin tabs-4
+
+        $html .= "</div>"; // Fin #tabs
+        
+        $html .= "</div></div>"; // Fin content-django et container
 
         return $html;
     }
@@ -305,6 +327,14 @@ class ChansonFormNewRenderer
         return <<<'JAVASCRIPT'
 <script>
 $(document).ready(function() {
+    var activeTab = sessionStorage.getItem('chansonFormActiveTab') || 0;
+    $("#tabs").tabs({
+        active: parseInt(activeTab),
+        activate: function(event, ui) {
+            sessionStorage.setItem('chansonFormActiveTab', ui.newTab.index());
+        }
+    });
+
     $('select[name="fidUser"]').addClass('input-django');
 
     // --- Gestion des pochettes ---
