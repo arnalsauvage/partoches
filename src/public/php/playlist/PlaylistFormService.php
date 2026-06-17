@@ -84,8 +84,8 @@ class PlaylistFormService
         while ($row = $resDocs->fetch_assoc()) {
             $idDoc = (int)$row['idDocument'];
             
-            // 2. Trouver la chanson rattachée à ce document
-            $resCh = $db->query("SELECT idChanson FROM document WHERE id = $idDoc");
+            // 2. Trouver la chanson rattachée à ce document (via idTable/nomTable)
+            $resCh = $db->query("SELECT idTable AS idChanson FROM document WHERE id = $idDoc AND nomTable = 'chanson'");
             if ($resCh && ($ch = $resCh->fetch_assoc())) {
                 $idChanson = (int)$ch['idChanson'];
                 
