@@ -157,7 +157,14 @@ class UtilisateurFormRenderer
             $html .= "<div class='row'>";
             foreach ($resIds as $idCh) {
                 $c = new Chanson($idCh);
-                $html .= $c->afficheCarteChanson();
+                $card = $c->afficheCarteChanson();
+                
+                // Correction des chemins (on est dans /php/utilisateur/)
+                $card = str_replace("href='chanson_voir.php", "href='../chanson/chanson_voir.php", $card);
+                $card = str_replace("href='chanson_form.php", "href='../chanson/chanson_form.php", $card);
+                $card = str_replace("href='?filtre", "href='../chanson/chanson_liste.php?filtre", $card);
+                
+                $html .= $card;
             }
             $html .= "</div>";
         } else {
