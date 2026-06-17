@@ -3,6 +3,23 @@
    Centralisation des styles pour le menu, le footer et les utilitaires globaux.
 */
 
+/* --- STRUCTURE GLOBALE --- */
+body {
+    padding-top: 70px; /* Espace pour la barre de navigation fixe (Desktop) */
+}
+
+/* Ajustement pour mobile : la navbar peut s'empiler ou être différente */
+@media (max-width: 767px) {
+    body {
+        padding-top: 60px;
+    }
+}
+
+.starter-template {
+    padding: 30px 15px 20px; /* On augmente le haut pour éviter le chevauchement */
+    text-align: center;
+}
+
 /* --- NAVIGATION / MENU --- */
 .navbar-brand-flex {
     display: flex !important;
