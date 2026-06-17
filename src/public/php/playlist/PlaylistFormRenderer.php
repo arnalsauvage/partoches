@@ -297,7 +297,13 @@ HTML;
         return <<<'JAVASCRIPT'
 <script>
 $(document).ready(function() {
-    $("#tabs").tabs();
+    var activeTab = sessionStorage.getItem('playlistFormActiveTab') || 0;
+    $("#tabs").tabs({
+        active: parseInt(activeTab),
+        activate: function(event, ui) {
+            sessionStorage.setItem('playlistFormActiveTab', ui.newTab.index());
+        }
+    });
     if ($.fn.select2) $('.select2').select2({ theme: "bootstrap", width: '100%' });
     $('#playlist_type').on('change', function() {
         if ($(this).val() == '1') { $('#dynamic_options').slideDown(); } 
