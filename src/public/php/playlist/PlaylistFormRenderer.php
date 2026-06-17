@@ -30,7 +30,7 @@ class PlaylistFormRenderer
             $html .= "<div class='alert alert-success'>$message</div>";
         }
 
-        $html .= "<div id='tabs' class='tabs-django'>";
+        $html .= "<div id='tabs'>";
         $html .= "<ul>";
         $html .= "<li><a href='#tabs-1'><i class='glyphicon glyphicon-info-sign'></i> Configuration</a></li>";
         if ($typePl == 0) {
@@ -298,7 +298,7 @@ HTML;
 <script>
 $(document).ready(function() {
     $("#tabs").tabs();
-    if ($.fn.select2) $('.select2').select2({ theme: "bootstrap" });
+    if ($.fn.select2) $('.select2').select2({ theme: "bootstrap", width: '100%' });
     $('#playlist_type').on('change', function() {
         if ($(this).val() == '1') { $('#dynamic_options').slideDown(); } 
         else { $('#dynamic_options').slideUp(); }

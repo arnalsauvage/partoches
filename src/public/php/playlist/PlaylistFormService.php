@@ -45,10 +45,12 @@ class PlaylistFormService
      */
     public static function handleActions(int $id, array $get): void
     {
-        if (isset($get['action']) && isset($get['rang'])) {
-            $rang = (int)$get['rang'];
-            if ($get['action'] === "up") remonteTitrePlaylist($id, $rang, 1);
-            if ($get['action'] === "down") descendTitrePlaylist($id, $rang, 1);
+        if (isset($get['action'])) {
+            if (isset($get['rang'])) {
+                $rang = (int)$get['rang'];
+                if ($get['action'] === "up") remonteTitrePlaylist($id, $rang, 1);
+                if ($get['action'] === "down") descendTitrePlaylist($id, $rang, 1);
+            }
             if ($get['action'] === "del" && isset($get['idLien'])) {
                 supprimelienChansonPlaylist((int)$get['idLien']);
                 ordonneLiensPlaylist($id);
