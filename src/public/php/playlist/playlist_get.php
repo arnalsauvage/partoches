@@ -50,6 +50,21 @@ if ($mode == "MAJ" && $id) {
             $fdate = dateMysqlVersTexte($playlist['date_creation'] ?? $playlist['date'] ?? date("Y-m-d"));
         }
     }
+
+    // Gestion Mosaïque Automatique ou Manuelle Multiple
+    require_once __DIR__ . '/PlaylistFormService.php';
+    if (empty($fimage) || str_contains($fimage, 'mosaique-automatique')) {
+        // On récupère les covers contextuelles
+        $covers = PlaylistFormService::getPlaylistContextualCovers($id, 4);
+        $fimage = PlaylistFormService::generateMosaic($covers, $fnom);
+    } elseif (str_contains($fimage, ',')) {
+        // Sélection multiple par l'utilisateur (URLs séparées par des virgules)
+        $selectedCovers = array_filter(explode(',', $fimage));
+        // On ne garde que les 4 premières
+        $selectedCovers = array_slice($selectedCovers, 0, 4);
+        $fimage = PlaylistFormService::generateMosaic($selectedCovers, $fnom);
+    }
+
     modifiePlaylist($id, $fnom, $fdescription, $fdate, $fimage, $fhits, $ftype, $fcriteres);
 }
 
@@ -57,6 +72,13 @@ if ($mode == "INS") {
     // Par défaut à la création
     $fhits = 0;
     $fdate = date("d/m/Y");
+
+    // A la création, on n'a pas encore de chansons pour faire une belle mosaïque, mais on génère le fond neutre
+    require_once __DIR__ . '/PlaylistFormService.php';
+    if (empty($fimage)) {
+        $fimage = PlaylistFormService::generateMosaic([], $fnom);
+    }
+
     creePlaylist($fnom, $fdescription, $fdate, $fimage, $fhits, $ftype, $fcriteres);
 }
 

@@ -111,10 +111,6 @@ HTML;
                                     <option value="1" $selDynamique>🤖 Dynamique</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>Image :</label>
-                                <input type="text" name="fimage" class="form-control" value="$image">
-                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -129,6 +125,56 @@ HTML;
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="well playlist-config-well">
+                    <h3 class="dynamic-options-title" style="margin-top: 0;"><i class="glyphicon glyphicon-picture"></i> Visuel de la Playlist</h3>
+                    <p class="small text-muted mb-15">Sélectionnez jusqu'à 4 pochettes pour composer la mosaïque. Si vous n'en sélectionnez aucune, les 4 premières chansons seront utilisées.</p>
+                    
+                    <input type="hidden" name="fimage" id="fimage" value="$image">
+                    
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <!-- Prévisualisation de la pochette actuelle -->
+                            <h5 style="font-weight:bold;">Pochette actuelle</h5>
+HTML;
+        
+        if (!empty($image)) {
+            $html .= "<img src='../data/playlists/$image' alt='Cover' class='img-responsive img-thumbnail' style='max-width:150px;'>";
+        } else {
+            $html .= "<div style='width:150px; height:150px; background:#2b1d1a; margin: 0 auto; border-radius:4px; display:flex; align-items:center; justify-content:center;'><i class='glyphicon glyphicon-music' style='color:#D2B48C; font-size:48px;'></i></div>";
+        }
+        
+        $html .= <<<HTML
+                            <div class="mt-10">
+                                <button type="button" id="btnClearMosaic" class="btn btn-xs btn-danger">Effacer (Mosaïque Auto)</button>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <h5 style="font-weight:bold;">Pochettes disponibles dans cette playlist</h5>
+                            <div id="mosaic-builder-container" style="display: flex; flex-wrap: wrap; gap: 8px;">
+HTML;
+        
+        if ($id > 0) {
+            $availableCovers = PlaylistFormService::getPlaylistContextualCovers($id, 50);
+            if (empty($availableCovers)) {
+                $html .= "<p class='text-muted small'>Aucune pochette trouvée dans les chansons de cette playlist.</p>";
+            } else {
+                foreach ($availableCovers as $covUrl) {
+                    $html .= "<img src='$covUrl' class='mosaic-thumbnail' data-url='$covUrl' style='width:60px; height:60px; object-fit:cover; border:2px solid transparent; cursor:pointer; border-radius:4px;' title='Cliquer pour sélectionner/désélectionner'>";
+                }
+            }
+        } else {
+            $html .= "<p class='text-muted small'>Enregistrez d'abord la playlist pour voir les pochettes contextuelles.</p>";
+        }
+
+        $html .= <<<HTML
+                            </div>
+                            <p class="small text-muted mt-10">
+                                <span id="mosaic-count">0</span> / 4 sélectionnée(s)
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -309,6 +355,58 @@ $(document).ready(function() {
         if ($(this).val() == '1') { $('#dynamic_options').slideDown(); } 
         else { $('#dynamic_options').slideUp(); }
     });
+
+    // Gestion de la Mosaïque
+    let selectedCovers = [];
+    
+    // Initialisation
+    let currentVal = $('#fimage').val();
+    if (currentVal && currentVal.indexOf(',') !== -1) {
+        selectedCovers = currentVal.split(',');
+        updateMosaicUI();
+    }
+
+    $('.mosaic-thumbnail').on('click', function() {
+        let url = $(this).data('url');
+        let index = selectedCovers.indexOf(url);
+        
+        if (index > -1) {
+            // Désélection
+            selectedCovers.splice(index, 1);
+            $(this).removeClass('selected-cover');
+        } else {
+            // Sélection (max 4)
+            if (selectedCovers.length < 4) {
+                selectedCovers.push(url);
+                $(this).addClass('selected-cover');
+            } else {
+                toastr.warning('Vous ne pouvez sélectionner que 4 pochettes maximum.');
+            }
+        }
+        updateMosaicInput();
+    });
+
+    $('#btnClearMosaic').on('click', function() {
+        selectedCovers = [];
+        $('.mosaic-thumbnail').removeClass('selected-cover');
+        $('#fimage').val('mosaique-automatique'); // Force la régénération côté serveur
+        $('#mosaic-count').text(0);
+        toastr.info('Mosaïque effacée. Elle sera regénérée automatiquement.');
+    });
+
+    function updateMosaicUI() {
+        $('.mosaic-thumbnail').each(function() {
+            if (selectedCovers.indexOf($(this).data('url')) > -1) {
+                $(this).addClass('selected-cover');
+            }
+        });
+        $('#mosaic-count').text(selectedCovers.length);
+    }
+
+    function updateMosaicInput() {
+        $('#fimage').val(selectedCovers.join(','));
+        $('#mosaic-count').text(selectedCovers.length);
+    }
 });
 </script>
 JAVASCRIPT;

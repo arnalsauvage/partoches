@@ -115,4 +115,138 @@ class PlaylistFormService
         
         return "Aucune nouvelle chanson ajoutée (déjà présentes ou songbook vide).";
     }
+
+    /**
+     * Convertit une chaîne en slug kebab-case.
+     */
+    public static function slugify(string $text): string
+    {
+        // Remplacer les caractères accentués
+        $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+        // Tout en minuscules
+        $text = strtolower($text);
+        // Remplacer tout ce qui n'est pas alphanumérique par un tiret
+        $text = preg_replace('/[^a-z0-9]+/', '-', $text);
+        // Supprimer les tirets au début et à la fin
+        $text = trim($text, '-');
+        // Remplacer les tirets multiples par un seul
+        $text = preg_replace('/-+/', '-', $text);
+        return empty($text) ? 'playlist' : $text;
+    }
+
+    /**
+     * Récupère les pochettes des chansons d'une playlist (jusqu'à une certaine limite).
+     */
+    public static function getPlaylistContextualCovers(int $idPlaylist, int $limit = 4): array
+    {
+        $db = $_SESSION['mysql'];
+        // On récupère les chansons de la playlist (on simule l'appel à getMorceauxPlaylist mais plus simple pour juste les covers)
+        // ATTENTION : Si la playlist est dynamique, il faudrait utiliser la même logique que getMorceauxPlaylist.
+        // Pour simplifier, on récupère via getMorceauxPlaylist (qui gère manuel/dynamique)
+        
+        $covers = [];
+        if (!function_exists('getMorceauxPlaylist')) {
+            require_once __DIR__ . '/playlist.php';
+        }
+        
+        $res = getMorceauxPlaylist($idPlaylist, 'ordre');
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                if (!empty($row['cover'])) {
+                    $covers[] = $row['cover'];
+                    if (count($covers) >= $limit) break;
+                }
+            }
+        }
+        
+        return array_unique($covers);
+    }
+
+    /**
+     * Génère une mosaïque 2x2 à partir d'un tableau d'URL d'images et la sauvegarde.
+     */
+    public static function generateMosaic(array $imageUrls, string $playlistName): string
+    {
+        $slug = self::slugify($playlistName);
+        $fileName = $slug . ".jpg";
+        $targetPath = dirname(__DIR__, 3) . "/data/playlists/" . $fileName;
+        
+        // Taille cible pour l'image finale
+        $finalWidth = 400;
+        $finalHeight = 400;
+        $mosaic = imagecreatetruecolor($finalWidth, $finalHeight);
+        
+        // Fond marron très foncé par défaut
+        $bgColor = imagecolorallocate($mosaic, 43, 29, 26);
+        imagefill($mosaic, 0, 0, $bgColor);
+        
+        if (empty($imageUrls)) {
+            // Pas d'images, on génère juste un fond avec des initiales
+            $textColor = imagecolorallocate($mosaic, 210, 180, 140); // Beige/Marron clair Canopée
+            // On écrit les initiales ou un texte par défaut (rudimentaire sans font ttf)
+            $text = strtoupper(substr($slug, 0, 2));
+            imagestring($mosaic, 5, ($finalWidth / 2) - 10, ($finalHeight / 2) - 10, $text, $textColor);
+            imagejpeg($mosaic, $targetPath, 85);
+            imagedestroy($mosaic);
+            return $fileName;
+        }
+        
+        // On complète le tableau avec la première image si on en a moins de 4, ou on laisse vide.
+        // Option choisie : Si 1 image, elle prend tout. Si 2 ou 3 images, on les place dans les cases 200x200.
+        
+        if (count($imageUrls) === 1) {
+            // Une seule image, elle prend tout l'espace
+            self::stampImageToMosaic($mosaic, $imageUrls[0], 0, 0, $finalWidth, $finalHeight);
+        } else {
+            // Mosaïque 2x2
+            $tileW = 200;
+            $tileH = 200;
+            
+            // Tile 1 : Top Left
+            if (isset($imageUrls[0])) self::stampImageToMosaic($mosaic, $imageUrls[0], 0, 0, $tileW, $tileH);
+            // Tile 2 : Top Right
+            if (isset($imageUrls[1])) self::stampImageToMosaic($mosaic, $imageUrls[1], $tileW, 0, $tileW, $tileH);
+            // Tile 3 : Bottom Left
+            if (isset($imageUrls[2])) self::stampImageToMosaic($mosaic, $imageUrls[2], 0, $tileH, $tileW, $tileH);
+            // Tile 4 : Bottom Right
+            if (isset($imageUrls[3])) self::stampImageToMosaic($mosaic, $imageUrls[3], $tileW, $tileH, $tileW, $tileH);
+        }
+        
+        imagejpeg($mosaic, $targetPath, 85);
+        imagedestroy($mosaic);
+        
+        return $fileName;
+    }
+    
+    private static function stampImageToMosaic($mosaic, string $url, int $dstX, int $dstY, int $dstW, int $dstH): void
+    {
+        // Gestion des URL relatives (partoches : souvent ../../data/chansons/...)
+        // On les résout en local si elles commencent par .. ou /
+        $filePath = $url;
+        if (str_starts_with($url, 'http')) {
+            $filePath = $url;
+        } elseif (str_starts_with($url, '../')) {
+            // On remonte depuis public/php/playlist
+            $filePath = dirname(__DIR__, 3) . "/" . str_replace("../", "", $url);
+        } elseif (str_starts_with($url, '/')) {
+            $filePath = dirname(__DIR__, 4) . $url; // /var/www/html/src/public/data... etc
+        }
+        
+        // Tenter de charger l'image silencieusement
+        $content = @file_get_contents($filePath);
+        if ($content) {
+            $img = @imagecreatefromstring($content);
+            if ($img !== false) {
+                $srcW = imagesx($img);
+                $srcH = imagesy($img);
+                // On recadre au centre (Crop)
+                $minDim = min($srcW, $srcH);
+                $srcX = ($srcW - $minDim) / 2;
+                $srcY = ($srcH - $minDim) / 2;
+                
+                imagecopyresampled($mosaic, $img, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $minDim, $minDim);
+                imagedestroy($img);
+            }
+        }
+    }
 }

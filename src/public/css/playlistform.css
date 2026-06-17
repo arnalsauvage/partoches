@@ -85,6 +85,23 @@
     border: none;
 }
 
+.mosaic-thumbnail {
+    opacity: 0.6;
+    transition: all 0.2s ease-in-out;
+}
+
+.mosaic-thumbnail:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.mosaic-thumbnail.selected-cover {
+    opacity: 1;
+    border-color: var(--c-accent) !important;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
 .mt-10 { margin-top: 10px; }
 .mt-15 { margin-top: 15px; }
 .mt-20 { margin-top: 20px; }
