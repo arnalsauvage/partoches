@@ -169,10 +169,10 @@ function afficheCartePlaylist($ligne): string
 
     // Actions (Écouter, Modifier)
     $actions = "
-        <a href='$urlVoir' class='btn btn-canopee-ecouter'><i class='glyphicon glyphicon-play'></i> Écouter</a>";
-    
+        <a href='$urlVoir' class='btn btn-canopee-ecouter'><i class='glyphicon glyphicon-eye-open'></i> Accéder</a>";
+
     if ($_SESSION['privilege'] >= $GLOBALS["PRIVILEGE_EDITEUR"]) {
-        $actions .= "  <a href='playlist_form.php?id=$id' class='btn btn-canopee-modifier-outline' title='Modifier'><i class='glyphicon glyphicon-pencil'></i></a>";
+        $actions .= "  <a href='playlist_form.php?id=$id' class='btn btn-canopee-modifier-outline' title='Modifier'><i class='glyphicon glyphicon-pencil'></i> Éditer</a>";
     }
 
     return ComposantsUI::afficheCarteCanopee($nom, $sousTitre, $htmlImage, $urlVoir, $badges, $actions, ['hauteur' => '380px']);
