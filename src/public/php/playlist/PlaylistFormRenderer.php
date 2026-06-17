@@ -163,7 +163,12 @@ HTML;
                 $html .= "<p class='text-muted small'>Aucune pochette trouvée dans les chansons de cette playlist.</p>";
             } else {
                 foreach ($availableCovers as $covUrl) {
-                    $html .= "<img src='$covUrl' class='mosaic-thumbnail' data-url='$covUrl' style='width:60px; height:60px; object-fit:cover; border:2px solid transparent; cursor:pointer; border-radius:4px;' title='Cliquer pour sélectionner/désélectionner'>";
+                    $thumbUrl = $covUrl;
+                    // Optimisation : on utilise la vignette si c'est une image de chanson
+                    if (str_contains($covUrl, '/data/chansons/')) {
+                        $thumbUrl = "/data/vignettes/" . basename($covUrl);
+                    }
+                    $html .= "<img src='$thumbUrl' class='mosaic-thumbnail' data-url='$covUrl' style='width:60px; height:60px; object-fit:cover; border:2px solid transparent; cursor:pointer; border-radius:4px;' title='Cliquer pour sélectionner/désélectionner'>";
                 }
             }
         } else {
