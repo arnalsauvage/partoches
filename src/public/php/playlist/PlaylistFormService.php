@@ -140,26 +140,41 @@ class PlaylistFormService
     public static function getPlaylistContextualCovers(int $idPlaylist, int $limit = 4): array
     {
         $db = $_SESSION['mysql'];
-        // On récupère les chansons de la playlist (on simule l'appel à getMorceauxPlaylist mais plus simple pour juste les covers)
-        // ATTENTION : Si la playlist est dynamique, il faudrait utiliser la même logique que getMorceauxPlaylist.
-        // Pour simplifier, on récupère via getMorceauxPlaylist (qui gère manuel/dynamique)
-        
         $covers = [];
+        
         if (!function_exists('getMorceauxPlaylist')) {
             require_once __DIR__ . '/playlist.php';
+        }
+        if (!class_exists('Document')) {
+            require_once dirname(__DIR__) . '/document/Document.php';
         }
         
         $res = getMorceauxPlaylist($idPlaylist, 'ordre');
         if ($res) {
             while ($row = $res->fetch_assoc()) {
+                $coverUrl = "";
+                
+                // 1. Tenter la nouvelle colonne cover
                 if (!empty($row['cover'])) {
-                    $covers[] = $row['cover'];
+                    $coverUrl = $row['cover'];
+                } else {
+                    // 2. Tenter l'ancien système (table document)
+                    $idChanson = (int)$row['id'];
+                    $nomImage = Document::imageTableId("chanson", $idChanson);
+                    if (!empty($nomImage)) {
+                        // Construire le chemin relatif
+                        $coverUrl = "../data/chansons/" . $idChanson . "/" . $nomImage;
+                    }
+                }
+
+                if (!empty($coverUrl) && !in_array($coverUrl, $covers)) {
+                    $covers[] = $coverUrl;
                     if (count($covers) >= $limit) break;
                 }
             }
         }
         
-        return array_unique($covers);
+        return $covers;
     }
 
     /**
