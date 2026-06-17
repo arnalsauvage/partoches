@@ -52,7 +52,7 @@ class ChansonFormNewRenderer
     private static function renderContainer(Chanson $_chanson, string $mode, array $context): string
     {
         $html  = "<div class='container sb-form-container' id='django-config-page'>";
-        $html .= self::renderHeader($mode);
+        $html .= self::renderHeader($mode, $_chanson);
         $html .= "<div class='content-django card-shadow-django'>";
         
         $html .= "<div id='tabs'>";
@@ -86,14 +86,18 @@ class ChansonFormNewRenderer
         return $html;
     }
 
-    private static function renderHeader(string $mode): string
+    private static function renderHeader(string $mode, Chanson $_chanson): string
     {
         $titre = ($mode === 'MAJ') ? 'Mise à jour chanson' : 'Nouvelle partition';
+        $id = $_chanson->getId();
 
         return <<<HTML
         <div class='header-django'>
             <h1><i class='glyphicon glyphicon-music'></i> {$titre}</h1>
             <div class='actions'>
+                <a href='chanson_form_classic.php?id={$id}' class='btn-dj btn-dj-info'>
+                    <i class='glyphicon glyphicon-time'></i> Formulaire classique
+                </a>
                 <a href='chanson_liste.php' class='btn-dj btn-dj-default'>
                     <i class='glyphicon glyphicon-list'></i> Retour liste
                 </a>
