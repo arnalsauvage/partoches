@@ -124,3 +124,72 @@ body {
 .mb-20 { margin-bottom: 20px; }
 .pointer { cursor: pointer; }
 .hidden-element { display: none !important; }
+
+/* --- RYTHMIQUES (STRUMS) --- */
+.strum-well { 
+    background: white !important; 
+    border: 1px solid #D2B48C !important; 
+    border-left: 5px solid #8B4513 !important; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    flex-wrap: wrap; 
+    margin-bottom: 20px;
+}
+
+.strum-badge { 
+    background: #fdfaf5; 
+    border: 2px solid #D2B48C; 
+    padding: 10px 20px; 
+    border-radius: 12px; 
+    text-align: center; 
+    min-width: 150px; 
+    margin-right: 20px; 
+}
+
+.strum-label { 
+    text-transform: uppercase; 
+    font-size: 12px; 
+    font-weight: 900; 
+    color: #8B4513; 
+    letter-spacing: 2px; 
+    display: block; 
+    border-bottom: 1px solid #D2B48C; 
+    margin-bottom: 5px; 
+    padding-bottom: 2px; 
+}
+
+.strum-name { 
+    font-family: monospace; 
+    font-size: 28px; 
+    font-weight: 900; 
+    color: #2b1d1a; 
+}
+
+.strum-content { 
+    flex: 1; 
+    min-width: 250px; 
+    text-align: right; 
+}
+
+.btn-strum-play { 
+    background-color: #2980b9 !important; 
+    color: white !important; 
+    border: none; 
+    padding: 12px 25px; 
+    border-radius: 30px; 
+    font-size: 18px; 
+    font-weight: bold; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 15px; 
+}
+
+.btn-strum-play:hover {
+    background-color: #3498db !important;
+    color: white !important;
+    text-decoration: none;
+}
