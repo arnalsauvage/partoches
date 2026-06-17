@@ -166,7 +166,8 @@ function ordonneLiensPlaylist($idPlaylist)
     // Faire une boucle de 1 à n pour les renuméroter
     $parcours = 1;
     while ($parcours < $numero) {
-        modifielienChansonPlaylist($mesLiens [$parcours] [0], $mesLiens [$parcours] [1], $mesLiens [$parcours] [2], $parcours);
+        // Attention à l'ordre des colonnes : id_chanson est à l'index 2, id_playlist à l'index 1
+        modifielienChansonPlaylist($mesLiens[$parcours][0], $mesLiens[$parcours][2], $mesLiens[$parcours][1], $parcours);
         $parcours++;
     }
 }
@@ -190,8 +191,8 @@ function remonteTitrePlaylist($idPlaylist, $rang, $longueurSaut)
     }
 
     //  changer l'ordre et enregistrer
-    modifielienChansonPlaylist($lienAmonter[0], $lienAmonter[1], $lienAmonter[2], (int)$lienAmonter[3] - (int)$longueurSaut);
-    modifielienChansonPlaylist($lienAbaisser[0], $lienAbaisser[1], $lienAbaisser[2], (int)$lienAbaisser[3] + (int)$longueurSaut);
+    modifielienChansonPlaylist($lienAmonter[0], $lienAmonter[2], $lienAmonter[1], (int)$lienAmonter[3] - (int)$longueurSaut);
+    modifielienChansonPlaylist($lienAbaisser[0], $lienAbaisser[2], $lienAbaisser[1], (int)$lienAbaisser[3] + (int)$longueurSaut);
 
     //  réordonner au cas où
     ordonneLiensPlaylist($idPlaylist);
@@ -213,8 +214,8 @@ function descendTitrePlaylist($idPlaylist, $rang, $longueurSaut)
     }
 
     //  changer l'ordre et enregistrer
-    modifielienChansonPlaylist($lienAdescendre[0], $lienAdescendre[1], $lienAdescendre[2], (int)$lienAdescendre[3] + (int)$longueurSaut);
-    modifielienChansonPlaylist($lienAmonter[0], $lienAmonter[1], $lienAmonter[2], (int)$lienAmonter[3] - (int)$longueurSaut);
+    modifielienChansonPlaylist($lienAdescendre[0], $lienAdescendre[2], $lienAdescendre[1], (int)$lienAdescendre[3] + (int)$longueurSaut);
+    modifielienChansonPlaylist($lienAmonter[0], $lienAmonter[2], $lienAmonter[1], (int)$lienAmonter[3] - (int)$longueurSaut);
 
     //  réordonner au cas où
     ordonneLiensPlaylist($idPlaylist);
