@@ -8,7 +8,12 @@
     <div class='header-django'>
         <h1><i class='glyphicon glyphicon-music'></i> <?= ($mode === 'MAJ') ? 'Mise à jour chanson' : 'Nouvelle partition' ?></h1>
         <div class='actions'>
-            <a href='chanson_form_classic.php?id=<?= $chanson->getId() ?>' class='btn-dj btn-dj-info'>
+            <?php if ($chanson->getId() > 0): ?>
+                <a href='chanson_voir.php?id=<?= $chanson->getId() ?>' class='btn-dj btn-dj-info'>
+                    <i class='glyphicon glyphicon-eye-open'></i> Voir la chanson
+                </a>
+            <?php endif; ?>
+            <a href='chanson_form_classic.php?id=<?= $chanson->getId() ?>' class='btn-dj btn-dj-warning'>
                 <i class='glyphicon glyphicon-time'></i> Formulaire classique
             </a>
             <a href='chanson_liste.php' class='btn-dj btn-dj-default'>
@@ -243,7 +248,27 @@ $(document).ready(function() {
             type: 'GET', dataType: 'json',
             success: function(data) {
                 if (data.local_covers && data.local_covers.length > 0) {
-                    renderCovers('#localCoversContainer', data.local_covers);
+                    const $container = $('#localCoversContainer');
+                    $container.empty();
+                    $('#noLocalCoversMessage').addClass('hidden-element');
+                    
+                    data.local_covers.forEach(function(relPath) {
+                        // Nettoyage du chemin relatif pour en faire un absolu web
+                        const absPath = relPath.replace('../../', '/');
+                        const fileName = absPath.split('/').pop();
+                        const thumbUrl = "/data/vignettes/" + fileName;
+
+                        const $img = $('<img>')
+                            .attr('src', thumbUrl)
+                            .addClass('cover-thumbnail')
+                            .attr('data-cover-url', absPath)
+                            .attr('title', fileName);
+                            
+                        if ($('#fcover').val() === absPath) {
+                            $img.addClass('selected-cover');
+                        }
+                        $container.append($img);
+                    });
                 }
             }
         });
