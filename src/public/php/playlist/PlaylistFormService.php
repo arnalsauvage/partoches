@@ -188,7 +188,7 @@ class PlaylistFormService
     {
         $slug = self::slugify($playlistName);
         $fileName = $slug . ".jpg";
-        $targetPath = dirname(__DIR__, 3) . "/data/playlists/" . $fileName;
+        $targetPath = dirname(__DIR__, 2) . "/data/playlists/" . $fileName;
         
         // Taille cible pour l'image finale
         $finalWidth = 400;
@@ -246,9 +246,10 @@ class PlaylistFormService
             $filePath = $url;
         } elseif (str_starts_with($url, '../')) {
             // On remonte depuis public/php/playlist
-            $filePath = dirname(__DIR__, 3) . "/" . str_replace("../", "", $url);
+            $filePath = __DIR__ . "/" . $url; // File_get_contents sait résoudre public/php/playlist/../../data...
         } elseif (str_starts_with($url, '/')) {
-            $filePath = dirname(__DIR__, 4) . $url; // /var/www/html/src/public/data... etc
+            // dirname(__DIR__, 2) == src/public
+            $filePath = dirname(__DIR__, 2) . $url; 
         }
         
         // Tenter de charger l'image silencieusement
