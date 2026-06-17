@@ -147,13 +147,24 @@ function afficheCartePlaylist($ligne): string
     $date = dateMysqlVersTexte($ligne['date_creation'] ?? $ligne['date'] ?? $ligne[3] ?? '');
     $hits = $ligne['hits'] ?? $ligne[8] ?? $ligne[5] ?? 0;
     
-    $imagePochette = imagePlaylist($id);
+    // 1. On tente d'utiliser l'image directe (mosaïque ou upload)
+    $imagePochette = $ligne['image'] ?? $ligne[4] ?? '';
+    
+    // 2. Fallback sur le système document si vide
+    if (empty($imagePochette)) {
+        $imagePochette = imagePlaylist($id);
+    }
     
     $urlVoir = "playlist_voir.php?id=$id";
     
     $htmlImage = "";
-    if ($imagePochette != "") {
-        $htmlImage = "<img src='../data/playlists/$imagePochette' alt='Pochette'>";
+    if (!empty($imagePochette)) {
+        // Déterminer le dossier (data/playlists/ pour les mosaïques, ou relatif pour legacy)
+        $src = $imagePochette;
+        if (!str_contains($src, '/')) {
+            $src = "../data/playlists/" . $src;
+        }
+        $htmlImage = "<img src='$src' alt='Pochette' class='img-responsive'>";
     } else {
         $htmlImage = "<i class='glyphicon glyphicon-music' style='font-size: 64px;'></i>";
     }

@@ -53,10 +53,25 @@ $sortie .= "    </div>";
 $sortie .= "    <div class='well playlist-header-well'>";
 $sortie .= "      <div class='row'>";
 $sortie .= "        <div class='col-md-3 text-center'>";
-// Image de la playlist
-$imagePochette = imagePlaylist($idPlaylist);
-if ($imagePochette != "") {
-    $sortie .= "<img src='../data/playlists/$imagePochette' class='img-responsive img-thumbnail playlist-pochette-voir' alt='Pochette'>";
+// Image de la playlist (Mosaïque ou Upload)
+$imagePochette = $donnee['image'] ?? '';
+$srcPochette = "";
+
+if (!empty($imagePochette)) {
+    $srcPochette = $imagePochette;
+    if (!str_contains($srcPochette, '/')) {
+        $srcPochette = "../data/playlists/" . $srcPochette;
+    }
+} else {
+    // Fallback legacy (table document)
+    $legacyImage = imagePlaylist($idPlaylist);
+    if (!empty($legacyImage)) {
+        $srcPochette = "../data/playlists/" . $legacyImage;
+    }
+}
+
+if ($srcPochette != "") {
+    $sortie .= "<img src='$srcPochette' class='img-responsive img-thumbnail playlist-pochette-voir' alt='Pochette'>";
 } else {
     $sortie .= "<div class='playlist-pochette-fallback'><i class='glyphicon glyphicon-music' style='font-size: 64px; color: #2b1d1a;'></i></div>";
 }
