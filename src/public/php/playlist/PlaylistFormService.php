@@ -62,6 +62,13 @@ class PlaylistFormService
      */
     public static function addSong(int $id, int $chansonId): string
     {
+        $db = $_SESSION['mysql'];
+        $check = $db->query("SELECT id FROM lienchansonplaylist WHERE id_playlist = $id AND id_chanson = $chansonId");
+        
+        if ($check && $check->num_rows > 0) {
+            return "Ce morceau est déjà dans la playlist.";
+        }
+        
         creelienChansonPlaylist($chansonId, $id);
         ordonneLiensPlaylist($id);
         return "Morceau ajouté avec succès !";

@@ -225,7 +225,7 @@ HTML;
 HTML;
         $lignes = chercheLiensChansonPlaylist('id_playlist', $id, "ordre", true);
         while ($ligne = $lignes->fetch_row()) {
-            $ch = new Chanson($ligne[1]);
+            $ch = new Chanson((int)$ligne[2]);
             $nomCh = htmlspecialchars($ch->getNom());
             $html .= <<<HTML
                                 <tr>
