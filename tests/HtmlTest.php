@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
 require_once __DIR__ . "/../src/public/php/note/UtilisateurNote.php";
 
-class htmlTest extends TestCase
+class HtmlTest extends TestCase
 {
     function setUp():void
     {

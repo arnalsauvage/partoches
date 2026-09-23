@@ -13,7 +13,7 @@ require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
 require_once __DIR__ . "/../src/public/php/strum/Strum.php";
 
 
-class utilssiTest extends TestCase
+class UtilssiTest extends TestCase
 {
     public function testValidateDate()
     {

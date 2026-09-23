@@ -8,7 +8,7 @@ require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
 require_once __DIR__ . "/../src/public/php/strum/Strum.php";
 
 
-class strumTest extends TestCase
+class StrumTest extends TestCase
 {
     public function testConstructeur0()
     {
