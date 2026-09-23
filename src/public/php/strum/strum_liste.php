@@ -3,7 +3,7 @@
  * Liste des Strums (Django Style)
  */
 
-require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 $pasDeMenu = true;
 require_once __DIR__ . "/../navigation/menu.php";
 

@@ -3,7 +3,19 @@ require_once __DIR__ .'/FichierIni.php';
 require_once __DIR__ .'/mysql.php';
 
 // --- INCLUSION DE L'AUTOLOADER MAISON (Django) ---
-require_once dirname(__DIR__, 3) . '/autoload.php';
+$autoloaderPaths = [
+    dirname(__DIR__, 3) . '/autoload.php',
+    dirname(__DIR__, 2) . '/autoload.php',
+    dirname(__DIR__, 1) . '/autoload.php',
+    __DIR__ . '/autoload.php'
+];
+
+foreach ($autoloaderPaths as $path) {
+    if (file_exists($path)) {
+        require_once $path;
+        break;
+    }
+}
 
 // --- CHEMIN DU DOSSIER PHP (Django) ---
 if (!defined('PHP_DIR')) {
@@ -22,13 +34,23 @@ if (!isset($configMysql)) {
 
     // 2. Si non trouvées, on se rabat sur les fichiers .ini
     if (!$monserveur) {
-        if (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING) {
-            $fichier = dirname(__DIR__, 3) . "/data/conf/params_test.ini";
-        } else {
-            $fichier = dirname(__DIR__, 3) . "/data/conf/params.ini";
+        $iniFiles = [
+            (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING) ? dirname(__DIR__, 3) . "/data/conf/params_test.ini" : null,
+            dirname(__DIR__, 3) . "/data/conf/params.ini",
+            dirname(__DIR__, 2) . "/data/conf/params.ini",
+            dirname(__DIR__, 2) . "/conf/params.ini",
+            dirname(__DIR__, 1) . "/conf/params.ini",
+            __DIR__ . "/params.ini"
+        ];
+        $fichier = null;
+        foreach ($iniFiles as $f) {
+            if ($f && file_exists($f)) {
+                $fichier = $f;
+                break;
+            }
         }
 
-        if (file_exists($fichier)) {
+        if ($fichier && file_exists($fichier)) {
             $ini_objet = new FichierIni ();
             $ini_objet->m_load_fichier($fichier);
             $monserveur = $ini_objet->m_valeur("monServeur", "mysql");

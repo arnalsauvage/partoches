@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 
 /**
  * CLASSE : Chanson (Entité)

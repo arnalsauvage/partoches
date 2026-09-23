@@ -4,7 +4,7 @@
  * Compare la BDD (table document et chanson.cover) avec le filesystem.
  */
 
-require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 require_once __DIR__ . "/../navigation/menu.php";
 require_once __DIR__ . "/../admin/AdminService.php";
 

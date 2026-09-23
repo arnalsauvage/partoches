@@ -12,7 +12,7 @@ const LIENS_LIEN_STRUM_CHANSON_POST_PHP = RETOUR_RACINE . "liens/lienStrumChanso
 const CHEMIN_SONGBOOK_FORM = RETOUR_RACINE . "/songbook/songbook_form.php";
 const JS_CHANSON_FORM_JS = RETOUR_RACINE . RETOUR_RACINE . "js/chansonForm.js?v=25.3.28";
 
-require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 require_once __DIR__ . "/../lib/utilssi.php";
 require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 

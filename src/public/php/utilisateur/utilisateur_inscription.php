@@ -4,7 +4,7 @@
  * Contrôleur de création de compte (Inscription utilisateur).
  */
 
-require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 require_once __DIR__ . "/UtilisateurInscriptionService.php";
 
 $error = "";

@@ -4,7 +4,7 @@
  * Génère un rapport d'empreinte (MD5) de tous les fichiers du projet.
  */
 
-require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 
 // Sécurité : Seul l'admin peut lancer l'audit
 if (!estAdmin()) {

@@ -4,7 +4,7 @@
  * Affiche le détail d'une chanson avec une UX moderne (Refactorisé SOLID).
  */
 
-require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 require_once __DIR__ . "/ChansonService.php";
 require_once __DIR__ . "/ChansonVoirRenderer.php";
 require_once PHP_DIR . "/liens/lienurl_voir.php";

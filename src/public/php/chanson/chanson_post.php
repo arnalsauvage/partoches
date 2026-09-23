@@ -8,7 +8,7 @@ const SUPPR = "SUPPR";
 const REGEN_THUMBS = "REGEN_THUMBS";
 const CHANSON = "chanson";
 $nomTable = CHANSON;
-require_once dirname(__DIR__, 3) . "/autoload.php";
+require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 require_once __DIR__ . "/../lib/utilssi.php";
 
 // ecritFichierLog("ajaxlog.htm", "entrée dans chanson_post");
