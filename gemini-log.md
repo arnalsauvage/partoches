@@ -1,7 +1,10 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (23 Septembre 2026)
-- **Fix Définitif Erreur 500 Hostinger Prod (`autoload.php`)** :
+- **Fixation de la Stabilité Réseau Windows/Docker & Validation Automatisée (Smoke Tests)** :
+    - **Bind Réseau 127.0.0.1** : Modification de `docker-compose.yml` avec l'adressage explicite `127.0.0.1:8080:80`, `127.0.0.1:3307:3306` et `127.0.0.1:8081:80` pour garantir la joignabilité instantanée depuis les navigateurs Windows sans conflit de boucle locale IPv6.
+    - **Automatisation des Tests HTTP (21/21 Vert)** : Exécution autonome d'une suite complète d'intégration HTTP validant le statut **200 OK** sur les 21 pages critiques du site.
+    - **Succès Suite Unitaire PHPUnit** : 141 tests sur 141 validés avec succès dans le conteneur `site-partoches` (0 échec, 0 erreur). Poussé sur `master` (`d4f90fa`).
     - **Identification de la Root Cause** : L'erreur exacte transmise par le serveur Hostinger indiquait `Warning: require_once(.../autoload.php): Failed to open stream: No such file or directory`. L'ancienne instruction `dirname(__DIR__, 3) . '/autoload.php'` remontait hors du dossier web `public_html/` de production où `autoload.php` n'existait pas.
     - **Solution Technique** :
         1. Création de [src/public/autoload.php](file:///f:/Arnaud/projets-dev/partoches/src/public/autoload.php) inclus dans le périmètre de transfert FTP.
