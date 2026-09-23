@@ -1,7 +1,11 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (23 Septembre 2026)
-- **CI/CD GitHub Actions & Fix Définitif Syntaxe `secrets`** :
+- **Hotfix Erreur 500 & Migration SQL 004 (`lienstrumchanson`)** :
+    - **Identification Root Cause** : La table `lienstrumchanson` dans `dbPartoches.sql` ne possédait pas la colonne `ordre`, ce qui faisait chuter la méthode `LienStrumChanson::chercheLiensStrumChanson()` avec `Unknown column 'ordre' in 'ORDER BY'`, provoquant un crash Fatal Error HTTP 500 sur plusieurs pages majeures (dont `chanson_voir.php`, `chanson_form.php`).
+    - **Fix & Migrations** : Ajout de la colonne `ordre` dans `dbPartoches.sql` et création du script de migration `src/data/database/migrations/004_add_ordre_to_lienstrumchanson.sql`.
+    - **Conformité HTML & Linter** : Échappement des esperluettes `&` -> `&amp;` dans `chanson_form_view.phtml` et `ChansonFormRenderer.php`.
+    - **Validation suite complète** : Succès total des 141 tests PHPUnit (141 tests OK, 0 échec, 0 erreur).
     - Éradication définitive de l'erreur `Unrecognized named-value: 'secrets'`. En GitHub Actions, le contexte `secrets` ne peut être lu directement dans aucune clause `if:`. Mise en place d'une étape intermédiaire `Check FTP Secret Configuration` (`id: check_ftp`) qui inspecte la présence de la variable en bash et définit un output `$GITHUB_OUTPUT` (`has_ftp=true/false`). La step de déploiement utilise désormais `if: steps.check_ftp.outputs.has_ftp == 'true'`, syntaxe 100% conforme et reconnue par le parseur GitHub Actions.
     - Ajout de `continue-on-error: true` sur le déploiement FTP.
     - Activation de la directive `workflow_dispatch` dans `.github/workflows/ci-cd.yml` permettant de relancer manuellement les workflows depuis l'interface GitHub sans nouveau commit.
