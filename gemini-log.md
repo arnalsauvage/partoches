@@ -1,9 +1,9 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (23 Septembre 2026)
-- **CI/CD GitHub Actions & Tolérance Déploiement FTP** :
-    - Ajout de `continue-on-error: true` sur l'étape de déploiement FTP. Si les identifiants FTP (Hostinger) configurés dans les Secrets GitHub sont erronés ou indisponibles, le job de tests (`lint-and-test`) reste au vert (100% OK) sans bloquer la validation de la suite de tests.
-    - Résolution de l'erreur `Unrecognized named-value: 'secrets'` au niveau de la condition `if` du job `deploy`.
+- **CI/CD GitHub Actions & Fix Définitif Syntaxe `secrets`** :
+    - Éradication définitive de l'erreur `Unrecognized named-value: 'secrets'`. En GitHub Actions, le contexte `secrets` ne peut être lu directement dans aucune clause `if:`. Mise en place d'une étape intermédiaire `Check FTP Secret Configuration` (`id: check_ftp`) qui inspecte la présence de la variable en bash et définit un output `$GITHUB_OUTPUT` (`has_ftp=true/false`). La step de déploiement utilise désormais `if: steps.check_ftp.outputs.has_ftp == 'true'`, syntaxe 100% conforme et reconnue par le parseur GitHub Actions.
+    - Ajout de `continue-on-error: true` sur le déploiement FTP.
     - Activation de la directive `workflow_dispatch` dans `.github/workflows/ci-cd.yml` permettant de relancer manuellement les workflows depuis l'interface GitHub sans nouveau commit.
 - **Validation de Compte par Email (Anti-Bot / Activation)** :
     - **Modèle & BD** : Ajout des méthodes `creeUtilisateurEnAttente` et `activeCompteParToken` dans `Utilisateur.php`. Blocage des connexions `login_utilisateur` tant que `est_actif === 0`.
