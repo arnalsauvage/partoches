@@ -1,5 +1,17 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (24 Septembre 2026)
+- **Résolution de l'erreur 500 / Fatal Error en Production (`Cannot redeclare convertitDateJJMMAAAAversMySql`)** :
+    - **Identification de la Root Cause** : Sur Hostinger, un ancien sous-dossier abandonné `public_html/public/` existait sur le serveur web. Dans `src/public/autoload.php`, le test `is_dir(ROOT_DIR . '/public')` s'évaluait à `true` en prod et forçait `PUBLIC_DIR` à pointer vers l'ancien dossier `public_html/public/php/lib` au lieu de `public_html/php/lib`. `require_once` chargeait donc deux versions distinctes de `configMysql.php`, redéfinissant la fonction `convertitDateJJMMAAAAversMySql()`.
+    - **Solution Technique** :
+        1. **Attribution stricte dans [src/public/autoload.php](file:///f:/Arnaud/projets-dev/partoches/src/public/autoload.php)** : `PUBLIC_DIR` est désormais obligatoirement fixé à `__DIR__`, empêchant tout basculement vers un sous-dossier fantôme en production.
+        2. **Protection défensive dans [src/public/php/lib/configMysql.php](file:///f:/Arnaud/projets-dev/partoches/src/public/php/lib/configMysql.php)** : Encadrement des fonctions d'aide avec `if (!function_exists('...'))`.
+        3. Nettoyage des `use` redondants dans `chanson_form.php` supprimant les warnings PHP 8.2 en espace de nom global.
+    - **Validation & Poussée** :
+        - 141/141 tests PHPUnit validés (100% Succès).
+        - 21/21 pages validées par la suite de Smoke Tests HTTP.
+        - Poussé sur `master` (`31f55fd`). Le pipeline GitHub Actions déploie automatiquement le correctif par FTP sur Hostinger.
+
 ### 📖 Résumé de la session (23 Septembre 2026)
 - **Fixation de la Stabilité Réseau Windows/Docker & Validation Automatisée (Smoke Tests)** :
     - **Bind Réseau 127.0.0.1** : Modification de `docker-compose.yml` avec l'adressage explicite `127.0.0.1:8080:80`, `127.0.0.1:3307:3306` et `127.0.0.1:8081:80` pour garantir la joignabilité instantanée depuis les navigateurs Windows sans conflit de boucle locale IPv6.
