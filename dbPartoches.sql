@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS `lienstrumchanson` (
   `idChanson` int(11) NOT NULL,
   `idStrum` int(11) DEFAULT NULL,
   `strum` varchar(255) DEFAULT NULL,
+  `ordre` int(11) DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

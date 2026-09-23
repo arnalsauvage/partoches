@@ -310,11 +310,13 @@ HTML;
             $idLien = $l['id'];
             $actionDel = "../liens/lienStrumChanson_post.php?id=$idLien&amp;mode=DEL&amp;idChanson=$id";
 
+            $descStrum = htmlspecialchars($s->getDescription(), ENT_QUOTES, 'UTF-8');
+
             $out .= <<<HTML
             <div class="list-group-item" style="display:flex; justify-content:space-between; align-items:center; padding: 12px 15px;">
                 <div>
                     <code style="font-size: 1.3em; color: #8B4513; background: #fdf5e6; padding: 2px 6px; border-radius: 4px;">$motif</code> $badgeSwing<br>
-                    <small class="text-muted" style="display:inline-block; margin-top: 5px;">{$s->getLongueur()} {$s->renvoieUniteEnFrancais()} - {$s->getDescription()}</small>
+                    <small class="text-muted" style="display:inline-block; margin-top: 5px;">{$s->getLongueur()} {$s->renvoieUniteEnFrancais()} - $descStrum</small>
                 </div>
                 <div style="margin-left: 15px;">
                     <a href="$actionDel" class="btn btn-sm btn-danger" title="Supprimer cette rythmique" onclick="return confirm('Supprimer ce strum ?')">
@@ -331,7 +333,8 @@ HTML;
         $optStrums = "";
         foreach ($listeStrums as $st) {
             $motif = str_replace(" ", "-", $st->getStrum());
-            $optStrums .= "<option value='{$st->getId()}'>$motif ({$st->getDescription()})</option>";
+            $descOpt = htmlspecialchars($st->getDescription(), ENT_QUOTES, 'UTF-8');
+            $optStrums .= "<option value='{$st->getId()}'>$motif ($descOpt)</option>";
         }
 
         $actionPostStrum = "../liens/lienStrumChanson_post.php";
