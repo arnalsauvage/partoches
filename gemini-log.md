@@ -1,7 +1,13 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (23 Septembre 2026)
+- **Restauration du Compte Admin Local** :
+    - Réinitialisation et création du compte administrateur local via [scripts/create_admin_user.php](file:///f:/Arnaud/projets-dev/partoches/scripts/create_admin_user.php).
+    - Identifiants de connexion actifs en local : Login `admin`, Mot de passe `kazoo` (Privilège `2-Admin`, statut `est_actif=1`).
 - **Restauration du Catalogue Local de Chansons & Documents** :
+    - Import du dump de chansons dans le conteneur MariaDB (397 chansons restaurées).
+    - Resynchronisation des 258 fichiers PDF avec la table `document` via `scripts/repopulate_documents.php`.
+    - La page `http://localhost:8080/php/chanson/chanson_liste.php` affiche à nouveau l'intégralité du catalogue. 100% des tests PHPUnit au vert (141 OK).
     - **Identification** : Suite à la réinitialisation de la base locale MariaDB avec le fichier de test minimal `dbPartoches.sql`, seule 1 chanson s'affichait dans la liste.
     - **Restauration Données** : Import du dump de chansons dans le conteneur MariaDB (397 chansons restaurées).
     - **Synchronisation Documents PDF** : Création du script `scripts/repopulate_documents.php` ayant analysé l'arborescence `src/public/data/chansons/` et réinscrit les 258 fichiers PDF associés dans la table `document`.
