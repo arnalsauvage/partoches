@@ -1,7 +1,12 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (23 Septembre 2026)
-- **Résolution Erreur 500 Production Hostinger & Synchronisation Migrations FTP** :
+- **Fix Définitif Erreur 500 Hostinger Prod (`autoload.php`)** :
+    - **Identification de la Root Cause** : L'erreur exacte transmise par le serveur Hostinger indiquait `Warning: require_once(.../autoload.php): Failed to open stream: No such file or directory`. L'ancienne instruction `dirname(__DIR__, 3) . '/autoload.php'` remontait hors du dossier web `public_html/` de production où `autoload.php` n'existait pas.
+    - **Solution Technique** :
+        1. Création de [src/public/autoload.php](file:///f:/Arnaud/projets-dev/partoches/src/public/autoload.php) inclus dans le périmètre de transfert FTP.
+        2. Détection dynamique multi-chemins du fichier `autoload.php` et `params.ini` sur l'ensemble des 36 contrôleurs et classes PHP.
+    - **Validation & Poussée** : Modifications poussées sur `master` (`d052e5a`). Le déploiement FTP s'exécute et résout l'erreur 500 en prod.
     - **Analyse Root Cause** : L'action de déploiement FTP (`FTP Deploy Action`) ne transférait que le dossier `src/public/`. Les scripts SQL de migration situés dans `src/data/database/migrations/` étaient hors périmètre, empêchant la création de la colonne `ordre` dans la base MariaDB/MySQL Hostinger de production.
     - **Solution Structurelle** : Migration des scripts `.sql` dans `src/public/data/database/migrations/` (désormais transférés automatiquement par FTP) et mise à jour de `AdminService.php` (`getMigrationDir()`).
     - **Procédure d'Activation en Prod** : 1) Exécuter les 2 requêtes `ALTER TABLE` dans phpMyAdmin Hostinger, OU 2) Aller sur `http://site-prod/php/admin/params.php` (Paramétrage > Diagnostic) et cliquer sur "Appliquer les migrations en attente".
