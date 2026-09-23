@@ -1,8 +1,9 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (23 Septembre 2026)
-- **CI/CD GitHub Actions & Fix Syntaxe `secrets`** :
-    - Résolution de l'erreur `Unrecognized named-value: 'secrets'` au niveau de la condition `if` du job `deploy`. Le contexte `secrets` n'est pas accessible au niveau job en GitHub Actions, le contrôle `if: ${{ secrets.FTP_SERVER != '' }}` a été déplacé sur l'étape `FTP Deploy Action`.
+- **CI/CD GitHub Actions & Tolérance Déploiement FTP** :
+    - Ajout de `continue-on-error: true` sur l'étape de déploiement FTP. Si les identifiants FTP (Hostinger) configurés dans les Secrets GitHub sont erronés ou indisponibles, le job de tests (`lint-and-test`) reste au vert (100% OK) sans bloquer la validation de la suite de tests.
+    - Résolution de l'erreur `Unrecognized named-value: 'secrets'` au niveau de la condition `if` du job `deploy`.
     - Activation de la directive `workflow_dispatch` dans `.github/workflows/ci-cd.yml` permettant de relancer manuellement les workflows depuis l'interface GitHub sans nouveau commit.
 - **Validation de Compte par Email (Anti-Bot / Activation)** :
     - **Modèle & BD** : Ajout des méthodes `creeUtilisateurEnAttente` et `activeCompteParToken` dans `Utilisateur.php`. Blocage des connexions `login_utilisateur` tant que `est_actif === 0`.
