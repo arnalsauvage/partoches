@@ -11,10 +11,9 @@ class ChansonListeTest extends TestCase
 
     public function testListe()
     {
-        $chansons = Chanson::search('%');
-        $this->assertNotEmpty($chansons, "La liste devrait contenir des chansons");
+        $ids = Chanson::search('%');
+        $this->assertNotEmpty($ids, "La liste devrait contenir des chansons");
 
-        $ids = array_map(fn($c) => $c->getId(), $chansons);
         $nbChansons = count($ids);
         $this->assertGreaterThan(0, $nbChansons, "Il devrait y avoir au moins une chanson");
 
