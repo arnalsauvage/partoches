@@ -49,6 +49,15 @@ class AdminService
         return $html;
     }
 
+    private function getMigrationDir(): string
+    {
+        $dir1 = __DIR__ . '/../../../data/database/migrations/';
+        if (is_dir($dir1)) return $dir1;
+        $dir2 = __DIR__ . '/../../data/database/migrations/';
+        if (is_dir($dir2)) return $dir2;
+        return $dir1;
+    }
+
     /**
      * Retourne l'état des migrations SQL.
      */
@@ -61,7 +70,7 @@ class AdminService
             while ($row = $res->fetch_row()) $played[] = $row[0];
         }
 
-        $migrationDir = __DIR__ . '/../../../data/database/migrations/';
+        $migrationDir = $this->getMigrationDir();
         $files = glob($migrationDir . "*.sql");
         $status = [];
         foreach ($files as $f) {
@@ -87,7 +96,7 @@ class AdminService
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
         $status = $this->getMigrationsStatus();
-        $migrationDir = __DIR__ . '/../../../data/database/migrations/';
+        $migrationDir = $this->getMigrationDir();
         $count = 0;
 
         foreach ($status as $mig) {
