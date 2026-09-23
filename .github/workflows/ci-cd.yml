@@ -74,8 +74,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check FTP Secret Configuration
+        id: check_ftp
+        run: |
+          if [ -n "${{ secrets.FTP_SERVER }}" ]; then
+            echo "has_ftp=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_ftp=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: FTP Deploy Action
-        if: ${{ secrets.FTP_SERVER != '' }}
+        if: steps.check_ftp.outputs.has_ftp == 'true'
         continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
