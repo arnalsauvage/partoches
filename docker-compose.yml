@@ -2,6 +2,7 @@ services:
   web:
     build: .
     container_name: site-partoches
+    stop_signal: SIGTERM
     restart: always
     tty: true
     ports:

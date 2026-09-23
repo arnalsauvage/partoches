@@ -25,6 +25,7 @@ $routes = [
     '/php/utilisateur/utilisateur_form.php?id=1',
     '/php/document/documents_voir.php',
     '/php/admin/params.php',
+    '/html/diagrammes/',
     '/html/mentionsLegales.html',
     '/html/merci.html'
 ];

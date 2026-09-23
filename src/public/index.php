@@ -1,8 +1,11 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Si l'utilisateur est logué
-if (isset ($_SESSION ['user']))
+if (isset($_SESSION['user'])) {
     header('Location: php/chanson/chanson_liste.php');
-else {
+} else {
     header('Location: php/media/listeMedias.php');
 }
+exit;
