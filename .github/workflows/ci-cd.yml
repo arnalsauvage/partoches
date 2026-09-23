@@ -76,6 +76,7 @@ jobs:
 
       - name: FTP Deploy Action
         if: ${{ secrets.FTP_SERVER != '' }}
+        continue-on-error: true
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
