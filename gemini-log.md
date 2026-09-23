@@ -1,7 +1,10 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (23 Septembre 2026)
-- **Restauration du Compte Admin Local** :
+- **Résolution Erreur 500 Production Hostinger & Synchronisation Migrations FTP** :
+    - **Analyse Root Cause** : L'action de déploiement FTP (`FTP Deploy Action`) ne transférait que le dossier `src/public/`. Les scripts SQL de migration situés dans `src/data/database/migrations/` étaient hors périmètre, empêchant la création de la colonne `ordre` dans la base MariaDB/MySQL Hostinger de production.
+    - **Solution Structurelle** : Migration des scripts `.sql` dans `src/public/data/database/migrations/` (désormais transférés automatiquement par FTP) et mise à jour de `AdminService.php` (`getMigrationDir()`).
+    - **Procédure d'Activation en Prod** : 1) Exécuter les 2 requêtes `ALTER TABLE` dans phpMyAdmin Hostinger, OU 2) Aller sur `http://site-prod/php/admin/params.php` (Paramétrage > Diagnostic) et cliquer sur "Appliquer les migrations en attente".
     - Réinitialisation et création du compte administrateur local via [scripts/create_admin_user.php](file:///f:/Arnaud/projets-dev/partoches/scripts/create_admin_user.php).
     - Identifiants de connexion actifs en local : Login `admin`, Mot de passe `kazoo` (Privilège `2-Admin`, statut `est_actif=1`).
 - **Restauration du Catalogue Local de Chansons & Documents** :
