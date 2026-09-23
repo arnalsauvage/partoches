@@ -22,6 +22,9 @@ conf/params.ini
 /html/diagrammes/pageAccords.htm
 /html/diagrammes/style.css
 *.sql
+!dbPartoches.sql
+!src/data/database/migrations/*.sql
+!data/database/migrations/*.sql
 temp_*.php
 php/api/tunebat_scraper.php
 merci.html
