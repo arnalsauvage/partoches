@@ -121,6 +121,9 @@ class MediaService
     public static function transformeDocumentEnMedia(Media $media, int $idDoc, ?string $typeForce = null): void
     {
         $document = Document::chercheDocument($idDoc);
+        if (!$document || !is_array($document)) {
+            return;
+        }
         $idChanson = (int)$document[6];
         $chanson = Chanson::load($idChanson);
         

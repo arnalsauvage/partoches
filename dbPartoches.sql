@@ -88,14 +88,14 @@ CREATE TABLE IF NOT EXISTS `noteUtilisateur` (
 
 CREATE TABLE IF NOT EXISTS `media` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `titre` varchar(255) NOT NULL,
-  `description` text,
-  `auteur` int(11) DEFAULT 1,
-  `datePub` datetime DEFAULT CURRENT_TIMESTAMP,
   `type` varchar(50) DEFAULT 'partoche',
-  `tags` varchar(255) DEFAULT NULL,
+  `titre` varchar(255) NOT NULL,
   `image` varchar(255) DEFAULT NULL,
+  `auteur` int(11) DEFAULT 1,
   `lien` varchar(255) DEFAULT NULL,
+  `description` text,
+  `tags` varchar(255) DEFAULT NULL,
+  `datePub` datetime DEFAULT CURRENT_TIMESTAMP,
   `hits` int(11) DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -121,14 +121,20 @@ CREATE TABLE IF NOT EXISTS `lienstrumchanson` (
 
 CREATE TABLE IF NOT EXISTS `lienurl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nom` varchar(255) NOT NULL,
+  `nomTable` varchar(255) DEFAULT 'chanson',
+  `idTable` int(11) DEFAULT NULL,
   `url` text NOT NULL,
   `type` varchar(50) DEFAULT NULL,
   `description` text,
   `date` date DEFAULT NULL,
   `idUser` int(11) DEFAULT 1,
-  `nomTable` varchar(255) DEFAULT 'chanson',
-  `idTable` int(11) DEFAULT NULL,
   `hits` int(11) DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Données initiales pour les tests unitaires
+INSERT IGNORE INTO `chanson` (`id`, `nom`, `interprete`, `annee`, `idUser`, `tempo`, `mesure`, `pulsation`, `datePub`, `hits`, `tonalite`, `tonalite_originale`, `cover`, `publication`) 
+VALUES (1955, 'Haere Mai', 'Traditionnel', 1955, 1, 120, '4/4', 'noire', '2022-03-25', 0, 'C', 'C', 'cover.jpg', 1);
+
+INSERT IGNORE INTO `document` (`id`, `nom`, `tailleKo`, `date`, `version`, `nomTable`, `idTable`, `idUser`, `hits`)
+VALUES (1305, 'Haere Mai.pdf', 100, '2022-03-25', 1, 'chanson', 1955, 1, 0);
