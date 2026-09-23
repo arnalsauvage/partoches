@@ -1,6 +1,8 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (23 Septembre 2026)
+- **CI/CD GitHub Actions & Relance Manuelle** :
+    - Activation de la directive `workflow_dispatch` dans `.github/workflows/ci-cd.yml` permettant de relancer manuellement les workflows depuis l'interface GitHub sans nouveau commit.
 - **Validation de Compte par Email (Anti-Bot / Activation)** :
     - **Modèle & BD** : Ajout des méthodes `creeUtilisateurEnAttente` et `activeCompteParToken` dans `Utilisateur.php`. Blocage des connexions `login_utilisateur` tant que `est_actif === 0`.
     - **Service & Email** : `UtilisateurInscriptionService` génère un jeton d'activation aléatoire sécurisé (32 hex), enregistre l'utilisateur inactif (`privilege=0`, `est_actif=0`), expédie l'email d'activation et consigne l'URL d'activation dans les logs PHP pour le dev local.
