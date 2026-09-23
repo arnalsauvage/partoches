@@ -1,7 +1,11 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (23 Septembre 2026)
-- **Hotfix Erreur 500 & Migration SQL 004 (`lienstrumchanson`)** :
+- **Restauration du Catalogue Local de Chansons & Documents** :
+    - **Identification** : Suite à la réinitialisation de la base locale MariaDB avec le fichier de test minimal `dbPartoches.sql`, seule 1 chanson s'affichait dans la liste.
+    - **Restauration Données** : Import du dump de chansons dans le conteneur MariaDB (397 chansons restaurées).
+    - **Synchronisation Documents PDF** : Création du script `scripts/repopulate_documents.php` ayant analysé l'arborescence `src/public/data/chansons/` et réinscrit les 258 fichiers PDF associés dans la table `document`.
+    - **Vérification** : La page `http://localhost:8080/php/chanson/chanson_liste.php` affiche à nouveau l'intégralité du catalogue (349+ chansons filtrables). 100% des tests PHPUnit au vert (141 OK).
     - **Identification Root Cause** : La table `lienstrumchanson` dans `dbPartoches.sql` ne possédait pas la colonne `ordre`, ce qui faisait chuter la méthode `LienStrumChanson::chercheLiensStrumChanson()` avec `Unknown column 'ordre' in 'ORDER BY'`, provoquant un crash Fatal Error HTTP 500 sur plusieurs pages majeures (dont `chanson_voir.php`, `chanson_form.php`).
     - **Fix & Migrations** : Ajout de la colonne `ordre` dans `dbPartoches.sql` et création du script de migration `src/data/database/migrations/004_add_ordre_to_lienstrumchanson.sql`.
     - **Conformité HTML & Linter** : Échappement des esperluettes `&` -> `&amp;` dans `chanson_form_view.phtml` et `ChansonFormRenderer.php`.
