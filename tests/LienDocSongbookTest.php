@@ -8,11 +8,16 @@ use PHPUnit\Framework\TestCase;
 class LienDocSongbookTest extends TestCase
 {
     private $mysqliMock;
+    private $oldMysql;
 
     protected function setUp(): void
     {
         require_once __DIR__ . '/../src/public/php/liens/LienDocSongbook.php';
         
+        if (isset($_SESSION['mysql'])) {
+            $this->oldMysql = $_SESSION['mysql'];
+        }
+
         // Mock de l'objet mysqli
         $this->mysqliMock = $this->getMockBuilder(mysqli::class)
             ->disableOriginalConstructor()
@@ -22,6 +27,15 @@ class LienDocSongbookTest extends TestCase
             $_SESSION = [];
         }
         $_SESSION['mysql'] = $this->mysqliMock;
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->oldMysql !== null) {
+            $_SESSION['mysql'] = $this->oldMysql;
+        } else {
+            unset($_SESSION['mysql']);
+        }
     }
 
     /**
@@ -52,8 +66,12 @@ class LienDocSongbookTest extends TestCase
      */
     public function testNombreDeLiensDuSongbook(): void
     {
-        // On crée un vrai résultat depuis la BDD Docker qui est dispo
-        $realDb = new mysqli('db', 'root', 'root', 'dbPartoches');
+        $host = getenv('DATABASE_HOST') ?: ($_ENV['DATABASE_HOST'] ?? '127.0.0.1');
+        $user = getenv('DATABASE_USER') ?: ($_ENV['DATABASE_USER'] ?? 'root');
+        $pass = getenv('DATABASE_PASSWORD') ?: ($_ENV['DATABASE_PASSWORD'] ?? 'root');
+        $name = getenv('DATABASE_NAME') ?: ($_ENV['DATABASE_NAME'] ?? 'dbPartoches');
+
+        $realDb = new mysqli($host, $user, $pass, $name);
         $result = $realDb->query("SELECT 1 UNION SELECT 2 UNION SELECT 3"); // 3 lignes
         
         $this->mysqliMock->expects($this->once())
