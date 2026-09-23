@@ -9,8 +9,15 @@
         3. Nettoyage des `use` redondants dans `chanson_form.php` supprimant les warnings PHP 8.2 en espace de nom global.
     - **Validation & Poussée** :
         - 141/141 tests PHPUnit validés (100% Succès).
-        - 21/21 pages validées par la suite de Smoke Tests HTTP.
-        - Poussé sur `master` (`31f55fd`). Le pipeline GitHub Actions déploie automatiquement le correctif par FTP sur Hostinger.
+- **Résolution de l'erreur HTTP 403 & Couverture E2E des 8 Pages Principales du Menu** :
+    - **Identification Root Cause HTTP 403 (`/html/diagrammes/`)** : Le sous-dossier `src/public/html/diagrammes/` ne contenait pas de fichier d'index (`index.html` ou `index.php`), provoquant une interdiction d'affichage de répertoire Apache (Error 403 Forbidden).
+    - **Correctif** : Création de [src/public/html/diagrammes/index.html](file:///f:/Arnaud/projets-dev/partoches/src/public/html/diagrammes/index.html) qui redirige proprement vers `pageDiagrammes.htm`.
+    - **Nouvelle Spécification Cypress E2E** : Création du fichier [cypress/e2e/05_menu_navigation.cy.js](file:///f:/Arnaud/projets-dev/partoches/cypress/e2e/05_menu_navigation.cy.js) testant spécifiquement les 8 pages du menu général (Médias, Chansons, Strums, Songbooks, Liens, Outils, Playlists, Utilisateurs).
+    - **Résultats** : 
+        - **Smoke Tests HTTP** : **22 / 22 pages valides (100% Succès)**.
+        - **Tests E2E Cypress (05_menu_navigation)** : **8 / 8 pages validées (100% Succès)**.
+        - **Tests unitaires PHPUnit** : **141 / 141 validés (100% Succès)**.
+        - Poussé sur `master` (`737c39d`).
 
 ### 📖 Résumé de la session (23 Septembre 2026)
 - **Fixation de la Stabilité Réseau Windows/Docker & Validation Automatisée (Smoke Tests)** :
