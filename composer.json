@@ -1,0 +1,16 @@
+{
+    "name": "arnaud/partoches",
+    "description": "Gestion de partitions",
+    "require": {
+        "tecnickcom/tcpdf": "^6.6",
+        "setasign/fpdi": "^2.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Partoches\\": "src/"
+        }
+    }
+}

@@ -7,8 +7,6 @@ tmp/
 vignettes/
 vendor/
 composer-setup.php
-composer.json
-composer.lock
 composer.phar
 Dockerfile
 /html/diagrammes/Accords/

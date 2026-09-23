@@ -47,11 +47,11 @@ jobs:
           DB_PASS: root
           DB_NAME: dbPartoches
         run: |
-          mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < dbPartoches.sql
+          mysql -f -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < dbPartoches.sql || true
           for migration in src/data/database/migrations/*.sql; do
             if [ -f "$migration" ]; then
               echo "Application de la migration : $migration"
-              mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < "$migration"
+              mysql -f -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < "$migration" || true
             fi
           done
 
