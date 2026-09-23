@@ -59,6 +59,7 @@ class SongbookSmokeTest extends TestCase
             'Liens' => ['/php/liens/lienurl_liste.php', []],
             'Playlists' => ['/php/playlist/playlist_liste.php', []],
             'Utilisateurs' => ['/php/utilisateur/utilisateur_liste.php', []],
+            'Inscription' => ['/php/utilisateur/utilisateur_inscription.php', []],
             'Documents' => ['/php/document/documents_voir.php', []],
             'Paramétrage' => ['/php/admin/params.php', []],
             'Connexion' => ['/php/navigation/login.php', []],

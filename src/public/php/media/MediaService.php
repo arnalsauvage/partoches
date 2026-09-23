@@ -122,7 +122,7 @@ class MediaService
     {
         $document = Document::chercheDocument($idDoc);
         $idChanson = (int)$document[6];
-        $chanson = new Chanson($idChanson);
+        $chanson = Chanson::load($idChanson);
         
         $extension = strtolower(pathinfo($document[1], PATHINFO_EXTENSION));
         $typeDoc = $typeForce ?? ($extension === 'pdf' ? 'partoche' : 'audio');
@@ -142,7 +142,7 @@ class MediaService
     {
         $lienUrl = LienUrl::chercheLienurlId($idLienurl);
         $idChanson = (int)$lienUrl[2];
-        $chanson = new Chanson($idChanson);
+        $chanson = Chanson::load($idChanson);
         
         $media->setTitre($chanson->getNom());
         $typeLien = (string)$lienUrl[4];
@@ -154,5 +154,23 @@ class MediaService
         $media->setTags($typeLien . " " . $chanson->getAnnee());
         $media->setImage("./data/chansons/$idChanson/" . rawurlencode(Document::imageTableId('chanson', $idChanson)));
         $media->setLien((string)$lienUrl[3]);
+    }
+
+    /**
+     * Vérifie si l'utilisateur courant a les droits d'accès aux ressources audio.
+     */
+    public static function estAudioAccessible(): bool
+    {
+        $privilegeMin = $GLOBALS["PRIVILEGE_MEMBRE"] ?? 1;
+        return aDroits($privilegeMin);
+    }
+
+    /**
+     * Vérifie si une extension de fichier est un format audio réservé (mp3, m4a, aac, etc.).
+     */
+    public static function estExtensionAudio(string $extension): bool
+    {
+        $ext = strtolower(trim($extension, '.'));
+        return in_array($ext, ['mp3', 'm4a', 'aac', 'ogg', 'wav']);
     }
 }

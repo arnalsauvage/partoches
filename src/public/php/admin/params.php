@@ -45,6 +45,14 @@ if (isset($_POST['action'])) {
             MediaService::resetMediaTable(); 
             echo "✅ Catalogue regenere avec succes !";
             break;
+        case 'regenere_vignettes_all':
+            try {
+                $res = $adminService->batchRegenerateThumbnails();
+                echo "✅ {$res['total']} image(s) vérifiée(s). {$res['generated']} miniature(s) générée(s).";
+            } catch (Exception $e) {
+                echo "❌ " . $e->getMessage();
+            }
+            break;
         case 'export_db':
             $filePath = $adminService->exportDatabase();
             if ($filePath && file_exists($filePath)) {

@@ -181,4 +181,89 @@ class AdminService
 
         return $gzPath;
     }
+
+    /**
+     * Régénère en masse les miniatures manquantes pour toutes les chansons.
+     */
+    public function batchRegenerateThumbnails()
+    {
+        if (!class_exists('Document')) require_once dirname(__DIR__) . "/document/Document.php";
+        if (!class_exists('Image')) require_once dirname(__DIR__) . "/lib/Image.php";
+
+        $sql = "SELECT idTable, nom, version FROM document WHERE nomTable = 'chanson' AND (nom LIKE '%.jpg' OR nom LIKE '%.jpeg' OR nom LIKE '%.png' OR nom LIKE '%.webp')";
+        $res = $this->db->query($sql);
+
+        $countTotal = 0;
+        $countGenerated = 0;
+        while ($row = $res->fetch_assoc()) {
+            $relPath = $row['idTable'] . "/" . Document::composeNomVersion($row['nom'], $row['version']);
+            
+            // On vérifie manuellement si les vignettes existent pour avoir un compte précis
+            $pathInfo = pathinfo($relPath);
+            $baseDir = dirname(__DIR__, 2) . "/data/chansons/";
+            $thumbMini = $baseDir . $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "-mini.webp";
+            $thumbSd = $baseDir . $pathInfo['dirname'] . "/" . $pathInfo['filename'] . "-sd.webp";
+
+            $needed = (!file_exists($thumbMini) || !file_exists($thumbSd));
+
+            if ($needed) {
+                Image::getThumbnailUrl($relPath, 'mini', 'chansons', false);
+                Image::getThumbnailUrl($relPath, 'sd', 'chansons', false);
+                $countGenerated++;
+            }
+            $countTotal++;
+        }
+        return ['total' => $countTotal, 'generated' => $countGenerated];
+    }
+
+    /**
+     * Supprime tous les dossiers dans data/chansons dont l'ID n'existe plus en BDD.
+     */
+    public function deleteOrphanSongFolders()
+    {
+        global $_DOSSIER_CHANSONS;
+        $db = $this->db;
+        
+        // 1. Liste des IDs existants
+        $idsExistants = [];
+        $res = $db->query("SELECT id FROM chanson");
+        while ($row = $res->fetch_row()) $idsExistants[] = (int)$row[0];
+
+        // 2. Scan du dossier data/chansons
+        $count = 0;
+        if (is_dir($_DOSSIER_CHANSONS)) {
+            $folders = scandir($_DOSSIER_CHANSONS);
+            foreach ($folders as $f) {
+                if ($f === '.' || $f === '..' || !is_numeric($f)) continue;
+                
+                $idFolder = (int)$f;
+                if (!in_array($idFolder, $idsExistants)) {
+                    $path = $_DOSSIER_CHANSONS . $f;
+                    if ($this->rrmdir($path)) {
+                        $count++;
+                    }
+                }
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * Supprime récursivement un dossier.
+     */
+    private function rrmdir($dir) {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (is_dir($dir . DIRECTORY_SEPARATOR . $object) && !is_link($dir . "/" . $object))
+                        $this->rrmdir($dir . DIRECTORY_SEPARATOR . $object);
+                    else
+                        unlink($dir . DIRECTORY_SEPARATOR . $object);
+                }
+            }
+            return rmdir($dir);
+        }
+        return false;
+    }
 }

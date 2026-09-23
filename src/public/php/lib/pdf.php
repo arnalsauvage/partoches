@@ -7,8 +7,17 @@
 // On s'assure d'avoir nos constantes de chemins absolus
 require_once __DIR__ . '/../../../autoload.php';
 
-require_once VENDOR_DIR . '/php/tcpdf/tcpdf.php';
-require_once VENDOR_DIR . '/php/fpdi/autoload.php';
+if (file_exists(VENDOR_DIR . '/php/tcpdf/tcpdf.php')) {
+    require_once VENDOR_DIR . '/php/tcpdf/tcpdf.php';
+} elseif (file_exists(ROOT_DIR . '/../vendor/tecnickcom/tcpdf/tcpdf.php')) {
+    require_once ROOT_DIR . '/../vendor/tecnickcom/tcpdf/tcpdf.php';
+}
+
+if (file_exists(VENDOR_DIR . '/php/fpdi/autoload.php')) {
+    require_once VENDOR_DIR . '/php/fpdi/autoload.php';
+} elseif (file_exists(ROOT_DIR . '/../vendor/autoload.php')) {
+    require_once ROOT_DIR . '/../vendor/autoload.php';
+}
 
 use setasign\Fpdi\TcpdfFpdi;
 

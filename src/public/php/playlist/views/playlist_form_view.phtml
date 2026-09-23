@@ -183,7 +183,7 @@
                                 <?php 
                                 $lignes = chercheLiensChansonPlaylist('id_playlist', $id, "ordre", true);
                                 while ($ligne = $lignes->fetch_row()): 
-                                    $ch = new Chanson((int)$ligne[2]);
+                                    $ch = Chanson::load((int)$ligne[2]);
                                 ?>
                                     <tr>
                                         <td><?= $ligne[3] ?></td>

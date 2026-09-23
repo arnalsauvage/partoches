@@ -24,10 +24,16 @@ dans "Sommaire des morceaux" , si je clique sur la croix pour supprimer un morce
         </li>
 
 ## 🟡 Sprint en cours
+- [ ] **#10 — Restriction d'accès aux ressources audio (MP3) pour les utilisateurs non connectés** (Masquage des MP3 et invite Canopée de connexion pour les invités).
 
 ## 🟢 Icebox (à planifier)
 - [ ] **#08 — Intégration du Design System Canopée** (Migration progressive de toutes les pages vers les nouveaux composants CSS).
 - [ ] **#09 — Refactorisation des pages "Admin"** (Appliquer SOLID à `params.php` et aux outils de diagnostic).
+
+## ✅ Terminé (Septembre 2026)
+- [x] **US-000 — Inscription Utilisateur et Validation Email** (Workflow anti-bot, token d'activation 32-hex, contrôleur `utilisateur_activation.php`, vue Canopée).
+- [x] **US-001 — Mise en place des tests E2E Cypress** (4 specs E2E `01_auth`, `02_inscription`, `03_medias`, `04_songbook` avec `cy.login()`).
+- [x] **Hotfix Prod — MediaRenderer & Migration SQL 003** (Compatibilité de la méthode `Chanson::load()`, sécurisation idempotente `IF NOT EXISTS` de la migration SQL 003).
 
 ## ✅ Terminé (Avril 2026)
 - [x] **#01 — Correction ligne noire PDF** (Désactivation de l'en-tête TCPDF dans `SongbookPdf`).

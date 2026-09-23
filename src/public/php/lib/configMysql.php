@@ -58,7 +58,34 @@ if (!isset($configMysql)) {
             . $mysqli->connect_error);
     }
 
-    // === AUTO-MIGRATION BY DJANGO (Correctif colonne manquante) ===
+    // === AUTO-MIGRATION BY DJANGO (Correctif tables & colonnes manquantes) ===
+    $mysqli->query("CREATE TABLE IF NOT EXISTS `utilisateur` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `login` varchar(255) NOT NULL,
+      `mdp` varchar(255) NOT NULL,
+      `prenom` varchar(255) DEFAULT NULL,
+      `nom` varchar(255) DEFAULT NULL,
+      `image` varchar(255) DEFAULT 'utilisateur/defaut.png',
+      `site` varchar(255) DEFAULT NULL,
+      `email` varchar(255) DEFAULT NULL,
+      `signature` text DEFAULT NULL,
+      `dateDernierLogin` date DEFAULT NULL,
+      `nbreLogins` int(11) DEFAULT 0,
+      `privilege` int(11) DEFAULT 1,
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `login` (`login`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+    $res_users = $mysqli->query("SELECT COUNT(*) FROM utilisateur");
+    if ($res_users && (int)$res_users->fetch_row()[0] === 0) {
+        $mysqli->query("INSERT INTO utilisateur (id, login, mdp, prenom, nom, image, site, email, signature, dateDernierLogin, nbreLogins, privilege) VALUES (1, 'invite', '', 'Invité', 'Visiteur', 'utilisateur/defaut.png', '', 'invite@canopee.fr', '', NOW(), 0, 0)");
+    }
+
+    $res_token = $mysqli->query("SHOW COLUMNS FROM utilisateur LIKE 'token_activation'");
+    if ($res_token && $res_token->num_rows == 0) {
+        $mysqli->query("ALTER TABLE utilisateur ADD COLUMN token_activation VARCHAR(255) NULL DEFAULT NULL AFTER privilege, ADD COLUMN est_actif TINYINT(1) NOT NULL DEFAULT 1 AFTER token_activation");
+    }
+
     $res_django = $mysqli->query("SHOW COLUMNS FROM chanson LIKE 'publication'");
     if ($res_django && $res_django->num_rows == 0) {
         $mysqli->query("ALTER TABLE chanson ADD COLUMN publication TINYINT(1) DEFAULT 1 AFTER cover");

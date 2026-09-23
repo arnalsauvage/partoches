@@ -63,7 +63,7 @@ while ($ligne = $lignes->fetch_row()) {
     if ($ligneDoc) {
         $chansonId = $ligneDoc[6];
         if (!isset($chansons[$chansonId])) {
-            $chansons[$chansonId] = new Chanson((int)$chansonId);
+            $chansons[$chansonId] = Chanson::load($chansonId);
         }
     }
 }

@@ -2,6 +2,7 @@ services:
   web:
     build: .
     container_name: site-partoches
+    restart: always
     ports:
       - "8080:80"
 

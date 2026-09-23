@@ -133,7 +133,7 @@
                     $resIds = Chanson::chercheChansons('%', 'nom', true, 'contributeur', $donnee[0]);
                     if (!empty($resIds)):
                         foreach ($resIds as $idCh):
-                            $c = new Chanson($idCh);
+                            $c = Chanson::load($idCh);
                             $card = $c->afficheCarteChanson();
                             $card = str_replace("href='chanson_voir.php", "href='../chanson/chanson_voir.php", $card);
                             $card = str_replace("href='chanson_form.php", "href='../chanson/chanson_form.php", $card);

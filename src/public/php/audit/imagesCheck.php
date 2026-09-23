@@ -6,6 +6,7 @@
 
 require_once dirname(__DIR__, 3) . "/autoload.php";
 require_once __DIR__ . "/../navigation/menu.php";
+require_once __DIR__ . "/../admin/AdminService.php";
 
 /**
  * Supprime récursivement un dossier
@@ -33,7 +34,8 @@ if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_AD
 }
 
 $db = $_SESSION['mysql'];
-$dossierChansons = __DIR__ . "/../../../data/chansons/";
+$adminService = new AdminService($db);
+$dossierChansons = $_DOSSIER_CHANSONS;
 $extensionsAutorisees = ['jpg'];
 
 // --- 0. RÉCUPÉRATION DES IDS CHANSONS EXISTANTS ---
@@ -49,6 +51,16 @@ if (isset($_GET['action'])) {
     $action = $_GET['action'];
     $path = $_GET['path'] ?? '';
     $id = (int)($_GET['id'] ?? 0);
+
+    if ($action === 'regen_all') {
+        $res = $adminService->batchRegenerateThumbnails();
+        $message = "<div class='alert alert-success'>✅ {$res['total']} image(s) vérifiée(s). {$res['generated']} miniature(s) générée(s).</div>";
+    }
+
+    if ($action === 'clean_orphans') {
+        $count = $adminService->deleteOrphanSongFolders();
+        $message = "<div class='alert alert-success'>✅ $count dossier(s) de chansons supprimées ont été nettoyés du disque.</div>";
+    }
 
     if ($action === 'delete_file' && !empty($path)) {
         $fullPath = realpath($dossierChansons . $path);
@@ -179,7 +191,17 @@ $countOrphelins = count($orphelinsDisque);
 
 $html .= <<<HTML
 <div class="container" style="margin-top: 20px;">
-    <h1><i class="glyphicon glyphicon-eye-open"></i> Inspection des images Chansons (.jpg)</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 style="margin: 0;"><i class="glyphicon glyphicon-eye-open"></i> Inspection des images Chansons (.jpg)</h1>
+        <div class="btn-group">
+            <a href="?action=clean_orphans" class="btn btn-danger" onclick="return confirm('Supprimer définitivement tous les dossiers dont la chanson n\'existe plus ?')">
+                <i class="glyphicon glyphicon-trash"></i> NETTOYER LES DOSSIERS ORPHELINS
+            </a>
+            <a href="?action=regen_all" class="btn btn-warning" onclick="return confirm('Générer toutes les miniatures manquantes ?')">
+                <i class="glyphicon glyphicon-picture"></i> GÉNÉRER LES MINIATURES MANQUANTES
+            </a>
+        </div>
+    </div>
     $message
 
     <div class="row" style="margin-top: 30px;">

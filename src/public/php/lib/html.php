@@ -122,7 +122,7 @@ if (!isset($FichierHtml)) {
         return envoieHead($titrePage, $feuilleCss);
     }
 
-    function envoieHead($titrePage, $feuilleCss)
+    function envoieHead($titrePage = "", $feuilleCss = "")
     {
         $siteTitle = $_SESSION['titreSite'] ?? 'Partoches Canopée';
         $fullTitle = ($titrePage && !str_contains(strtolower($titrePage), strtolower($siteTitle))) ? "$siteTitle - $titrePage" : ($titrePage ?: $siteTitle);

@@ -1,0 +1,136 @@
+<?php
+/**
+ * VUE : utilisateur_inscription_view.phtml
+ * Template HTML pour la création de compte (Inscription).
+ */
+?>
+<div class="container mt-20">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="card-shadow-django bg-white p-30 border-radius-lg">
+                <?php if (!empty($formData['requires_activation'])): ?>
+                    <div class="text-center p-20">
+                        <i class="glyphicon glyphicon-envelope text-success font-size-48 mb-15"></i>
+                        <h2 class="mt-0 text-success">Compte créé avec succès !</h2>
+                        <p class="font-size-16 lead">
+                            Un e-mail de confirmation vient d'être envoyé à <strong><?= htmlspecialchars($formData['registered_email']) ?></strong>.
+                        </p>
+                        <p class="text-muted mb-20">
+                            Veuillez cliquer sur le lien d'activation contenu dans le message pour valider votre compte.
+                        </p>
+
+                        <?php if (!empty($formData['activation_token'])): ?>
+                            <div class="alert alert-info text-left mt-20">
+                                <strong><i class="glyphicon glyphicon-info-sign"></i> Mode Développement / Local :</strong><br>
+                                En environnement local, vous pouvez simuler le clic sur l'e-mail en ouvrant le lien suivant :<br>
+                                <a href="utilisateur_activation.php?token=<?= htmlspecialchars($formData['activation_token']) ?>" class="btn btn-sm btn-primary mt-10">
+                                    <i class="glyphicon glyphicon-ok"></i> Activer mon compte maintenant
+                                </a>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="mt-30">
+                            <a href="../chanson/chanson_liste.php" class="btn btn-default btn-lg">
+                                <i class="glyphicon glyphicon-home"></i> Retour à l'accueil
+                            </a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <h1 class="mt-0 text-center"><i class="glyphicon glyphicon-user"></i> Créer un compte</h1>
+                    <p class="text-muted text-center mb-20">Inscrivez-vous gratuitement pour accéder à toutes les fonctionnalités et médias audio.</p>
+
+                    <?php if (!empty($formData['error'])): ?>
+                        <div class="alert alert-danger text-center mb-20">
+                            <i class="glyphicon glyphicon-exclamation-sign"></i> <?= htmlspecialchars($formData['error']) ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form id="inscription-form" method="POST" action="utilisateur_inscription.php" enctype="multipart/form-data" class="form-dj-reset">
+                        
+                        <!-- 1. Identifiant (Login) -->
+                        <div class="form-group-django">
+                            <label class="label-django">Identifiant (Login) <span class="text-danger">*</span> :</label>
+                            <input type="text" name="flogin" value="<?= $formData['login'] ?>" class="input-django" placeholder="Votre identifiant de connexion" required>
+                        </div>
+
+                        <!-- 2. Email -->
+                        <div class="form-group-django">
+                            <label class="label-django">Email <span class="text-danger">*</span> :</label>
+                            <input type="email" name="femail" value="<?= $formData['email'] ?>" class="input-django" placeholder="votre@email.com" required>
+                        </div>
+
+                        <!-- 3. Prénom & Nom -->
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group-django">
+                                    <label class="label-django">Prénom <span class="text-danger">*</span> :</label>
+                                    <input type="text" name="fprenom" value="<?= $formData['prenom'] ?>" class="input-django" placeholder="Votre prénom" required>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group-django">
+                                    <label class="label-django">Nom <span class="text-danger">*</span> :</label>
+                                    <input type="text" name="fnom" value="<?= $formData['nom'] ?>" class="input-django" placeholder="Votre nom" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Mot de passe & Confirmation -->
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group-django">
+                                    <label class="label-django">Mot de passe <span class="text-danger">*</span> :</label>
+                                    <input type="password" name="fmdp" class="input-django" placeholder="Mot de passe" required>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group-django">
+                                    <label class="label-django">Confirmation du mot de passe <span class="text-danger">*</span> :</label>
+                                    <input type="password" name="fmdp_confirm" class="input-django" placeholder="Confirmez le mot de passe" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 7. Photo (optionnel) -->
+                        <div class="form-group-django">
+                            <label class="label-django">Photo (optionnel) :</label>
+                            <input type="file" name="fichierUploade" class="input-django" accept="image/*">
+                            <small class="text-muted">Formats acceptés : JPG, PNG, WEBP. Taille max : 2 Mo.</small>
+                        </div>
+
+                        <!-- 8. Site Web (optionnel) -->
+                        <div class="form-group-django">
+                            <label class="label-django">Site Web (optionnel) :</label>
+                            <input type="text" name="fsite" value="<?= $formData['site'] ?>" class="input-django" placeholder="https://votre-site.fr">
+                        </div>
+
+                        <!-- 9. Signature / Devise (optionnel) -->
+                        <div class="form-group-django">
+                            <label class="label-django">Signature / Devise (optionnel) :</label>
+                            <textarea name="fsignature" class="input-django" rows="3" placeholder="Une petite phrase ou devise..."><?= $formData['signature'] ?></textarea>
+                        </div>
+
+                        <!-- Privilèges (Fixe : 1 - Membre) -->
+                        <input type="hidden" name="fprivilege" value="1">
+                        <div class="mb-15 text-muted small">
+                            <span class="label label-primary"><i class="glyphicon glyphicon-user"></i> Statut : Membre</span>
+                            <span class="ml-5">Un e-mail de confirmation vous sera envoyé pour activer votre compte.</span>
+                        </div>
+
+                        <div class="mt-20">
+                            <button type="submit" class="btn btn-success btn-lg btn-block">
+                                <i class="glyphicon glyphicon-ok-sign"></i> S'INSCRIRE
+                            </button>
+                        </div>
+
+                        <div class="text-center mt-15">
+                            <small class="text-muted">Déjà un compte ? 
+                                <a href="../navigation/login.php" onclick="if($('#afficherPopup').length){$('#afficherPopup').click(); return false;}">Se connecter</a>
+                            </small>
+                        </div>
+                    </form>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>

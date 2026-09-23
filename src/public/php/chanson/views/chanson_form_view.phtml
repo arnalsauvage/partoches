@@ -49,20 +49,30 @@
                             </div>
 
                             <!-- Année / Tonalité -->
-                            <div class='row'>
-                                <div class='col-sm-6'>
-                                    <div class='form-group-django'>
-                                        <label class='label-django'>Année de sortie :</label>
-                                        <div class='input-group-django'>
-                                            <input class='input-django' type='number' min='0' max='2100' name='fannee' id='fannee' value='<?= (int)$chanson->getAnnee() ?>' data-db-year='<?= (int)$chanson->getAnnee() ?>'>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group-django">
+                                        <label class="label-django">Année de sortie :</label>
+                                        <div class="input-group-django">
+                                            <input class="input-django" type="number" min='0' max='2100' name='fannee' id='fannee' value='<?= (int)$chanson->getAnnee() ?>' data-db-year='<?= (int)$chanson->getAnnee() ?>'>
                                             <span id='yearValidationDot' class='dot year-validation-dot'></span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class='col-sm-6'>
-                                    <div class='form-group-django'>
-                                        <label class='label-django'>Tonalité :</label>
+                                <div class="col-sm-6">
+                                    <div class="form-group-django">
+                                        <label class="label-django">Tonalité :</label>
                                         <input id='input-tonalite' class='input-django' type='text' name='ftonalite' value='<?= htmlspecialchars($chanson->getTonalite(), ENT_QUOTES) ?>' placeholder='ex: Am, C, F#m'>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tonalité originale -->
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group-django">
+                                        <label class="label-django">Tonalité originale :</label>
+                                        <input id='input-tonalite-originale' class='input-django' type='text' name='ftonalite_originale' value='<?= htmlspecialchars($chanson->getTonaliteOriginale() ?? '', ENT_QUOTES) ?>' placeholder='ex: Am, C, F#m'>
                                     </div>
                                 </div>
                             </div>
@@ -253,16 +263,24 @@ $(document).ready(function() {
                     $('#noLocalCoversMessage').addClass('hidden-element');
                     
                     data.local_covers.forEach(function(relPath) {
-                        // Nettoyage du chemin relatif pour en faire un absolu web
-                        const absPath = relPath.replace('../../', '/');
-                        const fileName = absPath.split('/').pop();
-                        const thumbUrl = "/data/vignettes/" + fileName;
+                        // relPath est du type "./data/chansons/763/image.jpg"
+                        const fileName = relPath.split('/').pop();
+                        const fileBase = fileName.split('.').slice(0, -1).join('.');
+                        
+                        // Le chemin de la miniature WebP (mini) est dans le même dossier
+                        // ex: /data/chansons/763/image-mini.webp
+                        const thumbUrl = relPath.replace('./data/', '/data/').replace(fileName, fileBase + '-mini.webp');
+                        const absPath = relPath.replace('./data/', '/data/');
 
                         const $img = $('<img>')
                             .attr('src', thumbUrl)
                             .addClass('cover-thumbnail')
                             .attr('data-cover-url', absPath)
-                            .attr('title', fileName);
+                            .attr('title', fileName)
+                            .on('error', function() {
+                                // Fallback si le webp n'existe pas encore (vielle image ou erreur)
+                                $(this).attr('src', absPath);
+                            });
                             
                         if ($('#fcover').val() === absPath) {
                             $img.addClass('selected-cover');

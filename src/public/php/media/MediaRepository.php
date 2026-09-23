@@ -192,9 +192,13 @@ class MediaRepository
         }
 
         if (!empty($requete)) {
-            $result = $_SESSION[self::MYSQL]->query($requete);
-            if ($result && $row = $result->fetch_row()) {
-                return (int)$row[0];
+            try {
+                $result = $_SESSION[self::MYSQL]->query($requete);
+                if ($result && $row = $result->fetch_row()) {
+                    return (int)$row[0];
+                }
+            } catch (Throwable $e) {
+                return null;
             }
         }
         return null;

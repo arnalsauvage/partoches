@@ -18,12 +18,17 @@ class MediaRenderer
 HTML;
         }
 
+        $badgeText = "{$data['emoji']} {$data['type']}";
+        if (!empty($data['isRestricted'])) {
+            $badgeText .= " (🔒 Connexion requise)";
+        }
+
         return <<<HTML
         <div class="col-sm-6 col-md-4 col-lg-3" style="margin-bottom: 25px;">
-            <a href="{$data['lien']}" target="_blank" class="text-decoration-none media-link" style="display:block;">
+            <a href="{$data['lien']}" class="text-decoration-none media-link" style="display:block;">
                 <article class="media-card shadow-sm border" style="height: 100%; display: flex; flex-direction: column;">
                     <div class="card-body d-flex flex-column align-items-center text-center" style="padding: 15px; flex-grow: 1;">
-                        <span class="badge bg-{$data['couleurBadge']} mb-2" style="font-size: 12px;">{$data['emoji']} {$data['type']}</span>
+                        <span class="badge bg-{$data['couleurBadge']} mb-2" style="font-size: 12px;">{$badgeText}</span>
                         <h5 class="card-title mb-1 text-dark" style="font-weight: bold; height: 40px; overflow: hidden;">{$data['titre']}</h5>
                         <img src="{$data['imageUrl']}" alt="Illustration : {$data['titre']}"
                              class="card-img-top my-2"
@@ -45,8 +50,24 @@ HTML;
         $chansonTitre = '';
 
         if ($idChanson > 0) {
-            $chanson = new Chanson($idChanson);
-            $chansonTitre = $chanson->getNom();
+            try {
+                if (method_exists('Chanson', 'load')) {
+                    $ref = new ReflectionMethod('Chanson', 'load');
+                    if ($ref->isStatic()) {
+                        $chanson = Chanson::load($idChanson);
+                    } else {
+                        $chanson = new Chanson();
+                        $chanson->load($idChanson);
+                    }
+                } else {
+                    $chanson = new Chanson($idChanson);
+                }
+                if (is_object($chanson) && method_exists($chanson, 'getNom')) {
+                    $chansonTitre = $chanson->getNom();
+                }
+            } catch (Throwable $e) {
+                $chansonTitre = '';
+            }
         }
 
         $typeMedia = strtolower($media->getType());
@@ -55,8 +76,18 @@ HTML;
         $imageRelative = ltrim($media->getImage(), './data/chansons/');
         $imageUrl = Image::getThumbnailUrl($imageRelative, 'sd');
 
+        $isAudio = ($typeMedia === 'audio' || $typeMedia === 'mp3' || $typeMedia === 'm4a' || $typeMedia === 'aac');
+        $canAccessAudio = MediaService::estAudioAccessible();
+        $isRestricted = ($isAudio && !$canAccessAudio);
+
         $lienRaw = $media->getLien();
-        if (str_contains($lienRaw, 'getdoc.php')) {
+        if ($isRestricted) {
+            if ($idChanson > 0) {
+                $lienFinal = "../../php/chanson/chanson_voir.php?id=" . $idChanson;
+            } else {
+                $lienFinal = "../../php/navigation/login.php";
+            }
+        } elseif (str_contains($lienRaw, 'getdoc.php')) {
             $lienFinal = "../../" . ltrim(ltrim($lienRaw, '.'), '/');
         } else {
             $lienFinal = htmlspecialchars($lienRaw);
@@ -78,7 +109,8 @@ HTML;
             'datePub' => htmlspecialchars($media->getDatePub()),
             'auteurNom' => $auteurNom,
             'couleurBadge' => $config['couleurBadge'],
-            'emoji' => $config['emoji']
+            'emoji' => $config['emoji'],
+            'isRestricted' => $isRestricted
         ];
     }
 

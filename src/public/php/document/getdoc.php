@@ -75,9 +75,22 @@ if (!function_exists('mime_content_type')) {
     }
 }
 
+require_once __DIR__ . "/../media/MediaService.php";
+
 if ((isset ($_GET ['doc'])) && (is_numeric($_GET ['doc']))) {
     $idDoc = $_GET ['doc'];
     $doc = chercheDocument($idDoc);
+    if (!$doc) {
+        header("HTTP/1.0 404 Not Found");
+        die("Document introuvable");
+    }
+
+    $extension = strtolower(pathinfo($doc[1], PATHINFO_EXTENSION));
+    if (MediaService::estExtensionAudio($extension) && !MediaService::estAudioAccessible()) {
+        header("Location: ../navigation/login.php");
+        exit();
+    }
+
     // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
     $fichier = __DIR__ . "/../../data/" . $doc [5] . "s/" . $doc [6] . "/" . composeNomVersion($doc [1], $doc [4]);
 //    header ( "Location: $fichier" );

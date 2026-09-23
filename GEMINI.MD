@@ -1,5 +1,5 @@
 # 🎸 GEMINI.MD — Constitution du Projet Partoches
-> Version 2.0 | Mise à jour : Avril 2026  
+> Version 2.1 | Mise à jour : Septembre 2026  
 > ⚠️ Ce fichier ne peut être modifié que par décision explicite du PO,  
 > documentée dans gemini-log.md avec la mention `[MODIF-CONSTITUTION]`.
 
@@ -20,6 +20,18 @@
 
 **Phrase d'amorce attendue du PO :**
 > "Lis GEMINI.MD et gemini-log.md, résume le contexte, puis on attaque."
+
+---
+
+## 0.1 🤖 Protocole d'Interaction Agent IA (Cadrage & Reformulation)
+
+**À chaque prompt reçu, l'agent IA doit impérativement :**
+1. **Reformuler** la demande du PO / de l'utilisateur pour valider sa compréhension.
+2. **Émettre des suggestions pertinentes** si nécessaire.
+3. **Présenter ce qu'il a l'intention de faire** (Plan d'action clair).
+4. **Procéder à l'exécution** en intégrant les réactions ou précisions fournies.
+
+> 💡 *Objectif : Assurer un retour rapide, éviter de produire du code non cadré ou de consommer inutilement des tokens sur une demande ambiguë.*
 
 ---
 

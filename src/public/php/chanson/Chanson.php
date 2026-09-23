@@ -1,739 +1,309 @@
 <?php
 require_once dirname(__DIR__, 3) . "/autoload.php";
 
-// Fonctions de gestion de la chanson
-
+/**
+ * CLASSE : Chanson (Entité)
+ * Responsabilité : Gérer les données d'une partition et sa persistance unitaire.
+ */
 class Chanson
 {
     const D_M_Y = "d/m/Y";
     const MYSQL = 'mysql';
-    private int $_id; // identifiant en BDD
-    private string $_nom; // titre de la chanson , chaine de caractères
-    private string $_interprete; // interprete de reference de la chanson, chaîne de caractères
-    private int $_annee; // annee de sortie de la version, entier entre 0 et 2100
-    private int $_idUser; // identifiant de l'utilisateur ayant propose la chanson, entier
-    private int $_tempo; // bpm principal de la chanson, entier entre 0 et 300 environ
-    private string $_mesure; // chaine indiquant la mesure, le plus souvent "4/4" ou "3/4"
-    private string $_pulsation; // chaine, indique si les temps se découpent en "binaire" ou "ternaire"
-    private string $_datePub; // date de publication de la chanson en chaine de caractères JJ/MM/AAAA
-    private int $_hits; // compteur de visites de la chanson, corresponds aux affichages de la page chanson
-    private string $_tonalite;
-    private ?string $_cover; // URL de la pochette
-    private int $_publication; // 1 = publié, 0 = brouillon
 
-    // static $_logger;
+    private int $_id = 0;
+    private string $_nom = "";
+    private string $_interprete = "";
+    private int $_annee = 1975;
+    private int $_idUser = 1;
+    private int $_tempo = 120;
+    private string $_mesure = "4/4";
+    private string $_pulsation = "binaire";
+    private string $_datePub = "";
+    private int $_hits = 0;
+    private string $_tonalite = "C";
+    private ?string $_tonaliteOriginale = null;
+    private ?string $_cover = null;
+    private int $_publication = 1;
 
-    // Fonction conseillée pour gérer plusieurs constructeurs
     function __construct()
     {
-        // Chanson::$_logger = init_logger();
-
-        $a = func_get_args();
-        $i = func_num_args();
-        if (method_exists($this, $f = '__construct' . $i)) {
-            call_user_func_array(array($this, $f), $a);
-        }
+        $this->__construct0();
     }
 
-    // Constructeur par défaut
     public function __construct0()
     {
         $this->_id = 0;
-        $this->setNom("");
-        $this->setInterprete("");
-        $this->setAnnee(1975);
-        $this->setIdUser(1);
-        $this->setTempo(120);
-        $this->setMesure("4/4");
-        $this->setPulsation("binaire");
-        $this->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
-        $this->setHits(0);
-        $this->setTonalite("C");
-        $this->setCover(null); 
-        $this->setPublication(1); // Publié par défaut
+        $this->_nom = "";
+        $this->_interprete = "";
+        $this->_annee = 1975;
+        $this->_idUser = 1;
+        $this->_tempo = 120;
+        $this->_mesure = "4/4";
+        $this->_pulsation = "binaire";
+        $this->_datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
+        $this->_hits = 0;
+        $this->_tonalite = "C";
+        $this->_tonaliteOriginale = null;
+        $this->_cover = null; 
+        $this->_publication = 1;
     }
 
-    /**
-     * Chanson constructor.
-     */
-    public function __construct9($_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
+    public static function load(int $id): self
     {
-        $this->setId(0);
-        $this->setNom($_nom);
-        $this->setInterprete($_interprete);
-        $this->setAnnee($_annee);
-        $this->setIdUser($_idUser);
-        $this->setTempo($_tempo);
-        $this->setMesure($_mesure);
-        $this->setPulsation($_pulsation);
-        $this->setDatePub(date(self::D_M_Y));
-        $this->setHits($_hits);
-        $this->setTonalite($_tonalite);
-        $this->setCover(null);
-        $this->setPublication(1);
+        $c = new self();
+        $c->loadInstance($id);
+        return $c;
     }
 
-    public function __construct10($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite)
+    private function loadInstance(int $id): bool
     {
-        $this->__construct9($_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite);
-        $this->setId($_id);
+        $db = $_SESSION[self::MYSQL];
+        $sql = sprintf("SELECT * FROM chanson WHERE id = %d", $id);
+        $res = $db->query($sql);
+        if ($res && ($row = $res->fetch_row())) {
+            $this->mysqlRowVersObjet($row);
+            return true;
+        }
+        return false;
     }
 
-    public function __construct11($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_date, $_hits, $_tonalite)
+    private function mysqlRowVersObjet(array $row)
     {
-        $this->__construct10($_id, $_nom, $_interprete, $_annee, $_idUser, $_tempo, $_mesure, $_pulsation, $_hits, $_tonalite);
-        $this->setDatePub($_date);
+        $this->_id = (int)$row[0];
+        $this->_nom = (string)$row[1];
+        $this->_interprete = (string)$row[2];
+        $this->_annee = (int)$row[3];
+        $this->_tempo = (int)$row[4];
+        $this->_mesure = (string)$row[5];
+        $this->_pulsation = (string)$row[6];
+        $this->_datePub = (string)$row[7];
+        $this->_idUser = (int)$row[8];
+        $this->_hits = (int)$row[9];
+        $this->_tonalite = (string)$row[10];
+        $this->_tonaliteOriginale = $row[11] ?? null;
+        $this->_cover = $row[12] ?? null;
+        $this->_publication = (int)($row[13] ?? 1);
     }
 
-    // Un constructeur qui charge directement depuis la BDD
-    public function __construct1($_id)
+    public function save(): int
     {
-        $this->__construct0();
-        $this->chercheChanson($_id);
-    }
+        $db = $_SESSION[self::MYSQL];
+        $nom = $db->real_escape_string($this->_nom);
+        $interprete = $db->real_escape_string($this->_interprete);
+        $annee = (int)$this->_annee;
+        $cover = $db->real_escape_string($this->_cover ?? '');
+        
+        if (empty($this->_datePub) || $this->_datePub == '0000-00-00') {
+            $this->_datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
+        }
 
-    /// Getters et Setters
-
-    /**
-     * @return mixed
-     */
-    public function getId(): int
-    {
+        if ($this->_id == 0) {
+            $sql = sprintf("INSERT INTO chanson (nom, interprete, annee, idUser, tempo, mesure, pulsation, datePub, hits, tonalite, tonalite_originale, cover, publication)
+                VALUES ('%s', '%s', %d, %d, %d, '%s', '%s', '%s', %d, '%s', '%s', '%s', %d)",
+                $nom, $interprete, $annee, $this->_idUser, $this->_tempo,
+                $db->real_escape_string($this->_mesure), $db->real_escape_string($this->_pulsation),
+                $db->real_escape_string($this->_datePub), $this->_hits, 
+                $db->real_escape_string($this->_tonalite), $db->real_escape_string($this->getTonaliteOriginale() ?? ''), $cover, $this->_publication);
+            $db->query($sql) or die ("Chanson::save(INSERT) error : " . $db->error);
+            $this->_id = $db->insert_id;
+        } else {
+            $sql = sprintf("UPDATE chanson SET nom='%s', interprete='%s', annee=%d, idUser=%d, tempo=%d, mesure='%s', pulsation='%s', 
+                hits=%d, tonalite='%s', tonalite_originale='%s', datePub='%s', cover='%s', publication=%d WHERE id=%d",
+                $nom, $interprete, $annee, $this->_idUser, $this->_tempo,
+                $db->real_escape_string($this->_mesure), $db->real_escape_string($this->_pulsation),
+                $this->_hits, $db->real_escape_string($this->_tonalite), $db->real_escape_string($this->getTonaliteOriginale() ?? ''),
+                $db->real_escape_string($this->_datePub), $cover, $this->_publication, $this->_id);
+            $db->query($sql) or die ("Chanson::save(UPDATE) error : " . $db->error);
+        }
         return $this->_id;
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function setId(int $id): void
+    // --- GETTERS / SETTERS ---
+
+    public function getId(): int { return $this->_id; }
+    public function setId(int $id): void { if ($id >= 0) $this->_id = $id; }
+
+    public function getNom(): string { return $this->_nom; }
+    public function setNom(string $nom): void { $this->_nom = $nom; }
+
+    public function getInterprete(): string { return $this->_interprete; }
+    public function setInterprete(string $interprete) { $this->_interprete = $interprete; }
+
+    public function getAnnee(): int { return $this->_annee; }
+    public function setAnnee(int $annee): void { if ($annee > 0) $this->_annee = $annee; }
+
+    public function getIdUser(): int { return $this->_idUser; }
+    public function setIdUser(int $idUser) { if ($idUser > 0) $this->_idUser = $idUser; }
+
+    public function getTempo(): int { return $this->_tempo; }
+    public function setTempo(int $tempo): void { if ($tempo > 0) $this->_tempo = $tempo; }
+
+    public function getMesure(): string { return $this->_mesure; }
+    public function setMesure(string $mesure) { $this->_mesure = $mesure; }
+
+    public function getPulsation(): string { return $this->_pulsation ?? ""; }
+    public function setPulsation(string $pulsation) { $this->_pulsation = $pulsation; }
+
+    public function getDatePub(): string { return $this->_datePub; }
+    public function setDatePub(string $datePub) { $this->_datePub = $datePub; }
+
+    public function getHits(): int { return $this->_hits; }
+    public function setHits(int $hits): void { if ($hits >= 0) $this->_hits = $hits; }
+
+    public function getTonalite(): string { return $this->_tonalite; }
+    public function setTonalite(string $tonalite) { $this->_tonalite = $tonalite; } 
+
+    public function getTonaliteOriginale(): ?string { return $this->_tonaliteOriginale; }
+    public function setTonaliteOriginale(?string $v): void { $this->_tonaliteOriginale = self::normalizeTonaliteOriginale($v); }
+
+    public static function normalizeTonaliteOriginale(?string $v): ?string
     {
-        if ($id > 0) {
-            $this->_id = $id;
-        }
+        if ($v === null) return null;
+        $v = trim($v);
+        if ($v === '') return null;
+        $v = preg_replace('/\s+/', '', $v);
+        $v = str_replace(['maj', 'M'], '', $v);
+        $v = str_replace(['min', 'mineur'], 'm', $v);
+        $v = preg_replace('/[^A-Ga-g#bm]/', '', $v);
+        return $v !== '' ? $v : null;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNom(): string
-    {
-        return $this->_nom;
+    public function getCover(): ?string { return $this->_cover; }
+    public function setCover(?string $cover): void { $this->_cover = $cover; }
+
+    public function getPublication(): int { return $this->_publication; }
+    public function setPublication(int $publication): void { $this->_publication = $publication; }
+
+    // --- COMPATIBILITÉ TEST & LEGACY ---
+
+    public function creeChansonBDD() { return $this->save(); }
+    public function modifieChansonBDD() { return $this->save(); }
+    public function creeModifieChansonBDD() { return $this->save(); }
+    public function chercheChanson($id) { return $this->loadInstance((int)$id) ? 1 : 0; }
+    public function supprimeChansonBddFile() { $this->delete(); }
+    public function chercheChansonParLeNom($nom) { 
+        $db = $_SESSION[self::MYSQL];
+        $res = $db->query(sprintf("SELECT * FROM chanson WHERE nom = '%s'", $db->real_escape_string($nom)));
+        if ($res && ($row = $res->fetch_row())) { $this->mysqlRowVersObjet($row); return 1; }
+        return 0;
     }
 
-    /**
-     * @param mixed $nom
-     */
-    public function setNom(string $nom): void
+    // --- PERSISTANCE (CRUD UNITAIRE) ---
+
+    public function delete(): void
     {
-        $this->_nom = $nom;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getInterprete(): string
-    {
-        return $this->_interprete;
-    }
-
-    /**
-     * @param mixed $interprete
-     */
-    public function setInterprete(string $interprete)
-    {
-        $this->_interprete = $interprete;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAnnee(): int
-    {
-        return $this->_annee;
-    }
-
-    /**
-     * @param mixed $annee
-     */
-    public function setAnnee(int $annee): void
-    {
-        if ($annee > 0) {
-            $this->_annee = $annee;
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getIdUser(): int
-    {
-        return $this->_idUser;
-    }
-
-    /**
-     * @param int $idUser
-     */
-    public function setIdUser(int $idUser)
-    {
-        if ($idUser > 0) {
-            $this->_idUser = $idUser;
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getTempo(): int
-    {
-        return $this->_tempo;
-    }
-
-    /**
-     * @param int $tempo
-     */
-    public function setTempo(int $tempo): void
-    {
-        if ($tempo > 0) {
-            $this->_tempo = $tempo;
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getMesure(): string
-    {
-        return $this->_mesure;
-    }
-
-    /**
-     * @param mixed $mesure
-     */
-    public function setMesure(string $mesure)
-    {
-        $this->_mesure = $mesure;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPulsation(): string
-    {
-        if (is_null($this->_pulsation)) {
-            return "";
-        } else {
-            return $this->_pulsation;
-        }
-    }
-
-    /**
-     * @param mixed $pulsation
-     */
-    public function setPulsation(string $pulsation)
-    {
-        $this->_pulsation = $pulsation;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDatePub(): string
-    {
-        return $this->_datePub;
-    }
-
-    /**
-     * @param mixed $datePub
-     */
-    public function setDatePub(string $datePub)
-    {
-        $this->_datePub = $datePub;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getHits(): int
-    {
-        return $this->_hits;
-    }
-
-    /**
-     * @param mixed $hits
-     */
-    public function setHits(int $hits)
-    {
-        if ($hits >= 0) {
-            $this->_hits = $hits;
-        }
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTonalite(): string
-    {
-        return $this->_tonalite;
-    }
-
-    /**
-     * @param mixed $tonalite
-     */
-    public function setTonalite(string $tonalite)
-    {
-        $this->_tonalite = $tonalite;
-    } 
-
-    /**
-     * @return string|null
-     */
-    public function getCover(): ?string
-    {
-        return $this->_cover;
-    }
-
-    /**
-     * @param string|null $cover
-     */
-    public function setCover(?string $cover): void
-    {
-        $this->_cover = $cover;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPublication(): int
-    {
-        return $this->_publication;
-    }
-
-    /**
-     * @param int $publication
-     */
-    public function setPublication(int $publication): void
-    {
-        $this->_publication = $publication;
-    }
-
-
-    // Cherche une chanson et la renvoie si elle existe
-    public function chercheChanson($id): int
-    {
-        $maRequete = sprintf("SELECT * FROM chanson WHERE chanson.id = '%s'",
-            $id);
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #1 : " . $_SESSION ['mysql']->error);
-        if ($ligne = $result->fetch_row()) {
-            $this->mysqlRowVersObjet($ligne);
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-
-    // Charge une ligne mysql vers un objet
-    private function mysqlRowVersObjet($ligne)
-    {
-        $this->_id = $ligne[0];
-        $this->_nom = $ligne[1];
-        $this->_interprete = $ligne[2];
-        $this->_annee = $ligne[3];
-        $this->_tempo = $ligne[4];
-        $this->_mesure = $ligne[5];
-        $this->_pulsation = $ligne[6];
-        $this->_datePub = $ligne[7];
-        $this->_idUser = $ligne[8];
-        $this->_hits = $ligne[9];
-        $this->_tonalite = $ligne[10];
-        $this->_cover = $ligne[11] ?? null;
-        $this->_publication = (int)($ligne[12] ?? 1); // Nouvelle colonne publication
-    }
-
-    // Cherche un chanson, la charge et renvoie vrai si elle existe
-    public function chercheChansonParLeNom($nom): int
-    {
-        $maRequete = sprintf("SELECT * FROM chanson WHERE chanson.nom = '%s'", $nom);
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChansonParLeNom #1 : " . $_SESSION ['mysql']->error);
-        if ($ligne = $result->fetch_row()) {
-            $this->mysqlRowVersObjet($ligne);
-            return (1);
-        } else {
-            return (0);
-        }
-    }
-
-    /**
-     *      enregistre l'objet en BDD
-     */
-    public function creeModifieChansonBDD()
-    {
-        if ($this->_id == 0) {
-            $this->creeChansonBDD();
-            $this->setId($_SESSION [self::MYSQL]->insert_id);
-            return $this->getId();
-        } else {
-            $nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
-            $interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
-            $annee = (int)$this->_annee;
-            $cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
-            $maRequete = sprintf("UPDATE  chanson SET nom = '%s', interprete = '%s', annee = '%d',
-            idUser = %d, tempo = '%d', mesure='%s', pulsation='%s', 
-            hits='%d', tonalite='%s', datePub='%s', cover='%s', publication=%d WHERE id='%d'", 
-                $nom,
-                $interprete,
-                $annee,
-                $this->_idUser,
-                $this->_tempo,
-                $_SESSION [self::MYSQL]->real_escape_string($this->_mesure),
-                $_SESSION [self::MYSQL]->real_escape_string($this->_pulsation),
-                $this->_hits,
-                $_SESSION [self::MYSQL]->real_escape_string($this->_tonalite),
-                $_SESSION [self::MYSQL]->real_escape_string($this->_datePub),
-                $cover,
-                $this->_publication,
-                $this->_id);
-            $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème modif dans creeModifieChanson #1 : " . $_SESSION [self::MYSQL]->error . " requete : " . $maRequete);
-            return $this->_id;
-        }
-    }
-
-    // Cree une chanson et renvoie l'id de la chanson créée
-    public function creeChansonBDD()
-    {
-        $nom = $_SESSION [self::MYSQL]->real_escape_string($this->_nom);
-        $interprete = $_SESSION [self::MYSQL]->real_escape_string($this->_interprete);
-        $annee = (int)$this->_annee;
-        $cover = $_SESSION [self::MYSQL]->real_escape_string($this->_cover ?? '');
-        
-        // On n'écrase la date que si elle est vide ou par défaut
-        if (empty($this->_datePub) || $this->_datePub == '0000-00-00') {
-            $this->_datePub = convertitDateJJMMAAAAversMySql(date(self::D_M_Y));
-        } else {
-            // S'assurer que la date est au format MySQL
-            if (str_contains($this->_datePub, '/')) {
-                $this->_datePub = convertitDateJJMMAAAAversMySql($this->_datePub);
+        $db = $_SESSION[self::MYSQL];
+        $db->query("DELETE FROM chanson WHERE id = " . $this->_id);
+        if (class_exists('Document')) {
+            $res = Document::chercheDocumentsTableId("chanson", $this->_id);
+            while ($row = $res->fetch_row()) {
+                Document::supprimeDocument((int)$row[0]);
             }
         }
-
-        $maRequete = sprintf("INSERT INTO chanson (id, nom, interprete, annee, idUSer, tempo, mesure, pulsation, datePub, hits, tonalite, cover, publication)
-	        VALUES (NULL, '%s', '%s', '%s', '%s', '%s', '%s', 
-	        '%s', '%s' ,  '%s', '%s', '%s', %s)", 
-            $nom,
-            $interprete,
-            $annee,
-            $this->_idUser,
-            $this->_tempo,
-            $_SESSION [self::MYSQL]->real_escape_string($this->_mesure),
-            $_SESSION [self::MYSQL]->real_escape_string($this->_pulsation),
-            $_SESSION [self::MYSQL]->real_escape_string($this->_datePub),
-            $this->_hits,
-            $_SESSION [self::MYSQL]->real_escape_string($this->_tonalite),
-            $cover,
-            $this->_publication);
-        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème creeChansonBDD#1 : " . $_SESSION [self::MYSQL]->error);
-        $this->setId($_SESSION [self::MYSQL]->insert_id);
-        return ($this->getId());
     }
 
-    // Supprime un chanson si elle existe
-    public function supprimeChansonBddFile()
+    // --- RECHERCHE ET LISTING (Délégation au Repository) ---
+
+    public static function search($query = '%', $sortBy = 'nom', $asc = true, $filterField = "", $filterValue = "", $limit = -1, $offset = 0): array
     {
-        $maRequete = "DELETE FROM chanson WHERE id='" . $this->getId() . "'";
-        $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème #1 dans supprimeChanson : " . $_SESSION [self::MYSQL]->error);
-        $result = Document::chercheDocumentsTableId("chanson", $this->getId());
-        while ($ligne = $result->fetch_row()) {
-            $id = $ligne [0];
-            Document::supprimeDocument($id);
-        }
+        if (!class_exists('ChansonRepository')) require_once __DIR__ . '/ChansonRepository.php';
+        return ChansonRepository::search($query, $sortBy, $asc, $filterField, $filterValue, $limit, $offset);
     }
 
-// Renvoie une chaine de description de la chanson
-    public function infosChanson(): string
+    public static function count(string $query = '%', string $filterField = "", $filterValue = ""): int
     {
-        $retour = "Id : " . $this->_id . " Nom : " . $this->_nom . " Interprète : " . $this->_interprete . " Année : " . $this->_annee;
-        $retour .= " idUSer : " . $this->_idUser . " tempo : " . $this->_tempo . " mesure : " . $this->_mesure . " pulsation : " . $this->_pulsation;
-        $retour .= " hits : " . $this->_hits . " tonalité : " . $this->_tonalite . " publication : " . $this->_publication;
-        return $retour . "<BR>\n";
+        if (!class_exists('ChansonRepository')) require_once __DIR__ . '/ChansonRepository.php';
+        return ChansonRepository::count($query, $filterField, $filterValue);
     }
 
-// Cette fonction renvoie la liste des fichiers dans le repertoire de la chanson ../".$_DOSSIER_CHANSONS/id/
-    public function fichiersChanson($dossier): array
+    /**
+     * @deprecated Utiliser ChansonRepository::search
+     */
+    public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true, $champFiltre = "", $valfiltre = "", $limit = -1, $offset = 0): array
     {
-        $retour = array();// repertoire, nom, extension
-        $repertoire = "../" . $dossier . $this->_id;
-        if (is_dir($repertoire)) {
-            foreach (new DirectoryIterator ($repertoire) as $fileInfo) {
-                if ($fileInfo->isDot() || strpos($fileInfo->getFilename(), ".") == 0) {
-                    continue;
-                }
-                array_push($retour,
-                    $repertoire,
-                    $fileInfo->getFilename(),
-                    $fileInfo->getextension()
-                );
-            }
-        }
-        return $retour;
+        return self::search($critere, $critereTri, $bTriAscendant, $champFiltre, $valfiltre, $limit, $offset);
+    }
+
+    /**
+     * @deprecated Utiliser ChansonRepository::count
+     */
+    public static function compteChansons($critere, $champFiltre = "", $valfiltre = ""): int
+    {
+        return self::count($critere, $champFiltre, $valfiltre);
     }
 
     public static function moteurRecherche($recherche): string
     {
         $rechercheNormalisee = self::normalize($recherche);
+        $db = $_SESSION[self::MYSQL];
         $maRequete = "SELECT id, nom, interprete FROM chanson";
-        // Ajout du filtre publication pour le moteur de recherche si pas admin
         if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
             $maRequete .= " WHERE publication = 1";
         }
         
-        $retour = "";
-        $result = $_SESSION[self::MYSQL]->query($maRequete) or die("Problème chercheChanson #2 : " . $_SESSION[self::MYSQL]->error . " Requete : $maRequete");
+        $result = $db->query($maRequete) or die("Chanson::moteurRecherche error : " . $db->error);
         $matches = [];
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $normalized_titre = self::normalize($row["nom"]);
-                $normalized_interprete = self::normalize($row["interprete"]);
-                
-                $compact_recherche = str_replace(' ', '', $rechercheNormalisee);
-                $compact_titre = str_replace(' ', '', $normalized_titre);
-                $compact_interprete = str_replace(' ', '', $normalized_interprete);
+        while ($row = $result->fetch_assoc()) {
+            $normalized_titre = self::normalize($row["nom"]);
+            $normalized_interprete = self::normalize($row["interprete"]);
+            $compact_recherche = str_replace(' ', '', $rechercheNormalisee);
+            $compact_titre = str_replace(' ', '', $normalized_titre);
+            $compact_interprete = str_replace(' ', '', $normalized_interprete);
 
-                // Priorité aux correspondances de sous-chaîne (Score 0)
-                if (str_contains($normalized_titre, $rechercheNormalisee) || 
-                    str_contains($normalized_interprete, $rechercheNormalisee) ||
-                    ($compact_recherche !== '' && (str_contains($compact_titre, $compact_recherche) || str_contains($compact_interprete, $compact_recherche)))) {
-                    $distance = 0;
-                } else {
-                    $distance_titre = levenshtein($rechercheNormalisee, $normalized_titre);
-                    $distance_interprete = levenshtein($rechercheNormalisee, $normalized_interprete);
-                    $distance = min($distance_titre, $distance_interprete);
-                }
-                
-                $row['distance'] = $distance;
-                $matches[] = $row;
-            }
-        }
-        usort($matches, function ($a, $b) {
-            return $a['distance'] <=> $b['distance'];
-        });
-        $top_matches = array_slice($matches, 0, 10);
-        if (count($top_matches) > 0) {
-            $retour .= "Matches : ";
-            foreach ($top_matches as $row) {
-                $retour .= "Titre: " . $row["nom"] . " - Interprète: " . $row["interprete"] . " - Distance: " . $row['distance'] . "<br>\n";
-            }
-            $retour = $top_matches[0]["nom"];
-        } else {
-            $retour .= "0 résultats";
-        }
-        return $retour;
-    }
-
-// Cherche les chansons sur le titre ou l'interprete, renvoie le tableau des identifiants
-    public static function chercheChansons($critere, $critereTri = 'nom', $bTriAscendant = true, $champFiltre = "", $valfiltre = "", $limit = -1, $offset = 0): array
-    {
-        $critere = $_SESSION [self::MYSQL]->real_escape_string($critere);
-
-        // Si on trie par votes, on doit faire une jointure
-        if ($critereTri == "votes") {
-            if ($_SESSION['privilege'] == $GLOBALS["PRIVILEGE_INVITE"]) {
-                $maRequete = "SELECT chanson.id, COALESCE(AVG(noteUtilisateur.note), 0) as moy_note FROM chanson 
-                              LEFT JOIN noteUtilisateur ON (noteUtilisateur.idObjet = chanson.id AND noteUtilisateur.nomObjet = 'chanson')";
+            if (str_contains($normalized_titre, $rechercheNormalisee) || 
+                str_contains($normalized_interprete, $rechercheNormalisee) ||
+                ($compact_recherche !== '' && (str_contains($compact_titre, $compact_recherche) || str_contains($compact_interprete, $compact_recherche)))) {
+                $distance = 0;
             } else {
-                $maRequete = "SELECT chanson.id, COALESCE(noteUtilisateur.note, 0) as ma_note FROM chanson 
-                              LEFT JOIN noteUtilisateur ON (noteUtilisateur.idObjet = chanson.id AND noteUtilisateur.nomObjet = 'chanson' AND noteUtilisateur.idUtilisateur = '" . $_SESSION['id'] . "')";
+                $distance = min(levenshtein($rechercheNormalisee, $normalized_titre), levenshtein($rechercheNormalisee, $normalized_interprete));
             }
-        } else {
-            $maRequete = "SELECT chanson.id FROM chanson";
+            $row['distance'] = $distance;
+            $matches[] = $row;
         }
-
-        $_bool_where_defini = false;
-
-        // Filtre de publication pour les non-admins
-        if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-            $maRequete .= " WHERE chanson.publication = 1";
-            $_bool_where_defini = true;
-        }
-
-        if ($critere != "" && $critere != "%") {
-            $maRequete .= ($_bool_where_defini ? " AND " : " WHERE ") . "( chanson.nom LIKE '$critere' OR chanson.interprete LIKE '$critere' )";
-            $_bool_where_defini = true;
-        }
-
-        if ($champFiltre != "" && $valfiltre != "") {
-            $maRequete .= ($_bool_where_defini ? " AND " : " WHERE ");
-            $valEscaped = $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
-            
-            if ($champFiltre == "contributeur") {
-                $maRequete .= " chanson.iduser =  " . $valEscaped;
-            } elseif ($champFiltre == "tonalite") {
-                $equivalents = self::getTonaliteEquivalents($valfiltre);
-                $conditions = [];
-                foreach ($equivalents as $eq) {
-                    $eqEscaped = $_SESSION[self::MYSQL]->real_escape_string($eq);
-                    $conditions[] = "chanson.tonalite = '$eqEscaped'";
-                }
-                $maRequete .= "(" . implode(" OR ", $conditions) . ")";
-            } elseif ($champFiltre == "tempo_famille") {
-                $maRequete .= match ($valEscaped) {
-                    "Largo" => " chanson.tempo < 60",
-                    "Adagio" => " chanson.tempo BETWEEN 60 AND 75",
-                    "Andante" => " chanson.tempo BETWEEN 76 AND 107",
-                    "Moderato" => " chanson.tempo BETWEEN 108 AND 119",
-                    "Allegro" => " chanson.tempo BETWEEN 120 AND 155",
-                    "Vivace" => " chanson.tempo BETWEEN 156 AND 175",
-                    "Presto" => " chanson.tempo >= 176",
-                    default => " 1=1"
-                };
-            } elseif ($champFiltre == "annee" || $champFiltre == "tempo") {
-                 // Pour les nombres, on peut utiliser = au lieu de LIKE
-                 $maRequete .= "chanson." . $champFiltre . " = '" . $valEscaped . "'";
-            } else {
-                $maRequete .= "chanson." . $champFiltre . " LIKE '" . $valEscaped . "'";
-            }
-            $_bool_where_defini = true;
-        }
-
-        // Group by si tri par votes (pour l'AVG)
-        if ($critereTri == "votes" && $_SESSION['privilege'] == $GLOBALS["PRIVILEGE_INVITE"]) {
-            $maRequete .= " GROUP BY chanson.id";
-        }
-
-        // Gestion du tri
-        if ($critereTri == "votes") {
-            $colTri = ($_SESSION['privilege'] == $GLOBALS["PRIVILEGE_INVITE"]) ? "moy_note" : "ma_note";
-            $maRequete .= " ORDER BY $colTri " . ($bTriAscendant ? "ASC" : "DESC");
-        } else {
-            $maRequete .= " ORDER BY chanson.$critereTri " . ($bTriAscendant ? "ASC" : "DESC");
-        }
-
-        if ($limit > 0) {
-            $maRequete .= " LIMIT $limit OFFSET $offset";
-        }
-
-        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheChansons #2 : " . $_SESSION [self::MYSQL]->error . "Requete : $maRequete");
-        $tableau = [];
-        while ($row = $result->fetch_row()) {
-            array_push($tableau, $row[0]);
-        }
-        return $tableau;
+        usort($matches, fn($a, $b) => $a['distance'] <=> $b['distance']);
+        $top = array_slice($matches, 0, 10);
+        return (count($top) > 0) ? $top[0]["nom"] : "0 résultats";
     }
 
     /**
-     * Compte le nombre de chansons correspondant aux critères (pour la pagination)
+     * @deprecated Utiliser ChansonRepository::getLinks
      */
-    public static function compteChansons($critere, $champFiltre = "", $valfiltre = ""): int
+    public function chercheLiensChanson(): ?mysqli_result
     {
-        $critere = $_SESSION [self::MYSQL]->real_escape_string($critere);
-        $maRequete = "SELECT COUNT(chanson.id) FROM chanson";
-        $_bool_where_defini = false;
-
-        if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-            $maRequete .= " WHERE chanson.publication = 1";
-            $_bool_where_defini = true;
-        }
-
-        if ($critere != "" && $critere != "%") {
-            $maRequete .= ($_bool_where_defini ? " AND " : " WHERE ") . "( chanson.nom LIKE '$critere' OR chanson.interprete LIKE '$critere' )";
-            $_bool_where_defini = true;
-        }
-
-        if ($champFiltre != "" && $valfiltre != "") {
-            $maRequete .= ($_bool_where_defini ? " AND " : " WHERE ");
-            $valEscaped = $_SESSION[self::MYSQL]->real_escape_string($valfiltre);
-
-            if ($champFiltre == "contributeur") {
-                $maRequete .= " chanson.iduser =  " . $valEscaped;
-            } elseif ($champFiltre == "tonalite") {
-                $equivalents = self::getTonaliteEquivalents($valfiltre);
-                $conditions = [];
-                foreach ($equivalents as $eq) {
-                    $eqEscaped = $_SESSION[self::MYSQL]->real_escape_string($eq);
-                    $conditions[] = "chanson.tonalite = '$eqEscaped'";
-                }
-                $maRequete .= "(" . implode(" OR ", $conditions) . ")";
-            } elseif ($champFiltre == "tempo_famille") {
-                $maRequete .= match ($valEscaped) {
-                    "Largo" => " chanson.tempo < 60",
-                    "Adagio" => " chanson.tempo BETWEEN 60 AND 75",
-                    "Andante" => " chanson.tempo BETWEEN 76 AND 107",
-                    "Moderato" => " chanson.tempo BETWEEN 108 AND 119",
-                    "Allegro" => " chanson.tempo BETWEEN 120 AND 155",
-                    "Vivace" => " chanson.tempo BETWEEN 156 AND 175",
-                    "Presto" => " chanson.tempo >= 176",
-                    default => " 1=1"
-                };
-            } elseif ($champFiltre == "annee" || $champFiltre == "tempo") {
-                $maRequete .= "chanson." . $champFiltre . " = '" . $valEscaped . "'";
-            } else {
-                $maRequete .= "chanson." . $champFiltre . " LIKE '" . $valEscaped . "'";
-            }
-            $_bool_where_defini = true;
-        }
-
-        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème compteChansons : " . $_SESSION [self::MYSQL]->error . " Requete : $maRequete");
-        $row = $result->fetch_row();
-        return (int) $row[0];
-    }
-    /**
-     * Cherche les songbooks associés aux documents de cette chanson
-     * @return mysqli_result|bool
-     */
-    public function chercheSongbooksDocuments()
-    {
-        $maRequete = "SELECT DISTINCT songbook.id, songbook.nom from songbook, liendocsongbook , document ,
-        chanson WHERE liendocsongbook.idDocument = document.id AND document.nomTable='chanson'
-        AND document.idTable = chanson.id AND chanson.id = " . $this->_id . "  AND songbook.id = liendocsongbook.idSongbook";
-        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheSongbooksDocuments #1 : " . $_SESSION [self::MYSQL]->error);
-        return $result;
+        if (!class_exists('ChansonRepository')) require_once __DIR__ . '/ChansonRepository.php';
+        return ChansonRepository::getLinks($this->_id);
     }
 
     /**
-     * Cherche les liens URL associés à cette chanson
-     * @return mysqli_result|bool
+     * @deprecated Utiliser ChansonRepository::getSongbooks
      */
-    public function chercheLiensChanson()
+    public function chercheSongbooksDocuments(): ?mysqli_result
     {
-        $maRequete = sprintf("SELECT * from lienurl WHERE lienurl.nomtable = 'chanson' AND lienurl.idtable = %s",
-            $this->_id);
-        $result = $_SESSION [self::MYSQL]->query($maRequete) or die ("Problème chercheLiensChanson #1 : " . $_SESSION [self::MYSQL]->error);
-        return $result;
-    }
-/**
- * Retourne les tonalités équivalentes (enharmoniques et majeur/mineur)
- * @param string $tonalite
- * @return array
- */
-public static function getTonaliteEquivalents(string $tonalite): array
-{
-    $isMinor = (substr($tonalite, -1) == 'm');
-    $root = $isMinor ? substr($tonalite, 0, -1) : $tonalite;
-
-    $map = [
-        'A#' => 'Bb', 'Bb' => 'A#',
-        'C#' => 'Db', 'Db' => 'C#',
-        'D#' => 'Eb', 'Eb' => 'D#',
-        'F#' => 'Gb', 'Gb' => 'F#',
-        'G#' => 'Ab', 'Ab' => 'G#',
-        'B#' => 'C',  'C'  => 'B#',
-        'E#' => 'F',  'F'  => 'E#',
-        'Cb' => 'B',  'B'  => 'Cb',
-        'Fb' => 'E',  'E'  => 'Fb'
-    ];
-
-    $suffix = $isMinor ? 'm' : '';
-    $equivalents = [$root . $suffix];
-
-    if (isset($map[$root])) {
-        $equivalents[] = $map[$root] . $suffix;
+        if (!class_exists('ChansonRepository')) require_once __DIR__ . '/ChansonRepository.php';
+        return ChansonRepository::getSongbooks($this->_id);
     }
 
-    return array_unique($equivalents);
-}
-// Fonction pour normaliser les chaînes de caractères    public
-    static function normalize($string)
+    /**
+     * @deprecated Utiliser ChansonRepository::getPhysicalFiles
+     */
+    public function fichiersChanson(string $dossier): array
     {
-        $string = strtolower($string); // Convertir en minuscules
+        if (!class_exists('ChansonRepository')) require_once __DIR__ . '/ChansonRepository.php';
+        return ChansonRepository::getPhysicalFiles($this->_id, $dossier);
+    }
+
+    public function infosChanson(): string
+    {
+        return "Id : {$this->_id} Nom : {$this->_nom} Interprète : {$this->_interprete} Année : {$this->_annee} " .
+               "idUSer : {$this->_idUser} tempo : {$this->_tempo} mesure : {$this->_mesure} pulsation : {$this->_pulsation} " .
+               "hits : {$this->_hits} tonalité : {$this->_tonalite} publication : {$this->_publication}<BR>\n";
+    }
+
+    // --- UTILITAIRES ---
+
+    public static function normalize($string): string
+    {
+        $string = mb_strtolower($string, 'UTF-8');
         $string = preg_replace('/[áàâãäå]/u', 'a', $string);
         $string = preg_replace('/[éèêë]/u', 'e', $string);
         $string = preg_replace('/[íìîï]/u', 'i', $string);
@@ -742,91 +312,27 @@ public static function getTonaliteEquivalents(string $tonalite): array
         $string = preg_replace('/[ýÿ]/u', 'y', $string);
         $string = preg_replace('/ç/u', 'c', $string);
         $string = preg_replace('/ñ/u', 'n', $string);
-        $string = preg_replace('/[^a-z0-9]/', ' ', $string); // Remplacer tout le reste par des espaces
-        $string = preg_replace('/\s+/', ' ', $string); // Réduire les espaces multiples
-        return trim($string); // Supprimer les espaces au début et à la fin
+        $string = preg_replace('/[^a-z0-9]/', ' ', $string);
+        $string = preg_replace('/\s+/', ' ', $string);
+        return trim($string);
     }
 
-    /**
-     * Affiche une carte moderne (thumbnail Bootstrap 3) pour la chanson
-     * @return string HTML de la carte
-     */
+    public static function getTonaliteEquivalents(string $tonalite): array
+    {
+        $isMinor = (str_ends_with($tonalite, 'm'));
+        $root = $isMinor ? substr($tonalite, 0, -1) : $tonalite;
+        $map = ['A#'=>'Bb','Bb'=>'A#','C#'=>'Db','Db'=>'C#','D#'=>'Eb','Eb'=>'D#','F#'=>'Gb','Gb'=>'F#','G#'=>'Ab','Ab'=>'G#','B#'=>'C','C'=>'B#','E#'=>'F','F'=>'E#','Cb'=>'B','B'=>'Cb','Fb'=>'E','E'=>'Fb'];
+        $suffix = $isMinor ? 'm' : '';
+        $equivalents = [$root . $suffix];
+        if (isset($map[$root])) $equivalents[] = $map[$root] . $suffix;
+        return array_unique($equivalents);
+    }
+
+    // --- RENDU (Délégation au Renderer) ---
+
     public function afficheCarteChanson(): string
     {
-        $_id = $this->getId();
-        $nomImage = Document::imageTableId("chanson", $_id);
-        $imagePochette = affichePochette($nomImage, $_id, 200, 200);
-        $titre = htmlspecialchars(limiteLongueur($this->getNom(), 25));
-        $interpreteFull = $this->getInterprete();
-        $interpreteAffiche = htmlspecialchars(limiteLongueur($interpreteFull, 25));
-        $annee = $this->getAnnee();
-        $tempo = $this->getTempo();
-        $tonalite = $this->getTonalite();
-
-        // Construction des liens de filtrage
-        $urlInterprete = "?filtre=interprete&amp;valFiltre=" . urlencode($interpreteFull);
-        $urlAnnee = "?filtre=annee&amp;valFiltre=" . urlencode($annee);
-        $urlTempo = "?filtre=tempo&amp;valFiltre=" . urlencode($tempo);
-        $urlTonalite = "?filtre=tonalite&amp;valFiltre=" . urlencode($tonalite);
-
-        // Sous-titre (Interprète)
-        $sousTitre = "<p style='font-style: italic; margin: 0;'>
-                        <a href='$urlInterprete' title='Filtrer par cet interprète' class='text-muted' style='text-decoration: none;'>$interpreteAffiche</a>
-                      </p>";
-
-        // Badges (Année, Tempo, Tona)
-        $badges = "
-            <a href='$urlAnnee' title='Filtrer par cette année' style='text-decoration: none;'>
-                <span class='label label-default' style='background-color: var(--c-marron-clair); color: var(--c-marron-fonce);'>$annee</span>
-            </a>
-            <a href='$urlTempo' title='Filtrer par ce tempo' style='text-decoration: none;'>
-                <span class='label label-default'>$tempo BPM</span>
-            </a>
-            <a href='$urlTonalite' title='Filtrer par cette tonalité' style='text-decoration: none;'>
-                <span class='label' style='background-color: var(--c-accent);'>$tonalite</span>
-            </a>";
-
-        // Actions (Voir, Editer)
-        $actions = "
-            <div class='btn-group' role='group'>
-                <a href='chanson_voir.php?id=$_id' class='btn btn-canopee-voir'>Voir</a>
-            </div>";
-        
-        if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
-            $actions .= "
-            <div class='btn-group' role='group'>
-                <a href='chanson_form.php?id=$_id' class='btn btn-canopee-editer'>Editer</a>
-            </div>";
-        }
-
-        // Badge Spécial (Brouillon)
-        $badgeSpecial = "";
-        if ($this->getPublication() == 0) {
-            if (estAdmin() || (isset($_SESSION['id']) && $_SESSION['id'] == $this->getIdUser())) {
-                $badgeSpecial = "<div class='badge-brouillon'>Brouillon</div>";
-            }
-        }
-
-        return ComposantsUI::afficheCarteCanopee($titre, $sousTitre, $imagePochette, "chanson_voir.php?id=$_id", $badges, $actions, ['badgeSpecial' => $badgeSpecial]);
+        if (!class_exists('ChansonRenderer')) require_once __DIR__ . '/ChansonRenderer.php';
+        return ChansonRenderer::renderCard($this);
     }
-}
-
-/// TODO fonctions à supprimer
-
-// Cherche les chansons correspondant à un critère
-function chercheChansons($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
-{
-    $maRequete = "SELECT * FROM chanson WHERE $critere LIKE '$valeur'";
-    // Ajout filtre publication si pas admin
-    if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
-        $maRequete .= " AND publication = 1";
-    }
-    $maRequete .= " ORDER BY $critereTri";
-    if (!$bTriAscendant) {
-        $maRequete .= " DESC";
-    } else {
-        $maRequete .= " ASC";
-    }
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheChanson #3 : " . $_SESSION ['mysql']->error);
-    return $result;
 }

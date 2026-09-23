@@ -154,7 +154,7 @@ class LienUrl
 
         switch (strtolower($nomTable)) {
             case 'chanson':
-                $obj = new Chanson($idTable);
+                $obj = Chanson::load($idTable);
                 $label = $obj->getNom();
                 $url = "../chanson/chanson_voir.php?id=$idTable";
                 break;

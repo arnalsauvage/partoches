@@ -156,11 +156,15 @@ class Utilisateur
         $db = $_SESSION ['mysql'];
         $id = (int)$id;
         $maRequete = "SELECT * FROM utilisateur WHERE utilisateur.id = '$id'";
-        $result = $db->query($maRequete);
-        if (!$result) {
-            die ("Problème chercheutilisateur #1 : " . $db->error);
+        try {
+            $result = $db->query($maRequete);
+            if (!$result) {
+                return 0;
+            }
+            return $result->fetch_row() ?: 0;
+        } catch (Throwable $e) {
+            return 0;
         }
-        return $result->fetch_row() ?: 0;
     }
 
     /**
@@ -195,9 +199,54 @@ class Utilisateur
         $email = $db->real_escape_string($email);
         $signature = $db->real_escape_string($signature);
 
-        $maRequete = "INSERT INTO utilisateur VALUES (NULL, '$login', '$crypt', '$prenom', '$nom', '$image', '$site', '$email', '$signature', '$date', '0', '$privilege')";
+        $maRequete = "INSERT INTO utilisateur (login, mdp, prenom, nom, image, site, email, signature, dateDernierLogin, nbreLogins, privilege, est_actif) 
+                      VALUES ('$login', '$crypt', '$prenom', '$nom', '$image', '$site', '$email', '$signature', '$date', 0, '$privilege', 1)";
         $result = $db->query($maRequete) or die ("Problème creeUtilisateur#1 : " . $db->error);
         return $result;
+    }
+
+    /**
+     * Crée un utilisateur en attente d'activation par email
+     */
+    public static function creeUtilisateurEnAttente($login, $mdp, $prenom, $nom, $image, $site, $email, $signature, $token)
+    {
+        $db = $_SESSION['mysql'];
+        $crypt = Chiffrement::crypt($mdp);
+        $date = convertitDateJJMMAAAAversMySql(date("d/m/Y"));
+        
+        $login = $db->real_escape_string($login);
+        $prenom = $db->real_escape_string($prenom);
+        $nom = $db->real_escape_string($nom);
+        $image = $db->real_escape_string($image);
+        $site = $db->real_escape_string($site);
+        $email = $db->real_escape_string($email);
+        $signature = $db->real_escape_string($signature);
+        $tokenEscaped = $db->real_escape_string($token);
+
+        $maRequete = "INSERT INTO utilisateur (login, mdp, prenom, nom, image, site, email, signature, dateDernierLogin, nbreLogins, privilege, token_activation, est_actif) 
+                      VALUES ('$login', '$crypt', '$prenom', '$nom', '$image', '$site', '$email', '$signature', '$date', 0, 0, '$tokenEscaped', 0)";
+        $db->query($maRequete) or die ("Problème creeUtilisateurEnAttente#1 : " . $db->error);
+        return $db->insert_id;
+    }
+
+    /**
+     * Active un compte utilisateur par son jeton d'activation
+     */
+    public static function activeCompteParToken(string $token)
+    {
+        $db = $_SESSION['mysql'];
+        $tokenEscaped = $db->real_escape_string($token);
+        
+        $sql = "SELECT * FROM utilisateur WHERE token_activation = '$tokenEscaped' AND est_actif = 0 LIMIT 1";
+        $res = $db->query($sql);
+        if ($res && $row = $res->fetch_row()) {
+            $userId = (int)$row[0];
+            $updateSql = "UPDATE utilisateur SET privilege = 1, est_actif = 1, token_activation = NULL WHERE id = $userId";
+            $db->query($updateSql);
+            $row[11] = 1; // Privilège Membre
+            return $row;
+        }
+        return false;
     }
 
     /**
@@ -242,6 +291,10 @@ class Utilisateur
     {
         $donnee = self::chercheUtilisateurParLeLogin($login);
         if (is_array($donnee) && isset($donnee[2])) {
+            // Un compte non activé (est_actif == 0) ne peut pas se connecter
+            if (isset($donnee[13]) && (int)$donnee[13] === 0) {
+                return false;
+            }
             if ($mdp == Chiffrement::decrypt($donnee[2])) {
                 $donnee[10] = (int)$donnee[10] + 1;
                 self::modifieUtilisateur($donnee[0], $donnee[1], $mdp, $donnee[3], $donnee[4], $donnee[5], $donnee[6], $donnee[7], $donnee[8], $donnee[10], $donnee[11]);

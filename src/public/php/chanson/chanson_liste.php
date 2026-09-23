@@ -90,7 +90,7 @@ if (!isset($_SESSION[VAL_FILTRE])) $_SESSION[VAL_FILTRE] = "";
 if (isset($_GET[FILTRE])) {
     $filtreGet = filtreGetPost($_GET, FILTRE);
     $valeurGet = filtreGetPost($_GET, VAL_FILTRE);
-    $filtres_valides = ['contributeur', 'tempo', 'tempo_famille', 'mesure', 'tonalite', 'pulsation', 'annee', 'interprete'];
+    $filtres_valides = ['contributeur', 'tempo', 'tempo_famille', 'mesure', 'tonalite', 'tonalite_originale', 'pulsation', 'annee', 'interprete'];
 
     if ($filtreGet !== null && in_array($filtreGet, $filtres_valides, true)) {
         $_SESSION[FILTRE] = $filtreGet;

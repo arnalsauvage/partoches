@@ -30,6 +30,9 @@
                     <?php $urlBase = "chanson_liste.php?filtre="; ?>
                     <a href="<?= $urlBase ?>annee&amp;valFiltre=<?= $chanson->getAnnee() ?>" class="label label-success badge-tech"><i class="glyphicon glyphicon-calendar"></i> <?= $chanson->getAnnee() ?></a>
                     <a href="<?= $urlBase ?>tonalite&amp;valFiltre=<?= urlencode($chanson->getTonalite() ?: '?') ?>" class="label label-primary badge-tech"><i class="glyphicon glyphicon-music"></i> <?= $chanson->getTonalite() ?: '?' ?></a>
+                    <?php if (!empty($chanson->getTonaliteOriginale())): ?>
+                        <a href="<?= $urlBase ?>tonalite_originale&amp;valFiltre=<?= urlencode($chanson->getTonaliteOriginale()) ?>" class="label label-default badge-tech"><i class="glyphicon glyphicon-music"></i> Orig. : <?= htmlentities($chanson->getTonaliteOriginale()) ?></a>
+                    <?php endif; ?>
                     <a href="<?= $urlBase ?>tempo_famille&amp;valFiltre=<?= urlencode($tempoInfo['name']) ?>" class="label label-info badge-tech"><i class="glyphicon glyphicon-time"></i> <?= $chanson->getTempo() ?> <span class="tempo-label"><?= $tempoInfo['label'] ?></span></a>
                     <a href="<?= $urlBase ?>mesure&amp;valFiltre=<?= urlencode($chanson->getMesure()) ?>" class="label label-default badge-tech"><i class="glyphicon glyphicon-equalizer"></i> <?= $chanson->getMesure() ?></a>
                     <a href="<?= $urlBase ?>pulsation&amp;valFiltre=<?= urlencode($chanson->getPulsation()) ?>" class="label label-warning badge-tech"><i class="glyphicon <?= ($chanson->getPulsation() === 'ternaire') ? 'glyphicon-refresh' : 'glyphicon-option-vertical' ?>"></i> <?= $chanson->getPulsation() ?></a>
@@ -83,17 +86,34 @@
         <?php endif; ?>
 
         <!-- Médias -->
-        <?php if (!empty($medias)): ?>
+        <?php if (!empty($hasAudio) && empty($canAccessAudio)): ?>
             <hr><div class="row">
+                <div class="col-xs-12">
+                    <div class="alert alert-info text-center canopee-audio-invite mb-20">
+                        <i class="glyphicon glyphicon-volume-up mr-5"></i>
+                        <strong>Ressources audio disponibles :</strong>
+                        ce document contient un ou plusieurs ressources audios, connectez-vous pour l'afficher !
+                        <a href="../navigation/login.php" onclick="if($('#afficherPopup').length){$('#afficherPopup').click(); return false;}" class="btn btn-sm btn-info ml-10">
+                            <i class="glyphicon glyphicon-log-in"></i> Se connecter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($medias)): ?>
+            <div class="row">
                 <?php foreach ($medias as $row): 
                     $ext = strtolower(pathinfo($row[1], PATHINFO_EXTENSION));
+                    $isAudio = in_array($ext, ['mp3', 'm4a', 'aac']);
+                    if ($isAudio && empty($canAccessAudio)) continue;
                     $nom = pathinfo($row[1], PATHINFO_FILENAME);
                     $url = Document::lienUrlAffichageDocument($row[0]);
                 ?>
                     <div class="col-xs-12 col-sm-6 col-md-4 text-center mb-20">
                         <div class="well well-sm">
                             <strong><?= $nom ?></strong><br>
-                            <?php if (in_array($ext, ['mp3', 'm4a', 'aac'])): ?>
+                            <?php if ($isAudio): ?>
                                 <audio controls class="w-100 mt-10"><source src="<?= $url ?>" type="audio/<?= ($ext === 'aac' ? 'mpeg' : 'mp3') ?>"></audio>
                             <?php else: ?>
                                 <video width="100%" controls class="mt-10"><source src="<?= $url ?>" type="video/mp4"></video>

@@ -1,0 +1,21 @@
+{
+  "name": "partoches-e2e",
+  "version": "1.0.0",
+  "description": "Tests automatisés End-to-End Cypress pour l'application Partoches Canopée",
+  "main": "cypress.config.js",
+  "scripts": {
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open"
+  },
+  "devDependencies": {
+    "cypress": "^13.17.0"
+  },
+  "keywords": [
+    "partoches",
+    "e2e",
+    "cypress",
+    "testing"
+  ],
+  "author": "Partoches Team",
+  "license": "ISC"
+}

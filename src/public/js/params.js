@@ -91,6 +91,18 @@ $(document).ready(function(){
         });
     });
 
+    // --- RÉGÉNÉRATION VIGNETTES ---
+    $(document).on('click', '#btnRegenVignettes', function(){
+        if (!confirm('Voulez-vous générer toutes les miniatures manquantes ? Cela peut prendre un certain temps selon le nombre d\'images.')) return;
+        var btn = $(this);
+        var oldHtml = btn.html();
+        btn.prop('disabled', true).html('<span class="glyphicon glyphicon-refresh spin"></span> Traitement...');
+        $.post('', {action: 'regenere_vignettes_all'}, function(d){
+            toastr.success(d);
+            btn.prop('disabled', false).html(oldHtml);
+        });
+    });
+
     // --- DIAGNOSTIC SYSTÈME ---
     $('#btnRunDiagDj').click(function(){
         $('#diagResDj').html('<div class="diag-loading-indicator"><span class="glyphicon glyphicon-refresh spin"></span> Analyse en cours...</div>');

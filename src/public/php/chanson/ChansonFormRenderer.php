@@ -22,6 +22,7 @@ class ChansonFormRenderer
         $tempo = $_chanson->getTempo();
         $mesure = $_chanson->getMesure();
         $tonalite = $_chanson->getTonalite();
+        $tonaliteOriginale = htmlspecialchars($_chanson->getTonaliteOriginale() ?? '', ENT_QUOTES);
         $datePub = dateMysqlVersTexte($_chanson->getDatePub());
         $hits = $_chanson->getHits();
         $idUser = $_chanson->getIdUser();
@@ -54,6 +55,10 @@ class ChansonFormRenderer
                 <div class="col-sm-3"><input class="form-control" type="number" name="fannee" value="$annee"></div>
                 <label class="col-sm-2 control-label">Tonalité :</label>
                 <div class="col-sm-3"><input class="form-control" type="text" name="ftonalite" value="$tonalite"></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Tonalité originale :</label>
+                <div class="col-sm-3"><input class="form-control" type="text" name="ftonalite_originale" value="$tonaliteOriginale"></div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">Tempo :</label>
@@ -140,7 +145,13 @@ HTML;
             
             $iconeSrc = "../../images/icones/$ext.png";
             if (!file_exists($iconeSrc)) $iconeSrc = "../../images/icones/fichier.png";
-            $iconeHtml = image($iconeSrc, 32, 32, "icone");
+            
+            // Si c'est une image, on tente d'afficher une miniature
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                $iconeHtml = affichePochette($fichierCourt, $id, 48, 48);
+            } else {
+                $iconeHtml = image($iconeSrc, 32, 32, "icone");
+            }
 
             $nomAffiche = preg_replace('/-v[0-9]+(?=\.[a-z0-9]+$)/i', '', $fichierCourt);
             if ($nomAffiche === $fichierCourt) $nomAffiche = preg_replace('/-v[0-9]+$/', '', $fichierCourt);

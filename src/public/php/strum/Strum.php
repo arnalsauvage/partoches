@@ -192,19 +192,23 @@ class Strum
                     </div>
                     
                     <div style='display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed #D2B48C; padding-top: 15px;'>
+                        <div id='strum-actions-left-$id' style='display: flex; gap: 10px;'>
+";
+        if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
+            $html .= "                            <a href='strum_form.php?id=$id' class='btn btn-md' title='Editer' style='background-color: #8B4513; color: white; border: none; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);'><i class='glyphicon glyphicon-pencil' style='font-size: 1.2em;'></i></a>
+";
+        }
+        $html .= "                        </div>
                         <a title='Ouvrir dans la Boîte à Strum' href='$urlBoiteAstrum?strum=$strumDisplay$swingParam' style='text-decoration: none;'>
                             <img src='$imageBoiteAstrum' alt='Boîte à Strum' height='40' style='border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
                         </a>
-                        <div style='display: flex; gap: 10px;'>";
-        
-        if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
-            $html .= " <a href='strum_form.php?id=$id' class='btn btn-md' title='Editer' style='background-color: #8B4513; color: white; border: none; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);'><i class='glyphicon glyphicon-pencil' style='font-size: 1.2em;'></i></a>";
-        }
+                        <div id='strum-actions-right-$id' style='display: flex; gap: 10px;'>
+";
         if (aDroits($GLOBALS["PRIVILEGE_EDITEUR"])) {
-            $html .= " <button type='button' class='btn btn-md btn-danger' title='Supprimer' onclick='supprimerStrum($id, \"$strumDisplay\")' style='width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);'><i class='glyphicon glyphicon-trash' style='font-size: 1.2em;'></i></button>";
+            $html .= "                            <button type='button' class='btn btn-md btn-danger' title='Supprimer' onclick='supprimerStrum($id, \"$strumDisplay\")' style='width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);'><i class='glyphicon glyphicon-trash' style='font-size: 1.2em;'></i></button>
+";
         }
-
-        $html .= "      </div>
+        $html .= "                        </div>
                     </div>
                 </div>
             </div>

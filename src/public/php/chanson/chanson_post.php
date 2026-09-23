@@ -106,6 +106,7 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
         $fhits = $_POST ['fhits'];
     }
     $ftonalite = $_POST ['ftonalite'];
+    $ftonaliteOriginale = $_POST['ftonalite_originale'] ?? null;
     $mode = $_POST ['mode'];
     if (isset($_POST ['fidUser'])) {
         $fidUser = $_POST ['fidUser'];
@@ -122,9 +123,19 @@ if (isset ($_POST ['id']) && is_numeric($_POST ['id'])) {
 //  1- création d'une chanson,
 if ($mode == "INS") {
     $fhits = 0;
-    $_chanson = new Chanson($fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fhits, $ftonalite);
+    $_chanson = new Chanson();
+    $_chanson->setNom($fnom);
+    $_chanson->setInterprete($finterprete);
+    $_chanson->setAnnee($fannee);
+    $_chanson->setIdUser($fidUser);
+    $_chanson->setTempo($ftempo);
+    $_chanson->setMesure($fmesure);
+    $_chanson->setPulsation($fpulsation);
+    $_chanson->setHits($fhits);
+    $_chanson->setTonalite($ftonalite);
+    $_chanson->setTonaliteOriginale($ftonaliteOriginale);
     $_chanson->setPublication($fpublication);
-    $id = $_chanson->creeChansonBDD();
+    $id = $_chanson->save();
 
     // Si une cover URL est fournie, on la télécharge maintenant qu'on a l'ID
     if ($fcover && str_starts_with($fcover, 'http')) {
@@ -144,10 +155,8 @@ if ($mode == "INS") {
 
 //  2 - modif,
 if ($mode == "MAJ") {
-    if ($_SESSION [PRIVILEGE] < 3) {
-        $_chanson->chercheChanson($id);
-        $fhits = $_chanson->getHits();
-    }
+    $_chanson = Chanson::load($id);
+    $fhits = $_chanson->getHits();
     
     // Si c'est une nouvelle URL externe, on la télécharge et on l'optimise
     if ($fcover && str_starts_with($fcover, 'http')) {
@@ -155,10 +164,20 @@ if ($mode == "MAJ") {
         if ($localCover) $fcover = $localCover;
     }
 
-    $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
+    $_chanson->setNom($fnom);
+    $_chanson->setInterprete($finterprete);
+    $_chanson->setAnnee($fannee);
+    $_chanson->setIdUser($fidUser);
+    $_chanson->setTempo($ftempo);
+    $_chanson->setMesure($fmesure);
+    $_chanson->setPulsation($fpulsation);
+    $_chanson->setDatePub($fdate);
+    $_chanson->setHits($fhits);
+    $_chanson->setTonalite($ftonalite);
+    $_chanson->setTonaliteOriginale($ftonaliteOriginale);
     $_chanson->setCover($fcover);
     $_chanson->setPublication($fpublication);
-    $_chanson->creeModifieChansonBDD();
+    $_chanson->save();
 }
 
 // On actualise la table des médias automatiquement
@@ -166,7 +185,7 @@ actualiseMedias();
 
 //  3 - suppression chanson
 if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR"]) {
-    $_chanson = new Chanson($id);
+    $_chanson = Chanson::load($id);
     $_chanson->supprimeChansonBddFile();
     redirection($nomTable . "_liste.php");
 }
@@ -184,7 +203,9 @@ if ($mode == "MAJ_SONGBPM") {
     $ftempo = $_GET ['tempo'];
     $fmesure = $_GET ['mesure'];
     $ftonalite = $_GET ['tonalite'];
+    $ftonaliteOriginale = $_POST['tonalite_originale'] ?? $_chanson->getTonaliteOriginale();
     $_chanson->__construct($id, $fnom, $finterprete, $fannee, $fidUser, $ftempo, $fmesure, $fpulsation, $fdate, $fhits, $ftonalite);
+    $_chanson->setTonaliteOriginale($ftonaliteOriginale);
     $_chanson->creeModifieChansonBDD();
     $fimage = $_GET ['image'];
     echo "télécharge fichier " . $fnom . "-" . $finterprete . " depuis url " . $fimage;

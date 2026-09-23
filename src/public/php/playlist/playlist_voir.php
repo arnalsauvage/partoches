@@ -60,13 +60,13 @@ $srcPochette = "";
 if (!empty($imagePochette)) {
     $srcPochette = $imagePochette;
     if (!str_contains($srcPochette, '/')) {
-        $srcPochette = "../data/playlists/" . $srcPochette;
+        $srcPochette = "/data/playlists/" . $srcPochette;
     }
 } else {
     // Fallback legacy (table document)
     $legacyImage = imagePlaylist($idPlaylist);
     if (!empty($legacyImage)) {
-        $srcPochette = "../data/playlists/" . $legacyImage;
+        $srcPochette = "/data/playlists/" . $legacyImage;
     }
 }
 
@@ -120,7 +120,7 @@ if ($lignes->num_rows > 0) {
     $sortie .= "    <div class='row'>";
     while ($ligne = $lignes->fetch_assoc()) {
         $idChanson = $ligne['id'];
-        $_chanson = new Chanson($idChanson);
+        $_chanson = Chanson::load($idChanson);
         
         // On récupère la carte et on adapte les liens (car on est dans /php/playlist/)
         $card = $_chanson->afficheCarteChanson();

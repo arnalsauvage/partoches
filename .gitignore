@@ -37,4 +37,6 @@ temp_media.html
 !tests/**/*.html
 !html/composants/*.html
 !src/public/html/**/*.html
-
+node_modules/
+.~lock.*
+audit-partoches-*.csv
