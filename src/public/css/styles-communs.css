@@ -37,6 +37,13 @@ body {
     width: auto !important;
 }
 
+.menu-icon-diagramme {
+    height: 18px;
+    width: auto;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
 .navbar-user-info {
     display: flex !important;
     align-items: center !important;

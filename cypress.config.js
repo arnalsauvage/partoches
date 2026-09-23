@@ -1,6 +1,6 @@
 module.exports = {
   e2e: {
-    baseUrl: "http://localhost:8080",
+    baseUrl: "http://127.0.0.1:8080",
     viewportWidth: 1280,
     viewportHeight: 720,
     video: false,

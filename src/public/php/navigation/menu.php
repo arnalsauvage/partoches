@@ -79,7 +79,7 @@ $lienLiens = "<li><a href=\"../liens/lienurl_liste.php\">Liens</a></li>";
 $lienOutils = <<<HTML
     <li>
         <a href="../../html/diagrammes/">
-            <i class="glyphicon glyphicon-wrench"></i> Outils
+            <img src="../../images/icones/diagramme.png" class="menu-icon-diagramme" alt="Outils"> Outils
         </a>
     </li>
 HTML;

@@ -3,6 +3,7 @@ services:
     build: .
     container_name: site-partoches
     restart: always
+    tty: true
     ports:
       - "8080:80"
 
