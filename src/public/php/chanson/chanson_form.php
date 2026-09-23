@@ -13,8 +13,6 @@ require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR_
 require_once __DIR__ . "/../lib/utilssi.php";
 require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 
-use ChansonFormService;
-use ChansonFormNewRenderer;
 
 $id = isset($_GET['id']) && is_numeric($_GET['id']) ? (int) $_GET['id'] : 0;
 

@@ -4,11 +4,13 @@
  * Centralisation des chemins absolus (compatible local et déploiement FTP Prod)
  */
 
-if (!defined('ROOT_DIR')) {
-    define('ROOT_DIR', file_exists(dirname(__DIR__) . '/public') ? dirname(__DIR__) : __DIR__);
-}
 if (!defined('PUBLIC_DIR')) {
-    define('PUBLIC_DIR', is_dir(ROOT_DIR . '/public') ? ROOT_DIR . '/public' : ROOT_DIR);
+    define('PUBLIC_DIR', __DIR__);
+}
+if (!defined('ROOT_DIR')) {
+    define('ROOT_DIR', file_exists(dirname(__DIR__) . '/data/conf/params.ini') ? dirname(__DIR__) : PUBLIC_DIR);
+}
+if (!defined('VENDOR_DIR')) {
     define('VENDOR_DIR', PUBLIC_DIR . '/vendor');
     define('PUBLIC_URL', '');
     define('VENDOR_URL', '');

@@ -142,27 +142,28 @@ if (!isset($configMysql)) {
 //	echo "connexion : $idconnect";
 //	return($idconnect);
 
-function convertitDateJJMMAAAAversMySql($date)
-{
-    // On convertit la date au format mysql : "JJ/MM/AAAA" devient "AAAA-MM-JJ"
-    // echo "Ancienne date : $date ";
-    $date = explode('/', $date);
-    $new_date = $date[2] . '-' . $date[1] . '-' . $date[0];
-    // echo " , New date : " . $new_date . "<br>";
-    return $new_date;
+if (!function_exists('convertitDateJJMMAAAAversMySql')) {
+    function convertitDateJJMMAAAAversMySql($date)
+    {
+        // On convertit la date au format mysql : "JJ/MM/AAAA" devient "AAAA-MM-JJ"
+        $date = explode('/', $date);
+        $new_date = $date[2] . '-' . $date[1] . '-' . $date[0];
+        return $new_date;
+    }
 }
 
-function convertitDateMySqlVersJJMMAAAA($date)
-{
-    // On vérifie que la date est au format MySQL : "AAAA-MM-JJ"
-    $date = explode('-', $date);
+if (!function_exists('convertitDateMySqlVersJJMMAAAA')) {
+    function convertitDateMySqlVersJJMMAAAA($date)
+    {
+        // On vérifie que la date est au format MySQL : "AAAA-MM-JJ"
+        $date = explode('-', $date);
 
-    // On s'assure qu'on a bien trois éléments
-    if (count($date) === 3) {
-        $new_date = $date[2] . '/' . $date[1] . '/' . $date[0];
-        return $new_date;
-    } else {
-        // Gérer le cas où la date n'est pas au format attendu
-        return null; // ou une exception, selon vos besoins
+        // On s'assure qu'on a bien trois éléments
+        if (count($date) === 3) {
+            $new_date = $date[2] . '/' . $date[1] . '/' . $date[0];
+            return $new_date;
+        } else {
+            return null;
+        }
     }
 }
