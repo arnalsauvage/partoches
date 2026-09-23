@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . "/../lib/Pagination.php";
 require_once dirname(__DIR__) . "/lib/utilssi.php";
+require_once __DIR__ . "/../media/MediaService.php";
 require_once __DIR__ . "/LienUrl.php";
 require_once __DIR__ . "/lienurl_voir.php";
 $pasDeMenu = true;
@@ -89,9 +90,13 @@ while ($_lienurl = $_listeDeslienurls->fetch_row()) {
         </div>
 HTML;
     } elseif ($isAudio) {
-        // CAS AUDIO : Icône Musique
+        // CAS AUDIO : Icône Musique (Accès restreint si non connecté)
+        $canAccessAudio = MediaService::estAudioAccessible();
+        $targetAudioUrl = $canAccessAudio ? $url : "../navigation/login.php";
+        $audioLockIcon = $canAccessAudio ? "" : "<div style='position:absolute; top:10px; right:10px; background:rgba(217,83,79,0.9); color:#fff; padding:2px 8px; border-radius:4px; font-size:12px;'><i class='glyphicon glyphicon-lock'></i> Connexion requise</div>";
         $thumbHtml = <<<HTML
-        <a href="$url" target="_blank" class="video-card-thumb" style="display:flex; align-items:center; justify-content:center; background:#e8f4fd; text-decoration:none;">
+        <a href="$targetAudioUrl" target="_blank" class="video-card-thumb" style="display:flex; align-items:center; justify-content:center; background:#e8f4fd; text-decoration:none; position:relative;">
+            $audioLockIcon
             <i class="glyphicon glyphicon-headphones" style="font-size:64px; color:#31708f;"></i>
             <div class="video-play-btn" style="font-size:24px; top:75%; color:#31708f;"><i class="glyphicon glyphicon-volume-up"></i></div>
         </a>

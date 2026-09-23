@@ -132,16 +132,36 @@ class MediaRepository
         return $tableau;
     }
 
+    private static function buildWhereClause(array $filtres, mysqli $db): string
+    {
+        if (empty($filtres) || in_array('tous', $filtres)) {
+            return "";
+        }
+
+        $typesEtendus = [];
+        foreach ($filtres as $f) {
+            $fLower = strtolower($f);
+            if ($fLower === 'audio') {
+                $typesEtendus = array_merge($typesEtendus, ['audio', 'mp3', 'm4a', 'aac', 'ogg', 'wav']);
+            } elseif ($fLower === 'vidéo' || $fLower === 'video') {
+                $typesEtendus = array_merge($typesEtendus, ['vidéo', 'video', 'mp4', 'mkv', 'avi']);
+            } elseif ($fLower === 'partoche') {
+                $typesEtendus = array_merge($typesEtendus, ['partoche', 'pdf']);
+            } else {
+                $typesEtendus[] = $f;
+            }
+        }
+
+        $typesEtendus = array_unique($typesEtendus);
+        $escapedFiltres = array_map(fn($f) => "'" . $db->real_escape_string($f) . "'", $typesEtendus);
+        return "WHERE type IN (" . implode(',', $escapedFiltres) . ")";
+    }
+
     public static function chercheTousLesMedias(int $limit = 50, int $offset = 0, array $filtres = []): array
     {
         self::checkDbConnection();
         $db = $_SESSION[self::MYSQL];
-        $where = "";
-        
-        if (!empty($filtres) && !in_array('tous', $filtres)) {
-            $escapedFiltres = array_map(fn($f) => "'" . $db->real_escape_string($f) . "'", $filtres);
-            $where = "WHERE type IN (" . implode(',', $escapedFiltres) . ")";
-        }
+        $where = self::buildWhereClause($filtres, $db);
 
         $maRequete = "SELECT id FROM media $where ORDER BY datePub DESC LIMIT $limit OFFSET $offset";
         $result = $db->query($maRequete);
@@ -158,12 +178,7 @@ class MediaRepository
     {
         self::checkDbConnection();
         $db = $_SESSION[self::MYSQL];
-        $where = "";
-        
-        if (!empty($filtres) && !in_array('tous', $filtres)) {
-            $escapedFiltres = array_map(fn($f) => "'" . $db->real_escape_string($f) . "'", $filtres);
-            $where = "WHERE type IN (" . implode(',', $escapedFiltres) . ")";
-        }
+        $where = self::buildWhereClause($filtres, $db);
         
         $res = $db->query("SELECT COUNT(*) FROM media $where");
         if ($res) {

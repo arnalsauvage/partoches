@@ -110,4 +110,36 @@ class ChansonTest extends TestCase
         $this->assertEquals(0, strpos($resultat, $nomUnique));
         $c->supprimeChansonBddFile();
     }
+
+    public function testUpdateChansonBDD()
+    {
+        $nomUnique = "CHANSON_A_MODIFIER_" . time();
+        $c = new Chanson();
+        $c->setNom($nomUnique);
+        $c->setInterprete("Artiste Initial");
+        $c->setAnnee(2025);
+        $c->setIdUser(1);
+        $c->setTempo(100);
+        $c->setMesure("4/4");
+        $c->setPulsation("binaire");
+        $c->setHits(0);
+        $c->setTonalite("G");
+        $c->setTonaliteOriginale("Em");
+        $id = $c->creeChansonBDD();
+        $this->assertGreaterThan(0, $id);
+
+        // Modification
+        $cModif = Chanson::load($id);
+        $cModif->setInterprete("Artiste Modifie");
+        $cModif->setTempo(130);
+        $cModif->modifieChansonBDD();
+
+        // Verification de la persistance
+        $cRecharge = Chanson::load($id);
+        $this->assertEquals("Artiste Modifie", $cRecharge->getInterprete());
+        $this->assertEquals(130, $cRecharge->getTempo());
+
+        // Nettoyage
+        $cRecharge->supprimeChansonBddFile();
+    }
 }

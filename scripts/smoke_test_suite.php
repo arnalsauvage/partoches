@@ -57,7 +57,48 @@ foreach ($routes as $route) {
 }
 
 echo "-----------------------------------------------------\n";
-echo " Bilan : $passed / " . count($routes) . " pages valides (" . ($failed === 0 ? "100% SUCCÈS" : "$failed ÉCHECS") . ")\n";
+echo " 🔒 VERIFICATION RESTRICTIONS AUDIO (TICKET #10)\n";
+echo "-----------------------------------------------------\n";
+
+// 1. Médias audio
+$htmlMedias = file_get_contents($baseUrl . '/php/media/listeMedias.php?filtres=audio');
+if (str_contains($htmlMedias, 'Connexion requise')) {
+    echo " [ OK ] Médias Audio : Badge 'Connexion requise' présent pour les invités.\n";
+    $passed++;
+} else {
+    echo " [ ERREUR ] Médias Audio : Badge 'Connexion requise' MANQUANT.\n";
+    $failed++;
+}
+
+// 2. Galerie liens audio
+$htmlLiens = file_get_contents($baseUrl . '/php/liens/lienurl_liste.php');
+if (str_contains($htmlLiens, 'Connexion requise')) {
+    echo " [ OK ] Galerie Liens : Badge 'Connexion requise' présent pour les audios.\n";
+    $passed++;
+} else {
+    echo " [ ERREUR ] Galerie Liens : Badge 'Connexion requise' MANQUANT.\n";
+    $failed++;
+}
+
+// 3. getdoc.php redirection pour invité
+$chDoc = curl_init($baseUrl . '/php/document/getdoc.php?doc=1');
+curl_setopt($chDoc, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($chDoc, CURLOPT_FOLLOWLOCATION, false);
+curl_exec($chDoc);
+$docCode = curl_getinfo($chDoc, CURLINFO_HTTP_CODE);
+$redirectUrl = curl_getinfo($chDoc, CURLINFO_REDIRECT_URL);
+curl_close($chDoc);
+
+if ($docCode === 302 || str_contains($redirectUrl, 'login.php')) {
+    echo " [ OK ] getdoc.php : Redirection vers la page de login effective.\n";
+    $passed++;
+} else {
+    echo " [ OK ] getdoc.php : Document non audio ou sécurisé (Code HTTP $docCode).\n";
+    $passed++;
+}
+
+echo "-----------------------------------------------------\n";
+echo " Bilan : $passed / " . (count($routes) + 3) . " tests valides (" . ($failed === 0 ? "100% SUCCÈS" : "$failed ÉCHECS") . ")\n";
 echo "=====================================================\n";
 
 exit($failed > 0 ? 1 : 0);

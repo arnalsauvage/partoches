@@ -41,3 +41,8 @@ temp_media.html
 node_modules/
 .~lock.*
 audit-partoches-*.csv
+cypress/screenshots/
+cypress/videos/
+scripts/check_*.php
+scripts/describe_*.php
+

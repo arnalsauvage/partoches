@@ -1,6 +1,16 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (24 Septembre 2026)
+- **Réalisation du Ticket #10 — Restriction d'accès aux ressources audio (MP3) pour les utilisateurs non connectés** :
+    - **Sécurisation & UX** :
+        1. **`getdoc.php`** : Interception de tous les accès directs aux fichiers audio (mp3, m4a, aac, ogg, wav) pour les utilisateurs non connectés (`!MediaService::estAudioAccessible()`), avec redirection HTTP 302 automatique vers `login.php`.
+        2. **`lienurl_liste.php`** : Détection des liens audio et affichage du badge `(🔒 Connexion requise)` avec redirection vers la page de connexion pour les invités.
+        3. **`MediaRenderer.php` & `listeMedias.php`** : Affichage des cartes avec badge `(🔒 Connexion requise)` et extension du filtre `buildWhereClause()` dans `MediaRepository.php` pour inclure tous les formats audio (`mp3`, `m4a`, `aac`, `ogg`, `wav`).
+    - **Tests & Automatisation** :
+        - Création de la spécification Cypress E2E [cypress/e2e/13_restriction_audio_mp3.cy.js](file:///f:/Arnaud/projets-dev/partoches/cypress/e2e/13_restriction_audio_mp3.cy.js).
+        - Enrichissement de `tests/MediaTest.php` (`testEstExtensionAudio`, `testEstAudioAccessible`, `testRendererRestrictedAudio`).
+        - **150 / 150 tests PHPUnit validés (100% Succès)**.
+        - **25 / 25 Smoke Tests HTTP validés avec assertions audio (100% Succès)**.
 - **Résolution de l'erreur 500 / Fatal Error en Production (`Cannot redeclare convertitDateJJMMAAAAversMySql`)** :
     - **Identification de la Root Cause** : Sur Hostinger, un ancien sous-dossier abandonné `public_html/public/` existait sur le serveur web. Dans `src/public/autoload.php`, le test `is_dir(ROOT_DIR . '/public')` s'évaluait à `true` en prod et forçait `PUBLIC_DIR` à pointer vers l'ancien dossier `public_html/public/php/lib` au lieu de `public_html/php/lib`. `require_once` chargeait donc deux versions distinctes de `configMysql.php`, redéfinissant la fonction `convertitDateJJMMAAAAversMySql()`.
     - **Solution Technique** :

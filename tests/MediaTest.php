@@ -149,4 +149,73 @@ class MediaTest extends TestCase
         $this->assertStringContainsString('badge bg-danger', $html); // Danger = Partoche
         $this->assertStringContainsString('🎵', $html); // Emoji partoche
     }
+
+    public function testUpdateMediaBDD()
+    {
+        $data = [
+            'type' => 'mp3',
+            'titre' => 'Titre Avant Modif',
+            'image' => 'http://example.com/image.jpg',
+            'auteur' => 1,
+            'lien' => 'http://example.com/media.mp3',
+            'description' => 'Description initiale',
+            'tags' => 'tag1, tag2'
+        ];
+        $media = new Media($data);
+        $mediaId = MediaRepository::persist($media);
+        $this->assertGreaterThan(0, $mediaId);
+
+        // Modification
+        $mediaModif = MediaRepository::chercheMedia($mediaId);
+        $mediaModif->setTitre('Titre Apres Modif');
+        $mediaModif->setDescription('Description mise a jour');
+        MediaRepository::persist($mediaModif);
+
+        // Rechargement
+        $mediaApres = MediaRepository::chercheMedia($mediaId);
+        $this->assertEquals('Titre Apres Modif', $mediaApres->getTitre());
+        $this->assertEquals('Description mise a jour', $mediaApres->getDescription());
+
+        // Nettoyage
+        MediaRepository::supprimeMediaBDD($mediaId);
+    }
+
+    public function testEstExtensionAudio()
+    {
+        $this->assertTrue(MediaService::estExtensionAudio('mp3'));
+        $this->assertTrue(MediaService::estExtensionAudio('M4A'));
+        $this->assertTrue(MediaService::estExtensionAudio('.aac'));
+        $this->assertTrue(MediaService::estExtensionAudio('ogg'));
+        $this->assertTrue(MediaService::estExtensionAudio('wav'));
+
+        $this->assertFalse(MediaService::estExtensionAudio('pdf'));
+        $this->assertFalse(MediaService::estExtensionAudio('jpg'));
+        $this->assertFalse(MediaService::estExtensionAudio('png'));
+    }
+
+    public function testEstAudioAccessible()
+    {
+        $_SESSION['privilege'] = 0;
+        $this->assertFalse(MediaService::estAudioAccessible());
+
+        $_SESSION['privilege'] = 1;
+        $this->assertTrue(MediaService::estAudioAccessible());
+
+        $_SESSION['privilege'] = 2;
+        $this->assertTrue(MediaService::estAudioAccessible());
+    }
+
+    public function testRendererRestrictedAudio()
+    {
+        $_SESSION['privilege'] = 0; // Invité
+        $media = new Media([
+            'type' => 'mp3',
+            'titre' => 'Audio Restreint',
+            'lien' => 'http://test.com/chanson.mp3'
+        ]);
+
+        $html = MediaRenderer::afficheComposantMedia($media);
+        $this->assertStringContainsString('Audio Restreint', $html);
+        $this->assertStringContainsString('Connexion requise', $html);
+    }
 }
