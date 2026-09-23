@@ -1,0 +1,95 @@
+name: CI/CD Partoches Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint-and-test:
+    name: Lint & PHPUnit Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: dbPartoches
+        ports:
+          - 3306:3306
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, pdo_mysql, gd, zip, mbstring
+          coverage: none
+
+      - name: Verify PHP Syntax (Linter)
+        run: |
+          echo "=== Vérification de la syntaxe PHP ==="
+          find src -name "*.php" -exec php -l {} \; | grep -v "No syntax errors detected" || true
+
+      - name: Install Composer Dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Import Database Schema & Migrations
+        env:
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASS: root
+          DB_NAME: dbPartoches
+        run: |
+          mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < dbPartoches.sql
+          for migration in src/data/database/migrations/*.sql; do
+            if [ -f "$migration" ]; then
+              echo "Application de la migration : $migration"
+              mysql -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME < "$migration"
+            fi
+          done
+
+      - name: Run PHPUnit Tests Suite
+        env:
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_USER: root
+          DATABASE_PASSWORD: root
+          DATABASE_NAME: dbPartoches
+        run: vendor/bin/phpunit tests/
+
+  deploy:
+    name: Deploy to Production (Hostinger FTP)
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: FTP Deploy Action
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./src/public/
+          server-dir: ./
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/tests/**
+            **/cypress/**
+            **/node_modules/**
+            **/documentation/**
+            docker-compose.yml
+            Dockerfile
+            xdebug.ini
+            data/**
+            src/data/conf/params.ini

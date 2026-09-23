@@ -27,6 +27,10 @@
     - Résolution du crash `Fatal Error` sur `listeMedias.php` ([MediaRenderer.php](file:///f:/Arnaud/projets-dev/partoches/src/public/php/media/MediaRenderer.php)) via la mise en conformité de la méthode statique `Chanson::load()`.
     - Idempotence de la migration SQL `003_add_activation_token_to_utilisateur.sql` via `IF NOT EXISTS`.
     - Analyse automatique et validation par le script d'audit comparatif `scripts/run_audit_compare.php`.
+- **Mise en place de la CI/CD GitHub Actions** :
+    - Création du workflow [.github/workflows/ci-cd.yml](file:///f:/Arnaud/projets-dev/partoches/.github/workflows/ci-cd.yml) avec 2 jobs (`lint-and-test` et `deploy`).
+    - Exécution automatisée des linter PHP et tests PHPUnit avec un service MariaDB 10.11 dans GitHub Actions.
+    - Intégration du déploiement FTP automatique vers Hostinger via `SamKirkland/FTP-Deploy-Action@v4.3.5` avec règles d'exclusion.
 
 ---
 ### 📖 Résumé de la session (22 Septembre 2026)
