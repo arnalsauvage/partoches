@@ -244,7 +244,7 @@ class Document
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imageSongbook #1 : " . $_SESSION ['mysql']->error);
         
         $tableImages = array();
-        while ($ligne = $result->fetch_row()) {
+        while ($ligne = $result->fetch_assoc()) {
             array_push($tableImages, $ligne);
         }
         if (empty($tableImages)) {
@@ -252,7 +252,9 @@ class Document
         }
         $imageChoisie = rand(0, count($tableImages) - 1);
         $ligne = $tableImages [$imageChoisie];
-        return (self::composeNomVersion($ligne [1], $ligne [4]));
+        $nom = $ligne['nom'] ?? $ligne[1] ?? '';
+        $version = $ligne['version'] ?? $ligne[4] ?? 1;
+        return (self::composeNomVersion($nom, $version));
     }
 }
 

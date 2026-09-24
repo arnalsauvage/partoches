@@ -55,14 +55,13 @@
             <section class="col-sm-4 text-center">
                 <?php 
                     $monImage = Document::imageTableId("chanson", $id);
+                    if (empty($monImage) && !empty($chanson->getCover())) {
+                        $monImage = $chanson->getCover();
+                    }
                     if (!empty($monImage)):
-                        $urlOriginale = "../../data/chansons/$id/$monImage";
-                        $urlThumbnail = Image::getThumbnailUrl("$id/$monImage", 'sd');
+                        echo affichePochette($monImage, $id, 300, 300);
+                    endif;
                 ?>
-                    <div class="pochette-container" onclick="openLightbox('<?= $urlOriginale ?>')">
-                        <img src="<?= $urlThumbnail ?>" alt="pochette" class="img-thumbnail img-responsive center-block shadow-lg" style="max-width: 300px;">
-                    </div>
-                <?php endif; ?>
             </section>
         </div>
 

@@ -19,6 +19,9 @@ class ChansonRenderer
         if (!class_exists('ComposantsUI')) require_once dirname(__DIR__) . "/lib/ComposantsUI.php";
         
         $nomImage = Document::imageTableId("chanson", $id);
+        if (empty($nomImage) && !empty($chanson->getCover())) {
+            $nomImage = $chanson->getCover();
+        }
         $imagePochette = affichePochette($nomImage, $id, 200, 200);
         $titre = htmlspecialchars(limiteLongueur($chanson->getNom(), 25));
         $interpreteFull = $chanson->getInterprete();

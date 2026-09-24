@@ -5,7 +5,8 @@ images/
 logs/
 tmp/
 vignettes/
-vendor/
+/vendor/
+!src/public/vendor/
 composer-setup.php
 composer.phar
 Dockerfile

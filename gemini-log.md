@@ -1,6 +1,22 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (24 Septembre 2026)
+- **Hotfix Production : Eradication de l'Erreur 500 `Class "setasign\Fpdi\TcpdfFpdi" not found`** :
+    - **Identification Root Cause** : L'analyse des logs d'exécution sur le serveur de prod a révélé que la classe `setasign\Fpdi\TcpdfFpdi` provoquait une `Fatal Error` lors du chargement de `pdf.php` et `Songbook.php`. Deux causes conjointes :
+        1. `.gitignore` contenait la règle globale `vendor/`, empêchant Git d'inclure le sous-dossier `src/public/vendor/` et donc d'expédier TCPDF et FPDI vers Hostinger via le déploiement FTP.
+        2. `src/public/vendor/php/fpdi/autoload.php` avait un chemin codé en dur `/var/www/html/vendor/autoload.php` inexistant en prod.
+    - **Solution Structurelle & Correctifs** :
+        1. **`.gitignore`** : Ajustement de `vendor/` en `/vendor/` (racine) avec inclusion explicite `!src/public/vendor/`.
+        2. **Intégration Vendor** : Copie et versionnage des paquets TCPDF / FPDI / Composer dans `src/public/vendor/`.
+        3. **Portabilité Autoload** : Modification de `src/public/vendor/php/fpdi/autoload.php` et `src/public/php/lib/pdf.php` avec des détections dynamiques multi-chemins et vérification `if (!class_exists('setasign\Fpdi\TcpdfFpdi'))`.
+    - **Validation** : 150 / 150 tests PHPUnit (100% Succès), déploiement FTP automatisé.
+- **Résolution Défensive de l'Affichage des Pochettes (Fallback & Multi-sources)** :
+    - **Identification Root Cause** : `ChansonRenderer::renderCard()` et `chanson_voir_view.phtml` s'appuyaient uniquement sur `Document::imageTableId()`. Lorsque les images n'étaient pas répertoriées dans la table `document` (mais stockées dans la colonne `chanson.cover` ou présentes physiquement dans `data/chansons/`), le système retombait immédiatement sur la vignette vinyle par défaut (`vinyle.png`).
+    - **Solutions Appliquées** :
+        1. **`Document::imageTableId()`** : Migration de `fetch_row()` vers `fetch_assoc()` avec extraction sécurisée par noms de colonnes (`nom`, `version`).
+        2. **`affichePochette()`** : Prise en charge universelle des URL HTTP/HTTPS externes (Discogs, images en ligne), fallback automatique vers `$chanson->getCover()` si `Document::imageTableId()` renvoie vide, et vérification physique de l'image source sur disque avant affichage du vinyle par défaut.
+        3. **Renderers UI** : Alignement de `ChansonRenderer.php` et `chanson_voir_view.phtml` sur ce pipeline d'images résilient.
+    - **Validation** : 150 / 150 tests PHPUnit (100% Succès).
 - **Audit Comparatif Prod vs Local & Éradication des Décalages de Colonnes BDD (`fetch_assoc`)** :
     - **Audit & Nettoyage du Dossier Fantôme Hostinger** :
         1. Analyse du CSV d'audit prod (`audit-partoches-2026-09-24(1).csv`).

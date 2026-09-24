@@ -32,11 +32,37 @@ if (!isset($FichierHtml)) {
 
     function affichePochette($nomFichier, $id, $largeur = 48, $hauteur = 48)
     {
-        if (empty($nomFichier) || empty($id)) return fallbackPochette($largeur, $hauteur);
+        if (empty($nomFichier) && !empty($id)) {
+            if (class_exists('Chanson')) {
+                $ch = Chanson::load($id);
+                if ($ch && $ch->getCover()) {
+                    $nomFichier = $ch->getCover();
+                }
+            }
+        }
+
+        if (empty($nomFichier)) return fallbackPochette($largeur, $hauteur);
+
+        if (str_starts_with($nomFichier, 'http://') || str_starts_with($nomFichier, 'https://')) {
+            return "<img src=\"" . htmlspecialchars($nomFichier) . "\" width=\"$largeur\" height=\"$hauteur\" alt=\"couverture\" class=\"img-thumbnail\" loading=\"lazy\" style=\"object-fit: cover;\">";
+        }
+
+        if (str_contains($nomFichier, '/')) {
+            $nomFichier = basename($nomFichier);
+        }
+
         $tailleVignette = ($largeur > 100) ? 'sd' : 'mini';
         $relPath = $id . "/" . $nomFichier;
         $urlVignette = Image::getThumbnailUrl($relPath, $tailleVignette);
-        if (str_contains($urlVignette, 'icone_musique.png')) return fallbackPochette($largeur, $hauteur);
+
+        if (str_contains($urlVignette, 'icone_musique.png') || str_contains($urlVignette, 'vinyle.png')) {
+            $directUrl = "../../data/chansons/$id/$nomFichier";
+            $directPath = dirname(__DIR__, 2) . "/data/chansons/$id/$nomFichier";
+            if (file_exists($directPath)) {
+                return "<img src=\"$directUrl\" width=\"$largeur\" height=\"$hauteur\" alt=\"couverture\" class=\"img-thumbnail\" loading=\"lazy\" style=\"object-fit: cover;\">";
+            }
+            return fallbackPochette($largeur, $hauteur);
+        }
         return "<img src=\"$urlVignette\" width=\"$largeur\" height=\"$hauteur\" alt=\"couverture\" class=\"img-thumbnail\" loading=\"lazy\" style=\"object-fit: cover;\">";
     }
 

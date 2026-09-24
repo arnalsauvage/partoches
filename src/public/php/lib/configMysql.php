@@ -27,10 +27,10 @@ if (!isset($configMysql)) {
 
     // --- STRATÉGIE DE CONNEXION (Django Style) ---
     // 1. On cherche en priorité les variables d'environnement (Docker / PHPUnit Bootstrap)
-    $monserveur = $_ENV['DATABASE_HOST'] ?? $_SERVER['DATABASE_HOST'] ?? null;
-    $mabase = $_ENV['DATABASE_NAME'] ?? $_SERVER['DATABASE_NAME'] ?? null;
-    $LOGIN = $_ENV['DATABASE_USER'] ?? $_SERVER['DATABASE_USER'] ?? null;
-    $MOTDEPASSE = $_ENV['DATABASE_PASSWORD'] ?? $_SERVER['DATABASE_PASSWORD'] ?? null;
+    $monserveur = getenv('DATABASE_HOST') ?: ($_ENV['DATABASE_HOST'] ?? $_SERVER['DATABASE_HOST'] ?? null);
+    $mabase = getenv('DATABASE_NAME') ?: ($_ENV['DATABASE_NAME'] ?? $_SERVER['DATABASE_NAME'] ?? null);
+    $LOGIN = getenv('DATABASE_USER') ?: ($_ENV['DATABASE_USER'] ?? $_SERVER['DATABASE_USER'] ?? null);
+    $MOTDEPASSE = getenv('DATABASE_PASSWORD') ?: ($_ENV['DATABASE_PASSWORD'] ?? $_SERVER['DATABASE_PASSWORD'] ?? null);
 
     // 2. Si non trouvées, on se rabat sur les fichiers .ini
     if (!$monserveur) {
