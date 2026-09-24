@@ -57,7 +57,7 @@ if ($listeSongbooks) {
             while ($lien = $liensChansons->fetch_row()) {
                 $docInfo = chercheDocument($lien[1]); // [6] est l'idChanson
                 if (is_array($docInfo)) {
-                    $idChanson = $docInfo[6];
+                    $idChanson = (int)($docInfo['idTable'] ?? $docInfo[6] ?? 0);
                     if (isset($titresChansons[$idChanson])) {
                         $nomChanson = htmlspecialchars(limiteLongueur($titresChansons[$idChanson], 50));
                         $trackListHtml .= <<<HTML
