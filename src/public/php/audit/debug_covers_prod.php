@@ -6,47 +6,49 @@ header('Content-Type: text/plain; charset=utf-8');
 
 $db = $_SESSION['mysql'];
 
-echo "=== 1. CHECK CHANSON COVER COLUMN IN PROD DB ===\n";
-$res = $db->query("SELECT id, nom, cover FROM chanson WHERE cover IS NOT NULL AND cover != '' LIMIT 30");
+echo "=== 1. CHECK CHANSON COVER COLUMN & PHYSICAL FILE EXISTENCE ===\n";
+$res = $db->query("SELECT id, nom, cover FROM chanson WHERE cover IS NOT NULL AND cover != '' LIMIT 50");
 if ($res) {
     echo "Found " . $res->num_rows . " chansons with non-empty cover in DB:\n";
     while ($row = $res->fetch_assoc()) {
-        echo "ID {$row['id']} ('{$row['nom']}'): cover = '{$row['cover']}'\n";
-    }
-} else {
-    echo "Query error: " . $db->error . "\n";
-}
+        $id = $row['id'];
+        $cover = $row['cover'];
+        $nom = $row['nom'];
+        
+        $cleanName = basename($cover);
+        $directPath = PUBLIC_DATA_DIR . "/chansons/$id/$cleanName";
+        $exists = file_exists($directPath) ? "YES" : "NO";
+        
+        echo "ID $id ('$nom'): cover DB='$cover', cleanName='$cleanName'\n";
+        echo "   -> DirectPath: $directPath | Exists: $exists\n";
 
-echo "\n=== 2. CHECK DOCUMENT TABLE FOR IMAGES IN PROD DB ===\n";
-$res2 = $db->query("SELECT * FROM document WHERE (nom LIKE '%.jpg' OR nom LIKE '%.png' OR nom LIKE '%.webp' OR nom LIKE '%.jpeg') LIMIT 30");
-if ($res2) {
-    echo "Found " . $res2->num_rows . " image documents in document table:\n";
-    while ($row = $res2->fetch_assoc()) {
-        echo "Doc ID {$row['id']}: nom='{$row['nom']}', nomTable='{$row['nomTable']}', idTable='{$row['idTable']}', version='{$row['version']}'\n";
-    }
-} else {
-    echo "Query error: " . $db->error . "\n";
-}
-
-echo "\n=== 3. CHECK PHYSICAL FILES IN data/chansons/ ON PROD DISK ===\n";
-$baseData = PUBLIC_DATA_DIR . '/chansons';
-echo "PUBLIC_DATA_DIR chansons path: $baseData\n";
-if (is_dir($baseData)) {
-    $folders = glob($baseData . '/*', GLOB_ONLYDIR);
-    echo "Found " . count($folders) . " song folders in data/chansons/\n";
-    $imgCount = 0;
-    foreach (array_slice($folders, 0, 30) as $folder) {
-        $id = basename($folder);
-        $files = glob($folder . '/*.{jpg,jpeg,png,webp,JPG,PNG}', GLOB_BRACE);
-        if (!empty($files)) {
-            echo "Folder $id has images:\n";
-            foreach ($files as $f) {
-                echo "   - " . basename($f) . " (" . filesize($f) . " bytes)\n";
-                $imgCount++;
-            }
+        // Check folder contents
+        $folder = PUBLIC_DATA_DIR . "/chansons/$id";
+        if (is_dir($folder)) {
+            $files = glob($folder . '/*');
+            $fileNames = array_map('basename', $files ?: []);
+            echo "   -> Actual files in folder $id: " . implode(', ', $fileNames) . "\n";
+        } else {
+            echo "   -> Folder $folder DOES NOT EXIST!\n";
         }
     }
-    echo "Sample checked. Total image files found in first 30 folders: $imgCount\n";
 } else {
-    echo "Directory data/chansons does not exist or is not readable!\n";
+    echo "Query error: " . $db->error . "\n";
 }
+
+echo "\n=== 2. CHECK DOCUMENT TABLE IMAGES ===\n";
+$res2 = $db->query("SELECT id, nom, nomTable, idTable, version FROM document WHERE nomTable='chanson' AND (nom LIKE '%.jpg' OR nom LIKE '%.png' OR nom LIKE '%.webp' OR nom LIKE '%.jpeg') LIMIT 15");
+if ($res2) {
+    while ($row = $res2->fetch_assoc()) {
+        $idSong = $row['idTable'];
+        $nomDoc = $row['nom'];
+        $verDoc = $row['version'];
+        
+        $folder = PUBLIC_DATA_DIR . "/chansons/$idSong";
+        $files = is_dir($folder) ? glob($folder . '/*') : [];
+        $fileNames = array_map('basename', $files ?: []);
+        echo "Doc ID {$row['id']} (chanson $idSong): nom='$nomDoc', version='$verDoc'\n";
+        echo "   -> Files in folder $idSong: " . implode(', ', $fileNames) . "\n";
+    }
+}
+
