@@ -6,35 +6,19 @@ header('Content-Type: text/plain; charset=utf-8');
 
 $db = $_SESSION['mysql'];
 
-echo "=== 1. CHECK CHANSON COVER COLUMN & PHYSICAL FILE EXISTENCE ===\n";
-$res = $db->query("SELECT id, nom, cover FROM chanson WHERE cover IS NOT NULL AND cover != '' LIMIT 50");
-if ($res) {
-    echo "Found " . $res->num_rows . " chansons with non-empty cover in DB:\n";
-    while ($row = $res->fetch_assoc()) {
-        $id = $row['id'];
-        $cover = $row['cover'];
-        $nom = $row['nom'];
-        
-        $cleanName = basename($cover);
-        $directPath = PUBLIC_DATA_DIR . "/chansons/$id/$cleanName";
-        $exists = file_exists($directPath) ? "YES" : "NO";
-        
-        echo "ID $id ('$nom'): cover DB='$cover', cleanName='$cleanName'\n";
-        echo "   -> DirectPath: $directPath | Exists: $exists\n";
-
-        // Check folder contents
-        $folder = PUBLIC_DATA_DIR . "/chansons/$id";
-        if (is_dir($folder)) {
-            $files = glob($folder . '/*');
-            $fileNames = array_map('basename', $files ?: []);
-            echo "   -> Actual files in folder $id: " . implode(', ', $fileNames) . "\n";
-        } else {
-            echo "   -> Folder $folder DOES NOT EXIST!\n";
-        }
+echo "=== 1. CHECK GIT-TRACKED SONG FOLDERS ON PROD DISK ===\n";
+$sampleIds = [77, 78, 80, 100, 104, 765, 768, 772];
+foreach ($sampleIds as $id) {
+    $folder = PUBLIC_DATA_DIR . "/chansons/$id";
+    if (is_dir($folder)) {
+        $files = glob($folder . '/*');
+        $fileNames = array_map('basename', $files ?: []);
+        echo "Folder $id EXISTS. Files (" . count($fileNames) . "): " . implode(', ', array_slice($fileNames, 0, 10)) . "\n";
+    } else {
+        echo "Folder $id DOES NOT EXIST!\n";
     }
-} else {
-    echo "Query error: " . $db->error . "\n";
 }
+
 
 echo "\n=== 2. CHECK DISK DIRECTORY STRUCTURE ON PROD ===\n";
 echo "PUBLIC_DIR: " . PUBLIC_DIR . "\n";
