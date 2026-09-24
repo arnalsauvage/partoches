@@ -7,16 +7,6 @@
 // On s'assure d'avoir nos constantes de chemins absolus
 require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 
-if (!class_exists('setasign\Fpdi\TcpdfFpdi')) {
-    if (file_exists(VENDOR_DIR . '/autoload.php')) {
-        require_once VENDOR_DIR . '/autoload.php';
-    } elseif (file_exists(VENDOR_DIR . '/php/fpdi/autoload.php')) {
-        require_once VENDOR_DIR . '/php/fpdi/autoload.php';
-    } elseif (file_exists(ROOT_DIR . '/../vendor/autoload.php')) {
-        require_once ROOT_DIR . '/../vendor/autoload.php';
-    }
-}
-
 if (!class_exists('TCPDF')) {
     if (file_exists(VENDOR_DIR . '/tecnickcom/tcpdf/tcpdf.php')) {
         require_once VENDOR_DIR . '/tecnickcom/tcpdf/tcpdf.php';
@@ -24,6 +14,16 @@ if (!class_exists('TCPDF')) {
         require_once VENDOR_DIR . '/php/tcpdf/tcpdf.php';
     } elseif (file_exists(ROOT_DIR . '/../vendor/tecnickcom/tcpdf/tcpdf.php')) {
         require_once ROOT_DIR . '/../vendor/tecnickcom/tcpdf/tcpdf.php';
+    }
+}
+
+if (!class_exists('setasign\Fpdi\TcpdfFpdi')) {
+    if (file_exists(VENDOR_DIR . '/autoload.php')) {
+        require_once VENDOR_DIR . '/autoload.php';
+    } elseif (file_exists(VENDOR_DIR . '/php/fpdi/autoload.php')) {
+        require_once VENDOR_DIR . '/php/fpdi/autoload.php';
+    } elseif (file_exists(ROOT_DIR . '/../vendor/autoload.php')) {
+        require_once ROOT_DIR . '/../vendor/autoload.php';
     }
 }
 
