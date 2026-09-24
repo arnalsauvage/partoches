@@ -42,10 +42,8 @@ if (!isset($FichierHtml)) {
 
     function fallbackPochette($largeur, $hauteur)
     {
-        $fontSize = floor($largeur / 2);
-        return "<div class=\"text-center img-thumbnail\" style=\"width:{$largeur}px; height:{$hauteur}px; display:flex; align-items:center; justify-content:center; background:#f9f9f9; border:1px solid #ddd;\">
-                    <span class=\"glyphicon glyphicon-cd\" style=\"font-size:{$fontSize}px; color:#ccc;\" title=\"Pochette absente\"></span>
-                </div>";
+        $urlFallback = "../../images/icones/vinyle.png";
+        return "<img src=\"$urlFallback\" width=\"$largeur\" height=\"$hauteur\" alt=\"Pochette vinyle par défaut\" class=\"img-thumbnail\" loading=\"lazy\" style=\"object-fit: cover;\">";
     }
 
     function champSelect($liste, $numero, $nom)

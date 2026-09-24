@@ -2,18 +2,12 @@ services:
   web:
     build: .
     container_name: site-partoches
-    stop_signal: SIGTERM
-    restart: always
-    tty: true
+    restart: unless-stopped
     ports:
       - "127.0.0.1:8080:80"
-
     user: "33:33"
     volumes:
       - .:/var/www/html
-      - ./xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-#     - data_volume:/var/www/html/data  # Volume Docker pour les données
-#      - ./data:/var/www/html/data             # dossier data partagé dans le conteneur
     depends_on:
       - db
     environment:
@@ -21,11 +15,13 @@ services:
       DATABASE_USER: root
       DATABASE_PASSWORD: root
       DATABASE_NAME: dbPartoches
+    networks:
+      - partoches-net
 
   db:
     image: mariadb:latest
     container_name: my-mariadb
-    restart: always
+    restart: unless-stopped
     ports:
       - "127.0.0.1:3307:3306"
     environment:
@@ -34,11 +30,13 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./dbPartoches.sql:/docker-entrypoint-initdb.d/dbPartoches.sql
+    networks:
+      - partoches-net
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: site-phpmyadmin
-    restart: always
+    restart: unless-stopped
     ports:
       - "127.0.0.1:8081:80"
     environment:
@@ -47,6 +45,12 @@ services:
       PMA_PASSWORD: root
     depends_on:
       - db
+    networks:
+      - partoches-net
+
+networks:
+  partoches-net:
+    driver: bridge
 
 volumes:
   db_data:

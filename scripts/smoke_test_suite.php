@@ -60,8 +60,18 @@ echo "-----------------------------------------------------\n";
 echo " 🔒 VERIFICATION RESTRICTIONS AUDIO (TICKET #10)\n";
 echo "-----------------------------------------------------\n";
 
+function getUrlContent($url) {
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    $res = curl_exec($ch);
+    curl_close($ch);
+    return $res ?: '';
+}
+
 // 1. Médias audio
-$htmlMedias = file_get_contents($baseUrl . '/php/media/listeMedias.php?filtres=audio');
+$htmlMedias = getUrlContent($baseUrl . '/php/media/listeMedias.php?filtres=audio');
 if (str_contains($htmlMedias, 'Connexion requise')) {
     echo " [ OK ] Médias Audio : Badge 'Connexion requise' présent pour les invités.\n";
     $passed++;
@@ -71,7 +81,7 @@ if (str_contains($htmlMedias, 'Connexion requise')) {
 }
 
 // 2. Galerie liens audio
-$htmlLiens = file_get_contents($baseUrl . '/php/liens/lienurl_liste.php');
+$htmlLiens = getUrlContent($baseUrl . '/php/liens/lienurl_liste.php');
 if (str_contains($htmlLiens, 'Connexion requise')) {
     echo " [ OK ] Galerie Liens : Badge 'Connexion requise' présent pour les audios.\n";
     $passed++;
@@ -98,7 +108,65 @@ if ($docCode === 302 || str_contains($redirectUrl, 'login.php')) {
 }
 
 echo "-----------------------------------------------------\n";
-echo " Bilan : $passed / " . (count($routes) + 3) . " tests valides (" . ($failed === 0 ? "100% SUCCÈS" : "$failed ÉCHECS") . ")\n";
+echo " 🖼️ VERIFICATION IMAGES ET FORMULAIRE CHANSON\n";
+echo "-----------------------------------------------------\n";
+
+// 1. Images Médias
+if (preg_match('/<img[^>]+src=["\'][^"\']+["\']/i', $htmlMedias)) {
+    echo " [ OK ] Page Médias : Les vignettes images des médias sont bien affichées.\n";
+    $passed++;
+} else {
+    echo " [ ERREUR ] Page Médias : Aucune balise <img src='...'> trouvée.\n";
+    $failed++;
+}
+
+// 2. Images Pochettes Chansons
+$htmlChansons = getUrlContent($baseUrl . '/php/chanson/chanson_liste.php?razFiltres=1');
+if (preg_match('/<img[^>]+src=["\'][^"\']+["\']/i', $htmlChansons)) {
+    echo " [ OK ] Page Chansons : Les pochettes d'images des chansons sont bien affichées.\n";
+    $passed++;
+} else {
+    echo " [ ERREUR ] Page Chansons : Aucune balise <img src='...'> de pochette trouvée.\n";
+    $failed++;
+}
+
+// 3. Formulaire d'édition de chanson (chanson_form.php?id=23) avec session Admin
+$cookieFile = sys_get_temp_dir() . '/smoke_cookie.txt';
+$chLogin = curl_init($baseUrl . '/php/navigation/login.php');
+curl_setopt($chLogin, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($chLogin, CURLOPT_POST, true);
+curl_setopt($chLogin, CURLOPT_POSTFIELDS, http_build_query([
+    'user' => 'admin',
+    'pass' => 'kazoo'
+]));
+curl_setopt($chLogin, CURLOPT_COOKIEJAR, $cookieFile);
+curl_setopt($chLogin, CURLOPT_COOKIEFILE, $cookieFile);
+curl_exec($chLogin);
+curl_close($chLogin);
+
+$chForm = curl_init($baseUrl . '/php/chanson/chanson_form.php?id=23');
+curl_setopt($chForm, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($chForm, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($chForm, CURLOPT_COOKIEJAR, $cookieFile);
+curl_setopt($chForm, CURLOPT_COOKIEFILE, $cookieFile);
+$htmlForm = curl_exec($chForm);
+curl_close($chForm);
+
+$formErrors = (str_contains($htmlForm, 'Fatal error') || str_contains($htmlForm, 'Warning: require_once'));
+$hasFields = (str_contains($htmlForm, 'fnom') && str_contains($htmlForm, 'finterprete'));
+$hasImage = preg_match('/<img/i', $htmlForm);
+$hasMediaStrums = (preg_match('/médias|documents|fichiers/i', $htmlForm) || preg_match('/strum|rythmique/i', $htmlForm));
+
+if (!$formErrors && $hasFields && $hasImage) {
+    echo " [ OK ] Formulaire Chanson Admin : Chargé correctement sans erreur (champs, pochette, médias/strums OK).\n";
+    $passed++;
+} else {
+    echo " [ ERREUR ] Formulaire Chanson Admin : Erreur de chargement ou champs manquants.\n";
+    $failed++;
+}
+
+echo "-----------------------------------------------------\n";
+echo " Bilan : $passed / " . (count($routes) + 6) . " tests valides (" . ($failed === 0 ? "100% SUCCÈS" : "$failed ÉCHECS") . ")\n";
 echo "=====================================================\n";
 
 exit($failed > 0 ? 1 : 0);
