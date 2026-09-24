@@ -36,19 +36,37 @@ if ($res) {
     echo "Query error: " . $db->error . "\n";
 }
 
-echo "\n=== 2. CHECK DOCUMENT TABLE IMAGES ===\n";
-$res2 = $db->query("SELECT id, nom, nomTable, idTable, version FROM document WHERE nomTable='chanson' AND (nom LIKE '%.jpg' OR nom LIKE '%.png' OR nom LIKE '%.webp' OR nom LIKE '%.jpeg') LIMIT 15");
-if ($res2) {
-    while ($row = $res2->fetch_assoc()) {
-        $idSong = $row['idTable'];
-        $nomDoc = $row['nom'];
-        $verDoc = $row['version'];
-        
-        $folder = PUBLIC_DATA_DIR . "/chansons/$idSong";
-        $files = is_dir($folder) ? glob($folder . '/*') : [];
-        $fileNames = array_map('basename', $files ?: []);
-        echo "Doc ID {$row['id']} (chanson $idSong): nom='$nomDoc', version='$verDoc'\n";
-        echo "   -> Files in folder $idSong: " . implode(', ', $fileNames) . "\n";
+echo "\n=== 2. CHECK DISK DIRECTORY STRUCTURE ON PROD ===\n";
+echo "PUBLIC_DIR: " . PUBLIC_DIR . "\n";
+echo "ROOT_DIR: " . ROOT_DIR . "\n";
+echo "DATA_DIR: " . DATA_DIR . "\n";
+echo "PUBLIC_DATA_DIR: " . PUBLIC_DATA_DIR . "\n";
+
+$publicItems = glob(PUBLIC_DIR . '/*');
+echo "Items in PUBLIC_DIR (" . count($publicItems) . " items):\n";
+foreach (array_slice($publicItems, 0, 40) as $item) {
+    $type = is_dir($item) ? "[DIR]" : "[FILE]";
+    echo "   $type " . basename($item) . "\n";
+}
+
+if (is_dir(PUBLIC_DIR . '/data')) {
+    echo "\nItems in PUBLIC_DIR/data:\n";
+    $dataItems = glob(PUBLIC_DIR . '/data/*');
+    foreach ($dataItems as $item) {
+        $type = is_dir($item) ? "[DIR]" : "[FILE]";
+        echo "   $type " . basename($item) . "\n";
+    }
+} else {
+    echo "\nPUBLIC_DIR/data IS NOT A DIRECTORY!\n";
+}
+
+if (is_dir(dirname(PUBLIC_DIR) . '/data')) {
+    echo "\nItems in parent data dir (" . dirname(PUBLIC_DIR) . "/data):\n";
+    $parentDataItems = glob(dirname(PUBLIC_DIR) . '/data/*');
+    foreach ($parentDataItems as $item) {
+        $type = is_dir($item) ? "[DIR]" : "[FILE]";
+        echo "   $type " . basename($item) . "\n";
     }
 }
+
 
