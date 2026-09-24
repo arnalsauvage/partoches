@@ -100,7 +100,7 @@ class Songbook
     {
         $maRequete = sprintf("SELECT * FROM songbook WHERE id = '%s'", $id);
         $result = $_SESSION[self::MYSQL]->query($maRequete);
-        if ($ligne = $result->fetch_row()) {
+        if ($ligne = $result->fetch_assoc()) {
             $this->mysqlRowVersObjet($ligne);
             return true;
         }
@@ -112,14 +112,25 @@ class Songbook
      */
     public function mysqlRowVersObjet(array $ligne): void
     {
-        $this->_id = (int)$ligne[0];
-        $this->_nom = $ligne[1];
-        $this->_description = $ligne[2];
-        $this->_date = $ligne[3];
-        $this->_image = $ligne[4] ?? "";
-        $this->_hits = (int)$ligne[5];
-        $this->_idUser = (int)$ligne[6];
-        $this->_type = (int)($ligne[7] ?? 1);
+        if (isset($ligne['id'])) {
+            $this->_id = (int)$ligne['id'];
+            $this->_nom = (string)($ligne['nom'] ?? '');
+            $this->_description = (string)($ligne['description'] ?? '');
+            $this->_date = (string)($ligne['date'] ?? '');
+            $this->_image = (string)($ligne['image'] ?? '');
+            $this->_hits = (int)($ligne['hits'] ?? 0);
+            $this->_idUser = (int)($ligne['idUser'] ?? 1);
+            $this->_type = (int)($ligne['type'] ?? 1);
+        } else {
+            $this->_id = (int)($ligne[0] ?? 0);
+            $this->_nom = (string)($ligne[1] ?? '');
+            $this->_description = (string)($ligne[2] ?? '');
+            $this->_date = (string)($ligne[3] ?? '');
+            $this->_image = (string)($ligne[4] ?? '');
+            $this->_hits = (int)($ligne[5] ?? 0);
+            $this->_idUser = (int)($ligne[6] ?? 1);
+            $this->_type = (int)($ligne[7] ?? 1);
+        }
     }
 
     /**

@@ -26,6 +26,7 @@ class ChansonRenderer
         $annee = $chanson->getAnnee();
         $tempo = $chanson->getTempo();
         $tonalite = $chanson->getTonalite();
+        $tonaliteOrig = $chanson->getTonaliteOriginale();
 
         // Construction des liens de filtrage (pointent vers la liste des chansons)
         $urlBase = "../chanson/chanson_liste.php";
@@ -39,7 +40,15 @@ class ChansonRenderer
                         <a href='$urlInterprete' title='Filtrer par cet interprète' class='text-muted' style='text-decoration: none;'>$interpreteAffiche</a>
                       </p>";
 
-        // Badges (Année, Tempo, Tona)
+        $badgeTonaOrig = "";
+        if (!empty($tonaliteOrig)) {
+            $urlTonaOrig = "$urlBase?filtre=tonalite_originale&amp;valFiltre=" . urlencode($tonaliteOrig);
+            $badgeTonaOrig = "<a href='$urlTonaOrig' title='Filtrer par la tonalité originale ($tonaliteOrig)' style='text-decoration: none;'>
+                <span class='label label-default' style='background-color: #6c757d; color: #fff;'>Orig. $tonaliteOrig</span>
+            </a>";
+        }
+
+        // Badges (Année, Tempo, Tona, Tona Orig)
         $badges = "
             <a href='$urlAnnee' title='Filtrer par cette année' style='text-decoration: none;'>
                 <span class='label label-default' style='background-color: var(--c-marron-clair); color: var(--c-marron-fonce);'>$annee</span>
@@ -49,7 +58,8 @@ class ChansonRenderer
             </a>
             <a href='$urlTonalite' title='Filtrer par cette tonalité' style='text-decoration: none;'>
                 <span class='label' style='background-color: var(--c-accent);'>$tonalite</span>
-            </a>";
+            </a>
+            $badgeTonaOrig";
 
         // Actions (Voir, Editer)
         $actions = "

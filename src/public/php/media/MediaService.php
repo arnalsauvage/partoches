@@ -124,17 +124,18 @@ class MediaService
         if (!$document || !is_array($document)) {
             return;
         }
-        $idChanson = (int)$document[6];
+        $idChanson = (int)($document['idTable'] ?? $document[6] ?? 0);
         $chanson = Chanson::load($idChanson);
         
-        $extension = strtolower(pathinfo($document[1], PATHINFO_EXTENSION));
+        $nomDoc = $document['nom'] ?? $document[1] ?? '';
+        $extension = strtolower(pathinfo($nomDoc, PATHINFO_EXTENSION));
         $typeDoc = $typeForce ?? ($extension === 'pdf' ? 'partoche' : 'audio');
 
         $media->setTitre($chanson->getNom());
         $descPrefix = ($typeDoc === 'partoche') ? "Partoche" : "Audio";
         $media->setDescription("$descPrefix pour la chanson de " . $chanson->getInterprete() . " - " . $chanson->getAnnee());
-        $media->setAuteur((int)$document[7]);
-        $media->setDatePub($document[3]);
+        $media->setAuteur((int)($document['idUser'] ?? $document[7] ?? 1));
+        $media->setDatePub($document['date'] ?? $document[3] ?? date('Y-m-d'));
         $media->setType($typeDoc);
         $media->setTags("$typeDoc " . $chanson->getAnnee());
         $media->setImage("./data/chansons/$idChanson/" . rawurlencode(Document::imageTableId('chanson', $idChanson)));

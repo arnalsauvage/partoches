@@ -60,7 +60,7 @@ class Chanson
         $db = $_SESSION[self::MYSQL];
         $sql = sprintf("SELECT * FROM chanson WHERE id = %d", $id);
         $res = $db->query($sql);
-        if ($res && ($row = $res->fetch_row())) {
+        if ($res && ($row = $res->fetch_assoc())) {
             $this->mysqlRowVersObjet($row);
             return true;
         }
@@ -69,20 +69,37 @@ class Chanson
 
     private function mysqlRowVersObjet(array $row)
     {
-        $this->_id = (int)$row[0];
-        $this->_nom = (string)$row[1];
-        $this->_interprete = (string)$row[2];
-        $this->_annee = (int)$row[3];
-        $this->_tempo = (int)$row[4];
-        $this->_mesure = (string)$row[5];
-        $this->_pulsation = (string)$row[6];
-        $this->_datePub = (string)$row[7];
-        $this->_idUser = (int)$row[8];
-        $this->_hits = (int)$row[9];
-        $this->_tonalite = (string)$row[10];
-        $this->_tonaliteOriginale = $row[11] ?? null;
-        $this->_cover = $row[12] ?? null;
-        $this->_publication = (int)($row[13] ?? 1);
+        if (isset($row['id'])) {
+            $this->_id = (int)$row['id'];
+            $this->_nom = (string)($row['nom'] ?? '');
+            $this->_interprete = (string)($row['interprete'] ?? '');
+            $this->_annee = (int)($row['annee'] ?? 1975);
+            $this->_tempo = (int)($row['tempo'] ?? 120);
+            $this->_mesure = (string)($row['mesure'] ?? '4/4');
+            $this->_pulsation = (string)($row['pulsation'] ?? 'binaire');
+            $this->_datePub = (string)($row['datePub'] ?? '');
+            $this->_idUser = (int)($row['idUser'] ?? 1);
+            $this->_hits = (int)($row['hits'] ?? 0);
+            $this->_tonalite = (string)($row['tonalite'] ?? 'C');
+            $this->_tonaliteOriginale = $row['tonalite_originale'] ?? null;
+            $this->_cover = $row['cover'] ?? null;
+            $this->_publication = (int)($row['publication'] ?? 1);
+        } else {
+            $this->_id = (int)($row[0] ?? 0);
+            $this->_nom = (string)($row[1] ?? '');
+            $this->_interprete = (string)($row[2] ?? '');
+            $this->_annee = (int)($row[3] ?? 1975);
+            $this->_tempo = (int)($row[4] ?? 120);
+            $this->_mesure = (string)($row[5] ?? '4/4');
+            $this->_pulsation = (string)($row[6] ?? 'binaire');
+            $this->_datePub = (string)($row[7] ?? '');
+            $this->_idUser = (int)($row[8] ?? 1);
+            $this->_hits = (int)($row[9] ?? 0);
+            $this->_tonalite = (string)($row[10] ?? 'C');
+            $this->_tonaliteOriginale = $row[11] ?? null;
+            $this->_cover = $row[12] ?? null;
+            $this->_publication = (int)($row[13] ?? 1);
+        }
     }
 
     public function save(): int
@@ -184,7 +201,7 @@ class Chanson
     public function chercheChansonParLeNom($nom) { 
         $db = $_SESSION[self::MYSQL];
         $res = $db->query(sprintf("SELECT * FROM chanson WHERE nom = '%s'", $db->real_escape_string($nom)));
-        if ($res && ($row = $res->fetch_row())) { $this->mysqlRowVersObjet($row); return 1; }
+        if ($res && ($row = $res->fetch_assoc())) { $this->mysqlRowVersObjet($row); return 1; }
         return 0;
     }
 

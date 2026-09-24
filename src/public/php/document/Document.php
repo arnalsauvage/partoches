@@ -35,10 +35,14 @@ class Document
     {
         $maRequete = "SELECT * FROM document WHERE document.id = '$id'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #2 : " . $_SESSION ['mysql']->error);
-        if ($ligne = $result->fetch_row()) {
-            return ($ligne);
+        $ligne = null;
+        if (is_object($result) && method_exists($result, 'fetch_assoc')) {
+            $ligne = $result->fetch_assoc();
         }
-        return (0);
+        if (!$ligne && is_object($result) && method_exists($result, 'fetch_row')) {
+            $ligne = $result->fetch_row();
+        }
+        return $ligne ?: 0;
     }
 
     /**
@@ -48,10 +52,14 @@ class Document
     {
         $maRequete = "SELECT * FROM document WHERE document.nom = '$nom' AND document.idTable = '$id' AND document.nomTable = '$table'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #3 : " . $_SESSION ['mysql']->error);
-        if ($ligne = $result->fetch_row()) {
-            return ($ligne);
+        $ligne = null;
+        if (is_object($result) && method_exists($result, 'fetch_assoc')) {
+            $ligne = $result->fetch_assoc();
         }
-        return (0);
+        if (!$ligne && is_object($result) && method_exists($result, 'fetch_row')) {
+            $ligne = $result->fetch_row();
+        }
+        return $ligne ?: 0;
     }
 
     /**
@@ -208,9 +216,13 @@ class Document
     public static function lienUrlAffichageDocument($idDoc)
     {
         $ligne = self::chercheDocument($idDoc);
-        if ($ligne != 0) {
+        if ($ligne && is_array($ligne)) {
+            $nomTable = $ligne['nomTable'] ?? $ligne[5] ?? '';
+            $idTable = $ligne['idTable'] ?? $ligne[6] ?? 0;
+            $nom = $ligne['nom'] ?? $ligne[1] ?? '';
+            $version = $ligne['version'] ?? $ligne[4] ?? 1;
             // On utilise un chemin relatif web plutôt que DOSSIER_DATA (qui est physique)
-            return "../../data/" . $ligne [5] . "s/" . $ligne [6] . "/" . self::composeNomVersion($ligne [1], $ligne [4]);
+            return "../../data/" . $nomTable . "s/" . $idTable . "/" . self::composeNomVersion($nom, $version);
         }
         return "";
     }
@@ -218,8 +230,9 @@ class Document
     public static function lienUrlTelechargeDocument($idDoc)
     {
         $ligne = self::chercheDocument($idDoc);
-        if ($ligne != 0) {
-            return "getdoc.php?doc=" . $ligne [0];
+        if ($ligne && is_array($ligne)) {
+            $id = $ligne['id'] ?? $ligne[0] ?? 0;
+            return "getdoc.php?doc=" . $id;
         }
         return "";
     }

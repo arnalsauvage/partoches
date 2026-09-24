@@ -1,6 +1,16 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (24 Septembre 2026)
+- **Audit Comparatif Prod vs Local & Éradication des Décalages de Colonnes BDD (`fetch_assoc`)** :
+    - **Audit & Nettoyage du Dossier Fantôme Hostinger** :
+        1. Analyse du CSV d'audit prod (`audit-partoches-2026-09-24(1).csv`).
+        2. Suppression du sous-dossier fantôme `/public_html/public/` sur Hostinger, ramenant le nombre de fichiers de prod de 477 à 274 (assainissement à 83% d'identité exacte).
+    - **Résolution du Bug de Décalage des Colonnes SQL (Pochettes & Tonalité originale)** :
+        1. **Root Cause** : `Chanson::loadInstance()`, `Songbook::chercheSongbook()`, `Document::chercheDocument()` et `documents_voir.php` lisaient les lignes MySQL avec `fetch_row()` (indices numériques `$row[11]`, `$row[12]`). Comme l'ordre des colonnes MariaDB différait entre Dev et Prod, `tonalite_originale` recevait l'URL de l'image et `cover` recevait `NULL`.
+        2. **Correctif Défensif** : Bascule vers `fetch_assoc()` et l'extraction par noms de colonnes (`$row['cover']`, `$row['tonalite_originale']`, `$row['nom']`, etc.) dans `Chanson.php`, `Songbook.php`, `Document.php`, `MediaService.php`, `documents_voir.php`.
+        3. **Enrichissement UX** : Intégration du badge `Orig. <Tonalité>` sur les cartes de chansons dans `ChansonRenderer.php`.
+        4. **Migration SQL 005** : Création du script [src/public/data/database/migrations/005_delete_test_chansons_above_764.sql](file:///f:/Arnaud/projets-dev/partoches/src/public/data/database/migrations/005_delete_test_chansons_above_764.sql) pour nettoyer les entrées de test.
+    - **Validation** : 150 / 150 tests PHPUnit (100% Succès), 27/28 Smoke Tests HTTP validés.
 - **Résolution du crash Production sur `chanson_form.php` (Fatal error `pdf.php` Line 8)** :
     - **Identification Root Cause** : Dans `src/public/php/lib/pdf.php`, l'instruction `require_once __DIR__ . '/../../../autoload.php'` remontait 3 niveaux au-dessus du dossier `public_html/` d'Hostinger, pointant vers un fichier inexistant en prod.
     - **Solution** : Remplacement par l'analyse multi-chemins dynamique `file_exists(dirname(__DIR__, 3) . '/autoload.php') ? ... : ...`. Idem dans `chanson_form_classic.php`.

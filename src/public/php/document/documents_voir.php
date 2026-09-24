@@ -103,15 +103,20 @@ $sortie .= <<<HTML
 HTML;
 
 $numligne = 0;
-while ($ligneDoc = $lignes->fetch_row()) {
+while ($ligneDoc = $lignes->fetch_assoc()) {
     $numligne++;
     if (($numligne < $pagination->getItemDebut()) || $numligne > $pagination->getItemFin()) {
         continue;
     }
 
-    $fichierCourt = composeNomVersion($ligneDoc[1], $ligneDoc[4]);
-    $urlFichier = C_RACINE . $_DOSSIER_CHANSONS . $ligneDoc[6] . "/" . urlencode($fichierCourt);
-    $extension = substr(strrchr($ligneDoc[1], '.'), 1);
+    $docNom = $ligneDoc['nom'] ?? $ligneDoc[1] ?? '';
+    $docVersion = $ligneDoc['version'] ?? $ligneDoc[4] ?? 1;
+    $docIdTable = $ligneDoc['idTable'] ?? $ligneDoc[6] ?? 0;
+    $docIdUser = $ligneDoc['idUser'] ?? $ligneDoc[7] ?? 0;
+
+    $fichierCourt = composeNomVersion($docNom, $docVersion);
+    $urlFichier = C_RACINE . $_DOSSIER_CHANSONS . $docIdTable . "/" . urlencode($fichierCourt);
+    $extension = substr(strrchr($docNom, '.'), 1);
 
     if ($contenuFiltrer) {
         if (($contenuFiltrer == "son") && ($extension != "mp3")) continue;
@@ -125,7 +130,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
     }
     $icone = image($iconePath, 32, 32, "icone");
 
-    $idUserDoc = $ligneDoc[7] ?? 0;
+    $idUserDoc = $docIdUser;
     $userPseudo = htmlspecialchars($tabUsers[$idUserDoc][1] ?? 'Inconnu', ENT_QUOTES);
     $userImage = $tabUsers[$idUserDoc][5] ?? 'defaut.png';
     $userNom = htmlspecialchars($tabUsers[$idUserDoc][0] ?? 'Inconnu', ENT_QUOTES);
@@ -134,7 +139,7 @@ while ($ligneDoc = $lignes->fetch_row()) {
     $avatarUrl = Image::getThumbnailUrl($idUserDoc . "/" . $userImage, 'mini', 'utilisateurs');
     $vignettePublicateur = "<img src='$avatarUrl' width='48' height='48' class='img-circle' style='object-fit:cover;' alt='$userNom' title='$userPseudo'>";
     
-    $idChansonDoc = $ligneDoc[6] ?? 0;
+    $idChansonDoc = $docIdTable;
     $vignetteChanson = "";
     if ($idChansonDoc > 0) {
         $vignetteChanson = image(C_RACINE . $_DOSSIER_CHANSONS . $idChansonDoc . "/" . rawurlencode(Document::imageTableId(CHANSON, $idChansonDoc)), 128, 128, CHANSON);
