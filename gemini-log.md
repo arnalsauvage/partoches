@@ -1,14 +1,10 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (24 Septembre 2026)
-- **Résolution Défensive et Restauration de la Synchronisation FTP des Pochettes Chansons (`src/public/data/`)** :
-    - **Identification Root Cause** :
-        1. Dans `.github/workflows/ci-cd.yml`, l'instruction d'exclusion `data/**` empêchait l'action FTP `FTP-Deploy-Action` d'expédier le dossier `src/public/data/` (qui héberge les 123+ visuels de pochettes et 250+ partitions PDF versionnées). Les sous-dossiers `data/chansons/$id/` n'existaient donc pas sur Hostinger, forçant le fallback direct vers l'image vinyle générique `vinyle.png`.
-        2. Des divergences mineures de nommage entre la colonne BDD `cover` et le fichier image physique sur disque empêchaient parfois l'affichage.
-    - **Correctifs Appliqués** :
-        1. **CI/CD (`.github/workflows/ci-cd.yml`)** : Affinement de la clause `exclude` pour n'ignorer que les données de session/logs/temp (`data/logs/**`, `data/temp/**`, `data/backups/**`, `src/data/conf/params.ini`). Le dossier `src/public/data/` est à présent transféré et maintenu à jour automatiquement sur Hostinger.
-        2. **Logique d'Images (`Image::getThumbnailUrl()`)** : Intégration d'un algorithme de recherche de secours dans le répertoire de la chanson (`data/chansons/$id/`) si le nom exact spécifié en BDD est absurde ou obsolète.
-    - **Validation** : 150 / 150 tests PHPUnit (100% Succès).
+- **Clarification PO & Isolation Stricte du dossier `/data/` par Environnement** :
+    - **Directive PO** : Le dossier `data/` est strictement propre à chaque environnement (Prod vs Dev). Les fichiers et médias de prod (partitions, pochettes uploadées par les éditeurs) vivent sur le serveur de prod et ne doivent JAMAIS être écrasés ni synchronisés par Git / FTP CI-CD.
+    - **Restauration CI/CD** : Ré-établissement immédiat de `data/**` dans la liste `exclude` de [.github/workflows/ci-cd.yml](file:///f:/Arnaud/projets-dev/partoches/.github/workflows/ci-cd.yml) pour garantir qu'aucun déploiement FTP ne touche, modifie ou supprime l'arborescence `/public_html/data/` sur Hostinger.
+    - **Recherche résiliente des pochettes** : Conservation de l'amélioration dans [src/public/php/lib/Image.php](file:///f:/Arnaud/projets-dev/partoches/src/public/php/lib/Image.php) qui effectue une recherche intelligente `glob()` dans `data/chansons/$id/` sur prod sans toucher au système de fichiers.
 - **Restauration des Assets Visuels en Prod (`src/public/images/`) & Fin des 404** :
     - **Identification Root Cause** : L'inspection directe des URL d'images en prod (`/images/icones/vinyle.png`, `/images/navigation/logo_site.png`, `/images/icones/icone_musique.png`) renvoyait un code HTTP **404 Not Found**. La règle globale `images/` dans `.gitignore` ignorait l'arborescence `src/public/images/`, l'empêchant d'être versionnée sur GitHub et transférée par FTP vers Hostinger.
     - **Solution Structurelle** : Ajustement dans `.gitignore` avec la bascule vers `/images/` (racine) et l'inclusion explicite `!src/public/images/`. Ajout et publication de l'intégralité du dossier `src/public/images/` dans le dépôt Git.
