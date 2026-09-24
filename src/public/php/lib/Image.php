@@ -38,6 +38,24 @@ class Image {
             return $thumbUrl;
         }
 
+        // Si le fichier source exact n'existe pas, on cherche une image équivalente dans le même dossier
+        if (!file_exists($sourcePath)) {
+            $dir = dirname($sourcePath);
+            if (is_dir($dir)) {
+                $images = glob($dir . '/*.{jpg,jpeg,png,webp,JPG,PNG,JPEG}', GLOB_BRACE);
+                if (!empty($images)) {
+                    foreach ($images as $img) {
+                        $bName = basename($img);
+                        if (!str_contains($bName, '-mini.webp') && !str_contains($bName, '-sd.webp') && !str_contains($bName, '-pdf.jpg')) {
+                            $sourcePath = $img;
+                            $relPath = dirname($relPath) . "/" . $bName;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         // Si on arrive ici, c'est que la vignette manque. On fait les checks lourds.
         if (!file_exists($sourcePath)) return $fallback;
 
