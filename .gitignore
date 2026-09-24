@@ -1,7 +1,8 @@
 .idea/
 .settings/
-data/
-images/
+/data/
+/images/
+!src/public/images/
 logs/
 tmp/
 vignettes/

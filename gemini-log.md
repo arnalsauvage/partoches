@@ -1,6 +1,10 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (24 Septembre 2026)
+- **Restauration des Assets Visuels en Prod (`src/public/images/`) & Fin des 404** :
+    - **Identification Root Cause** : L'inspection directe des URL d'images en prod (`/images/icones/vinyle.png`, `/images/navigation/logo_site.png`, `/images/icones/icone_musique.png`) renvoyait un code HTTP **404 Not Found**. La règle globale `images/` dans `.gitignore` ignorait l'arborescence `src/public/images/`, l'empêchant d'être versionnée sur GitHub et transférée par FTP vers Hostinger.
+    - **Solution Structurelle** : Ajustement dans `.gitignore` avec la bascule vers `/images/` (racine) et l'inclusion explicite `!src/public/images/`. Ajout et publication de l'intégralité du dossier `src/public/images/` dans le dépôt Git.
+    - **Validation** : Rétablissement de l'affichage de l'image vinyle de fallback et des icônes sur le serveur de prod.
 - **Hotfix Production : Eradication de l'Erreur 500 `Class "setasign\Fpdi\TcpdfFpdi" not found`** :
     - **Identification Root Cause** : L'analyse des logs d'exécution sur le serveur de prod a révélé que la classe `setasign\Fpdi\TcpdfFpdi` provoquait une `Fatal Error` lors du chargement de `pdf.php` et `Songbook.php`. Deux causes conjointes :
         1. `.gitignore` contenait la règle globale `vendor/`, empêchant Git d'inclure le sous-dossier `src/public/vendor/` et donc d'expédier TCPDF et FPDI vers Hostinger via le déploiement FTP.

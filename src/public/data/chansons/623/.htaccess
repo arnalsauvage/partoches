@@ -1,0 +1,1 @@
+AddType application/msword .doc AddType application/vnd.openxmlformats-officedocument.wordprocessingml.document .docx 
