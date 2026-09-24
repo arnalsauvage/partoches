@@ -1,6 +1,15 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (24 Septembre 2026)
+- **Résolution du crash Production sur `chanson_form.php` (Fatal error `pdf.php` Line 8)** :
+    - **Identification Root Cause** : Dans `src/public/php/lib/pdf.php`, l'instruction `require_once __DIR__ . '/../../../autoload.php'` remontait 3 niveaux au-dessus du dossier `public_html/` d'Hostinger, pointant vers un fichier inexistant en prod.
+    - **Solution** : Remplacement par l'analyse multi-chemins dynamique `file_exists(dirname(__DIR__, 3) . '/autoload.php') ? ... : ...`. Idem dans `chanson_form_classic.php`.
+- **Stabilisation complète de l'environnement Docker Desktop (Windows / WSL2)** :
+    - **Optimisation WSL2** : Création du fichier `C:\Users\medin\.wslconfig` (RAM fixée à 4 Go, swap à 2 Go) empêchant la saturation mémoire du sous-système Windows (`vmmem`).
+    - **Nettoyage Compose** : Suppression des `stop_signal: SIGTERM` et `tty: true` réagissant mal aux signaux Windows CLI, suppression du montage erroné de `xdebug.ini` et création du réseau bridge `partoches-net`.
+- **Correction d'affichage des pochettes & Spécification Cypress E2E (Spec 14)** :
+    - **Affichage des images de pochettes** : Mise à jour de `fallbackPochette()` dans `src/public/php/lib/html.php` garantissant qu'une balise `<img src=".../vinyle.png">` valide est toujours retournée pour les chansons sans pochette spécifique.
+    - **Nouvelle Spécification Cypress E2E** : Création de [cypress/e2e/14_affichage_images_et_formulaire_chanson.cy.js](file:///f:/Arnaud/projets-dev/partoches/cypress/e2e/14_affichage_images_et_formulaire_chanson.cy.js) (Test 1 : images médias visiteur, Test 2 : pochettes chansons visiteur, Test 3 : formulaire chanson complet admin).
 - **Réalisation du Ticket #10 — Restriction d'accès aux ressources audio (MP3) pour les utilisateurs non connectés** :
     - **Sécurisation & UX** :
         1. **`getdoc.php`** : Interception de tous les accès directs aux fichiers audio (mp3, m4a, aac, ogg, wav) pour les utilisateurs non connectés (`!MediaService::estAudioAccessible()`), avec redirection HTTP 302 automatique vers `login.php`.
