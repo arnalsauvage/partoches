@@ -33,24 +33,36 @@ foreach (array_slice($publicItems, 0, 40) as $item) {
     echo "   $type " . basename($item) . "\n";
 }
 
-if (is_dir(PUBLIC_DIR . '/data')) {
-    echo "\nItems in PUBLIC_DIR/data:\n";
-    $dataItems = glob(PUBLIC_DIR . '/data/*');
-    foreach ($dataItems as $item) {
-        $type = is_dir($item) ? "[DIR]" : "[FILE]";
-        echo "   $type " . basename($item) . "\n";
+echo "\n=== 3. SEARCHING FOR DATA AND CHANSONS DIRECTORIES ON HOSTINGER ===\n";
+
+$candidates = [
+    dirname(PUBLIC_DIR) . '/data',
+    dirname(PUBLIC_DIR) . '/chansons',
+    dirname(PUBLIC_DIR, 2) . '/data',
+    dirname(PUBLIC_DIR, 2) . '/chansons',
+    '/home/u715493341/data',
+    '/home/u715493341/domains/partoches.canopee-musique.fr/data',
+];
+
+foreach ($candidates as $cand) {
+    if (is_dir($cand)) {
+        echo "FOUND DIR: $cand\n";
+        $items = glob($cand . '/*');
+        foreach (array_slice($items, 0, 15) as $it) {
+            echo "   -> " . basename($it) . "\n";
+        }
+    } else {
+        echo "NOT FOUND: $cand\n";
     }
-} else {
-    echo "\nPUBLIC_DIR/data IS NOT A DIRECTORY!\n";
 }
 
-if (is_dir(dirname(PUBLIC_DIR) . '/data')) {
-    echo "\nItems in parent data dir (" . dirname(PUBLIC_DIR) . "/data):\n";
-    $parentDataItems = glob(dirname(PUBLIC_DIR) . '/data/*');
-    foreach ($parentDataItems as $item) {
-        $type = is_dir($item) ? "[DIR]" : "[FILE]";
-        echo "   $type " . basename($item) . "\n";
-    }
+// Let's also search for any 'pochette-Pauvres-Diables-v1.webp' or PDF file on the server using find command if possible or recursively in parent
+echo "\n=== 4. PARENT DIR LISTING (" . dirname(PUBLIC_DIR) . ") ===\n";
+$parentItems = glob(dirname(PUBLIC_DIR) . '/*');
+foreach ($parentItems as $p) {
+    $type = is_dir($p) ? "[DIR]" : "[FILE]";
+    echo "   $type " . basename($p) . "\n";
 }
+
 
 
