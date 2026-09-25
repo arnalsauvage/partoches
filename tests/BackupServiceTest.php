@@ -15,7 +15,10 @@ class BackupServiceTest extends TestCase
     protected function setUp(): void
     {
         $db = $_SESSION['mysql'];
-        $rootDir = dirname(__DIR__) . '/src/public';
+        $rootDir = sys_get_temp_dir() . '/partoches_test_backup_' . uniqid();
+        @mkdir($rootDir . '/data/conf', 0777, true);
+        @file_put_contents($rootDir . '/data/conf/params.ini', "[general]\nversion=2.1\n");
+        $this->tempFiles[] = $rootDir;
         $this->service = new BackupService($db, $rootDir);
     }
 
@@ -23,7 +26,18 @@ class BackupServiceTest extends TestCase
     {
         foreach ($this->tempFiles as $file) {
             if (file_exists($file)) {
-                unlink($file);
+                if (is_dir($file)) {
+                    $it = new RecursiveIteratorIterator(
+                        new RecursiveDirectoryIterator($file, RecursiveDirectoryIterator::SKIP_DOTS),
+                        RecursiveIteratorIterator::CHILD_FIRST
+                    );
+                    foreach ($it as $sub) {
+                        $sub->isDir() ? rmdir($sub->getPathname()) : unlink($sub->getPathname());
+                    }
+                    rmdir($file);
+                } else {
+                    unlink($file);
+                }
             }
         }
     }

@@ -6,7 +6,7 @@
 
 // Charger la clé API depuis params.ini en utilisant FichierIni
 // Assure-toi que FichierIni est disponible (il devrait l'être via les includes globaux ou vérifier son include)
-require_once __DIR__ . '/../lib/FichierIni.php'; // Chemin relatif vers FichierIni
+require_once __DIR__ . '/FichierIni.php';
 $ini_objet = new FichierIni();
 // Chemin vers params.ini (relatif au dossier lib/)
 $configPath = __DIR__ . '/../../conf/params.ini'; 

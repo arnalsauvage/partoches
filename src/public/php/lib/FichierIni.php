@@ -1,4 +1,7 @@
 <?php
+if (class_exists('FichierIni', false)) {
+    return;
+}
 
 class FichierIni
 {

@@ -46,8 +46,8 @@ Header always set X-Content-Type-Options "nosniff"
 </IfModule>
   
   
-# On suit les liens symboliques 
-Options +FollowSymlinks 
+# On suit les liens symboliques (commenté pour compatibilité hébergement mutualisé Hostinger)
+# Options +FollowSymlinks 
 # Activation du mod rewrite d'Apache 
 RewriteEngine On
 

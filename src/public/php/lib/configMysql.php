@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ .'/FichierIni.php';
+require_once __DIR__ . '/FichierIni.php';
 require_once __DIR__ .'/mysql.php';
 
 // --- INCLUSION DE L'AUTOLOADER MAISON (Django) ---

@@ -1,7 +1,7 @@
 <?php
-
-require_once PHP_DIR . "/navigation/Footer.php";
-require_once PHP_DIR . "/lib/Image.php";
+require_once __DIR__ . '/../../autoload.php'; // load path constants
+require_once PHP_DIR . '/navigation/Footer.php';
+require_once PHP_DIR . '/lib/Image.php';
 
 if (!isset($FichierHtml)) {
     $FichierHtml = 1;

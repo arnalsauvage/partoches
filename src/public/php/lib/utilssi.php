@@ -1,4 +1,10 @@
 <?php
+// Chargement de l'autoloader et des constantes globales de chemins (Django)
+$autoloaderPath = dirname(__DIR__, 2) . '/autoload.php';
+if (file_exists($autoloaderPath)) {
+    require_once $autoloaderPath;
+}
+
 if (!defined('IMAGES')) {
     define('IMAGES', "../../images");
 }
@@ -24,7 +30,7 @@ if (!isset ($FichierUtilsSi)) {
     $GLOBALS["PRIVILEGE_ADMIN"] = 3;
 
     // Inclusion des différentes librairies
-    require_once(__DIR__ . "/FichierIni.php");
+    require_once __DIR__ . "/FichierIni.php";
     require_once(__DIR__ . "/compteur.php");
     require_once(__DIR__ . "/configMysql.php");
     include_once(__DIR__ . "/config-images.php");

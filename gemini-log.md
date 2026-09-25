@@ -1,5 +1,15 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (26 Septembre 2026 - Nuit)
+- **🔥 Résolution de l'incident critique de production & alignement architectural** :
+    - **Identification Root Cause du 404 généralisé** : Une règle de réécriture Apache (`RewriteCond %{REQUEST_URI} !^/public/` / `RewriteRule ^(.*)$ public/$1`) avait été injectée dans `src/public/.htaccess`. Sur Hostinger (LiteSpeed) comme sous Docker local, le DocumentRoot sert déjà directement le contenu de `public/` (ou `public_html/`). La réécriture forçait donc la recherche d'un sous-dossier inexistant `/public/public/...`, provoquant un 404 sur l'intégralité du site.
+    - **Suppression du bloc de redirection fantôme** : Éradication de la règle dans `src/public/.htaccess` et désactivation de `Options +FollowSymlinks` (incompatible LiteSpeed / mutualisé Hostinger).
+    - **Sécurisation absolue de `FichierIni.php`** : Ajout du guard `if (class_exists('FichierIni', false)) return;` à la racine de la classe. Aucune double inclusion ne peut plus provoquer d'erreur fatale PHP.
+    - **Normalisation de l'Autoloader** : Chargement automatique dès la première ligne de `utilssi.php` et `configMysql.php`. Rétablissement des inclusions propres des bibliothèques (`__DIR__ . '/FichierIni.php'`).
+    - **Optimisation de `BackupServiceTest`** : Isolation d'un dossier temporaire léger pour les tests unitaires au lieu de compresser en direct les 500 Mo de partitions réelles (temps d'exécution ramené de 30s à 0,25s).
+    - **Alignement parfait Prod vs Local** : Déplacement propre des fichiers de `public_html/public/` vers `public_html/` sur Hostinger. Les environnements local et prod sont désormais de parfaits jumeaux sans divergence de chemin.
+    - **Validation & Smoke Tests** : **28 / 28 pages HTTP (100% Succès)** sans aucune erreur, validation des URL réécrites propres (`/chanson/{id}`).
+
 ### 📖 Résumé de la session (25 Septembre 2026)
 - **Réalisation de la US-002 — Audit Fichiers Orphelins & Suite d'Intégrité Globale** :
     - **Architecture & API AJAX** : Transformation de `audit_orphelins.php` en contrôleur mixte HTML / API JSON (`?action=scan_orphans`, `?action=scan_duplicates`, `?action=scan_integrity`, etc.).

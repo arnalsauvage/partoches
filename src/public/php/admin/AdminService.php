@@ -18,7 +18,8 @@ class AdminService
      */
     public function getLogContent($filename)
     {
-        $path = __DIR__ . "/../../../data/logs/" . basename($filename);
+        $logDir = defined('DATA_DIR') ? DATA_DIR . '/logs/' : dirname(__DIR__, 2) . '/data/logs/';
+        $path = $logDir . basename($filename);
         if (!file_exists($path)) return "Fichier non trouvé.";
 
         $contenu = file_get_contents($path);
@@ -136,7 +137,7 @@ class AdminService
         $pass = $_ENV['DATABASE_PASSWORD'] ?? $_SERVER['DATABASE_PASSWORD'] ?? null;
 
         if (!$host) {
-            $fichier = __DIR__ . "/../../../data/conf/params.ini";
+            $fichier = defined('CONF_DIR') ? CONF_DIR . "/params.ini" : dirname(__DIR__, 2) . "/data/conf/params.ini";
             if (file_exists($fichier)) {
                 $ini = new FichierIni();
                 $ini->m_load_fichier($fichier);
@@ -152,7 +153,7 @@ class AdminService
         $user = $user ?: "root";
         $pass = $pass ?: "";
 
-        $tempDir = __DIR__ . '/../../../data/backups/';
+        $tempDir = (defined('DATA_DIR') ? DATA_DIR : dirname(__DIR__, 2) . '/data') . '/backups/';
         if (!is_dir($tempDir)) {
             if (!mkdir($tempDir, 0777, true)) {
                 error_log("AdminService::exportDatabase : Impossible de créer le dossier $tempDir");

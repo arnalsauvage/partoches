@@ -2,7 +2,7 @@
 // Script PHP pour API Mammouth.ai (compatible OpenAI)
 // Charge la clé depuis params.ini (section [mammouth] ou [gemini] fallback)
 
-require_once __DIR__ . '/../lib/FichierIni.php';
+require_once __DIR__ . '/FichierIni.php';
 $ini_objet = new FichierIni();
 $configPath = realpath(__DIR__ . '/../../conf/params.ini');
 if (!file_exists($configPath)) {

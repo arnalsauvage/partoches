@@ -22,7 +22,7 @@ class BackupService
         }
         $this->db = $db ?? $_SESSION['mysql'] ?? ($GLOBALS['conn'] ?? null);
         $this->rootDir = $rootDir ?? (defined('ROOT_DIR') ? ROOT_DIR : dirname(__DIR__, 2));
-        $this->dataDir = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : $this->rootDir . '/data';
+        $this->dataDir = $rootDir ? $rootDir . '/data' : (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : $this->rootDir . '/data');
     }
 
     /**

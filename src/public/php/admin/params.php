@@ -80,7 +80,7 @@ if (isset($_POST['action'])) {
 }
 
 // 3. LOGIQUE METIER (Chargement des donnees)
-$fichierIni = __DIR__ . "/../../../data/conf/params.ini";
+$fichierIni = defined('CONF_DIR') ? CONF_DIR . "/params.ini" : dirname(__DIR__, 2) . "/data/conf/params.ini";
 $ini_objet = new FichierIni();
 $ini_objet->m_load_fichier($fichierIni);
 $alerts = "";
@@ -131,7 +131,8 @@ $genFields2 = champInputView($ini_objet, "EmailAdmin", "Email admin", "email", "
 $mysqlFields = champInputView($ini_objet, "monServeur", "Serveur MySQL", "text", "mysql") . champInputView($ini_objet, "maBase", "Base MySQL", "text", "mysql") . champInputView($ini_objet, "login", "Login MySQL", "text", "mysql") . champInputView($ini_objet, "motDePasse", "Mot de passe MySQL", "password", "mysql");
 
 $logLinks = "";
-foreach (glob(__DIR__ . "/../../../data/logs/*.{txt,htm,log,html}", GLOB_BRACE) as $l) {
+$logsPattern = (defined('DATA_DIR') ? DATA_DIR : dirname(__DIR__, 2) . '/data') . "/logs/*.{txt,htm,log,html}";
+foreach (glob($logsPattern, GLOB_BRACE) as $l) {
     $b = basename($l); 
     $logLinks .= "<a href='#' class='list-group-item item-log-dj' data-file='$b'>$b</a>";
 }
