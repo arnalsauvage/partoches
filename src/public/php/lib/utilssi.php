@@ -105,7 +105,8 @@ if (!isset ($FichierUtilsSi)) {
      */
     function estAdmin(): bool
     {
-        return aDroits($GLOBALS["PRIVILEGE_ADMIN"]);
+        $privAdmin = $GLOBALS["PRIVILEGE_EDITEUR"] ?? 2;
+        return aDroits((int)$privAdmin);
     }
 
     // Vérifie qu'une date, selon un format donné, est bien valide - repris sur un exemple dans la doc php

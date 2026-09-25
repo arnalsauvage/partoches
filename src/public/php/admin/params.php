@@ -7,10 +7,8 @@
 require_once dirname(__DIR__) . "/lib/configMysql.php";
 require_once "AdminService.php";
 
-// 1. SECURITE (Test direct sur la session avec les vraies valeurs du projet)
-$privAdmin = $GLOBALS["PRIVILEGE_ADMIN"] ?? 3; // L'admin est au niveau 3 dans ce projet
-
-if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $privAdmin) {
+// 1. SECURITE
+if (!estAdmin()) {
     header("Location: ../navigation/login.php");
     exit();
 }

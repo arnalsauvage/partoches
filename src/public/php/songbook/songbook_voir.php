@@ -58,12 +58,20 @@ $imgTag = $imgUrl ? "<img src='$imgUrl' alt='$nom' class='img-responsive img-thu
 // --- RÉCUPÉRATION DES CHANSONS ---
 $lignes = LienDocSongbook::chercheLiensDocSongbook('idSongbook', $id, "ordre");
 $chansons = [];
-while ($ligne = $lignes->fetch_row()) {
-    $ligneDoc = chercheDocument($ligne[1]);
-    if ($ligneDoc) {
-        $chansonId = $ligneDoc[6];
-        if (!isset($chansons[$chansonId])) {
-            $chansons[$chansonId] = Chanson::load($chansonId);
+if ($lignes) {
+    while ($ligne = ($lignes->fetch_assoc() ?: $lignes->fetch_row())) {
+        $idDoc = (int)($ligne['idDocument'] ?? $ligne[1] ?? 0);
+        if (!$idDoc) continue;
+
+        $ligneDoc = chercheDocument($idDoc);
+        if ($ligneDoc && is_array($ligneDoc)) {
+            $chansonId = (int)($ligneDoc['idTable'] ?? $ligneDoc[6] ?? 0);
+            if ($chansonId > 0 && !isset($chansons[$chansonId])) {
+                $chansonObj = Chanson::load($chansonId);
+                if ($chansonObj && $chansonObj->getId() > 0) {
+                    $chansons[$chansonId] = $chansonObj;
+                }
+            }
         }
     }
 }
@@ -116,14 +124,19 @@ HTML;
 // On cherche s'il existe un PDF déjà généré pour ce songbook
 $docsPdf = Document::chercheDocumentsTableId("songbook", $id);
 $dernierPdf = null;
-while ($doc = $docsPdf->fetch_row()) {
-    if (strpos(strtolower($doc[1]), '.pdf') !== false) {
-        $dernierPdf = $doc; 
+if ($docsPdf) {
+    while ($doc = ($docsPdf->fetch_assoc() ?: $docsPdf->fetch_row())) {
+        $nomDoc = $doc['nom'] ?? $doc[1] ?? '';
+        if (strpos(strtolower($nomDoc), '.pdf') !== false) {
+            $dernierPdf = $doc; 
+        }
     }
 }
 
 if ($dernierPdf) {
-    $nomFichier = Document::composeNomVersion($dernierPdf[1], $dernierPdf[4]);
+    $nomDoc = $dernierPdf['nom'] ?? $dernierPdf[1] ?? '';
+    $versionDoc = (int)($dernierPdf['version'] ?? $dernierPdf[4] ?? 1);
+    $nomFichier = Document::composeNomVersion($nomDoc, $versionDoc);
     $urlPdf = "../../data/songbooks/$id/" . urlencode($nomFichier);
     $html .= <<<HTML
                 <a href="$urlPdf" target="_blank" class="btn btn-sb-action btn-orange-sb shadow" style="background-color: $c_orange; border: none; color: white; text-decoration: none;">

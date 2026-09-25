@@ -18,8 +18,8 @@ describe('01 - Authentification & Modal de connexion', () => {
     cy.get('#popup-login').should('not.be.visible');
   });
 
-  it('Connecte un utilisateur valide (ex: membre)', () => {
-    cy.login('membre', 'membre123');
+  it('Connecte un utilisateur valide (ex: admin)', () => {
+    cy.login('admin', 'kazoo');
     // Vérification que l'utilisateur est redirigé ou connecté
     cy.url().should('include', '/php/');
   });

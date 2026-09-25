@@ -25,6 +25,7 @@ $routes = [
     '/php/utilisateur/utilisateur_form.php?id=1',
     '/php/document/documents_voir.php',
     '/php/admin/params.php',
+    '/php/admin/audit_orphelins.php',
     '/html/diagrammes/',
     '/html/mentionsLegales.html',
     '/html/merci.html'
@@ -71,7 +72,7 @@ function getUrlContent($url) {
 }
 
 // 1. Médias audio
-$htmlMedias = getUrlContent($baseUrl . '/php/media/listeMedias.php?filtres=audio');
+$htmlMedias = getUrlContent($baseUrl . '/php/media/listeMedias.php?filtres=tous');
 if (str_contains($htmlMedias, 'Connexion requise')) {
     echo " [ OK ] Médias Audio : Badge 'Connexion requise' présent pour les invités.\n";
     $passed++;

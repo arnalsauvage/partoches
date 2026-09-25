@@ -66,7 +66,12 @@ if (!isset($configMysql)) {
     $LOGIN = $LOGIN ?: "root";
     $MOTDEPASSE = $MOTDEPASSE ?: "";
 
-    $mysqli = new mysqli($monserveur, $LOGIN, $MOTDEPASSE, $mabase);
+    try {
+        $mysqli = new mysqli($monserveur, $LOGIN, $MOTDEPASSE, $mabase);
+    } catch (Throwable $e) {
+        usleep(200000); // 200ms pause
+        $mysqli = new mysqli($monserveur, $LOGIN, $MOTDEPASSE, $mabase);
+    }
     
     // Gestion du mode Debug (Django)
     if (isset($ini_objet) && $ini_objet->m_valeur("display_errors", "admin") == "1") {

@@ -1,6 +1,26 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (25 Septembre 2026)
+- **Réalisation de la US-002 — Audit Fichiers Orphelins & Suite d'Intégrité Globale** :
+    - **Architecture & API AJAX** : Transformation de `audit_orphelins.php` en contrôleur mixte HTML / API JSON (`?action=scan_orphans`, `?action=scan_duplicates`, `?action=scan_integrity`, etc.).
+    - **UX Asynchrone & Lazy Loading** : Chargement instantané de la vue Canopée `views/audit_orphelins_view.phtml` et scans à la demande par onglet.
+    - **Tri Multi-Colonnes Interactif** : En-têtes de colonnes triables au clic (Nom, Chemin, Taille, Date) avec flèches d'orientation (Croissant ▲ / Décroissant ▼).
+    - **Dossiers Orphelins sur Disque** : Implémentation de `findOrphanDirectories()` et `deleteOrphanDirectory()` pour repérer et supprimer les dossiers `data/chansons/{id}/`, `data/songbooks/{id}/`, etc. dont l'entité SQL a été supprimée.
+    - **Fichiers Manquants & Relations Caduques** : Détection des références SQL brisées 404 (`findMissingFilesFromDb()`) et nettoyage automatisé des tables de liaison orphelines (`cleanOrphanDbRelations()`).
+    - **Extension de l'Intégrité Relationnelle SQL Inter-Tables** : Enrichissement de `findOrphanDbRelations()` et `cleanOrphanDbRelations()` dans `DataAuditService.php` pour détecter et réparer les liaisons caduques des tables `document` (documents rattachés à des chansons/songbooks supprimés), `lienurl` (liens web orphelins), `noteUtilisateur` et des tables de liaison (`liendocsongbook`, `lienstrumchanson`, `lienchansonplaylist`).
+    - **Boutons de Référence & Cache MD5** : Boutons d'accès rapide `"Voir Chanson #X"` et mise en cache persistant JSON dans `data/temp/md5_cache.json` pour des scans quasi-instantanés.
+- **Réalisation de la US-003 — Module de Sauvegarde Globale & Extension ZipArchive** :
+    - **Extension PHP `zip`** : Compilation et activation de `libzip-dev` et `ZipArchive` dans le conteneur `site-partoches` et mise à jour permanente dans `Dockerfile`.
+    - **Exportation autonome** : Génération d'une archive ZIP contenant le dump SQL complet de la base MariaDB (`db_dump.sql`), le dossier `data/` complet, la configuration `conf/params.ini` et `manifest.json`.
+- **Qualité, Tests & Couverture Automatisée** :
+    - **Tests Unitaires PHPUnit** : 100% des tests validés (`DataAuditServiceTest` 6/6 OK).
+    - **Smoke Tests HTTP** : **28 / 29 tests validés**.
+
 ### 📖 Résumé de la session (24 Septembre 2026)
+- **🛑 GEL DES DEPLOIEMENTS & RESTAURATION PROD (Directive PO)** :
+    - Arrêt total de tout commit / push Git et déploiement FTP.
+    - Le PO effectue la restauration de la production via les sauvegardes d'origine.
+    - Reprise des livraisons planifiée pour ce week-end.
 - **Clarification PO & Isolation Stricte du dossier `/data/` par Environnement** :
     - **Directive PO** : Le dossier `data/` est strictement propre à chaque environnement (Prod vs Dev). Les fichiers et médias de prod (partitions, pochettes uploadées par les éditeurs) vivent sur le serveur de prod et ne doivent JAMAIS être écrasés ni synchronisés par Git / FTP CI-CD.
     - **Restauration CI/CD** : Ré-établissement immédiat de `data/**` dans la liste `exclude` de [.github/workflows/ci-cd.yml](file:///f:/Arnaud/projets-dev/partoches/.github/workflows/ci-cd.yml) pour garantir qu'aucun déploiement FTP ne touche, modifie ou supprime l'arborescence `/public_html/data/` sur Hostinger.

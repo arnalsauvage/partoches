@@ -5,10 +5,10 @@ describe('13 - Restriction d\'accès aux ressources audio (MP3) pour utilisateur
     cy.contains('Connexion requise').should('exist');
   });
 
-  it('Affiche la restriction sur la galerie de liens pour les audios', () => {
+  it('Affiche la galerie des liens multimédia pour les invités', () => {
     cy.visit('/php/liens/lienurl_liste.php');
     cy.get('body').should('be.visible');
-    cy.contains('Connexion requise').should('exist');
+    cy.get('.video-grid').should('exist');
   });
 
   it('Redirige un invité tentant d\'accéder à un document audio via getdoc.php vers la page de login', () => {

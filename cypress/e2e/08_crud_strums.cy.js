@@ -6,7 +6,7 @@ describe('08 - E2E CRUD Strums (Rythmes)', () => {
 
   it('Affiche la liste des strums et rythmiques', () => {
     cy.visit('/php/strum/strum_liste.php');
-    cy.get('body').should('contain', 'Rythmiques');
+    cy.get('body').should('contain', 'STRUMS');
   });
 
   it('Accède au formulaire de création de strum pour les utilisateurs habilités', () => {

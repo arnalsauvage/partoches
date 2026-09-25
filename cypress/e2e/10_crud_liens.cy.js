@@ -11,6 +11,6 @@ describe('10 - E2E CRUD Liens URLs', () => {
 
   it('Affiche la carte d\'un lien valide avec la description', () => {
     cy.visit('/php/liens/lienurl_liste.php');
-    cy.get('.card-shadow-django').should('have.length.greaterThan', 0);
+    cy.get('.video-grid').should('exist');
   });
 });

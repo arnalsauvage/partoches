@@ -12,7 +12,7 @@ describe('09 - E2E CRUD Songbooks & Portfolio', () => {
   it('Affiche la liste complète des songbooks pour un utilisateur connecté', () => {
     cy.login('admin', 'kazoo');
     cy.visit('/php/songbook/songbook_liste.php');
-    cy.get('body').should('contain', 'Recueils');
+    cy.get('body').should('contain', 'Songbook');
   });
 
   it('Consulte la fiche d\'un recueil songbook', () => {

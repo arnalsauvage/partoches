@@ -296,8 +296,11 @@ class Utilisateur
                 return false;
             }
             if ($mdp == Chiffrement::decrypt($donnee[2])) {
+                $db = $_SESSION['mysql'];
+                $date = convertitDateJJMMAAAAversMySql(date("d/m/Y"));
+                $userId = (int)$donnee[0];
+                $db->query("UPDATE utilisateur SET dateDernierLogin = '$date', nbreLogins = nbreLogins + 1 WHERE id = $userId");
                 $donnee[10] = (int)$donnee[10] + 1;
-                self::modifieUtilisateur($donnee[0], $donnee[1], $mdp, $donnee[3], $donnee[4], $donnee[5], $donnee[6], $donnee[7], $donnee[8], $donnee[10], $donnee[11]);
                 return $donnee;
             }
         }

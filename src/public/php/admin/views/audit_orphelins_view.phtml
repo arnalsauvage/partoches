@@ -1,0 +1,700 @@
+<?php
+/**
+ * VUE : audit_orphelins_view.phtml
+ * Template HTML Canopée pour l'audit asynchrone (AJAX) des orphelins, doublons et de l'intégrité globale.
+ */
+?>
+<div id="django-audit-page" class="container" style="padding-top: 80px; padding-bottom: 60px;">
+
+    <!-- Zone de notification dynamique -->
+    <div id="ajaxNotification" class="alert alert-dismissible" style="display: none;" role="alert">
+        <button type="button" class="close" onclick="document.getElementById('ajaxNotification').style.display='none';" aria-label="Fermer"><span aria-hidden="true">&times;</span></button>
+        <span id="ajaxNotificationText"></span>
+    </div>
+
+    <div class="header-django">
+        <h1><span class="glyphicon glyphicon-trash"></span> Audit Fichiers Orphelins &amp; Intégrité Globale</h1>
+        <div class="btn-group-django">
+            <a href="params.php" class="btn-dj btn-dj-default"><span class="glyphicon glyphicon-arrow-left"></span> Retour Paramétrage</a>
+            <a href="backup_export.php" class="btn-dj btn-dj-success"><span class="glyphicon glyphicon-compressed"></span> Sauvegarde Globale ZIP</a>
+        </div>
+    </div>
+
+    <!-- CARTE DE SYNTHÈSE ASYNCHRONE -->
+    <div class="row" style="margin-bottom: 25px;">
+        <div class="col-md-4">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-file"></span> Fichiers Orphelins</h3>
+                </div>
+                <div class="panel-body">
+                    <h4><strong id="orphanCount">--</strong> fichier(s) non référencé(s)</h4>
+                    <p class="text-muted">Espace occupé : <strong id="orphanTotalSize">Analyse en cours...</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-duplicate"></span> Doublons (MD5)</h3>
+                </div>
+                <div class="panel-body">
+                    <h4><strong id="duplicateCount">--</strong> groupe(s) de doublons</h4>
+                    <p class="text-muted">Espace gaspillé : <strong id="duplicateTotalWasted">Analyse au clic...</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><span class="glyphicon glyphicon-wrench"></span> Intégrité Globale</h3>
+                </div>
+                <div class="panel-body">
+                    <h4><strong id="integrityTotalAnomalies">--</strong> anomalie(s) détectée(s)</h4>
+                    <p class="text-muted">Dossiers orphelins &amp; références : <strong id="integrityStatus">Au clic...</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ONGLETS AUDIT -->
+    <ul class="tabs-django" style="margin-bottom: 20px;">
+        <li class="tab-dj active" data-target="dj-orphans" id="tabOrphans">
+            <span class="glyphicon glyphicon-trash"></span> Fichiers Orphelins <span id="badgeOrphansCount" class="badge">...</span>
+        </li>
+        <li class="tab-dj" data-target="dj-duplicates" id="tabDuplicates">
+            <span class="glyphicon glyphicon-duplicate"></span> Fichiers Doublons <span id="badgeDuplicatesCount" class="badge">...</span>
+        </li>
+        <li class="tab-dj" data-target="dj-integrity" id="tabIntegrity">
+            <span class="glyphicon glyphicon-wrench"></span> Intégrité Globale &amp; Dossiers <span id="badgeIntegrityCount" class="badge">...</span>
+        </li>
+    </ul>
+
+    <div class="content-django">
+        <!-- TAB 1 : ORPHELINS -->
+        <div id="dj-orphans" class="pane-dj active">
+            <div id="orphansLoading" class="text-center" style="padding: 40px;">
+                <span class="glyphicon glyphicon-refresh spinner" style="font-size: 32px; animation: spin 1s infinite linear;"></span>
+                <p style="margin-top: 15px;" class="text-muted">Recherche des fichiers orphelins en arrière-plan...</p>
+            </div>
+
+            <div id="orphansEmpty" class="alert alert-success" style="display: none;">
+                <span class="glyphicon glyphicon-ok-sign"></span> <strong>Parfait Arnal !</strong> Aucun fichier orphelin détecté dans le répertoire <code>public/data/</code>.
+            </div>
+
+            <div id="orphansContainer" style="display: none;">
+                <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <button type="button" id="btnSelectAllOrphans" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-check"></span> Tout cocher</button>
+                        <button type="button" id="btnDeselectAllOrphans" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-unchecked"></span> Tout décocher</button>
+                    </div>
+                    <button type="button" id="btnDeleteSelected" class="btn btn-danger">
+                        <span class="glyphicon glyphicon-trash"></span> Supprimer la sélection (<span id="selectedCount">0</span>)
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-bordered" id="tableOrphans">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px; text-align: center;">#</th>
+                                <th class="sortable-col" data-sort="filename" style="cursor: pointer; user-select: none;">
+                                    Nom du fichier <span class="sort-icon glyphicon glyphicon-sort text-muted" style="margin-left: 5px;"></span>
+                                </th>
+                                <th class="sortable-col" data-sort="relativePath" style="cursor: pointer; user-select: none;">
+                                    Chemin relatif (dans data/) <span class="sort-icon glyphicon glyphicon-sort text-muted" style="margin-left: 5px;"></span>
+                                </th>
+                                <th class="sortable-col" data-sort="size" style="cursor: pointer; user-select: none;">
+                                    Taille <span class="sort-icon glyphicon glyphicon-sort text-muted" style="margin-left: 5px;"></span>
+                                </th>
+                                <th class="sortable-col" data-sort="mtime" style="cursor: pointer; user-select: none;">
+                                    Dernière modification <span class="sort-icon glyphicon glyphicon-sort text-muted" style="margin-left: 5px;"></span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="orphansTableBody">
+                            <!-- Rempli en JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2 : DOUBLONS -->
+        <div id="dj-duplicates" class="pane-dj">
+            <div id="duplicatesNotLoaded" class="text-center" style="padding: 30px;">
+                <p class="text-muted">Cliquez sur cet onglet pour lancer l'analyse des doublons MD5 en arrière-plan.</p>
+            </div>
+
+            <div id="duplicatesLoading" class="text-center" style="padding: 40px; display: none;">
+                <span class="glyphicon glyphicon-refresh spinner" style="font-size: 32px; animation: spin 1s infinite linear;"></span>
+                <p style="margin-top: 15px;" class="text-muted">Calcul des empreintes MD5 et détection des doublons en cours...</p>
+            </div>
+
+            <div id="duplicatesEmpty" class="alert alert-success" style="display: none;">
+                <span class="glyphicon glyphicon-ok-sign"></span> <strong>Aucun doublon trouvé !</strong> Tous les fichiers du dossier <code>public/data/</code> ont une empreinte MD5 unique.
+            </div>
+
+            <div id="duplicatesContainer" style="display: none;">
+                <p class="text-info"><span class="glyphicon glyphicon-info-sign"></span> Les fichiers ci-dessous partagent une empreinte MD5 strictement identique. Conservez-en un et vérifiez les références avant suppression.</p>
+                <div id="duplicatesList">
+                    <!-- Rempli en JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3 : INTÉGRITÉ GLOBALE -->
+        <div id="dj-integrity" class="pane-dj">
+            <div id="integrityNotLoaded" class="text-center" style="padding: 30px;">
+                <p class="text-muted">Cliquez sur cet onglet pour analyser l'intégrité globale (dossiers orphelins, références BDD manquantes et liaisons caduques).</p>
+            </div>
+
+            <div id="integrityLoading" class="text-center" style="padding: 40px; display: none;">
+                <span class="glyphicon glyphicon-refresh spinner" style="font-size: 32px; animation: spin 1s infinite linear;"></span>
+                <p style="margin-top: 15px;" class="text-muted">Analyse de l'intégrité globale en cours...</p>
+            </div>
+
+            <div id="integrityContainer" style="display: none;">
+                <!-- SECT 1 : DOSSIERS ORPHELINS -->
+                <div class="panel panel-danger" style="margin-bottom: 25px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><span class="glyphicon glyphicon-folder-close"></span> 1. Dossiers Orphelins sur Disque (<span id="orphanDirsCount">0</span>)</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-muted">Ces répertoires existent sur le disque (ex: <code>data/chansons/999/</code>) mais leur ID d'entité n'existe plus en BDD.</p>
+                        <div id="orphanDirsEmpty" class="alert alert-success" style="display: none; margin-bottom: 0;">
+                            <span class="glyphicon glyphicon-ok-sign"></span> Aucun dossier orphelin détecté sur le disque.
+                        </div>
+                        <div class="table-responsive" id="orphanDirsTableWrapper">
+                            <table class="table table-striped table-hover" id="tableOrphanDirs">
+                                <thead>
+                                    <tr>
+                                        <th>Domaine</th>
+                                        <th>ID</th>
+                                        <th>Chemin relatif</th>
+                                        <th>Nb Fichiers</th>
+                                        <th>Taille totale</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orphanDirsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECT 2 : FICHIERS BDD MANQUANTS -->
+                <div class="panel panel-warning" style="margin-bottom: 25px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><span class="glyphicon glyphicon-exclamation-sign"></span> 2. Fichiers Référencés en BDD Manquants sur Disque (<span id="missingFilesCount">0</span>)</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-muted">Ces entrées SQL répertorient un fichier qui n'existe physiquement plus sur le serveur (liens brisés 404).</p>
+                        <div id="missingFilesEmpty" class="alert alert-success" style="display: none; margin-bottom: 0;">
+                            <span class="glyphicon glyphicon-ok-sign"></span> Toutes les références SQL pointent vers un fichier physique existant.
+                        </div>
+                        <div class="table-responsive" id="missingFilesTableWrapper">
+                            <table class="table table-striped table-hover" id="tableMissingFiles">
+                                <thead>
+                                    <tr>
+                                        <th>Source BDD</th>
+                                        <th>Nom du fichier</th>
+                                        <th>Chemin attendu</th>
+                                        <th>Élément lié</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="missingFilesTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECT 3 : LIAISONS SQL ORPHELINES -->
+                <div class="panel panel-info">
+                    <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="panel-title"><span class="glyphicon glyphicon-link"></span> 3. Tables de Liaison SQL Orphelines (<span id="orphanRelationsCount">0</span>)</h3>
+                        <button type="button" id="btnCleanRelations" class="btn btn-xs btn-warning" style="display: none;">
+                            <span class="glyphicon glyphicon-erase"></span> Nettoyer les liaisons caduques
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-muted">Lignes dans <code>document</code>, <code>lienurl</code>, <code>noteUtilisateur</code>, <code>liendocsongbook</code>, <code>lienstrumchanson</code> ou <code>lienchansonplaylist</code> pointant vers un élément supprimé.</p>
+                        <div id="orphanRelationsEmpty" class="alert alert-success" style="display: none; margin-bottom: 0;">
+                            <span class="glyphicon glyphicon-ok-sign"></span> Aucune relation orpheline en BDD.
+                        </div>
+                        <ul class="list-group" id="orphanRelationsList" style="margin-bottom: 0;"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.spinner {
+    display: inline-block;
+}
+.row-deleted {
+    background-color: #f2def0 !important;
+    transition: opacity 0.5s ease-out;
+    opacity: 0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let orphansData = [];
+    let duplicatesLoaded = false;
+    let integrityLoaded = false;
+    let currentSortCol = 'relativePath';
+    let currentSortAsc = true;
+
+    // Utilitaires
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function escapeHtml(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showNotification(message, type = 'success') {
+        const notif = document.getElementById('ajaxNotification');
+        const notifText = document.getElementById('ajaxNotificationText');
+        notif.className = 'alert alert-dismissible alert-' + (type === 'success' ? 'success' : (type === 'warning' ? 'warning' : 'danger'));
+        notifText.innerHTML = message;
+        notif.style.display = 'block';
+    }
+
+    // Gestion du tri des colonnes
+    function sortOrphans(col) {
+        if (currentSortCol === col) {
+            currentSortAsc = !currentSortAsc;
+        } else {
+            currentSortCol = col;
+            currentSortAsc = true;
+        }
+
+        orphansData.sort((a, b) => {
+            let valA = a[col] ?? '';
+            let valB = b[col] ?? '';
+
+            if (typeof valA === 'string') {
+                valA = valA.toLowerCase();
+                valB = String(valB).toLowerCase();
+            }
+
+            if (valA < valB) return currentSortAsc ? -1 : 1;
+            if (valA > valB) return currentSortAsc ? 1 : -1;
+            return 0;
+        });
+
+        updateSortIcons();
+        renderOrphansTable();
+    }
+
+    function updateSortIcons() {
+        document.querySelectorAll('#tableOrphans .sortable-col').forEach(th => {
+            const col = th.getAttribute('data-sort');
+            const icon = th.querySelector('.sort-icon');
+            if (!icon) return;
+
+            if (col === currentSortCol) {
+                icon.className = 'sort-icon glyphicon ' + (currentSortAsc ? 'glyphicon-chevron-up text-primary' : 'glyphicon-chevron-down text-primary');
+            } else {
+                icon.className = 'sort-icon glyphicon glyphicon-sort text-muted';
+            }
+        });
+    }
+
+    document.querySelectorAll('#tableOrphans .sortable-col').forEach(th => {
+        th.addEventListener('click', function() {
+            const col = this.getAttribute('data-sort');
+            if (col) sortOrphans(col);
+        });
+    });
+
+    // Gestion des onglets
+    const tabs = document.querySelectorAll('.tabs-django .tab-dj');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.pane-dj').forEach(p => p.classList.remove('active'));
+
+            this.classList.add('active');
+            const targetId = this.getAttribute('data-target');
+            const targetPane = document.getElementById(targetId);
+            if (targetPane) targetPane.classList.add('active');
+
+            if (targetId === 'dj-duplicates' && !duplicatesLoaded) {
+                loadDuplicates();
+            }
+            if (targetId === 'dj-integrity' && !integrityLoaded) {
+                loadIntegrity();
+            }
+        });
+    });
+
+    // 1. Chargement des Orphelins (AJAX)
+    function loadOrphans() {
+        document.getElementById('orphansLoading').style.display = 'block';
+        document.getElementById('orphansContainer').style.display = 'none';
+        document.getElementById('orphansEmpty').style.display = 'none';
+
+        fetch('audit_orphelins.php?action=scan_orphans')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('orphansLoading').style.display = 'none';
+                if (!data.success) {
+                    showNotification('Erreur lors du scan : ' + data.error, 'danger');
+                    return;
+                }
+                orphansData = data.orphans || [];
+                updateOrphansUI(data.totalSize || 0);
+            })
+            .catch(err => {
+                document.getElementById('orphansLoading').style.display = 'none';
+                showNotification('Erreur réseau lors du scan des orphelins : ' + err.message, 'danger');
+            });
+    }
+
+    function updateOrphansUI(totalSizeOverride = null) {
+        const count = orphansData.length;
+        document.getElementById('orphanCount').textContent = count;
+        document.getElementById('badgeOrphansCount').textContent = count;
+
+        let totalSize = totalSizeOverride !== null ? totalSizeOverride : orphansData.reduce((acc, curr) => acc + (curr.size || 0), 0);
+        document.getElementById('orphanTotalSize').textContent = formatBytes(totalSize);
+
+        if (count === 0) {
+            document.getElementById('orphansEmpty').style.display = 'block';
+            document.getElementById('orphansContainer').style.display = 'none';
+        } else {
+            document.getElementById('orphansEmpty').style.display = 'none';
+            document.getElementById('orphansContainer').style.display = 'block';
+            renderOrphansTable();
+        }
+    }
+
+    function renderOrphansTable() {
+        const tbody = document.getElementById('orphansTableBody');
+        tbody.innerHTML = '';
+
+        orphansData.forEach(orphan => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-relpath', orphan.relativePath);
+            tr.innerHTML = `
+                <td style="text-align: center;">
+                    <input type="checkbox" value="${escapeHtml(orphan.relativePath)}" class="orphan-checkbox">
+                </td>
+                <td><strong>${escapeHtml(orphan.filename)}</strong></td>
+                <td><code>${escapeHtml(orphan.relativePath)}</code></td>
+                <td>${escapeHtml(orphan.formattedSize)}</td>
+                <td>${escapeHtml(orphan.formattedDate)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        bindCheckboxEvents();
+    }
+
+    function bindCheckboxEvents() {
+        document.querySelectorAll('.orphan-checkbox').forEach(cb => cb.addEventListener('change', updateSelectedCount));
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        const selected = document.querySelectorAll('.orphan-checkbox:checked');
+        document.getElementById('selectedCount').textContent = selected.length;
+    }
+
+    document.getElementById('btnSelectAllOrphans').addEventListener('click', function() {
+        document.querySelectorAll('.orphan-checkbox').forEach(cb => cb.checked = true);
+        updateSelectedCount();
+    });
+
+    document.getElementById('btnDeselectAllOrphans').addEventListener('click', function() {
+        document.querySelectorAll('.orphan-checkbox').forEach(cb => cb.checked = false);
+        updateSelectedCount();
+    });
+
+    // 2. Suppression dynamique orphelins sans rescan
+    document.getElementById('btnDeleteSelected').addEventListener('click', function() {
+        const selectedCbs = Array.from(document.querySelectorAll('.orphan-checkbox:checked'));
+        if (selectedCbs.length === 0) {
+            alert('Veuillez sélectionner au moins un fichier orphelin.');
+            return;
+        }
+
+        const relativePaths = selectedCbs.map(cb => cb.value);
+        if (!confirm(`Supprimer définitivement ${relativePaths.length} fichier(s) orphelin(s) ?`)) return;
+
+        const btn = this;
+        btn.disabled = true;
+
+        fetch('audit_orphelins.php?action=delete_orphans', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orphan_files: relativePaths })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            if (!data.success) {
+                showNotification('Erreur lors de la suppression : ' + data.error, 'danger');
+                return;
+            }
+
+            (data.deletedFiles || relativePaths).forEach(relPath => {
+                const tr = document.querySelector(`tr[data-relpath="${CSS.escape(relPath)}"]`);
+                if (tr) {
+                    tr.classList.add('row-deleted');
+                    setTimeout(() => tr.remove(), 400);
+                }
+                orphansData = orphansData.filter(o => o.relativePath !== relPath);
+            });
+
+            setTimeout(() => {
+                updateOrphansUI();
+                showNotification(`<strong>${data.deletedCount}</strong> fichier(s) orphelin(s) supprimé(s) avec succès !`, 'success');
+            }, 450);
+        })
+        .catch(err => {
+            btn.disabled = false;
+            showNotification('Erreur réseau lors de la suppression : ' + err.message, 'danger');
+        });
+    });
+
+    // 3. Lazy Loading Doublons (AJAX)
+    function loadDuplicates() {
+        duplicatesLoaded = true;
+        document.getElementById('duplicatesNotLoaded').style.display = 'none';
+        document.getElementById('duplicatesLoading').style.display = 'block';
+
+        fetch('audit_orphelins.php?action=scan_duplicates')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('duplicatesLoading').style.display = 'none';
+                if (!data.success) {
+                    showNotification('Erreur lors du scan des doublons : ' + data.error, 'danger');
+                    return;
+                }
+
+                const duplicates = data.duplicates || [];
+                document.getElementById('duplicateCount').textContent = duplicates.length;
+                document.getElementById('badgeDuplicatesCount').textContent = duplicates.length;
+                document.getElementById('duplicateTotalWasted').textContent = formatBytes(data.totalWastedSize || 0);
+
+                const container = document.getElementById('duplicatesList');
+                container.innerHTML = '';
+
+                if (duplicates.length === 0) {
+                    document.getElementById('duplicatesEmpty').style.display = 'block';
+                } else {
+                    document.getElementById('duplicatesContainer').style.display = 'block';
+
+                    duplicates.forEach((dupGroup, idx) => {
+                        const panel = document.createElement('div');
+                        panel.className = 'panel panel-default';
+
+                        let rowsHtml = '';
+                        dupGroup.files.forEach(f => {
+                            let refBtnHtml = (f.reference && f.reference.url) 
+                                ? `<a href="${escapeHtml(f.reference.url)}" target="_blank" class="btn btn-xs btn-info"><span class="glyphicon glyphicon-eye-open"></span> Voir ${escapeHtml(f.reference.label)}</a>`
+                                : `<span class="text-muted"><em style="font-size: 11px;">(Non référencé)</em></span>`;
+
+                            rowsHtml += `
+                                <tr>
+                                    <td><strong>${escapeHtml(f.filename)}</strong></td>
+                                    <td><code>${escapeHtml(f.relativePath)}</code></td>
+                                    <td>${escapeHtml(f.formattedSize)}</td>
+                                    <td>${escapeHtml(f.formattedDate)}</td>
+                                    <td>${refBtnHtml}</td>
+                                </tr>
+                            `;
+                        });
+
+                        panel.innerHTML = `
+                            <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><strong>Groupe #${idx + 1}</strong> — Hash MD5 : <code>${escapeHtml(dupGroup.hash)}</code></span>
+                                <span class="label label-warning">${dupGroup.count} exemplaires (Gaspillage : ${escapeHtml(dupGroup.formattedWastedSize)})</span>
+                            </div>
+                            <div class="panel-body" style="padding: 0;">
+                                <table class="table table-condensed table-striped" style="margin-bottom: 0;">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom du fichier</th>
+                                            <th>Chemin relatif</th>
+                                            <th>Taille</th>
+                                            <th>Dernière modification</th>
+                                            <th>Élément associé</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${rowsHtml}</tbody>
+                                </table>
+                            </div>
+                        `;
+                        container.appendChild(panel);
+                    });
+                }
+            })
+            .catch(err => {
+                document.getElementById('duplicatesLoading').style.display = 'none';
+                showNotification('Erreur réseau doublons : ' + err.message, 'danger');
+            });
+    }
+
+    // 4. Lazy Loading Intégrité Globale (AJAX)
+    function loadIntegrity() {
+        integrityLoaded = true;
+        document.getElementById('integrityNotLoaded').style.display = 'none';
+        document.getElementById('integrityLoading').style.display = 'block';
+
+        fetch('audit_orphelins.php?action=scan_integrity')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('integrityLoading').style.display = 'none';
+                if (!data.success) {
+                    showNotification('Erreur scan intégrité : ' + data.error, 'danger');
+                    return;
+                }
+
+                document.getElementById('integrityContainer').style.display = 'block';
+
+                const dirs = data.orphanDirs || [];
+                const missing = data.missingFiles || [];
+                const relations = data.orphanRelations || [];
+                const totalAnomalies = dirs.length + missing.length + relations.length;
+
+                document.getElementById('integrityTotalAnomalies').textContent = totalAnomalies;
+                document.getElementById('badgeIntegrityCount').textContent = totalAnomalies;
+                document.getElementById('integrityStatus').textContent = totalAnomalies === 0 ? 'Excellente (0)' : `${totalAnomalies} anomalie(s)`;
+
+                // A. Dossiers Orphelins
+                document.getElementById('orphanDirsCount').textContent = dirs.length;
+                const dirsTbody = document.getElementById('orphanDirsTableBody');
+                dirsTbody.innerHTML = '';
+                if (dirs.length === 0) {
+                    document.getElementById('orphanDirsEmpty').style.display = 'block';
+                    document.getElementById('orphanDirsTableWrapper').style.display = 'none';
+                } else {
+                    document.getElementById('orphanDirsEmpty').style.display = 'none';
+                    document.getElementById('orphanDirsTableWrapper').style.display = 'block';
+                    dirs.forEach(d => {
+                        const tr = document.createElement('tr');
+                        tr.setAttribute('data-dir', d.relativePath);
+                        tr.innerHTML = `
+                            <td><span class="label label-danger">${escapeHtml(d.domain)}</span></td>
+                            <td><strong>#${d.id}</strong></td>
+                            <td><code>${escapeHtml(d.relativePath)}</code></td>
+                            <td>${d.fileCount} fichier(s)</td>
+                            <td>${escapeHtml(d.formattedSize)}</td>
+                            <td>
+                                <button type="button" class="btn btn-xs btn-danger btn-delete-dir" data-dir="${escapeHtml(d.relativePath)}">
+                                    <span class="glyphicon glyphicon-trash"></span> Supprimer dossier
+                                </button>
+                            </td>
+                        `;
+                        dirsTbody.appendChild(tr);
+                    });
+
+                    document.querySelectorAll('.btn-delete-dir').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const relDir = this.getAttribute('data-dir');
+                            if (!confirm(`Supprimer définitivement le dossier orphelin "${relDir}" et tout son contenu ?`)) return;
+
+                            fetch('audit_orphelins.php?action=delete_orphan_dir', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ rel_dir: relDir })
+                            })
+                            .then(r => r.json())
+                            .then(res => {
+                                if (res.success) {
+                                    const tr = document.querySelector(`tr[data-dir="${CSS.escape(relDir)}"]`);
+                                    if (tr) tr.remove();
+                                    showNotification(`Dossier orphelin "${relDir}" supprimé avec succès !`, 'success');
+                                } else {
+                                    showNotification('Erreur suppression dossier : ' + (res.error || 'Échec'), 'danger');
+                                }
+                            });
+                        });
+                    });
+                }
+
+                // B. Fichiers BDD Manquants
+                document.getElementById('missingFilesCount').textContent = missing.length;
+                const missingTbody = document.getElementById('missingFilesTableBody');
+                missingTbody.innerHTML = '';
+                if (missing.length === 0) {
+                    document.getElementById('missingFilesEmpty').style.display = 'block';
+                    document.getElementById('missingFilesTableWrapper').style.display = 'none';
+                } else {
+                    document.getElementById('missingFilesEmpty').style.display = 'none';
+                    document.getElementById('missingFilesTableWrapper').style.display = 'block';
+                    missing.forEach(m => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><span class="label label-warning">${escapeHtml(m.source)}</span></td>
+                            <td><strong>${escapeHtml(m.filename)}</strong></td>
+                            <td><code>${escapeHtml(m.relativePath)}</code></td>
+                            <td>${escapeHtml(m.entityLabel)}</td>
+                            <td><a href="${escapeHtml(m.editUrl)}" target="_blank" class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-edit"></span> Éditer</a></td>
+                        `;
+                        missingTbody.appendChild(tr);
+                    });
+                }
+
+                // C. Liaisons SQL Orphelines
+                document.getElementById('orphanRelationsCount').textContent = relations.length;
+                const relList = document.getElementById('orphanRelationsList');
+                const btnCleanRel = document.getElementById('btnCleanRelations');
+                relList.innerHTML = '';
+                if (relations.length === 0) {
+                    document.getElementById('orphanRelationsEmpty').style.display = 'block';
+                    btnCleanRel.style.display = 'none';
+                } else {
+                    document.getElementById('orphanRelationsEmpty').style.display = 'none';
+                    btnCleanRel.style.display = 'inline-block';
+                    relations.forEach(r => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item list-group-item-warning';
+                        li.innerHTML = `<strong>Table ${escapeHtml(r.table)}</strong> (ID #${r.id}) : ${escapeHtml(r.details)}`;
+                        relList.appendChild(li);
+                    });
+                }
+            })
+            .catch(err => {
+                document.getElementById('integrityLoading').style.display = 'none';
+                showNotification('Erreur réseau intégrité : ' + err.message, 'danger');
+            });
+    }
+
+    // Bouton de nettoyage des liaisons caduques
+    document.getElementById('btnCleanRelations').addEventListener('click', function() {
+        if (!confirm('Supprimer automatiquement toutes les entrées SQL de liaison devenues caduques ?')) return;
+
+        fetch('audit_orphelins.php?action=clean_orphan_relations', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(`<strong>${data.cleanedCount}</strong> liaison(s) SQL caduque(s) nettoyée(s) !`, 'success');
+                    loadIntegrity();
+                } else {
+                    showNotification('Erreur lors du nettoyage : ' + data.error, 'danger');
+                }
+            });
+    });
+
+    // Démarrer avec les orphelins
+    loadOrphans();
+});
+</script>

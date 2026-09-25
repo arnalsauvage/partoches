@@ -23,8 +23,8 @@ describe('14 - Affichage des images Médias/Chansons & Formulaire d\'édition Ad
     cy.get('body').should('be.visible');
 
     // 1. Vérification des champs principaux du formulaire
-    cy.get('input[name="nom"]').should('be.visible');
-    cy.get('input[name="interprete"]').should('be.visible');
+    cy.get('input[name="fnom"]').should('be.visible');
+    cy.get('input[name="finterprete"]').should('be.visible');
 
     // 2. Vérification de la présence de la section Pochette / Image
     cy.get('img').should('exist');

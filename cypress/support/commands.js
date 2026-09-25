@@ -6,4 +6,5 @@ Cypress.Commands.add('login', (username, password) => {
   cy.get('#login').clear().type(username);
   cy.get('#pass').clear().type(password);
   cy.get('#btn-login-submit').click();
+  cy.get('.glyphicon-off').should('be.visible');
 });
