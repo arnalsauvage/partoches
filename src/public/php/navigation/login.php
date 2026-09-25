@@ -1,6 +1,9 @@
 <?php
-require_once dirname(__DIR__) . "/lib/utilssi.php";
-require_once __DIR__ . "/../utilisateur/Utilisateur.php";
+require_once file_exists(dirname(__DIR__, 2) . '/autoload.php') ? dirname(__DIR__, 2) . '/autoload.php' : dirname(__DIR__) . '/autoload.php';
+require_once LIB_DIR . "/utilssi.php";
+if (!class_exists('Utilisateur')) {
+    require_once PHP_DIR . "/utilisateur/Utilisateur.php";
+}
 
 $donnee = null;
 $_login = "";

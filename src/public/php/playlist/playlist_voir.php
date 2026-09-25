@@ -1,12 +1,15 @@
 <?php
-require_once __DIR__ . "/../lib/utilssi.php";
+require_once file_exists(dirname(__DIR__, 2) . '/autoload.php') ? dirname(__DIR__, 2) . '/autoload.php' : dirname(__DIR__) . '/autoload.php';
+require_once LIB_DIR . "/utilssi.php";
 $pasDeMenu = true;
-require_once __DIR__ . "/../navigation/menu.php";
+require_once PHP_DIR . "/navigation/menu.php";
 require_once("playlist.php");
-require_once __DIR__ . "/../liens/lienChansonPlaylist.php";
-require_once __DIR__ . "/../chanson/Chanson.php";
-require_once __DIR__ . "/../document/Document.php";
-require_once __DIR__ . "/../utilisateur/Utilisateur.php";
+require_once PHP_DIR . "/liens/lienChansonPlaylist.php";
+require_once PHP_DIR . "/chanson/Chanson.php";
+require_once PHP_DIR . "/document/Document.php";
+if (!class_exists('Utilisateur')) {
+    require_once PHP_DIR . "/utilisateur/Utilisateur.php";
+}
 
 echo envoieHead("Voir Playlist", "");
 echo $MENU_HTML;

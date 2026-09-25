@@ -1,9 +1,12 @@
 <?php
-include_once __DIR__ . "/../chanson/Chanson.php";
-include_once __DIR__ . "/../document/Document.php";
-include_once __DIR__ . "/../lib/formulaire.php";
-include_once __DIR__ . "/../lib/utilssi.php";
-require __DIR__ . "/../utilisateur/Utilisateur.php";
+require_once file_exists(dirname(__DIR__, 2) . '/autoload.php') ? dirname(__DIR__, 2) . '/autoload.php' : dirname(__DIR__) . '/autoload.php';
+include_once PHP_DIR . "/chanson/Chanson.php";
+include_once PHP_DIR . "/document/Document.php";
+include_once LIB_DIR . "/formulaire.php";
+include_once LIB_DIR . "/utilssi.php";
+if (!class_exists('Utilisateur')) {
+    require_once PHP_DIR . "/utilisateur/Utilisateur.php";
+}
 
 global $_DOSSIER_CHANSONS;
 const RACINE = "../../";

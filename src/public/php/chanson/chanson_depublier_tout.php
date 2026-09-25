@@ -1,13 +1,15 @@
 <?php
-// On démarre la session au tout début
+require_once file_exists(dirname(__DIR__, 2) . '/autoload.php') ? dirname(__DIR__, 2) . '/autoload.php' : dirname(__DIR__) . '/autoload.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once "../lib/configMysql.php";
-require_once "../lib/utilssi.php";
-require_once "../utilisateur/Utilisateur.php"; // Nécessaire pour les constantes de privilèges
-require_once "Chanson.php";
+require_once LIB_DIR . "/configMysql.php";
+require_once LIB_DIR . "/utilssi.php";
+if (!class_exists('Utilisateur')) {
+    require_once PHP_DIR . "/utilisateur/Utilisateur.php";
+}
+require_once PHP_DIR . "/chanson/Chanson.php";
 
 // Vérification des droits admin
 if (!estAdmin()) {
