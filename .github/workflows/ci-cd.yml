@@ -105,7 +105,12 @@ jobs:
             docker-compose.yml
             Dockerfile
             xdebug.ini
-            data/**
+            data/chansons/**
+            data/songbooks/**
+            data/utilisateurs/**
+            data/backups/**
+            data/temp/**
+            data/logs/**
             src/data/conf/params.ini
 
 

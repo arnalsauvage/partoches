@@ -51,9 +51,15 @@ class AdminService
 
     private function getMigrationDir(): string
     {
-        $dir1 = __DIR__ . '/../../../data/database/migrations/';
+        if (defined('PUBLIC_DATA_DIR') && is_dir(PUBLIC_DATA_DIR . '/database/migrations/')) {
+            return PUBLIC_DATA_DIR . '/database/migrations/';
+        }
+        if (defined('DATA_DIR') && is_dir(DATA_DIR . '/database/migrations/')) {
+            return DATA_DIR . '/database/migrations/';
+        }
+        $dir1 = dirname(__DIR__, 2) . '/data/database/migrations/';
         if (is_dir($dir1)) return $dir1;
-        $dir2 = __DIR__ . '/../../data/database/migrations/';
+        $dir2 = dirname(__DIR__, 3) . '/data/database/migrations/';
         if (is_dir($dir2)) return $dir2;
         return $dir1;
     }

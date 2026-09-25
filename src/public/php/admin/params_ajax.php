@@ -17,16 +17,20 @@ function handleDiagnostic($adminService, $mysqli)
     }
 
     echo "<hr><strong>Permissions Dossiers :</strong><br>";
+    $songbooksDir = (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : dirname(__DIR__, 2) . '/data') . '/songbooks/';
+    $chansonsDir = (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : dirname(__DIR__, 2) . '/data') . '/chansons/';
+    $migrationsDir = (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : dirname(__DIR__, 2) . '/data') . '/database/migrations/';
+
     $dossiers = [
-        'Songbooks' => __DIR__ . '/../../../data/songbooks/',
-        'Chansons' => __DIR__ . '/../../../data/chansons/',
-        'Migrations' => __DIR__ . '/../../../../data/database/migrations/'
+        'Songbooks' => $songbooksDir,
+        'Chansons' => $chansonsDir,
+        'Migrations' => $migrationsDir
     ];
     foreach ($dossiers as $nom => $path) {
         if (is_dir($path)) {
-            echo "$nom : " . (is_writable($path) ? "✅ Escriptible" : "❌ LECTURE SEULE") . " <small>($path)</small><br>";
+            echo "$nom : " . (is_writable($path) ? "✅ Éscriptible" : "❌ LECTURE SEULE") . " <small>($path)</small><br>";
         } else {
-            echo "$nom : ❌ INTROUVABLE <br>";
+            echo "$nom : ❌ INTROUVABLE <small>($path)</small><br>";
         }
     }
 
