@@ -12,10 +12,18 @@
         - `ChansonFormRenderer.php`, `ChansonService.php`, `views/chanson_voir_view.phtml`, `documentChercheAjax.php`, `Songbook.php`, `playlist.php` : Remplacement complet des lectures par indices (`$f[1]`, `$f[4]`) par les noms d'attributs explicites.
     - **Nettoyage & Refus de Code Verrue** :
         - Le PO ayant corrigé les deux noms de fichiers directement en FTP sur Hostinger, tout code d'auto-guérison ponctuel a été immédiatement retiré de `Document.php` et `getdoc.php` pour préserver un code source 100% pur, sans béquille ni dette technique.
-    - **Rétablissement du lien d'inscription sur la popin de connexion (`menuLogin.html`)** :
-        - Suite à la restauration manuelle de la prod le 24 septembre, `html/composants/menuLogin.html` était repassé sur une ancienne version.
-        - Libellé mis à jour selon la directive PO : `"Créer un compte gratuitement"`.
-        - Poussée Git pour déclenchement du déploiement FTP automatique vers Hostinger.
+    - **Modernisation de la Popin de Connexion (`menuLogin.html` & `styles-communs.css`)** :
+        - **Mise en page des liens** : Séparation propre de *"Créer un compte gratuitement"* et *"oubli de mot de passe"* sur deux lignes distinctes (flexbox en colonne avec espacement équilibré), éliminant tout retour à la ligne accidentel.
+        - **Design Canopée & Esthétique** :
+            - Carte moderne avec bandeau supérieur d'accent boisé (`border-top: 4px solid var(--c-accent)`), ombre portée douce et coins arrondis (10px).
+            - Ajout d'un en-tête sobre avec icône cadenas et croix de fermeture `&times;` (en plus du lien de fermeture inférieur).
+            - Nettoyage des vieux champs de saisie (éradication des ombres roses/grises `box-shadow inset` et de la bordure rose héritée d'`index.css`) au profit d'inputs sobres et lumineux avec focus ring doré/marron.
+            - Remplacement du bouton bleu brut *"Ok"* par un bouton chaleureux Canopée en dégradé de marron chaud avec le libellé explicite **"Se connecter"**.
+            - Mise en valeur du lien *"Créer un compte gratuitement"* sous forme de pastille interactive discrète.
+        - **Nettoyage architectural** :
+            - Centralisation complète de `.contenu_popup` dans `styles-communs.css` (chargé sur 100% des pages du site).
+            - Suppression des règles redondantes et obsolètes de `index.css`.
+            - Zero style inline (`style="..."`).
     - **Validation & Couverture de Tests** :
         - `DocumentTest.php` : Migration des mocks vers `fetch_assoc`, tests validant le fallback `composeNomVersion(..., null)` (4/4 tests OK, 9 assertions).
         - Smoke Tests : **28 / 28 pages vérifiées avec succès (100%)**.

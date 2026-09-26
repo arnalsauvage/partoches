@@ -71,9 +71,6 @@ input, textarea, select {
 	box-shadow: 1px 1px 2px #C0C0C0 inset;
 }
 
-input#login, input#pass {
-	width: 150px;
-}
 
 select {
 	margin-top: 10px;
@@ -154,78 +151,7 @@ li.fichiers {
 	color: #DF3333;
 }
 
-/* Gestion de popin jquery */
-.contenu_popup {
-	background-color: #FFFFFF;
-	border: 1px solid #ccc;
-	border-radius: 8px;
-	box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-	cursor: default;
-	display: none;
-	position: fixed; /* Changement de absolute à fixed pour le calage navbar */
-	top: 55px;      /* Juste sous la navbar (50px) */
-	right: 20px;    /* Calé à droite */
-	text-align: left;
-	width: 280px;
-	z-index: 2000;  /* Doit être au-dessus de tout */
-	padding: 20px;
-}
-
-.contenu_popup form.login {
-	width: 100%;
-	background: none;
-	padding: 0;
-	border: none;
-	border-radius: 0;
-}
-
-.contenu_popup form.login label {
-	display: block;
-	float: none;
-	margin-bottom: 5px;
-	color: #333;
-	font-weight: bold;
-}
-
-.contenu_popup form.login input {
-	width: 100%;
-	margin-bottom: 15px;
-	padding: 8px;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	box-sizing: border-box; /* Pour que le padding n'augmente pas la largeur */
-}
-
-.contenu_popup input[type="submit"] {
-	background-color: #1F75CC;
-	color: white;
-	border: none;
-	padding: 10px;
-	width: 100%;
-	cursor: pointer;
-	border-radius: 4px;
-	font-weight: bold;
-	float: none; /* Annule le float global */
-	display: block;
-	margin-top: 10px;
-}
-
-.contenu_popup .forgot-link {
-    display: block;
-    margin-top: 15px;
-    font-size: 0.9em;
-    text-align: center;
-}
-
-.btn-fermer-popup {
-	display: block;
-	margin-top: 15px;
-	text-align: center;
-	color: #999;
-	cursor: pointer;
-	font-size: 0.9em;
-	text-decoration: underline;
-}
+/* Note: Les styles de la modale de connexion (.contenu_popup) sont centralisés dans styles-communs.css (Design System Canopée) */
 
 span.selected {
 	background-color: #1F75CC;

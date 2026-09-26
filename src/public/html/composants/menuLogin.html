@@ -1,14 +1,22 @@
-<div id="popup-login" class='contenu_popup'>
-	<FORM id="form-login" action="../navigation/login.php" class="login" method="post">
-		<label class="login" for='login'>Login :</label>
-			<input size="16" id='login' name="user" value="" placeholder="prenom" autocomplete="username">
-		<label class="login" for='pass'>Mot de passe :</label>
-			<input size="16" type="password" id="pass" name="pass" value="" placeholder="mot de passe" autocomplete="current-password">
-		<input id="btn-login-submit" type="submit" value="Ok">
-	</FORM>
-	<span class="forgot-link"> 
-		<a id="link-register" href="../utilisateur/utilisateur_inscription.php">Créer un compte gratuitement</a> | 
-		<a id="link-forgot-password" href="../utilisateur/oubliMotDePasse.php">oubli de mot de passe</a>
-	</span>
-	<span id="btn-close-login" class="btn-fermer-popup">Fermer la fenêtre</span>
+<div id="popup-login" class="contenu_popup">
+	<div class="popup-header">
+		<span class="popup-titre"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Connexion</span>
+		<span class="popup-close-cross btn-fermer-popup" title="Fermer la fenêtre">&times;</span>
+	</div>
+	<form id="form-login" action="../navigation/login.php" class="login" method="post">
+		<div class="form-group-login">
+			<label class="login" for="login">Login :</label>
+			<input id="login" name="user" value="" placeholder="prénom" autocomplete="username">
+		</div>
+		<div class="form-group-login">
+			<label class="login" for="pass">Mot de passe :</label>
+			<input type="password" id="pass" name="pass" value="" placeholder="mot de passe" autocomplete="current-password">
+		</div>
+		<input id="btn-login-submit" type="submit" value="Se connecter">
+	</form>
+	<div class="popup-links-container">
+		<a id="link-register" class="link-register-canopee" href="../utilisateur/utilisateur_inscription.php">Créer un compte gratuitement</a>
+		<a id="link-forgot-password" class="link-forgot-canopee" href="../utilisateur/oubliMotDePasse.php">oubli de mot de passe</a>
+	</div>
+	<span id="btn-close-login" class="btn-fermer-popup btn-fermer-popup-text">Fermer la fenêtre</span>
 </div>
