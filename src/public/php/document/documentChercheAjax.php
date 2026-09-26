@@ -70,44 +70,42 @@ $listeDocs = chercheDocuments("nom", "%".$nomContient."%", $triPar, $triCroissan
 $sortie = "<table>";
 $nombreItems = 0;
 $nombreItemsMax = 10;
-while (($ligneDoc = $listeDocs->fetch_row()) && ($nombreItems<$nombreItemsMax)) {
-    $fichierCourt = composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    $fichier = RACINE . $_DOSSIER_CHANSONS . $ligneDoc [6] . "/" . composeNomVersion($ligneDoc [1], $ligneDoc [4]);
-    $extension = substr(strrchr($ligneDoc [1], '.'), 1);
-    //echo "extension " . $extension . " et filtre : " . $nom . " - " ;
+while (($ligneDoc = $listeDocs->fetch_assoc()) && ($nombreItems < $nombreItemsMax)) {
+    $idDoc = (int)$ligneDoc['id'];
+    $nomDoc = $ligneDoc['nom'];
+    $versionDoc = (int)$ligneDoc['version'];
+    $idTableDoc = (int)$ligneDoc['idTable'];
+    $tailleKoDoc = (int)$ligneDoc['tailleKo'];
+    $dateDoc = $ligneDoc['date'];
+    $hitsDoc = (int)$ligneDoc['hits'];
+
+    $fichierCourt = composeNomVersion($nomDoc, $versionDoc);
+    $fichier = RACINE . $_DOSSIER_CHANSONS . $idTableDoc . "/" . $fichierCourt;
+    $extension = substr(strrchr($nomDoc, '.'), 1);
+
     if ($typeDocument != $extension) {
         continue;
     }
 
-    if ($typeDocument!="*") {
-        if (($typeDocument == "son") && ($extension <> "mp3")) {
+    if ($typeDocument != "*") {
+        if (($typeDocument == "son") && ($extension != "mp3")) {
             continue;
         }
-        if (($typeDocument == "pdf") && ($extension <> "pdf")) {
+        if (($typeDocument == "pdf") && ($extension != "pdf")) {
             continue;
         }
-        if (($typeDocument == "doc") && ($extension <> "doc")) {
+        if (($typeDocument == "doc") && ($extension != "doc")) {
             continue;
         }
     }
     $nombreItems++;
-/*    <div>
-  <input type="radio" id="huey" name="drone" value="huey"
-         checked>
-  <label for="huey">Huey</label>
-</div>
 
-<div>
-  <input type="radio" id="dewey" name="drone" value="dewey">
-  <label for="dewey">Dewey</label>
-</div>*/
     $sortie .= "<tr> \n";
-    $sortie .= '<td><input type="radio" id = '.$ligneDoc [0] . ' name="documentJoint" value = '.$ligneDoc [0] . '></td>';
- //   $sortie .= "<td>" . $ligneDoc [0] .  "</td>";
+    $sortie .= '<td><input type="radio" id = ' . $idDoc . ' name="documentJoint" value = ' . $idDoc . '></td>';
     $sortie .= "<td> " . "<a href= '" . $fichier . "' target='_blank'> " . $fichierCourt . "</a> \n";
-    $sortie .= "<td>" . intval($ligneDoc [2] / 1024) . " ko  </td>";
-    $sortie .= "<td>" . " - " . dateMysqlVersTexte($ligneDoc [3]) . " </td>";
-    $sortie .= "<td> &nbsp; - " . $ligneDoc [8] . " vues </td></tr>\n";
+    $sortie .= "<td>" . intval($tailleKoDoc / 1024) . " ko  </td>";
+    $sortie .= "<td>" . " - " . dateMysqlVersTexte($dateDoc) . " </td>";
+    $sortie .= "<td> &nbsp; - " . $hitsDoc . " vues </td></tr>\n";
 }
 $sortie .= "</table>";
 echo $sortie;

@@ -85,19 +85,22 @@ if ((isset ($_GET ['doc'])) && (is_numeric($_GET ['doc']))) {
         die("Document introuvable");
     }
 
-    $extension = strtolower(pathinfo($doc[1], PATHINFO_EXTENSION));
+    $nomDoc = $doc['nom'] ?? '';
+    $versionDoc = $doc['version'] ?? 1;
+    $nomTableDoc = $doc['nomTable'] ?? '';
+    $idTableDoc = (int)($doc['idTable'] ?? 0);
+
+    $extension = strtolower(pathinfo($nomDoc, PATHINFO_EXTENSION));
     if (MediaService::estExtensionAudio($extension) && !MediaService::estAudioAccessible()) {
         header("Location: ../navigation/login.php");
         exit();
     }
 
-    // renvoie la ligne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-    $fichier = __DIR__ . "/../../data/" . $doc [5] . "s/" . $doc [6] . "/" . composeNomVersion($doc [1], $doc [4]);
-//    header ( "Location: $fichier" );
+    $nomFichier = composeNomVersion($nomDoc, $versionDoc);
+    $fichier = __DIR__ . "/../../data/" . $nomTableDoc . "s/" . $idTableDoc . "/" . $nomFichier;
 
-    //tester si le fichier existe
-    if ((!file_exists($fichier))) {
-        //ce n'est pas le cas, on envoie l'header 404
+    if (!file_exists($fichier)) {
+        // Ce n'est pas le cas, on envoie l'header 404
         header("HTTP/1.0 404 Not Found");
         echo file_get_contents(__DIR__ . "/404/404.htm");
         echo " <h1>Fichier non trouvé</h1>\n";
@@ -106,14 +109,14 @@ if ((isset ($_GET ['doc'])) && (is_numeric($_GET ['doc']))) {
         echo " Ou bien j'ai oublié,<br>\n";
         echo " Ou y sentait pas bon...<br>\n";
         echo " Enfin, pour le moment, le document n'existe pas... désolé.<br>\n";
-        //puis on quitte le script
         die;
     }
-//on indique le mime (type) du fichier
+
+    // On indique le mime (type) du fichier
     header('Content-type: ' . mime_content_type($fichier));
-//on indique le nom du fichier:
-    header('Content-Disposition: attachment; filename="' . composeNomVersion($doc [1], $doc [4]));
-//on envoie le fichier source
+    // On indique le nom du fichier
+    header('Content-Disposition: attachment; filename="' . $nomFichier . '"');
+    // On envoie le fichier source
     readfile($fichier);
     augmenteHits("document", $idDoc);
 }

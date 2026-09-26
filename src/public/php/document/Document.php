@@ -29,37 +29,31 @@ class Document
     }
 
     /**
-     * Cherche un document et le renvoie s'il existe
+     * Cherche un document et le renvoie s'il existe (tableau associatif)
      */
     public static function chercheDocument($id)
     {
         $maRequete = "SELECT * FROM document WHERE document.id = '$id'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #2 : " . $_SESSION ['mysql']->error);
-        $ligne = null;
         if (is_object($result) && method_exists($result, 'fetch_assoc')) {
             $ligne = $result->fetch_assoc();
+            return $ligne ?: 0;
         }
-        if (!$ligne && is_object($result) && method_exists($result, 'fetch_row')) {
-            $ligne = $result->fetch_row();
-        }
-        return $ligne ?: 0;
+        return 0;
     }
 
     /**
-     * Cherche un document par nom, table et id
+     * Cherche un document par nom, table et id (tableau associatif)
      */
     public static function chercheDocumentNomTableId($nom, $table, $id)
     {
         $maRequete = "SELECT * FROM document WHERE document.nom = '$nom' AND document.idTable = '$id' AND document.nomTable = '$table'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchedocument #3 : " . $_SESSION ['mysql']->error);
-        $ligne = null;
         if (is_object($result) && method_exists($result, 'fetch_assoc')) {
             $ligne = $result->fetch_assoc();
+            return $ligne ?: 0;
         }
-        if (!$ligne && is_object($result) && method_exists($result, 'fetch_row')) {
-            $ligne = $result->fetch_row();
-        }
-        return $ligne ?: 0;
+        return 0;
     }
 
     /**
@@ -75,11 +69,17 @@ class Document
     /**
      * Compose le nom du fichier avec sa version
      */
-    public static function composeNomVersion($nom, $version)
+    /**
+     * Compose le nom du fichier avec sa version
+     * Format : nom_fichier-v{version}.ext
+     * Si la version est absente ou vide, repli strict sur 1 pour éviter "-v.ext"
+     */
+    public static function composeNomVersion($nom, $version = 1)
     {
         $ext = strrchr($nom, ".");
         $nomSec = str_replace($ext, "", $nom);
-        return $nomSec . "-v$version" . $ext;
+        $v = (!empty($version) || $version === 0 || $version === '0') ? $version : 1;
+        return $nomSec . "-v$v" . $ext;
     }
 
     /**
@@ -115,7 +115,8 @@ class Document
         if ($resultat == NULL) {
             return false;
         }
-        $version = $resultat[4] + 1;
+        $versionActuelle = isset($resultat['version']) ? (int)$resultat['version'] : 1;
+        $version = $versionActuelle + 1;
 
         $maRequete = "UPDATE document SET nom = '$nom', tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser'
 	        WHERE id = '$id'";
@@ -137,7 +138,8 @@ class Document
         if ($resultat == NULL) {
             return false;
         }
-        $version = $resultat [4] + 1;
+        $versionActuelle = isset($resultat['version']) ? (int)$resultat['version'] : 1;
+        $version = $versionActuelle + 1;
 
         $maRequete = "UPDATE  document SET tailleKo = '$tailleKo', date = '$date', version = '$version', idUser = '$idUser'
 	        WHERE nom = '$nom' AND nomTable = '$nomTable' and idTable = '$idTable'";
@@ -154,11 +156,11 @@ class Document
         $document = self::chercheDocument($id);
         if (!$document) return -1;
 
-        $nomTable = $document[5];
-        $idTable = $document[6];
+        $nomTable = $document['nomTable'] ?? '';
+        $idTable = (int)($document['idTable'] ?? 0);
         $idUser = $_SESSION['id'] ?? 1;
-        $numVersion = $document[4];
-        $ancienNomBase = $document[1];
+        $numVersion = $document['version'] ?? 1;
+        $ancienNomBase = $document['nom'] ?? '';
 
         $nouveauNom = basename($nouveauNom);
         $pathInfo = pathinfo($nouveauNom);
@@ -217,12 +219,14 @@ class Document
     {
         $ligne = self::chercheDocument($idDoc);
         if ($ligne && is_array($ligne)) {
-            $nomTable = $ligne['nomTable'] ?? $ligne[5] ?? '';
-            $idTable = $ligne['idTable'] ?? $ligne[6] ?? 0;
-            $nom = $ligne['nom'] ?? $ligne[1] ?? '';
-            $version = $ligne['version'] ?? $ligne[4] ?? 1;
+            $nomTable = $ligne['nomTable'] ?? '';
+            $idTable = (int)($ligne['idTable'] ?? 0);
+            $nom = $ligne['nom'] ?? '';
+            $version = $ligne['version'] ?? 1;
+            $nomVersionne = self::composeNomVersion($nom, $version);
+
             // On utilise un chemin relatif web plutôt que DOSSIER_DATA (qui est physique)
-            return "../../data/" . $nomTable . "s/" . $idTable . "/" . self::composeNomVersion($nom, $version);
+            return "../../data/" . $nomTable . "s/" . $idTable . "/" . $nomVersionne;
         }
         return "";
     }
@@ -231,7 +235,7 @@ class Document
     {
         $ligne = self::chercheDocument($idDoc);
         if ($ligne && is_array($ligne)) {
-            $id = $ligne['id'] ?? $ligne[0] ?? 0;
+            $id = (int)($ligne['id'] ?? 0);
             return "getdoc.php?doc=" . $id;
         }
         return "";
@@ -252,8 +256,8 @@ class Document
         }
         $imageChoisie = rand(0, count($tableImages) - 1);
         $ligne = $tableImages [$imageChoisie];
-        $nom = $ligne['nom'] ?? $ligne[1] ?? '';
-        $version = $ligne['version'] ?? $ligne[4] ?? 1;
+        $nom = $ligne['nom'] ?? '';
+        $version = $ligne['version'] ?? 1;
         return (self::composeNomVersion($nom, $version));
     }
 }

@@ -12,12 +12,9 @@ if (!defined('ICONES')) {
     define('ICONES', IMAGES . "/icones/");
 }
 
-$a = session_id();
-if (empty ($a)) {
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     session_start();
 }
-
-unset ($a);
 
 if (!isset ($FichierUtilsSi)) {
     // Déclaration des variables globales

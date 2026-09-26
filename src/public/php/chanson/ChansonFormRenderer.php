@@ -135,13 +135,16 @@ HTML;
     {
         $out = "<h2>Liste des documents</h2><ul class='list-group'>";
         $lignes = Document::chercheDocumentsTableId("chanson", $id);
-        while ($ligneDoc = $lignes->fetch_row()) {
-            $idDoc = $ligneDoc[0];
-            $fichierCourt = Document::composeNomVersion($ligneDoc[1], $ligneDoc[4]);
+        while ($ligneDoc = ($lignes->fetch_assoc() ?: $lignes->fetch_row())) {
+            $idDoc = (int)($ligneDoc['id'] ?? $ligneDoc[0]);
+            $nomDoc = $ligneDoc['nom'] ?? $ligneDoc[1];
+            $versionDoc = (int)($ligneDoc['version'] ?? $ligneDoc[4] ?? 1);
+            $tailleKo = (int)($ligneDoc['tailleKo'] ?? $ligneDoc[2] ?? 0);
+            $fichierCourt = Document::composeNomVersion($nomDoc, $versionDoc);
             // Correction Arnal : On force un chemin relatif web pour l'affichage
             $fichierUrl = "../../data/chansons/$id/" . rawurlencode($fichierCourt);
-            $ext = strtolower(pathinfo($ligneDoc[1], PATHINFO_EXTENSION));
-            $poids = intval($ligneDoc[2] / 1024);
+            $ext = strtolower(pathinfo($nomDoc, PATHINFO_EXTENSION));
+            $poids = intval($tailleKo / 1024);
             
             $iconeSrc = "../../images/icones/$ext.png";
             if (!file_exists($iconeSrc)) $iconeSrc = "../../images/icones/fichier.png";
@@ -249,7 +252,7 @@ HTML;
         $out = "<h2>Corbeille</h2>";
         $fichiersEnBdd = [];
         $res = Document::chercheDocumentsTableId("chanson", (string)$id);
-        while ($f = $res->fetch_row()) $fichiersEnBdd[] = Document::composeNomVersion($f[1], $f[4]);
+        while ($f = ($res->fetch_assoc() ?: $res->fetch_row())) $fichiersEnBdd[] = Document::composeNomVersion($f['nom'] ?? $f[1], $f['version'] ?? $f[4] ?? 1);
 
         $fichiersSurDisque = $_chanson->fichiersChanson($_dossier_chansons);
         $nbOrphelins = 0;

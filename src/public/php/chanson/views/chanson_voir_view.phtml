@@ -70,13 +70,15 @@
             <hr><h2><i class="glyphicon glyphicon-file"></i> Documents</h2>
             <div class="row">
                 <?php foreach ($documents as $row): 
-                    $ext = strtolower(pathinfo($row[1], PATHINFO_EXTENSION));
+                    $nomDoc = $row['nom'] ?? $row[1] ?? '';
+                    $idDoc = $row['id'] ?? $row[0] ?? 0;
+                    $ext = strtolower(pathinfo($nomDoc, PATHINFO_EXTENSION));
                     if ($nbImages === 1 && in_array($ext, ['jpg', 'png', 'webp'])) continue;
-                    $nomSais = pathinfo($row[1], PATHINFO_FILENAME);
+                    $nomSais = pathinfo($nomDoc, PATHINFO_FILENAME);
                     $iconUrl = file_exists(ICONES . $ext . ".png") ? ICONES . $ext . ".png" : "../images/icones/fichier.png";
                 ?>
                     <div class="col-xs-6 col-sm-3 col-md-2 text-center mb-20">
-                        <a href="<?= Document::lienUrlAffichageDocument($row[0]) ?>" target="_blank" class="thumbnail doc-link">
+                        <a href="<?= Document::lienUrlAffichageDocument($idDoc) ?>" target="_blank" class="thumbnail doc-link">
                             <?= image($iconUrl, 32, 32, "icone") ?><br><small class="text-truncate"><?= $nomSais ?></small>
                         </a>
                     </div>
@@ -103,11 +105,13 @@
         <?php if (!empty($medias)): ?>
             <div class="row">
                 <?php foreach ($medias as $row): 
-                    $ext = strtolower(pathinfo($row[1], PATHINFO_EXTENSION));
+                    $nomDoc = $row['nom'] ?? $row[1] ?? '';
+                    $idDoc = $row['id'] ?? $row[0] ?? 0;
+                    $ext = strtolower(pathinfo($nomDoc, PATHINFO_EXTENSION));
                     $isAudio = in_array($ext, ['mp3', 'm4a', 'aac']);
                     if ($isAudio && empty($canAccessAudio)) continue;
-                    $nom = pathinfo($row[1], PATHINFO_FILENAME);
-                    $url = Document::lienUrlAffichageDocument($row[0]);
+                    $nom = pathinfo($nomDoc, PATHINFO_FILENAME);
+                    $url = Document::lienUrlAffichageDocument($idDoc);
                 ?>
                     <div class="col-xs-12 col-sm-6 col-md-4 text-center mb-20">
                         <div class="well well-sm">

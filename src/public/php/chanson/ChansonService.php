@@ -24,8 +24,8 @@ class ChansonService
         $canAccessAudio = MediaService::estAudioAccessible();
 
         if (!empty($resultDocs)) {
-            while ($ligne = $resultDocs->fetch_row()) {
-                $ext = strtolower(pathinfo($ligne[1], PATHINFO_EXTENSION));
+            while ($ligne = ($resultDocs->fetch_assoc() ?: $resultDocs->fetch_row())) {
+                $ext = strtolower(pathinfo($ligne['nom'] ?? $ligne[1], PATHINFO_EXTENSION));
                 
                 if (in_array($ext, ['mp3', 'm4a', 'aac', 'mp4'])) {
                     if (in_array($ext, ['mp3', 'm4a', 'aac'])) {

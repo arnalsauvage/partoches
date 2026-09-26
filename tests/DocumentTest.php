@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../src/public/autoload.php';
+require_once __DIR__ . '/../src/public/php/document/Document.php';
+
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -60,18 +63,42 @@ class DocumentTest extends TestCase
     }
 
     /**
-     * Teste la recherche de document (Mock MySQL)
+     * Teste le repli strict sur v1 si la version est null ou vide
+     * (Éradication du bug -v.ext)
+     */
+    public function testComposeNomVersionFallbackWhenVersionMissing()
+    {
+        $nom = "Tab-uku-riff-muchas-gracias.mp3";
+        $resultat = Document::composeNomVersion($nom, null);
+        $this->assertEquals("Tab-uku-riff-muchas-gracias-v1.mp3", $resultat);
+
+        $resultatVide = Document::composeNomVersion($nom, "");
+        $this->assertEquals("Tab-uku-riff-muchas-gracias-v1.mp3", $resultatVide);
+    }
+
+    /**
+     * Teste la recherche de document (Mock MySQL avec fetch_assoc)
      */
     public function testChercheDocument()
     {
         $id = 42;
         $mockResult = $this->getMockBuilder(stdClass::class)
-            ->addMethods(['fetch_row'])
+            ->addMethods(['fetch_assoc'])
             ->getMock();
             
         $mockResult->expects($this->once())
-            ->method('fetch_row')
-            ->willReturn(['42', 'test.pdf', '100', '2026-03-11', '1', 'chanson', '123', '1', '0']);
+            ->method('fetch_assoc')
+            ->willReturn([
+                'id' => 42,
+                'nom' => 'test.pdf',
+                'tailleKo' => 100,
+                'date' => '2026-03-11',
+                'version' => 1,
+                'nomTable' => 'chanson',
+                'idTable' => 123,
+                'idUser' => 1,
+                'hits' => 0
+            ]);
 
         $_SESSION['mysql']->expects($this->once())
             ->method('query')
@@ -81,6 +108,7 @@ class DocumentTest extends TestCase
         $resultat = Document::chercheDocument($id);
         
         $this->assertIsArray($resultat);
-        $this->assertEquals('test.pdf', $resultat[1]);
+        $this->assertEquals('test.pdf', $resultat['nom']);
+        $this->assertEquals(1, $resultat['version']);
     }
 }

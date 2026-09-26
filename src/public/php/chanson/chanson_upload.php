@@ -109,7 +109,7 @@ function handleFileUpload()
         $doc = Document::chercheDocument($oldFileId);
         // On conserve le nom de base du document existant (le "target"), mais on utilise l'extension finale
         // (utile si on change de format, ex: doc -> pdf, ou jpg -> webp)
-        $oldBaseName = pathinfo($doc[1], PATHINFO_FILENAME);
+        $oldBaseName = pathinfo($doc['nom'] ?? '', PATHINFO_FILENAME);
         $name_file = $oldBaseName . "." . $finalExt;
     } else {
         // Simplification du nom de fichier pour une nouvelle insertion
@@ -160,7 +160,8 @@ function handleFileUpload()
         $doc = Document::chercheDocumentNomTableId($name_file, "chanson", $_POST['id']);
     }
 
-    $name_file_versioned = Document::composeNomVersion($name_file, $doc[4]);
+    $version = (int)($doc['version'] ?? 1);
+    $name_file_versioned = Document::composeNomVersion($name_file, $version);
 
     // Déplacement du fichier final
     $destination = $repertoire . $name_file_versioned;

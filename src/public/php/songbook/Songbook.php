@@ -279,8 +279,10 @@ class Songbook
         $maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
         $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg' OR document.nom LIKE '%.webp') LIMIT 1";
         $result = $db->query($maRequete);
-        if ($ligne = $result->fetch_row()) {
-            return Document::composeNomVersion($ligne[1], $ligne[4]);
+        if ($ligne = ($result->fetch_assoc() ?: $result->fetch_row())) {
+            $nom = $ligne['nom'] ?? $ligne[1] ?? '';
+            $version = (int)($ligne['version'] ?? $ligne[4] ?? 1);
+            return Document::composeNomVersion($nom, $version);
         }
         return "";
     }
@@ -374,8 +376,10 @@ function imageSongbook($idSongbook): string
     $maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
     $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg') LIMIT 1";
     $result = $db->query($maRequete);
-    if ($ligne = $result->fetch_row()) {
-        return composeNomVersion($ligne[1], $ligne[4]);
+    if ($ligne = ($result->fetch_assoc() ?: $result->fetch_row())) {
+        $nom = $ligne['nom'] ?? $ligne[1] ?? '';
+        $version = (int)($ligne['version'] ?? $ligne[4] ?? 1);
+        return composeNomVersion($nom, $version);
     }
     return "";
 }
@@ -422,9 +426,10 @@ function CreeSongBookPdf($idSongbook): array
     $image = imageSongbook($idSongbook);
     $nomGenere = make_alias("songbook_" . $sb->getNom()) . '.pdf';
     $doc = chercheDocumentNomTableId($nomGenere, "songbook", $idSongbook);
+    $version = (int)($doc['version'] ?? $doc[4] ?? 1);
     
     // On retourne le résultat du service
-    return pdfCreeSongbookResult($idSongbook, $doc[4], $sb->getNom(), $image, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
+    return pdfCreeSongbookResult($idSongbook, $version, $sb->getNom(), $image, $listeNomsChanson, $listeNomsFichier, $listeIdChanson, $listeVersionsDoc);
 }
 
 /**

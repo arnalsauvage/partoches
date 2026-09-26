@@ -118,9 +118,10 @@ function imagePlaylist($idplaylist)
 
     // Choisit une vignette au hasard parmi les images
     // renvoie la ligne sélectionnée : id, nom, description, date , image, hits
-    if (($ligne = $result->fetch_row())) {
-        $nom = composeNomVersion($ligne[1], $ligne[4]);
-        return ($nom);
+    if (($ligne = ($result->fetch_assoc() ?: $result->fetch_row()))) {
+        $nomDoc = $ligne['nom'] ?? $ligne[1] ?? '';
+        $versionDoc = (int)($ligne['version'] ?? $ligne[4] ?? 1);
+        return composeNomVersion($nomDoc, $versionDoc);
     } else
         return ("");
 }

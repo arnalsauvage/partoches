@@ -37,9 +37,11 @@ if ($listeSongbooks) {
         $pdfSb = "vide";
         $docsSb = chercheDocumentsTableId("songbook", $idSb);
         if ($docsSb) {
-            while ($doc = $docsSb->fetch_row()) {
-                if (strstr(strtolower($doc[1]), "pdf")) {
-                    $pdfSb = composeNomVersion($doc[1], $doc[4]);
+            while ($doc = ($docsSb->fetch_assoc() ?: $docsSb->fetch_row())) {
+                $nomDoc = $doc['nom'] ?? $doc[1] ?? '';
+                $versionDoc = (int)($doc['version'] ?? $doc[4] ?? 1);
+                if (strstr(strtolower($nomDoc), "pdf")) {
+                    $pdfSb = composeNomVersion($nomDoc, $versionDoc);
                 }
             }
         }

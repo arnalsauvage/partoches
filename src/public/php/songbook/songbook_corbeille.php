@@ -5,28 +5,21 @@ $debug = true;
 //echo "<br> En bdd : <br>;";
 $fichiersEnBdd = [];
 $resultat = chercheDocumentsTableId($_table_lien_url, $id);
-while ($fichierEnBdd = $resultat->fetch_row()) {
-    array_push($fichiersEnBdd, $fichierEnBdd);
-    // echo "fichier en bdd :" ;
-    //print_r($fichierEnBdd);
+while ($fichierEnBdd = ($resultat->fetch_assoc() ?: $resultat->fetch_row())) {
+    $fichiersEnBdd[] = $fichierEnBdd;
 }
 $fichiersSurDisque = fichiersSongbook($id); // repertoire nom extension
 
 $nbFichiersKO = 0;
-//   echo "Fichiers du songbook : <br>";
-// print_r ($fichiersSurDisque);
 
 while (count($fichiersSurDisque) > 0) {
-    // echo "nb fichiers : "     .   count($fichiersSurDisque);
     $fichierSurDisque = array_shift($fichiersSurDisque);
-    //echo ".......FichierDisque ". $fichierSurDisque[1] ."<br>";
     $fichierOk = false;
     foreach ($fichiersEnBdd as $fichierEnBdd) {
-        // echo "cherche version du " . $fichierEnBdd[1] . " " . $fichierEnBdd[4] . "<br>";
-        // si le fichierBDD est sur disque, alors fichierOk
-        if (composeNomVersion($fichierEnBdd[1], $fichierEnBdd[4]) == $fichierSurDisque[1]) {
+        $nomBdd = $fichierEnBdd['nom'] ?? $fichierEnBdd[1] ?? '';
+        $versionBdd = (int)($fichierEnBdd['version'] ?? $fichierEnBdd[4] ?? 1);
+        if (composeNomVersion($nomBdd, $versionBdd) == $fichierSurDisque[1]) {
             $fichierOk = true;
-            //echo "Fichier $fichierSurDisque[1] trouvé !!!!!!!!!!!!!!!!!!!<br>";
         }
     }
     if (!$fichierOk) {

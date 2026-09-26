@@ -15,14 +15,16 @@ require_once PHP_DIR . "/liens/LienDocSongbook.php";
  */
 
 function renderDocumentRow($doc, $idSongbook): string {
-    $idDoc = (int)$doc[0];
-    $taille = (int)$doc[2];
-    $fichierCourt = composeNomVersion($doc[1], $doc[4]);
+    $idDoc = (int)($doc['id'] ?? $doc[0] ?? 0);
+    $nom = $doc['nom'] ?? $doc[1] ?? '';
+    $version = (int)($doc['version'] ?? $doc[4] ?? 1);
+    $taille = (int)($doc['tailleKo'] ?? $doc[2] ?? 0);
+    $fichierCourt = composeNomVersion($nom, $version);
     $url = "../../data/songbooks/$idSongbook/" . urlencode($fichierCourt);
-    $ext = strtolower(pathinfo($doc[1], PATHINFO_EXTENSION));
+    $ext = strtolower(pathinfo($nom, PATHINFO_EXTENSION));
     $iconePath = "../../images/icones/$ext.png";
     $icone = file_exists($iconePath) ? $iconePath : "../../images/icones/fichier.png";
-    $poids = intval($taille/1024);
+    $poids = intval($taille / 1024);
 
     return <<<HTML
         <div class="list-group-item sb-list-item">
@@ -45,8 +47,10 @@ HTML;
 }
 
 function renderSommaireRow($docLien, $idSongbook, $index): string {
-    $idDoc = (int)$docLien[0];
-    $nomFic = composeNomVersion($docLien[1], $docLien[4]);
+    $idDoc = (int)($docLien['id'] ?? $docLien[0] ?? 0);
+    $nom = $docLien['nom'] ?? $docLien[1] ?? '';
+    $version = (int)($docLien['version'] ?? $docLien[4] ?? 1);
+    $nomFic = composeNomVersion($nom, $version);
     return <<<HTML
         <li class="ui-state-default sb-sortable-item" data-index="$idDoc" data-position="$index">
             <i class="glyphicon glyphicon-menu-hamburger sb-handle-icon" aria-hidden="true"></i>
@@ -185,7 +189,7 @@ if ($mode == "MAJ") {
 HTML;
     
     $docsRecueil = Document::chercheDocumentsTableId("songbook", $id);
-    while ($doc = $docsRecueil->fetch_row()) {
+    while ($doc = ($docsRecueil->fetch_assoc() ?: $docsRecueil->fetch_row())) {
         $html .= renderDocumentRow($doc, $id);
     }
     $html .= "</div>";

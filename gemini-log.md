@@ -1,5 +1,21 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (26 Septembre 2026 - Matin)
+- **🐛 Résolution du Bug de Nommage des Fichiers Uploadés (`-v.ext` au lieu de `-v1.ext`)** :
+    - **Demande PO & Directive d'Excellence** : Rejet catégorique des indices numériques (`$doc[4]`, `$doc[1]`) et de toute solution de compromis "double compatibilité". Passage intégral à une version propre, lisible et maintenable utilisant les noms explicites d'attributs (`$doc['nom']`, `$doc['version']`, `$doc['id']`, `$doc['nomTable']`, `$doc['idTable']`).
+    - **Identification Root Cause** : Suite au passage récent de `Document::chercheDocument()` et `chercheDocumentNomTableId()` en `fetch_assoc()` pour sécuriser l'ordre des colonnes BDD, les scripts appelants (`chanson_upload.php`, `songbook_upload.php`, `Document.php`, `getdoc.php`) continuaient de lire l'indice numérique `$doc[4]`. Celui-ci valait `null`, provoquant la génération de noms de fichiers physiques tronqués sans numéro de version (`-v.mp3`, `-v.pdf`).
+    - **Refactorisation & Éradication des Indices Numériques** :
+        - `Document.php` : Utilisation stricte de `fetch_assoc()`, renommage et incrémentation de version basés sur `$resultat['version']`, `$resultat['nom']`, etc.
+        - `Document::composeNomVersion($nom, $version = 1)` : Ajout d'un garde-fou strict avec repli par défaut sur `1` si `$version` est vide ou null (impossible désormais de produire `-v.ext`).
+        - `chanson_upload.php` & `songbook_upload.php` : Migration vers `$doc['nom']` et `Document::composeNomVersion($name_file, $doc['version'])`.
+        - `getdoc.php` : Migration vers `$doc['nom']`, `$doc['version']`, `$doc['nomTable']`, `$doc['idTable']`.
+        - `ChansonFormRenderer.php`, `ChansonService.php`, `views/chanson_voir_view.phtml`, `documentChercheAjax.php`, `Songbook.php`, `playlist.php` : Remplacement complet des lectures par indices (`$f[1]`, `$f[4]`) par les noms d'attributs explicites.
+    - **Nettoyage & Refus de Code Verrue** :
+        - Le PO ayant corrigé les deux noms de fichiers directement en FTP sur Hostinger, tout code d'auto-guérison ponctuel a été immédiatement retiré de `Document.php` et `getdoc.php` pour préserver un code source 100% pur, sans béquille ni dette technique.
+    - **Validation & Couverture de Tests** :
+        - `DocumentTest.php` : Migration des mocks vers `fetch_assoc`, tests validant le fallback `composeNomVersion(..., null)` (4/4 tests OK, 9 assertions).
+        - Smoke Tests : **28 / 28 pages vérifiées avec succès (100%)**.
+
 ### 📖 Résumé de la session (26 Septembre 2026 - Nuit)
 - **🔥 Résolution de l'incident critique de production & alignement architectural** :
     - **Identification Root Cause du 404 généralisé** : Une règle de réécriture Apache (`RewriteCond %{REQUEST_URI} !^/public/` / `RewriteRule ^(.*)$ public/$1`) avait été injectée dans `src/public/.htaccess`. Sur Hostinger (LiteSpeed) comme sous Docker local, le DocumentRoot sert déjà directement le contenu de `public/` (ou `public_html/`). La réécriture forçait donc la recherche d'un sous-dossier inexistant `/public/public/...`, provoquant un 404 sur l'intégralité du site.
