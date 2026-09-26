@@ -24,6 +24,13 @@
             - Centralisation complète de `.contenu_popup` dans `styles-communs.css` (chargé sur 100% des pages du site).
             - Suppression des règles redondantes et obsolètes de `index.css`.
             - Zero style inline (`style="..."`).
+    - **Notifications Flash de Connexion/Déconnexion en Toasts Éphémères (`menu.php`)** :
+        - Éradication de l'ancien conteneur de message statique `<p class='ok'>Vous vous êtes bien connecté.e</p>` qui restait bloqué en haut de page.
+        - Utilisation du composant standard du projet **`toastr`** :
+            - Connexion : `toastr.success('Vous êtes bien connecté.e !');`
+            - Déconnexion : `toastr.info('Vous êtes bien déconnecté.e.');`
+            - Échec : `toastr.error('Erreur de login ou mot de passe !');`
+        - Injection automatique dans le DOM et auto-fermeture après quelques secondes.
     - **Validation & Couverture de Tests** :
         - `DocumentTest.php` : Migration des mocks vers `fetch_assoc`, tests validant le fallback `composeNomVersion(..., null)` (4/4 tests OK, 9 assertions).
         - Smoke Tests : **28 / 28 pages vérifiées avec succès (100%)**.

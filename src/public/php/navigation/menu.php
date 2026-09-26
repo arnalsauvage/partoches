@@ -29,17 +29,17 @@ if (!isset($_SESSION['user'])) {
     }
 }
 
-// Messages flash de connexion/déconnexion
-$infoLogin = "";
-if (isset($_SESSION['login'])) {
-    if ($_SESSION['login'] === "ok") {
-        $infoLogin = "<p class='ok'>Vous vous êtes bien connecté.e</p>";
-    } elseif ($_SESSION['login'] === "logout") {
-        $infoLogin = "<p class='info'>Vous vous êtes bien déconnecté.e</p>";
-    }
-    
-    if ($_SESSION['login'] === "ko") {
-        $contenuExtra = "<script>$(function() { toastr.error('Erreur de login ou mot de passe !'); });</script>";
+// Messages flash de connexion/déconnexion (Toastr)
+$flashToastJs = "";
+if (!empty($_SESSION['login'])) {
+    $toastCode = match ($_SESSION['login']) {
+        "ok"     => "toastr.success('Vous êtes bien connecté.e !');",
+        "logout" => "toastr.info('Vous êtes bien déconnecté.e.');",
+        "ko"     => "toastr.error('Erreur de login ou mot de passe !');",
+        default  => ""
+    };
+    if ($toastCode) {
+        $flashToastJs = "<script>$(function() { $toastCode });</script>";
     }
     $_SESSION['login'] = "";
 }
@@ -197,17 +197,7 @@ $contenu .= <<<HTML
 </nav>
 HTML;
 
-// --- ZONE MESSAGES (SOUS LE MENU) ---
-if (!empty($infoLogin)) {
-    $contenu .= <<<HTML
-<div class="container">
-    <div class="starter-template msg-flash-container">
-        $infoLogin
-    </div>
-</div>
-HTML;
-}
-$MENU_HTML = $contenu . $extraHtml;
+$MENU_HTML = $contenu . $extraHtml . $flashToastJs;
 
 // On n'affiche le menu AUTOMATIQUEMENT que si $pasDeMenu n'est pas défini.
 // Cela permet aux pages de contrôler l'ordre d'affichage (après envoieHead).
