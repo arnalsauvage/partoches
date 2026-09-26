@@ -12,6 +12,10 @@
         - `ChansonFormRenderer.php`, `ChansonService.php`, `views/chanson_voir_view.phtml`, `documentChercheAjax.php`, `Songbook.php`, `playlist.php` : Remplacement complet des lectures par indices (`$f[1]`, `$f[4]`) par les noms d'attributs explicites.
     - **Nettoyage & Refus de Code Verrue** :
         - Le PO ayant corrigé les deux noms de fichiers directement en FTP sur Hostinger, tout code d'auto-guérison ponctuel a été immédiatement retiré de `Document.php` et `getdoc.php` pour préserver un code source 100% pur, sans béquille ni dette technique.
+    - **Rétablissement du lien d'inscription sur la popin de connexion (`menuLogin.html`)** :
+        - Suite à la restauration manuelle de la prod le 24 septembre, `html/composants/menuLogin.html` était repassé sur une ancienne version.
+        - Libellé mis à jour selon la directive PO : `"Créer un compte gratuitement"`.
+        - Poussée Git pour déclenchement du déploiement FTP automatique vers Hostinger.
     - **Validation & Couverture de Tests** :
         - `DocumentTest.php` : Migration des mocks vers `fetch_assoc`, tests validant le fallback `composeNomVersion(..., null)` (4/4 tests OK, 9 assertions).
         - Smoke Tests : **28 / 28 pages vérifiées avec succès (100%)**.
