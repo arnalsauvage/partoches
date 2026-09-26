@@ -1,5 +1,38 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (26 Septembre 2026 - Après-midi)
+- **🧪 Réalisation des Suites de Tests Automatisés (US Kanban PO)** :
+    - **Suite 1 : Tests autos de base fonctionnels (PHPUnit — `tests/BaseFunctionalTest.php`)** :
+        - 8 tests exhaustifs validés à 100% via client cURL avec persistance de cookies de session :
+            1. Affichage de la page d'accueil (HTTP 200).
+            2. Présence du bouton entrer (`a.boutonEntree` / `#bouton_entree`).
+            3. Présence de médias récents (classe `.col-md-2`, cartes `.card`, `.pochette-container`).
+            4. Connexion au site (`POST /php/navigation/login.php` avec `admin`).
+            5. Déconnexion du site (`GET /php/navigation/login.php?deconnexion=1`).
+            6. Page liste chansons : affichage du catalogue et filtres.
+            7. Page songbook : affichage des recueils et vignettes.
+            8. Page strums : affichage du tableau des rythmiques et motifs.
+        - Résultat : **8 / 8 tests OK (19 assertions)**.
+    - **Suite 2 : Tests E2E Rôle Éditeur (Cypress — `cypress/e2e/17_workflow_editeur.cy.js`)** :
+        - 10 scénarios complets de bout en bout testant l'intégralité du cycle de vie éditeur :
+            1. Connexion et création d'une nouvelle chanson.
+            2. Modification des informations de la chanson (artiste, tempo, tonalité).
+            3. Upload d'un fichier joint à la chanson (PDF généré à la volée).
+            4. Suppression logique du document de la chanson (déplacement vers la corbeille).
+            5. Suppression définitive du fichier physique depuis la corbeille.
+            6. Création d'un nouveau songbook (vérification de redirection).
+            7. Modification des métadonnées du songbook.
+            8. Upload d'un fichier propre au songbook.
+            9. Ajout d'une partition du catalogue au sommaire du songbook.
+            10. Nettoyage automatique : suppression de la chanson et du songbook de test.
+        - Résultat : **10 / 10 tests passing (43s)**.
+- **🐛 Corrections & Durcissement Détectés lors des Tests** :
+    - **Création de Songbook (`songbook_get.php`)** : Affectation `$id = creeSongbook(...)` qui manquait, provoquant des redirections erronées vers `songbook_form.php?id=0`.
+    - **Contexte Formulaire Chanson (`chanson_form.php`)** : Déclaration explicite des variables globales `$_DOSSIER_CHANSONS`, `$iconePoubelle`, `$cheminImages` dans le contrôleur pour alimenter le contexte du renderer.
+    - **Résolution des Chemins Disque (`ChansonRepository::getPhysicalFiles`)** : Vérification préalable si `$baseDir` est déjà un chemin absolu valide pour éviter les chemins dupliqués `/var/www/html/src/public/data/var/www/html/...`.
+    - **Gestion de la Corbeille (`ChansonFormRenderer::renderTrash`)** : Prise en charge de la structure associative `['name' => ...]` retournée par `fichiersChanson` au lieu de l'ancien tableau plat à pas de 3.
+    - **Résilience Perte de Connexion BDD (`MediaRepository::checkDbConnection`)** : Détection de socket déconnecté via `ping()` et reconnexion automatique transparente en cas de redémarrage serveur MariaDB (*"MySQL server has gone away"*).
+
 ### 📖 Résumé de la session (26 Septembre 2026 - Matin)
 - **🐛 Résolution du Bug de Nommage des Fichiers Uploadés (`-v.ext` au lieu de `-v1.ext`)** :
     - **Demande PO & Directive d'Excellence** : Rejet catégorique des indices numériques (`$doc[4]`, `$doc[1]`) et de toute solution de compromis "double compatibilité". Passage intégral à une version propre, lisible et maintenable utilisant les noms explicites d'attributs (`$doc['nom']`, `$doc['version']`, `$doc['id']`, `$doc['nomTable']`, `$doc['idTable']`).

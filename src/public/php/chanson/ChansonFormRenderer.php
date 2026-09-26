@@ -258,8 +258,9 @@ HTML;
         $nbOrphelins = 0;
 
         $out .= "<div class='list-group'>";
-        for ($i = 0; $i < count($fichiersSurDisque); $i += 3) {
-            $nomFic = $fichiersSurDisque[$i+1];
+        foreach ($fichiersSurDisque as $file) {
+            $nomFic = is_array($file) ? ($file['name'] ?? '') : $file;
+            if (empty($nomFic)) continue;
             if (!in_array($nomFic, $fichiersEnBdd)) {
                 $nbOrphelins++;
                 // Correction Arnal : On utilise le chemin physique propre pour unlink, sans le RETOUR_RACINE superflu

@@ -227,8 +227,10 @@ class MediaRepository
 
     private static function checkDbConnection(): void
     {
-        if (!isset($_SESSION[self::MYSQL]) || !($_SESSION[self::MYSQL] instanceof mysqli) || $_SESSION[self::MYSQL]->connect_error) {
-            require_once PHP_DIR . self::CONFIG_MYSQL;
+        $db = $_SESSION[self::MYSQL] ?? null;
+        if (!($db instanceof mysqli) || $db->connect_error || !@$db->ping()) {
+            unset($GLOBALS['configMysql']);
+            require PHP_DIR . self::CONFIG_MYSQL;
         }
     }
 }

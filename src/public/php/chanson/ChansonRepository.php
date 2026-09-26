@@ -195,8 +195,12 @@ class ChansonRepository
     public static function getPhysicalFiles(int $idChanson, string $baseDir): array
     {
         $files = [];
-        $dataDir = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/' : dirname(__DIR__, 2) . '/data/';
-        $dirPath = $dataDir . trim(str_replace('data/', '', $baseDir), '/') . '/' . $idChanson;
+        if (is_dir(rtrim($baseDir, '/') . '/' . $idChanson)) {
+            $dirPath = rtrim($baseDir, '/') . '/' . $idChanson;
+        } else {
+            $dataDir = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/' : dirname(__DIR__, 2) . '/data/';
+            $dirPath = $dataDir . trim(str_replace('data/', '', $baseDir), '/') . '/' . $idChanson;
+        }
         if (is_dir($dirPath)) {
             foreach (new DirectoryIterator($dirPath) as $fileInfo) {
                 if ($fileInfo->isDot() || str_starts_with($fileInfo->getFilename(), ".")) continue;

@@ -67,7 +67,7 @@ if ($mode == "INS") {
     $fhits = 0;
     $fdate = date("d/m/Y");
     /** @noinspection PhpUndefinedVariableInspection */
-    creeSongbook($fnom, $fdescription, $fdate, $fimage, $fhits, $ftype);
+    $id = creeSongbook($fnom, $fdescription, $fdate, $fimage, $fhits, $ftype);
 }
 
 // Gestion de la demande de suppression

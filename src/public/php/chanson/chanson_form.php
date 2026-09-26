@@ -16,6 +16,8 @@ require_once __DIR__ . "/../utilisateur/Utilisateur.php";
 
 $id = isset($_GET['id']) && is_numeric($_GET['id']) ? (int) $_GET['id'] : 0;
 
+global $_DOSSIER_CHANSONS, $iconePoubelle, $cheminImages;
+
 // 1. Préparation métier (sécurité + initialisation entité + mode)
 $context = ChansonFormService::prepareForm($id);
 $chanson = $context['chanson'];
