@@ -96,6 +96,11 @@ if ((isset ($_GET ['doc'])) && (is_numeric($_GET ['doc']))) {
         exit();
     }
 
+    if (isset($_SERVER['HTTP_ORIGIN']) && str_starts_with($_SERVER['HTTP_ORIGIN'], 'https://ateliers.canopee-musique.fr')) {
+        header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+        header("Access-Control-Allow-Credentials: true");
+    }
+
     $nomFichier = composeNomVersion($nomDoc, $versionDoc);
     $fichier = __DIR__ . "/../../data/" . $nomTableDoc . "s/" . $idTableDoc . "/" . $nomFichier;
 

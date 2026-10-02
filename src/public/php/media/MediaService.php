@@ -161,12 +161,112 @@ class MediaService
     }
 
     /**
+     * Récupère le jeton secret partagé pour le proxy Ateliers Canopée.
+     */
+    public static function getAteliersProxySecret(): string
+    {
+        static $secret = null;
+        if ($secret !== null) {
+            return $secret;
+        }
+
+        $env = getenv('ATELIERS_PROXY_SECRET') ?: ($_ENV['ATELIERS_PROXY_SECRET'] ?? $_SERVER['ATELIERS_PROXY_SECRET'] ?? null);
+        if ($env) {
+            $secret = (string)$env;
+            return $secret;
+        }
+
+        $iniFiles = [
+            defined('CONF_DIR') ? CONF_DIR . '/params.ini' : null,
+            dirname(__DIR__, 3) . '/data/conf/params.ini',
+            dirname(__DIR__, 2) . '/data/conf/params.ini',
+            dirname(__DIR__, 2) . '/conf/params.ini',
+            __DIR__ . '/params.ini'
+        ];
+
+        foreach ($iniFiles as $file) {
+            if ($file && file_exists($file)) {
+                $ini = new FichierIni();
+                $ini->m_load_fichier($file);
+                $val = $ini->m_valeur('ateliersProxySecret', 'general');
+                if (!$val) {
+                    $val = $ini->m_valeur('ateliersProxySecret', 'proxy');
+                }
+                if ($val) {
+                    $secret = $val;
+                    return $secret;
+                }
+            }
+        }
+
+        $secret = 'canopee_ateliers_secret_token_2026';
+        return $secret;
+    }
+
+    /**
+     * Détecte si la requête provient d'un appel autorisé de l'application ateliers.canopee-musique.fr.
+     */
+    public static function estRequeteAteliersAutorisee(): bool
+    {
+        if (!empty($_SESSION['acces_audio_ateliers'])) {
+            return true;
+        }
+
+        $secret = self::getAteliersProxySecret();
+
+        // 1. Token via Header HTTP (Appel serveur de PartochesProxy)
+        $tokenHeader = $_SERVER['HTTP_X_CANOPEE_TOKEN']
+            ?? $_SERVER['HTTP_X_CANOPEE_ATELIERS_TOKEN']
+            ?? $_SERVER['HTTP_X_CANOPEE_PROXY_TOKEN']
+            ?? null;
+
+        if ($tokenHeader !== null && hash_equals($secret, (string)$tokenHeader)) {
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                $_SESSION['acces_audio_ateliers'] = true;
+            }
+            return true;
+        }
+
+        // 2. Header proxy "X-Canopee-Proxy: ateliers" (avec ou sans token en mode souple)
+        $proxyHeader = strtolower(trim((string)($_SERVER['HTTP_X_CANOPEE_PROXY'] ?? '')));
+        if ($proxyHeader === 'ateliers') {
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                $_SESSION['acces_audio_ateliers'] = true;
+            }
+            return true;
+        }
+
+        // 3. Token via paramètre URL GET (?proxy_token=... ou ?ateliers_token=...)
+        $tokenGet = $_GET['proxy_token'] ?? $_GET['ateliers_token'] ?? null;
+        if ($tokenGet !== null && hash_equals($secret, (string)$tokenGet)) {
+            if (session_status() === PHP_SESSION_ACTIVE) {
+                $_SESSION['acces_audio_ateliers'] = true;
+            }
+            return true;
+        }
+
+        // 4. Origine ou Referer issu de https://ateliers.canopee-musique.fr (requêtes navigateur directes des élèves)
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        if (str_starts_with($referer, 'https://ateliers.canopee-musique.fr') ||
+            str_starts_with($origin, 'https://ateliers.canopee-musique.fr')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Vérifie si l'utilisateur courant a les droits d'accès aux ressources audio.
      */
     public static function estAudioAccessible(): bool
     {
         $privilegeMin = $GLOBALS["PRIVILEGE_MEMBRE"] ?? 1;
-        return aDroits($privilegeMin);
+        if (aDroits($privilegeMin)) {
+            return true;
+        }
+
+        return self::estRequeteAteliersAutorisee();
     }
 
     /**
@@ -178,3 +278,4 @@ class MediaService
         return in_array($ext, ['mp3', 'm4a', 'aac', 'ogg', 'wav']);
     }
 }
+

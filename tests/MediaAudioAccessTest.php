@@ -13,6 +13,22 @@ class MediaAudioAccessTest extends TestCase
     protected function setUp(): void
     {
         $_SESSION['privilege'] = 0;
+        unset($_SESSION['acces_audio_ateliers']);
+        unset($_SERVER['HTTP_X_CANOPEE_PROXY']);
+        unset($_SERVER['HTTP_X_CANOPEE_TOKEN']);
+        unset($_SERVER['HTTP_REFERER']);
+        unset($_SERVER['HTTP_ORIGIN']);
+        unset($_GET['proxy_token']);
+    }
+
+    protected function tearDown(): void
+    {
+        unset($_SESSION['acces_audio_ateliers']);
+        unset($_SERVER['HTTP_X_CANOPEE_PROXY']);
+        unset($_SERVER['HTTP_X_CANOPEE_TOKEN']);
+        unset($_SERVER['HTTP_REFERER']);
+        unset($_SERVER['HTTP_ORIGIN']);
+        unset($_GET['proxy_token']);
     }
 
     public function testEstExtensionAudio()
@@ -37,6 +53,34 @@ class MediaAudioAccessTest extends TestCase
         $this->assertTrue(MediaService::estAudioAccessible());
     }
 
+    public function testEstAudioAccessibleViaProxyHeader()
+    {
+        $_SESSION['privilege'] = 0;
+        $_SERVER['HTTP_X_CANOPEE_PROXY'] = 'ateliers';
+        $this->assertTrue(MediaService::estAudioAccessible());
+    }
+
+    public function testEstAudioAccessibleViaTokenHeader()
+    {
+        $_SESSION['privilege'] = 0;
+        $_SERVER['HTTP_X_CANOPEE_TOKEN'] = 'canopee_ateliers_secret_token_2026';
+        $this->assertTrue(MediaService::estAudioAccessible());
+    }
+
+    public function testEstAudioAccessibleViaRefererAteliers()
+    {
+        $_SESSION['privilege'] = 0;
+        $_SERVER['HTTP_REFERER'] = 'https://ateliers.canopee-musique.fr/chansons/123';
+        $this->assertTrue(MediaService::estAudioAccessible());
+    }
+
+    public function testEstAudioAccessibleViaGetToken()
+    {
+        $_SESSION['privilege'] = 0;
+        $_GET['proxy_token'] = 'canopee_ateliers_secret_token_2026';
+        $this->assertTrue(MediaService::estAudioAccessible());
+    }
+
     public function testMediaRendererRestreintChansonUrl()
     {
         $_SESSION['privilege'] = 0;
@@ -55,3 +99,4 @@ class MediaAudioAccessTest extends TestCase
         $this->assertStringNotContainsString('getdoc.php?doc=999', $html);
     }
 }
+
