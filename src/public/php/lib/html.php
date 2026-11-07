@@ -275,7 +275,11 @@ HTML;
         return str_replace("'", "&#39;", $chaine);
     }
 
-    function simplifieNomFichier($nomOriginal){
+    function simplifieNomFichier($nomOriginal) {
+        $info = pathinfo($nomOriginal);
+        $baseName = $info['filename'] ?? $nomOriginal;
+        $ext = isset($info['extension']) && $info['extension'] !== '' ? '.' . strtolower($info['extension']) : '';
+
         $table = array(
             'Š'=>'S', 'š'=>'s', 'Đ'=>'Dj', 'đ'=>'dj', 'Ž'=>'Z', 'ž'=>'z', 'Č'=>'C', 'č'=>'c', 'Ć'=>'C', 'ć'=>'c',
             'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
@@ -285,10 +289,16 @@ HTML;
             'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o',
             'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ÿ'=>'y', 'Ŕ'=>'R', 'ŕ'=>'r'
         );
-        $_nomSimplifie = strtr($nomOriginal,$table) ;
-        $_nomSimplifie = str_replace("#","diese", $_nomSimplifie);
-        $_nomSimplifie = str_replace("'","", $_nomSimplifie);
-        $_nomSimplifie = str_replace(" ","-", $_nomSimplifie);
-        return $_nomSimplifie;
+        $clean = strtr($baseName, $table);
+        $clean = str_replace('#', 'diese', $clean);
+        $clean = preg_replace('/[^a-zA-Z0-9]+/', '-', $clean);
+        $clean = preg_replace('/-+/', '-', $clean);
+        $clean = trim($clean, '-');
+
+        if ($clean === '') {
+            $clean = 'fichier';
+        }
+
+        return $clean . $ext;
     }
 }

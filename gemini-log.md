@@ -1,5 +1,40 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (07 Novembre 2026 - Midi)
+- **🛡️ Résolution de l'Erreur 403 Forbidden sur l'Upload de Fichiers (Bouclier WAF / ModSecurity & Assainissement des Noms)** :
+    - **Problématique & Analyse Root Cause** :
+        - Lors de l'envoi d'un fichier audio (MP3 de ~6 Mo) sur la fiche d'une chanson contenant une apostrophe (ex: #783 - *Ain't Got No, I Got Life*), le serveur renvoyait brutalement `403 Forbidden - Access to this resource on the server is denied!`.
+        - Le test cURL comparatif a prouvé que la taille du fichier n'était pas en cause, mais que le WAF ModSecurity de LiteSpeed (Hostinger) intercepte et bloque les requêtes multipart contenant des apostrophes (`'`) ou des guillemets dans l'attribut `filename` de `Content-Disposition`, les assimilant à de l'injection SQL avant même d'atteindre PHP.
+    - **Solutions Déployées (Bouclier Frontend & Durcissement Backend)** :
+        1. **Frontend (`src/public/js/utilsJquery.js`)** :
+            - Ajout de la fonction `assainitNomFichierUpload()` et `securiseInputFile()`.
+            - Écouteurs globaux sur les événements `change` et `submit` des `<input type="file">`.
+            - Décomposition NFD pour éliminer les accents, conversion de `#` en `diese`, remplacement de tous les caractères non alphanumériques (`[^a-zA-Z0-9]+`) par un tiret `-`, réduction des tirets multiples en un seul `-`, et trimming des tirets aux extrémités.
+            - Utilisation de l'API moderne `DataTransfer` pour remplacer le nom de fichier dans `input.files` de manière transparente avant la transmission HTTP (avec notification Toastr).
+        2. **Backend (`src/public/php/lib/html.php` & `src/public/php/songbook/songbook_upload.php`)** :
+            - Refactorisation de `simplifieNomFichier()` dans `html.php` selon la même règle stricte (sans apostrophe, sans caractères spéciaux, tirets uniques consolidés).
+            - Utilisation unifiée de `simplifieNomFichier()` dans `songbook_upload.php` en remplacement de l'ancien `renommeFichierChanson()`.
+    - **Tests & Validation Qualité** :
+        - `tests/HtmlTest.php` mis à jour et enrichi avec des assertions sur les apostrophes (`L'opportuniste` -> `L-opportuniste`), dièses (`Morceau #` -> `Morceau-diese`), accents et tirets multiples (`4/4 tests OK, 9 assertions`).
+        - **171 / 171 tests PHPUnit validés (100% Succès)**.
+        - **28 / 28 Smoke Tests validés (100% Succès)**.
+        - Zéro style inline introduit.
+- **🎵 Lecteur Audio Pédagogique Canopée & Contrôle de Vitesse (`playbackRate`)** :
+    - **Besoin PO & Pédagogie** : Remplacement de l'ancien lecteur `<audio controls>` brut par un lecteur interactif moderne Canopée avec contrôle de vitesse de lecture (`0.5x`, `0.75x`, `0.9x`, `1.0x`, `1.15x`, `1.25x`), répétition en boucle (`loop 🔁`), boutons de saut rapide (±5s) et timeline interactive pour la pratique instrumentale.
+    - **Design System Canopée (`composants-canopee.css`)** :
+        - Composant `.canopee-audio-player` avec palette de couleurs chaleureuses (dégradé boisé, bordure marron clair, accent doré/terroir).
+        - Boutons de lecture circulaires et pastilles de vitesse (`.cap-speed-pills`, `.cap-speed-btn.active`).
+        - Timeline cliquable (`.cap-progress-container`, `.cap-progress-bar`) avec affichage du temps formaté (`0:00 / 3:45`).
+        - Zéro attribut `style="..."` introduit (100% conforme Constitution).
+    - **Contrôleur JavaScript (`utilsJquery.js`)** :
+        - Fonction `initCanopeeAudioPlayers()` initialisée automatiquement au chargement du DOM.
+        - Gestion synchronisée : la mise en lecture d'une piste met automatiquement en pause les autres lecteurs de la page.
+        - Saut ±5s via `audio.currentTime`, bascule mode boucle via `audio.loop`.
+        - Changement instantané du tempo via `audio.playbackRate` sans altération de tonalité.
+    - **Validation Qualité** :
+        - **171 / 171 tests PHPUnit validés (100% Succès)**.
+        - **28 / 28 Smoke Tests validés (100% Succès)**.
+
 ### 📖 Résumé de la session (02 Octobre 2026 - Soir)
 - **🎸 Autorisation Spéciale et Intégration Proxy pour `ateliers.canopee-musique.fr`** :
     - **Problématique & Besoin PO** : Suite à la restriction des ressources audio aux utilisateurs connectés (Ticket #10), l'application externe d'ateliers (`https://ateliers.canopee-musique.fr`) interrogeant Partoches via son proxy serveur voyait ses élèves bloqués (alerte "Connexion requise", balises `<audio>` absentes du HTML, redirection de `getdoc.php` vers `login.php`).

@@ -50,7 +50,7 @@ if (strstr($autorisees, $ext) == FALSE) {
 }
 
 // On met le nom au propre pour éviter les pb de caractères accentués
-$name_file = renommeFichierChanson($path); // on crée un nom compatible url
+$name_file = simplifieNomFichier($path); // Assainissement rigoureux sans apostrophe/caracteres speciaux
 //$name_file = urlencode($name_file);
 
 // On enregistre notre nom de fichier en BDD, on récupère un n°de version

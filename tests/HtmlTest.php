@@ -14,9 +14,12 @@ class HtmlTest extends TestCase
 
     public function testSimplifieNom()
     {
-        $this->assertEquals("Lopportuniste.pdf", simplifieNomFichier("L'opportuniste.pdf"));
+        $this->assertEquals("L-opportuniste.pdf", simplifieNomFichier("L'opportuniste.pdf"));
         $this->assertEquals("Le-jeu-du-telephone.pdf", simplifieNomFichier("Le jeu du téléphone.pdf"));
         $this->assertEquals("Viens-a-la-maison.pdf", simplifieNomFichier("Viens à la maison.pdf"));
+        $this->assertEquals("Ain-t-Got-No-I-Got-Life.mp3", simplifieNomFichier("Ain't Got No, I Got Life.mp3"));
+        $this->assertEquals("Morceau-diese-C-majeur-v2.pdf", simplifieNomFichier("Morceau # C majeur (v2)!.pdf"));
+        $this->assertEquals("Titre-multiple-tirets.mp3", simplifieNomFichier("---Titre   --   multiple---tirets---.mp3"));
     }
 
     public function testEnregistreNoteBDD()

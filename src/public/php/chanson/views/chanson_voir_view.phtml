@@ -113,15 +113,60 @@
                     $nom = pathinfo($nomDoc, PATHINFO_FILENAME);
                     $url = Document::lienUrlAffichageDocument($idDoc);
                 ?>
-                    <div class="col-xs-12 col-sm-6 col-md-4 text-center mb-20">
-                        <div class="well well-sm">
-                            <strong><?= $nom ?></strong><br>
-                            <?php if ($isAudio): ?>
-                                <audio controls class="w-100 mt-10"><source src="<?= $url ?>" type="audio/<?= ($ext === 'aac' ? 'mpeg' : 'mp3') ?>"></audio>
-                            <?php else: ?>
+                    <div class="col-xs-12 col-sm-6 col-md-4 mb-20">
+                        <?php if ($isAudio): ?>
+                            <div class="canopee-audio-player" data-audio-src="<?= $url ?>" data-audio-title="<?= htmlspecialchars($nom, ENT_QUOTES) ?>">
+                                <div class="cap-header">
+                                    <div class="cap-header-left">
+                                        <span class="cap-icon glyphicon glyphicon-headphones" aria-hidden="true"></span>
+                                        <span class="cap-title" title="<?= htmlspecialchars($nom, ENT_QUOTES) ?>"><?= htmlspecialchars($nom) ?></span>
+                                    </div>
+                                    <a href="<?= $url ?>" download class="cap-btn-download" title="Télécharger le fichier audio">
+                                        <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                                    </a>
+                                </div>
+                                <div class="cap-timeline-row">
+                                    <span class="cap-time cap-current-time">0:00</span>
+                                    <div class="cap-progress-container" role="slider" aria-label="Progression de lecture" tabindex="0">
+                                        <div class="cap-progress-bar"></div>
+                                    </div>
+                                    <span class="cap-time cap-total-time">--:--</span>
+                                </div>
+                                <div class="cap-controls-row">
+                                    <button type="button" class="cap-btn-control cap-btn-prev" title="Reculer de 5 secondes">
+                                        <span class="glyphicon glyphicon-backward" aria-hidden="true"></span> <span class="cap-step-label">5s</span>
+                                    </button>
+                                    <button type="button" class="cap-btn-play" title="Lancer la lecture">
+                                        <span class="glyphicon glyphicon-play cap-play-icon" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button" class="cap-btn-control cap-btn-next" title="Avancer de 5 secondes">
+                                        <span class="cap-step-label">5s</span> <span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button" class="cap-btn-control cap-btn-loop" title="Répéter en boucle (Désactivé)">
+                                        <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                                <div class="cap-speed-row">
+                                    <span class="cap-speed-label"><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Vitesse :</span>
+                                    <div class="cap-speed-pills btn-group btn-group-xs" role="group" aria-label="Vitesse de lecture">
+                                        <button type="button" class="btn btn-default cap-speed-btn" data-speed="0.5">0.5x</button>
+                                        <button type="button" class="btn btn-default cap-speed-btn" data-speed="0.75">0.75x</button>
+                                        <button type="button" class="btn btn-default cap-speed-btn" data-speed="0.9">0.9x</button>
+                                        <button type="button" class="btn btn-default cap-speed-btn active" data-speed="1.0">1.0x</button>
+                                        <button type="button" class="btn btn-default cap-speed-btn" data-speed="1.15">1.15x</button>
+                                        <button type="button" class="btn btn-default cap-speed-btn" data-speed="1.25">1.25x</button>
+                                    </div>
+                                </div>
+                                <audio preload="metadata" controls class="cap-native-audio">
+                                    <source src="<?= $url ?>" type="audio/<?= ($ext === 'aac' ? 'mpeg' : 'mp3') ?>">
+                                </audio>
+                            </div>
+                        <?php else: ?>
+                            <div class="well well-sm text-center">
+                                <strong><?= htmlspecialchars($nom) ?></strong><br>
                                 <video width="100%" controls class="mt-10"><source src="<?= $url ?>" type="video/mp4"></video>
-                            <?php endif; ?>
-                        </div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             </div>
