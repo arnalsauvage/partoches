@@ -42,18 +42,29 @@ $(document).ready(function(){
         });
     });
 
+    // --- SAUVEGARDE GLOBALE ZIP ---
+    $('#btnBackupZip').on('click', function(e){
+        if (!confirm('Voulez-vous générer et télécharger la sauvegarde complète de Partoches (Base de données + Fichiers + Configuration) ?\n\nSelon la taille des médias, la création du ZIP peut prendre 10 à 30 secondes.')) {
+            e.preventDefault();
+            return false;
+        }
+        var $btn = $(this);
+        var oldHtml = $btn.html();
+        $btn.addClass('disabled').html('<span class="glyphicon glyphicon-refresh spin"></span> Création du ZIP en cours...');
+        setTimeout(function(){
+            $btn.removeClass('disabled').html(oldHtml);
+        }, 12000);
+    });
+
     // --- EXPORT BDD ---
     $(document).on('click', '#btnExportDb', function(e){
         e.preventDefault();
-        console.log("Clic sur Export BDD détecté");
         
         if (!confirm('Voulez-vous exporter et télécharger une sauvegarde compressée de la base de données ?')) return;
         
         var btn = $(this);
         var oldHtml = btn.html();
         btn.prop('disabled', true).html('<span class="glyphicon glyphicon-refresh spin"></span> Export en cours...');
-        
-        console.log("Lancement du formulaire d'export...");
         
         // On utilise un formulaire temporaire pour forcer le téléchargement
         var form = $('<form>', {
@@ -71,8 +82,6 @@ $(document).ready(function(){
         form.submit();
         form.remove();
         
-        console.log("Formulaire soumis.");
-        
         // On remet le bouton après un petit délai
         setTimeout(function(){
             btn.prop('disabled', false).html(oldHtml);
@@ -81,7 +90,7 @@ $(document).ready(function(){
 
     // --- RÉGÉNÉRATION MÉDIAS ---
     $('#btnRegenMedias').click(function(){
-        if (!confirm('Voulez-vous vraiment régénérer tout le catalogue des médias ? Cela peut prendre quelques secondes.')) return;
+        if (!confirm('Voulez-vous vraiment régénérer tout le catalogue des médias ? Cela va reconstruire la table d\'indexation des morceaux.')) return;
         var btn = $(this);
         var oldHtml = btn.html();
         btn.prop('disabled', true).html('<span class="glyphicon glyphicon-refresh spin"></span> Régénération...');
@@ -93,7 +102,7 @@ $(document).ready(function(){
 
     // --- RÉGÉNÉRATION VIGNETTES ---
     $(document).on('click', '#btnRegenVignettes', function(){
-        if (!confirm('Voulez-vous générer toutes les miniatures manquantes ? Cela peut prendre un certain temps selon le nombre d\'images.')) return;
+        if (!confirm('Voulez-vous générer toutes les miniatures WebP manquantes ? Cela peut prendre quelques instants.')) return;
         var btn = $(this);
         var oldHtml = btn.html();
         btn.prop('disabled', true).html('<span class="glyphicon glyphicon-refresh spin"></span> Traitement...');

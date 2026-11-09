@@ -26,8 +26,6 @@ if (isset($_POST['action'])) {
             echo $adminService->executeRawSql($_POST['sql'] ?? '');
             break;
         case 'diagnostic_systeme':
-            // Pour le diagnostic, on garde un peu de logique ici ou on injecte une vue partielle
-            // On va appeler le service
             require_once __DIR__ . "/params_ajax.php";
             handleDiagnostic($adminService, $mysqli);
             break;
@@ -54,7 +52,6 @@ if (isset($_POST['action'])) {
         case 'export_db':
             $filePath = $adminService->exportDatabase();
             if ($filePath && file_exists($filePath)) {
-                // On vide les tampons pour éviter de corrompre le fichier binaire
                 if (ob_get_level()) ob_end_clean();
                 
                 header('Content-Description: File Transfer');
@@ -65,10 +62,6 @@ if (isset($_POST['action'])) {
                 header('Pragma: public');
                 header('Content-Length: ' . filesize($filePath));
                 readfile($filePath);
-                
-                // On peut supprimer le fichier temporaire après envoi si on veut, 
-                // mais le garder en backup local sur le serveur n'est pas une mauvaise idée.
-                // unlink($filePath);
                 exit;
             } else {
                 http_response_code(500);
@@ -80,38 +73,51 @@ if (isset($_POST['action'])) {
 }
 
 // 3. LOGIQUE METIER (Chargement des donnees)
-$fichierIni = defined('CONF_DIR') ? CONF_DIR . "/params.ini" : dirname(__DIR__, 2) . "/data/conf/params.ini";
+$fichierIni = class_exists('FichierIni') ? FichierIni::getParamsIniPath() : (defined('CONF_DIR') ? CONF_DIR . "/params.ini" : dirname(__DIR__, 2) . "/data/conf/params.ini");
 $ini_objet = new FichierIni();
 $ini_objet->m_load_fichier($fichierIni);
 $alerts = "";
 
 // Sauvegarde si POST normal
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // ... logique de sauvegarde ... (On simplifie pour l'instant en reprenant l'ancienne)
     $bModif = false;
     $footer = new Footer();
-    // On boucle sur les champs (Logique identique a l'ancienne pour la compatibilite)
-    $allKeys = ["loginParam", "urlSite", "EmailAdmin", "titreSite", "sousTitreSite", "mailOubliMotDePasse", "nomEmailOubliMotDePasse", "largeurMaxImageChanson", "hauteurMaxImageChanson", "cleGetSongBpm", "GEMINI_API_KEY", "MAMMOUTH_API_KEY", "monServeur", "maBase", "login", "motDePasse", "display_errors", "log_level"];
+    $allKeys = ["loginParam", "urlSite", "EmailAdmin", "titreSite", "sousTitreSite", "mailOubliMotDePasse", "nomEmailOubliMotDePasse", "largeurMaxImageChanson", "hauteurMaxImageChanson", "cleGetSongBpm", "GEMINI_API_KEY", "MAMMOUTH_API_KEY", "monServeur", "maBase", "login", "motDePasse", "log_level"];
     foreach ($allKeys as $key) {
         if (isset($_POST[$key])) {
-            $group = (in_array($key, ["monServeur", "maBase", "login", "motDePasse"])) ? "mysql" : (in_array($key, ["display_errors", "log_level"]) ? "admin" : "general");
+            $group = (in_array($key, ["monServeur", "maBase", "login", "motDePasse"])) ? "mysql" : (in_array($key, ["log_level"]) ? "admin" : "general");
             $ini_objet->m_put($_POST[$key], $key, $group);
             $bModif = true;
         }
     }
+
+    // Gestion du switch display_errors (case à cocher)
+    if (isset($_POST['display_errors_submitted'])) {
+        $displayErrorsNew = (!empty($_POST['display_errors'])) ? "1" : "0";
+        $ini_objet->m_put($displayErrorsNew, "display_errors", "admin");
+        $bModif = true;
+    }
+
     if (isset($_POST['footerHtml'])) {
         $footerHtmlRaw = strip_tags($_POST['footerHtml'], '<a><br><img><strong><em><p>');
         $ini_objet->m_put($footerHtmlRaw, 'footerHtml', 'footer');
         $footer->setHtml($footerHtmlRaw);
         $bModif = true;
     }
-    if ($bModif) { $footer->sauveBdd(); $ini_objet->save(); $alerts = "<div class='alert alert-success'>Enregistre !</div>"; }
+    if ($bModif) { 
+        $footer->sauveBdd(); 
+        $ini_objet->save(); 
+        $alerts = "<div class='alert alert-success'><span class='glyphicon glyphicon-ok'></span> Configuration enregistrée avec succès !</div>"; 
+    }
 }
 
 // Preparation des variables pour la vue
 $logoActuel = $ini_objet->m_valeur('logoSite', 'general');
 $footer = new Footer();
 $footerHtml = htmlspecialchars($footer->getHtml());
+
+$displayErrorsVal = $ini_objet->m_valeur('display_errors', 'admin');
+$displayErrorsChecked = ($displayErrorsVal === "1" || $displayErrorsVal === 1) ? 'checked' : '';
 
 function champInputView($ini, $name, $label, $type, $groupe) {
     $val = $ini->m_valeur($name, $groupe) ?? '';

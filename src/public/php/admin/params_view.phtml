@@ -4,41 +4,34 @@
  * Template HTML pour l'administration.
  */
 ?>
-<div id="django-config-page" class="container" style="padding-top: 80px;">
+<div id="django-config-page" class="container">
     <?= $alerts ?>
     
     <div class="header-django">
-        <h1><span class="glyphicon glyphicon-cog"></span> Parametrage</h1>
-        <div class="btn-group-django">
-            <a href="audit_orphelins.php" class="btn-dj btn-dj-danger"><span class="glyphicon glyphicon-trash"></span> Orphelins &amp; Doublons</a>
-            <a href="backup_export.php" class="btn-dj btn-dj-success"><span class="glyphicon glyphicon-compressed"></span> Sauvegarde Globale ZIP</a>
-            <a href="../todo/todo_admin.php" class="btn-dj btn-dj-primary"><span class="glyphicon glyphicon-list-alt"></span> Roadbook</a>
-            <a href="../audit/imagesCheck.php" class="btn-dj btn-dj-info"><span class="glyphicon glyphicon-eye-open"></span> Images</a>
-            <a href="audit_liens.php" class="btn-dj btn-dj-warning"><span class="glyphicon glyphicon-link"></span> Audit Liens</a>
-            <a href="audit_fichiers.php" class="btn-dj btn-dj-warning"><span class="glyphicon glyphicon-search"></span> Django Audit</a>
-            <button type="button" id="btnExportDb" class="btn-dj btn-dj-success"><span class="glyphicon glyphicon-download-alt"></span> Exporter BDD</button>
-            <button type="button" id="btnRegenVignettes" class="btn-dj btn-dj-warning"><span class="glyphicon glyphicon-picture"></span> Générer Vignettes</button>
-            <button type="button" id="btnRegenMedias" class="btn-dj btn-dj-default"><span class="glyphicon glyphicon-refresh"></span> Regenere Medias</button>
+        <div>
+            <h1><span class="glyphicon glyphicon-cog"></span> Paramétrage</h1>
+            <div class="header-django-subtitle">Configuration, maintenance et santé du système</div>
         </div>
     </div>
 
     <form method="post" enctype="multipart/form-data" class="form-dj-reset">
         <ul class="tabs-django">
-            <li class="tab-dj active" data-target="dj-gen"><span class="glyphicon glyphicon-home"></span> General</li>
-            <li class="tab-dj" data-target="dj-sql-db"><span class="glyphicon glyphicon-hdd"></span> Base</li>
-            <li class="tab-dj" data-target="dj-foot"><span class="glyphicon glyphicon-edit"></span> Footer</li>
+            <li class="tab-dj active" data-target="dj-gen"><span class="glyphicon glyphicon-home"></span> Général</li>
+            <li class="tab-dj" data-target="dj-sql-db"><span class="glyphicon glyphicon-hdd"></span> Base &amp; SQL</li>
+            <li class="tab-dj" data-target="dj-backups"><span class="glyphicon glyphicon-compressed"></span> Sauvegardes</li>
+            <li class="tab-dj" data-target="dj-audits"><span class="glyphicon glyphicon-heart"></span> Santé &amp; Audits</li>
             <li class="tab-dj" data-target="dj-logs"><span class="glyphicon glyphicon-list"></span> Logs</li>
-            <li class="tab-dj" data-target="dj-console"><span class="glyphicon glyphicon-console"></span> SQL</li>
             <li class="tab-dj" data-target="dj-diag"><span class="glyphicon glyphicon-wrench"></span> Diagnostic</li>
+            <li class="tab-dj" data-target="dj-foot"><span class="glyphicon glyphicon-edit"></span> Footer &amp; Roadbook</li>
         </ul>
 
         <div class="content-django">
-            <!-- ONGLET GÉNÉRAL -->
+            <!-- 1. ONGLET GÉNÉRAL -->
             <div id="dj-gen" class="pane-dj active">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="section-dj">
-                            <div class="section-dj-title">Identite</div>
+                            <div class="section-dj-title">Identité du Site</div>
                             <div class="logo-config-container">
                                 <img src="../../images/navigation/<?= $logoActuel ?>" class="img-thumbnail logo-config-preview" alt="Logo">
                                 <input type="file" name="logoSite" class="input-django">
@@ -48,61 +41,237 @@
                     </div>
                     <div class="col-md-6">
                         <div class="section-dj">
-                            <div class="section-dj-title">Emails &amp; API</div>
+                            <div class="section-dj-title">Emails &amp; Clés API</div>
                             <?= $genFields2 ?>
+                        </div>
+                        <div class="section-dj">
+                            <div class="section-dj-title"><span class="glyphicon glyphicon-bullhorn"></span> Mode Debug &amp; Erreurs PHP</div>
+                            <input type="hidden" name="display_errors_submitted" value="1">
+                            <div class="switch-container-dj">
+                                <label class="toggle-switch-dj" for="switchDisplayErrors">
+                                    <input type="checkbox" id="switchDisplayErrors" name="display_errors" value="1" class="toggle-switch-input" <?= $displayErrorsChecked ?>>
+                                    <span class="toggle-switch-slider"></span>
+                                </label>
+                                <label class="toggle-switch-label" for="switchDisplayErrors">
+                                    <strong>Affichage des erreurs PHP (<code>display_errors</code>)</strong>
+                                    Quand activé, affiche directement les alertes et avertissements PHP à l'écran. 
+                                    <span class="text-danger">Désactivez-le en production</span> pour éviter que des warnings système ne polluent l'affichage des utilisateurs.
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ONGLET BASE -->
+            <!-- 2. ONGLET BASE & SQL -->
             <div id="dj-sql-db" class="pane-dj">
-                <div class="section-dj section-sql-db">
-                    <div class="section-dj-title">Connexion MySQL</div>
-                    <?= $mysqlFields ?>
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="section-dj">
+                            <div class="section-dj-title">Connexion MariaDB / MySQL</div>
+                            <?= $mysqlFields ?>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="section-dj">
+                            <div class="section-dj-title">Console SQL Interactive</div>
+                            <p class="text-muted small">Exécutez des requêtes SELECT directement pour vérifier l'état des tables.</p>
+                            <textarea id="sqlQueryDj" class="input-django sql-console-textarea" rows="4" placeholder="SELECT id, titre, artiste FROM chanson ORDER BY id DESC LIMIT 5;"></textarea>
+                            <div class="sql-actions-bar">
+                                <button type="button" id="btnRunSqlDj" class="btn-dj btn-dj-info"><span class="glyphicon glyphicon-play"></span> Exécuter la requête</button>
+                            </div>
+                            <div id="sqlResDj" class="sql-results-container"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- ONGLET FOOTER -->
-            <div id="dj-foot" class="pane-dj">
+            <!-- 3. ONGLET SAUVEGARDES -->
+            <div id="dj-backups" class="pane-dj">
                 <div class="section-dj">
-                    <div class="section-dj-title">HTML du Footer</div>
-                    <textarea name="footerHtml" rows="12" class="textarea-footer-dj"><?= $footerHtml ?></textarea>
+                    <div class="section-dj-title"><span class="glyphicon glyphicon-floppy-save"></span> Sauvegardes &amp; Exports du Système</div>
+                    <p class="text-muted">Choisissez le type de sauvegarde souhaité selon votre besoin (sauvegarde d'urgence ou export de données).</p>
+                    
+                    <div class="action-cards-grid">
+                        <!-- Carte 1 : Sauvegarde Globale ZIP -->
+                        <div class="action-card-dj">
+                            <div>
+                                <div class="action-card-header">
+                                    <h3 class="action-card-title"><span class="glyphicon glyphicon-compressed text-success"></span> Sauvegarde Globale ZIP</h3>
+                                    <span class="action-card-badge badge-success-dj">Complète</span>
+                                </div>
+                                <p class="action-card-desc">
+                                    Génère une archive ZIP complète comprenant la base de données SQL (<code>dump.sql</code>), l'intégralité du répertoire <code>/data</code> (partitions, documents, pochettes, grilles, audio) et la configuration <code>params.ini</code>. Idéal pour une sauvegarde externe complète (Disaster Recovery).
+                                </p>
+                            </div>
+                            <div class="action-card-footer">
+                                <a href="backup_export.php" id="btnBackupZip" class="btn btn-success btn-action-card">
+                                    <span class="glyphicon glyphicon-download-alt"></span> Télécharger l'Archive Globale (.zip)
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Carte 2 : Export BDD Seul -->
+                        <div class="action-card-dj">
+                            <div>
+                                <div class="action-card-header">
+                                    <h3 class="action-card-title"><span class="glyphicon glyphicon-hdd text-primary"></span> Export Base de Données</h3>
+                                    <span class="action-card-badge badge-info-dj">Rapide</span>
+                                </div>
+                                <p class="action-card-desc">
+                                    Exporte uniquement la structure et les enregistrements de toutes les tables MySQL sous forme de script SQL compressé (<code>.sql.gz</code>). Rapide et léger, parfait pour cloner la base de données vers votre environnement de dev.
+                                </p>
+                            </div>
+                            <div class="action-card-footer">
+                                <button type="button" id="btnExportDb" class="btn btn-primary btn-action-card">
+                                    <span class="glyphicon glyphicon-download-alt"></span> Exporter la Base de Données (.sql.gz)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- ONGLET LOGS -->
+            <!-- 4. ONGLET SANTÉ & AUDITS -->
+            <div id="dj-audits" class="pane-dj">
+                <div class="section-dj">
+                    <div class="section-dj-title"><span class="glyphicon glyphicon-heart text-danger"></span> Outils d'Audit &amp; Maintenance du Catalogue</div>
+                    <p class="text-muted">Ces outils vous permettent de contrôler la santé du catalogue, réparer les liens et regénérer les fichiers optimisés.</p>
+                    
+                    <div class="action-cards-grid">
+                        <!-- Carte 1 : Orphelins & Doublons -->
+                        <div class="action-card-dj">
+                            <div>
+                                <div class="action-card-header">
+                                    <h3 class="action-card-title"><span class="glyphicon glyphicon-trash text-danger"></span> Orphelins &amp; Doublons</h3>
+                                    <span class="action-card-badge badge-warning-dj">Nettoyage</span>
+                                </div>
+                                <p class="action-card-desc">
+                                    Scanne le stockage disque pour repérer les fichiers résiduels sans lien en base de données, ainsi que les doublons physiques pour récupérer de l'espace.
+                                </p>
+                            </div>
+                            <div class="action-card-footer">
+                                <a href="audit_orphelins.php" class="btn btn-default btn-action-card">
+                                    <span class="glyphicon glyphicon-trash"></span> Ouvrir l'outil Orphelins &amp; Doublons
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Carte 2 : Audit des Liens -->
+                        <div class="action-card-dj">
+                            <div>
+                                <div class="action-card-header">
+                                    <h3 class="action-card-title"><span class="glyphicon glyphicon-link text-warning"></span> Audit des Liens URL</h3>
+                                    <span class="action-card-badge badge-info-dj">Qualité</span>
+                                </div>
+                                <p class="action-card-desc">
+                                    Vérifie l'accessibilité en ligne de tous les liens externes associés aux morceaux (vidéos YouTube, tutoriels web) et liste les erreurs 404.
+                                </p>
+                            </div>
+                            <div class="action-card-footer">
+                                <a href="audit_liens.php" class="btn btn-default btn-action-card">
+                                    <span class="glyphicon glyphicon-link"></span> Vérifier les Liens Externes
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Carte 3 : Images & Photothèque -->
+                        <div class="action-card-dj">
+                            <div>
+                                <div class="action-card-header">
+                                    <h3 class="action-card-title"><span class="glyphicon glyphicon-picture text-info"></span> Contrôle Photothèque</h3>
+                                    <span class="action-card-badge badge-muted-dj">Intégrité</span>
+                                </div>
+                                <p class="action-card-desc">
+                                    Inspecte les pochettes et images associées aux chansons, compare la cohérence entre fichiers et BDD (hérité de la migration catalogue).
+                                </p>
+                            </div>
+                            <div class="action-card-footer">
+                                <a href="../audit/imagesCheck.php" class="btn btn-default btn-action-card">
+                                    <span class="glyphicon glyphicon-eye-open"></span> Inspecter les Images
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Carte 4 : Régénération Vignettes -->
+                        <div class="action-card-dj">
+                            <div>
+                                <div class="action-card-header">
+                                    <h3 class="action-card-title"><span class="glyphicon glyphicon-refresh text-warning"></span> Régénérer Vignettes</h3>
+                                    <span class="action-card-badge badge-warning-dj">Traitement</span>
+                                </div>
+                                <p class="action-card-desc">
+                                    Parcourt les pochettes de chansons et génère toutes les miniatures WebP manquantes (<code>-mini.webp</code> pour les listes et <code>-sd.webp</code> pour les fiches).
+                                </p>
+                            </div>
+                            <div class="action-card-footer">
+                                <button type="button" id="btnRegenVignettes" class="btn btn-warning btn-action-card">
+                                    <span class="glyphicon glyphicon-picture"></span> Générer les Vignettes manquantes
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Carte 5 : Régénération Médias -->
+                        <div class="action-card-dj">
+                            <div>
+                                <div class="action-card-header">
+                                    <h3 class="action-card-title"><span class="glyphicon glyphicon-repeat text-muted"></span> Régénérer Médias</h3>
+                                    <span class="action-card-badge badge-muted-dj">Indexation</span>
+                                </div>
+                                <p class="action-card-desc">
+                                    Reconstruit intégralement la table d'indexation rapide des médias (MP3, vidéos, partitions) à partir des documents du catalogue.
+                                </p>
+                            </div>
+                            <div class="action-card-footer">
+                                <button type="button" id="btnRegenMedias" class="btn btn-default btn-action-card">
+                                    <span class="glyphicon glyphicon-refresh"></span> Régénérer la Table Médias
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. ONGLET LOGS -->
             <div id="dj-logs" class="pane-dj">
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="list-group"><?= $logLinks ?></div>
                     </div>
-                    <div class="col-sm-8"><div id="log-view-dj" class="well-log-dj">Selectionnez un log...</div></div>
+                    <div class="col-sm-8"><div id="log-view-dj" class="well-log-dj">Sélectionnez un log...</div></div>
                 </div>
             </div>
 
-            <!-- ONGLET CONSOLE SQL -->
-            <div id="dj-console" class="pane-dj">
-                <div class="section-dj">
-                    <textarea id="sqlQueryDj" class="input-django sql-console-textarea" rows="5" placeholder="SELECT * FROM chanson LIMIT 10;"></textarea>
-                    <div class="sql-actions-bar"><button type="button" id="btnRunSqlDj" class="btn-dj btn-dj-info">Executer</button></div>
-                    <div id="sqlResDj" class="sql-results-container"></div>
-                </div>
-            </div>
-
-            <!-- ONGLET DIAGNOSTIC -->
+            <!-- 6. ONGLET DIAGNOSTIC -->
             <div id="dj-diag" class="pane-dj">
                 <div class="section-dj">
-                    <div class="section-dj-title">Diagnostic Systeme</div>
-                    <p>Lancez une analyse complete de l'environnement pour detecter les problemes de memoire, d'extensions ou de permissions.</p>
+                    <div class="section-dj-title">Diagnostic Système &amp; Migrations BDD</div>
+                    <p>Lancez une analyse complète de l'environnement pour détecter les problèmes de mémoire, d'extensions ou de permissions, et appliquez les migrations SQL en attente.</p>
                     <button type="button" id="btnRunDiagDj" class="btn-dj btn-dj-warning"><span class="glyphicon glyphicon-play"></span> Lancer le Diagnostic</button>
                     <div id="diagResDj" class="diag-results-container"></div>
+                </div>
+            </div>
+
+            <!-- 7. ONGLET FOOTER & ROADBOOK -->
+            <div id="dj-foot" class="pane-dj">
+                <div class="section-dj">
+                    <div class="section-dj-title"><span class="glyphicon glyphicon-list-alt text-primary"></span> Roadbook &amp; Feuille de Route</div>
+                    <p>Accédez au suivi des tâches prioritaires, anomalies signalées et chantiers de développement en cours.</p>
+                    <a href="../todo/todo_admin.php" class="btn btn-primary"><span class="glyphicon glyphicon-list-alt"></span> Ouvrir le Roadbook Partoches</a>
+                </div>
+
+                <div class="section-dj">
+                    <div class="section-dj-title"><span class="glyphicon glyphicon-edit"></span> Code HTML du Footer</div>
+                    <p class="text-muted small">Personnalisez le pied de page du site (liens, mentions légales, mentions d'ateliers).</p>
+                    <textarea name="footerHtml" rows="10" class="textarea-footer-dj"><?= $footerHtml ?></textarea>
                 </div>
             </div>
         </div>
 
         <div class="footer-save-dj">
-            <button type="submit" class="btn-dj btn-dj-primary btn-lg full-width">ENREGISTRER TOUT</button>
+            <button type="submit" class="btn-dj btn-dj-primary btn-lg full-width">
+                <span class="glyphicon glyphicon-floppy-disk"></span> ENREGISTRER LA CONFIGURATION
+            </button>
         </div>
     </form>
 </div>
