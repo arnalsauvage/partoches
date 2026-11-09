@@ -91,7 +91,11 @@ if (($mode == "SUPPRFIC") && ($_SESSION [PRIVILEGE] > 1)) {
 // Gestion de la demande de suppression de fichier de la corbeille du songbook
 if ($mode == "SUPPRFICPOU" && $_SESSION [PRIVILEGE] > 1) {
     echo "Appel avec mode = $mode, nomFic =" . $_GET[NOM_FIC] . " ,  idSongbook = " . $_GET [ID_SONGBOOK];
-    unlink("../../data/songbooks/" . $id . "/" . $_GET[NOM_FIC]);
+    $dirSb = (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : dirname(__DIR__, 2) . '/data') . '/songbooks/' . (int)$id . '/';
+    $ficASuppr = $dirSb . basename($_GET[NOM_FIC]);
+    if (file_exists($ficASuppr)) {
+        unlink($ficASuppr);
+    }
 }
 
 // Ce cas est appelé en ajax, donc on ne redirigera pas

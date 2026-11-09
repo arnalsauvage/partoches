@@ -1,5 +1,70 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (09 Novembre 2026 - Fin de Matinée)
+- **🎵 Résolution du Bug du Lecteur Audio Pédagogique Canopée (Boutons Inopérants & Double Lecteur)** :
+    - **Identification Root Cause** :
+        - Dans `src/public/php/lib/html.php`, les feuilles CSS disposaient d'un paramètre de cache-busting automatique (`?v=$v`), mais le chargement de `utilsJquery.js` ne possédait aucun paramètre de version (`<script src="{$publicUrl}/js/utilsJquery.js"></script>`).
+        - Le navigateur client servait une version mise en cache (`HTTP 200 0ms / Disk Cache`) datant d'avant l'implémentation de `initCanopeeAudioPlayers()`.
+        - En conséquence, la classe `.cap-enhanced` n'était jamais ajoutée au composant `.canopee-audio-player` : les nouveaux boutons restaient inertes sans écouteurs d'événements, tandis que le lecteur natif `<audio controls class="cap-native-audio">` restait affiché et actif (avec son play, volume et curseur de progression natifs).
+    - **Actions & Améliorations Appliquées** :
+        1. **Cache Busting Universel (`src/public/php/lib/html.php`)** :
+            - Ajout systématique de `?v=$v` sur `utilsJquery.js` et `precise-star-rating.js`, forçant le rafraîchissement immédiat des scripts sans dépendre du cache local du client.
+        2. **Progressive Enhancement CSS (`src/public/css/composants-canopee.css`)** :
+            - Ajout des règles de repli gracieux : si JS n'a pas encore initialisé le lecteur (`:not(.cap-enhanced)`), les boutons personnalisés (`.cap-timeline-row`, `.cap-controls-row`, `.cap-speed-row`) sont masqués, laissant uniquement le lecteur natif visible. Dès que `initCanopeeAudioPlayers()` s'exécute, `.cap-enhanced` prend le relais en masquant le lecteur natif et en révélant l'interface riche.
+        3. **Durcissement & Fiabilisation du Lecteur (`src/public/js/utilsJquery.js`)** :
+            - Ajout de `e.preventDefault()` sur tous les contrôles pour prévenir tout effet de bord.
+            - Mémorisation et préservation du tempo pédagogique (`currentPlaybackRate`) pour éviter que le navigateur ne réinitialise la vitesse à 1.0x lors d'un play/pause.
+            - Écoute conjointe de `loadedmetadata` et `durationchange`, avec sécurisation `isFinite(audio.duration)` contre les valeurs `NaN` ou `Infinity`.
+            - Rafraîchissement synchrone immédiat du curseur et du temps lors des clics sur la timeline et les boutons ±5s.
+            - Exposition de `window.initCanopeeAudioPlayers` pour invocation manuelle si besoin.
+        4. **Compatibilité Cross-Browser du Flux Audio (`chanson_voir_view.phtml`)** :
+            - Ajout de l'attribut `src="<?= $url ?>"` directement sur la balise `<audio>` en plus de `<source>`, assurant un chargement immédiat sur Safari iOS et anciens moteurs.
+    - **Tests & Validation Qualité** :
+        - **174 / 174 tests PHPUnit validés (100% Succès)**.
+        - **56 / 56 Smoke Tests validés (100% Succès)**.
+        - Zéro style inline introduit (Règle 4).
+
+### 📖 Résumé de la session (09 Novembre 2026 - Matin)
+- **🧹 Éradication Globale des Chemins Relatifs Défaillants (`../../../`) & Fix Warning `logRecherche.txt`** :
+    - **Identification Root Cause Warning `fopen`** :
+        - Dans `src/public/php/chanson/chanson_liste.php`, la fonction `logueRecherche()` tentait d'ouvrir `fopen("../../../data/logs/logRecherche.txt", "a")`.
+        - Sur l'hébergement de production Hostinger (LiteSpeed), le chemin relatif à 3 niveaux remontait hors de `public_html/` dans `/home/u715493341/`, où le sous-dossier `data/logs/` n'existe pas, provoquant `Warning: fopen(../../../data/logs/logRecherche.txt): Failed to open stream: No such file or directory`.
+    - **Chasse Globale aux Chemins Relatifs & Solutions Appliquées** :
+        1. **Centralisation dans `FichierIni.php`** :
+            - Ajout de la méthode statique universelle `FichierIni::getParamsIniPath(): string` résolvant automatiquement et en sécurité le chemin de `params.ini` (Dev local sous Docker et Prod Hostinger via `CONF_DIR` ou détection multi-chemins défensive).
+            - Ajout de `FichierIni::getLogsDir(): string` garantissant la résolution du dossier de logs avec auto-création du répertoire (`mkdir 0775`) s'il n'existe pas encore.
+        2. **Remplacement des Chemins Hardcodés `../../../` et `../../`** :
+            - `chanson_liste.php` : Utilisation de `FichierIni::getLogsDir() . '/logRecherche.txt'`.
+            - `chanson_chercher.php`, `params.php`, `gemini_api.php`, `mammouth_api.php`, `songbpm_proxy.php`, `pdf.php` (ligne 377) : Migration vers `FichierIni::getParamsIniPath()`.
+            - `pdf.php` (lignes 171-172) : Utilisation des constantes de chemins absolus `DATA_DIR` / `PUBLIC_DATA_DIR` pour `$this->logFile` (`songbook_gen.log`) et `$this->tempDir`.
+            - `songbook_get.php` & `songbook_upload.php` : Éradication des chemins relatifs `../../data/songbooks/` au profit de `PUBLIC_DATA_DIR . '/songbooks/'` pour les uploads et suppressions physiques.
+            - `todo_admin.php` & `audit_fichiers.php` : Remplacement des `dirname(__DIR__, 3)` erronés par les constantes `DATA_DIR` / `ROOT_DIR`.
+    - **Tests & Validation Qualité** :
+        - `tests/FichierIniTest.php` complété avec `testGetParamsIniPathEtLogsDir()` (5/5 tests OK).
+        - **174 / 174 tests PHPUnit validés (100% Succès)**.
+        - **56 / 56 Smoke Tests validés (100% Succès)**.
+        - Validation directe en environnement web local d'un appel `POST` avec critère de recherche sur `chanson_liste.php` : écriture réussie dans `data/logs/logRecherche.txt` avec code HTTP 200 et zéro avertissement.
+
+- **🎥 Optimisation Embed Vidéo YouTube No-Cookie & Eradication des Styles Inline (`lienurl_voir.php`)** :
+    - **Contexte & Analyse Root Cause des Erreurs Console** :
+        - Sur la fiche chanson #763 (`chanson_voir.php?id=763`), un déluge d'erreurs JS inondait la console client Firefox (`[YOUTUBEJS][Parser]: Error: Type mismatch, got MenuCustomIconItem expected MenuNavigationItem`).
+        - L'analyse a démontré que Partoches fonctionnait parfaitement (HTTP 200 OK), mais qu'une extension navigateur Firefox tierce (basée sur `YouTube.js`) plantait sur les menus internes de YouTube au chargement de l'iframe embed standard `youtube.com/embed/`. De plus, Firefox bloquait et partitionnait les cookies tiers publicitaires de Google.
+    - **Optimisations & Durcissement Appliqués** :
+        1. **Domaine YouTube No-Cookie (`prepareYoutubeEmbedUrl`)** :
+            - Extraction regex robuste de l'ID vidéo (11 caractères) supportant les formats `watch?v=`, `youtu.be/`, `shorts/`, `embed/`, avec ou sans paramètres d'URL.
+            - Redirection systématique vers `https://www.youtube-nocookie.com/embed/{id}` pour éliminer les cookies tiers publicitaires et respecter la vie privée.
+        2. **Sécurisation & Lazy Loading de l'Iframe (`lienurl_voir.php`)** :
+            - Ajout de `loading="lazy"` pour différer le chargement des scripts lourds de YouTube au défilement.
+            - Ajout de `referrerpolicy="strict-origin-when-cross-origin"`.
+            - Définition des permissions standards `allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"`.
+        3. **Conformité Constitution Design System (Règle 4 — Zéro Style Inline)** :
+            - Éradication de tous les attributs `style="..."` dans `lienurl_voir.php`.
+            - Déport des règles visuelles dans `composants-canopee.css` (`.lien-associe-carte`, `.lien-associe-well`, `.lien-associe-titre`, `.lien-associe-desc`).
+    - **Tests & Validation Qualité** :
+        - `tests/LienUrlTest.php` complété avec 2 nouveaux tests unitaires (`testPrepareYoutubeEmbedUrlFormatsDivers` et `testAfficheLienVideoConformiteHtmlEtCss`) : 5/5 tests OK (22 assertions).
+        - **173 / 173 tests PHPUnit validés (100% Succès)**.
+        - **56 / 56 Smoke Tests validés (100% Succès)**.
+
 ### 📖 Résumé de la session (07 Novembre 2026 - Midi)
 - **🛡️ Résolution de l'Erreur 403 Forbidden sur l'Upload de Fichiers (Bouclier WAF / ModSecurity & Assainissement des Noms)** :
     - **Problématique & Analyse Root Cause** :

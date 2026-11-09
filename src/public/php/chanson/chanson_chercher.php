@@ -10,7 +10,7 @@ $table =  CHANSON;
 $sortie = "";
 
 // On lit les données dans le fichier ini
-$fichier = "../../../conf/params.ini";
+$fichier = FichierIni::getParamsIniPath();
 $ini_objet = new FichierIni ();
 $ini_objet->m_load_fichier($fichier);
 $cle = $ini_objet->m_valeur("cleGetSongBpm", "general") ?? '';

@@ -1,9 +1,12 @@
 <?php
 use PHPUnit\Framework\TestCase;
-// require_once 'PHPUnit/Autoload.php';
-session_start();
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . "/../src/public/php/lib/utilssi.php";
 require_once __DIR__ . "/../src/public/php/liens/LienUrl.php";
+require_once __DIR__ . "/../src/public/php/liens/lienurl_voir.php";
 
 class LienUrlTest extends TestCase
 {
@@ -68,6 +71,7 @@ class LienUrlTest extends TestCase
         // Suppression de la donnée
         supprimeLienurl($idgenere);
     }
+
     public function testAjouteHitk()
     {
         // Etant données les valeurs suivantes
@@ -95,5 +99,56 @@ class LienUrlTest extends TestCase
 
         // Suppression de la donnée
         supprimeLienurl($idgenere);
+    }
+
+    public function testPrepareYoutubeEmbedUrlFormatsDivers()
+    {
+        // URL watch standard
+        $url1 = "https://www.youtube.com/watch?v=1poKE-rBeI4";
+        $this->assertEquals("https://www.youtube-nocookie.com/embed/1poKE-rBeI4", prepareYoutubeEmbedUrl($url1));
+
+        // URL raccourcie youtu.be
+        $url2 = "https://youtu.be/1poKE-rBeI4";
+        $this->assertEquals("https://www.youtube-nocookie.com/embed/1poKE-rBeI4", prepareYoutubeEmbedUrl($url2));
+
+        // URL avec paramètres additionnels (&t=..., &feature=...)
+        $url3 = "https://www.youtube.com/watch?v=1poKE-rBeI4&feature=related&t=45s";
+        $this->assertEquals("https://www.youtube-nocookie.com/embed/1poKE-rBeI4", prepareYoutubeEmbedUrl($url3));
+
+        // URL format Shorts
+        $url4 = "https://www.youtube.com/shorts/1poKE-rBeI4";
+        $this->assertEquals("https://www.youtube-nocookie.com/embed/1poKE-rBeI4", prepareYoutubeEmbedUrl($url4));
+
+        // URL déjà au format embed youtube.com
+        $url5 = "https://www.youtube.com/embed/1poKE-rBeI4";
+        $this->assertEquals("https://www.youtube-nocookie.com/embed/1poKE-rBeI4", prepareYoutubeEmbedUrl($url5));
+
+        // URL déjà au format youtube-nocookie
+        $url6 = "https://www.youtube-nocookie.com/embed/1poKE-rBeI4";
+        $this->assertEquals("https://www.youtube-nocookie.com/embed/1poKE-rBeI4", prepareYoutubeEmbedUrl($url6));
+    }
+
+    public function testAfficheLienVideoConformiteHtmlEtCss()
+    {
+        $lienData = [
+            1, // id
+            'chanson', // nomTable
+            763, // idTable
+            'https://www.youtube.com/watch?v=1poKE-rBeI4', // url
+            'Vidéo', // type
+            'Clip officiel de Gracias a la vida' // description
+        ];
+
+        $html = afficheLien($lienData);
+
+        // Vérification de la présence du domaine sans cookie et des attributs iframe
+        $this->assertStringContainsString("youtube-nocookie.com/embed/1poKE-rBeI4", $html);
+        $this->assertStringContainsString("loading='lazy'", $html);
+        $this->assertStringContainsString("referrerpolicy='strict-origin-when-cross-origin'", $html);
+        $this->assertStringContainsString("allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'", $html);
+
+        // Vérification Règle 4 de la Constitution : Aucun attribut style="..."
+        $this->assertStringNotContainsString('style="', $html);
+        $this->assertStringNotContainsString("style='", $html);
     }
 }

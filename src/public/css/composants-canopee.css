@@ -337,6 +337,37 @@
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+.canopee-audio-player:not(.cap-enhanced) .cap-timeline-row,
+.canopee-audio-player:not(.cap-enhanced) .cap-controls-row,
+.canopee-audio-player:not(.cap-enhanced) .cap-speed-row {
+    display: none;
+}
+
 .canopee-audio-player.cap-enhanced .cap-native-audio {
     display: none;
+}
+
+/* --- LIENS ASSOCIÉS & INTÉGRATIONS VIDÉO --- */
+.lien-associe-carte {
+    margin-bottom: 20px;
+}
+
+.lien-associe-well {
+    overflow: hidden;
+    background: rgba(43, 29, 26, 0.6);
+    border: 1px solid rgba(210, 180, 140, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.lien-associe-titre {
+    margin-top: 0;
+    color: var(--c-marron-clair);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.lien-associe-desc {
+    margin-bottom: 12px;
+    color: var(--c-beige);
 }

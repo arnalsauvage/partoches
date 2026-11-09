@@ -3,7 +3,8 @@ require __DIR__ . "/../lib/utilssi.php";
 require __DIR__ . "/../document/Document.php";
 
 $autorisees = "pdf doc docx gif jpg png swf mp3 odt";
-$repertoire = "../../data/songbooks/" . $_POST ['id'] . "/";
+$baseDirSb = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/songbooks/' : dirname(__DIR__, 2) . '/data/songbooks/';
+$repertoire = $baseDirSb . (int)$_POST['id'] . '/';
 
 // On vérifie que l'utilisateur est connecté
 if (!isset ($_SESSION ['user'])) {

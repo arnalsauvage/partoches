@@ -9,7 +9,7 @@
 require_once __DIR__ . '/FichierIni.php';
 $ini_objet = new FichierIni();
 // Chemin vers params.ini (relatif au dossier lib/)
-$configPath = __DIR__ . '/../../conf/params.ini'; 
+$configPath = FichierIni::getParamsIniPath(); 
 $ini_objet->m_load_fichier($configPath);
 
 // Récupère la clé depuis la section [gemini] dans params.ini

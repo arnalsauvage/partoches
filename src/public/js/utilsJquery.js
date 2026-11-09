@@ -192,8 +192,10 @@ function initCanopeeAudioPlayers() {
         const $btnPrev = $player.find('.cap-btn-prev');
         const $btnNext = $player.find('.cap-btn-next');
 
+        let currentPlaybackRate = 1.0;
+
         function formatTime(seconds) {
-            if (isNaN(seconds) || seconds < 0) return '0:00';
+            if (isNaN(seconds) || seconds < 0 || !isFinite(seconds)) return '0:00';
             const m = Math.floor(seconds / 60);
             const s = Math.floor(seconds % 60);
             return m + ':' + (s < 10 ? '0' : '') + s;
@@ -209,8 +211,16 @@ function initCanopeeAudioPlayers() {
             }
         }
 
+        function updateProgress() {
+            if (!audio.duration || !isFinite(audio.duration)) return;
+            const pct = Math.max(0, Math.min(100, (audio.currentTime / audio.duration) * 100));
+            $progressBar.css('width', pct + '%');
+            $currentTime.text(formatTime(audio.currentTime));
+        }
+
         // Lecture / Pause
-        $btnPlay.on('click', function () {
+        $btnPlay.on('click', function (e) {
+            e.preventDefault();
             if (audio.paused) {
                 // Pause tous les autres lecteurs audio de la page
                 $('audio.cap-native-audio').each(function () {
@@ -218,8 +228,8 @@ function initCanopeeAudioPlayers() {
                         this.pause();
                     }
                 });
-                audio.play().catch(function (e) {
-                    console.warn("Erreur lecture audio :", e);
+                audio.play().catch(function (err) {
+                    console.warn("Erreur lecture audio :", err);
                 });
             } else {
                 audio.pause();
@@ -227,6 +237,9 @@ function initCanopeeAudioPlayers() {
         });
 
         audio.addEventListener('play', function () {
+            if (audio.playbackRate !== currentPlaybackRate) {
+                audio.playbackRate = currentPlaybackRate;
+            }
             updatePlayIcon(true);
         });
 
@@ -243,43 +256,46 @@ function initCanopeeAudioPlayers() {
         });
 
         // Durée totale
-        audio.addEventListener('loadedmetadata', function () {
-            $totalTime.text(formatTime(audio.duration));
-        });
-        if (audio.duration) {
-            $totalTime.text(formatTime(audio.duration));
+        function updateDuration() {
+            if (audio.duration && isFinite(audio.duration)) {
+                $totalTime.text(formatTime(audio.duration));
+            }
         }
+        audio.addEventListener('loadedmetadata', updateDuration);
+        audio.addEventListener('durationchange', updateDuration);
+        updateDuration();
 
         // Progression de la lecture
-        audio.addEventListener('timeupdate', function () {
-            if (!audio.duration) return;
-            const pct = (audio.currentTime / audio.duration) * 100;
-            $progressBar.css('width', pct + '%');
-            $currentTime.text(formatTime(audio.currentTime));
-        });
+        audio.addEventListener('timeupdate', updateProgress);
 
         // Déplacement dans la piste (Seek)
         $progressContainer.on('click', function (e) {
-            if (!audio.duration) return;
+            e.preventDefault();
+            if (!audio.duration || !isFinite(audio.duration)) return;
             const rect = this.getBoundingClientRect();
             const clickPos = (e.clientX - rect.left) / rect.width;
-            audio.currentTime = clickPos * audio.duration;
+            audio.currentTime = Math.max(0, Math.min(audio.duration, clickPos * audio.duration));
+            updateProgress();
         });
 
         // Saut arrière 5s
-        $btnPrev.on('click', function () {
-            audio.currentTime = Math.max(0, audio.currentTime - 5);
+        $btnPrev.on('click', function (e) {
+            e.preventDefault();
+            audio.currentTime = Math.max(0, (audio.currentTime || 0) - 5);
+            updateProgress();
         });
 
         // Saut avant 5s
-        $btnNext.on('click', function () {
-            if (audio.duration) {
-                audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
-            }
+        $btnNext.on('click', function (e) {
+            e.preventDefault();
+            const maxDuration = (audio.duration && isFinite(audio.duration)) ? audio.duration : Infinity;
+            audio.currentTime = Math.min(maxDuration, (audio.currentTime || 0) + 5);
+            updateProgress();
         });
 
         // Mode boucle
-        $btnLoop.on('click', function () {
+        $btnLoop.on('click', function (e) {
+            e.preventDefault();
             audio.loop = !audio.loop;
             $(this).toggleClass('active', audio.loop);
             const title = audio.loop ? 'Mode boucle : Activé (répétition continue)' : 'Mode boucle : Désactivé';
@@ -287,9 +303,11 @@ function initCanopeeAudioPlayers() {
         });
 
         // Sélecteur de vitesse pédagogique
-        $speedBtns.on('click', function () {
+        $speedBtns.on('click', function (e) {
+            e.preventDefault();
             const spd = parseFloat($(this).data('speed'));
             if (!isNaN(spd)) {
+                currentPlaybackRate = spd;
                 audio.playbackRate = spd;
                 $speedBtns.removeClass('active');
                 $(this).addClass('active');
@@ -297,3 +315,4 @@ function initCanopeeAudioPlayers() {
         });
     });
 }
+window.initCanopeeAudioPlayers = initCanopeeAudioPlayers;

@@ -15,7 +15,7 @@ try {
 
     // --- Récupération de la clé API SongBPM depuis params.ini ---
     $ini_objet = new FichierIni();
-    $configPath = __DIR__ . '/../../conf/params.ini';
+    $configPath = FichierIni::getParamsIniPath();
     $ini_objet->m_load_fichier($configPath);
 
     // Clé récupérée depuis la section [general] comme indiqué

@@ -4,7 +4,7 @@
 
 require_once __DIR__ . '/FichierIni.php';
 $ini_objet = new FichierIni();
-$configPath = realpath(__DIR__ . '/../../conf/params.ini');
+$configPath = FichierIni::getParamsIniPath();
 if (!file_exists($configPath)) {
     die("Erreur : params.ini introuvable à $configPath");
 }

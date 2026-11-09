@@ -1,5 +1,5 @@
 <?php
-$fichier = __DIR__ . "/../../../data/conf/params.ini";
+$fichier = FichierIni::getParamsIniPath();
 
 // On lit les données dans le fichier ini
 $ini_objet = new FichierIni ();

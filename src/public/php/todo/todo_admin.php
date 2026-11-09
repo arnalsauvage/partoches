@@ -13,7 +13,8 @@ if (!isset($_SESSION['user']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_AD
     exit();
 }
 
-$fileTodo = dirname(__DIR__, 3) . "/data/todo/to-do-list.md";
+$dataDir = defined('DATA_DIR') ? DATA_DIR : (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : dirname(__DIR__, 2) . '/data');
+$fileTodo = $dataDir . '/todo/to-do-list.md';
 $message = "";
 
 // Sauvegarde du contenu

@@ -17,6 +17,43 @@ class FichierIni
     public ?string $groupe = null;
 
     /**
+     * Retourne le chemin absolu résolu de params.ini (compatible Dev et Prod)
+     */
+    public static function getParamsIniPath(): string
+    {
+        if (defined('CONF_DIR') && file_exists(CONF_DIR . '/params.ini')) {
+            return CONF_DIR . '/params.ini';
+        }
+        $candidats = [
+            defined('DATA_DIR') ? DATA_DIR . '/conf/params.ini' : null,
+            defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/conf/params.ini' : null,
+            dirname(__DIR__, 3) . '/data/conf/params.ini',
+            dirname(__DIR__, 2) . '/data/conf/params.ini',
+            dirname(__DIR__, 2) . '/conf/params.ini',
+            dirname(__DIR__, 1) . '/conf/params.ini',
+            __DIR__ . '/params.ini'
+        ];
+        foreach ($candidats as $c) {
+            if ($c && file_exists($c)) {
+                return $c;
+            }
+        }
+        return defined('CONF_DIR') ? CONF_DIR . '/params.ini' : dirname(__DIR__, 2) . '/data/conf/params.ini';
+    }
+
+    /**
+     * Retourne le chemin absolu du dossier des logs, en le créant si nécessaire.
+     */
+    public static function getLogsDir(): string
+    {
+        $logDir = defined('DATA_DIR') ? DATA_DIR . '/logs' : (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/logs' : dirname(__DIR__, 2) . '/data/logs');
+        if (!is_dir($logDir)) {
+            @mkdir($logDir, 0775, true);
+        }
+        return $logDir;
+    }
+
+    /**
      * Charge un fichier INI dans l'objet
      */
     public function m_load_fichier(string $chemin): void

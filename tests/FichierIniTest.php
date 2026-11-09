@@ -1,6 +1,9 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
+require_once __DIR__ . '/../src/public/autoload.php';
+require_once __DIR__ . '/../src/public/php/lib/FichierIni.php';
+
 /**
  * Test unitaire pour la classe FichierIni
  */
@@ -48,25 +51,26 @@ INI;
     public function testMPut()
     {
         $ini = new FichierIni();
-        $ini->m_put('nouvelle_valeur', 'test_item', 'test_groupe');
-        
-        $this->assertEquals('nouvelle_valeur', $ini->m_valeur('test_item', 'test_groupe'));
+        $ini->m_put('valeur_modifiee', 'cle1', 'general');
+        $ini->m_put('nouvelle_valeur', 'cle_nouvelle', 'general');
+
+        $this->assertEquals('valeur_modifiee', $ini->m_valeur('cle1', 'general'));
+        $this->assertEquals('nouvelle_valeur', $ini->m_valeur('cle_nouvelle', 'general'));
     }
 
     /**
-     * Teste la sauvegarde du fichier
+     * Teste la sauvegarde d'un fichier INI
      */
     public function testSave()
     {
         $ini = new FichierIni();
-        $ini->m_put('val1', 'item1', 'groupe1');
-        $ini->fichier = $this->tempFile;
+        $ini->m_load_fichier($this->tempFile);
+        $ini->m_put('nouvelle_valeur', 'cle_test', 'general');
         $ini->save();
 
         $ini2 = new FichierIni();
         $ini2->m_load_fichier($this->tempFile);
-        
-        $this->assertEquals('val1', $ini2->m_valeur('item1', 'groupe1'));
+        $this->assertEquals('nouvelle_valeur', $ini2->m_valeur('cle_test', 'general'));
     }
 
     /**
@@ -85,5 +89,19 @@ INI;
         $total = $ini->m_count();
         $this->assertEquals(2, $total[1]); // 2 groupes
         $this->assertEquals(3, $total[0]); // 3 items total
+    }
+
+    /**
+     * Teste la résolution du chemin params.ini et du dossier logs
+     */
+    public function testGetParamsIniPathEtLogsDir()
+    {
+        $paramsPath = FichierIni::getParamsIniPath();
+        $this->assertNotEmpty($paramsPath);
+        $this->assertStringEndsWith('params.ini', $paramsPath);
+
+        $logsDir = FichierIni::getLogsDir();
+        $this->assertNotEmpty($logsDir);
+        $this->assertTrue(is_dir($logsDir));
     }
 }

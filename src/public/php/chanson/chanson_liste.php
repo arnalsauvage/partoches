@@ -28,8 +28,9 @@ global $contenuHtmlCompCherche;
 function logueRecherche($critereCherche): void
 {
     $date = new DateTime();
-    $logPath = "../../../data/logs/logRecherche.txt";
-    $myfile = fopen($logPath, "a");
+    $logDir = class_exists('FichierIni') ? FichierIni::getLogsDir() : (defined('DATA_DIR') ? DATA_DIR . '/logs' : (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/logs' : dirname(__DIR__, 2) . '/data/logs'));
+    $logPath = $logDir . '/logRecherche.txt';
+    $myfile = @fopen($logPath, 'a');
     if ($myfile) {
         $txt = $date->format('Y-m-d--H-i') . " : " . $critereCherche . "\n";
         fwrite($myfile, $txt);

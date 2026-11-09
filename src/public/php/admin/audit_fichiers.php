@@ -12,7 +12,7 @@ if (!estAdmin()) {
 }
 
 // Configuration
-$racine = dirname(__DIR__, 3); // C:\Users\medin\PhpstormProjects\partoches
+$racine = defined('ROOT_DIR') ? ROOT_DIR : dirname(__DIR__, 2);
 $extensions_autorisees = ['php', 'css', 'js', 'html', 'phtml', 'sql', 'ini'];
 $fichiers_a_ignorer = ['.git', '.idea', 'vendor', 'node_modules', 'rendered_html'];
 

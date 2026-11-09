@@ -166,10 +166,10 @@ class SongbookPdfService
     
     public function __construct()
     {
-        $this->chansonsDir = __DIR__ . "/../../data/chansons/";
-        $this->songbooksDir = __DIR__ . "/../../data/songbooks/";
-        $this->logFile = __DIR__ . "/../../../data/logs/songbook_gen.log";
-        $this->tempDir = __DIR__ . "/../../../data/temp/";
+        $this->chansonsDir = (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : dirname(__DIR__, 2) . '/data') . '/chansons/';
+        $this->songbooksDir = (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : dirname(__DIR__, 2) . '/data') . '/songbooks/';
+        $this->logFile = (defined('DATA_DIR') ? DATA_DIR : (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : dirname(__DIR__, 2) . '/data')) . '/logs/songbook_gen.log';
+        $this->tempDir = (defined('DATA_DIR') ? DATA_DIR : (defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR : dirname(__DIR__, 2) . '/data')) . '/temp/';
         
         if (!is_dir($this->tempDir)) {
             mkdir($this->tempDir, 0777, true);
@@ -374,7 +374,7 @@ class SongbookPdfService
         $logo = $_SESSION['logoSite'] ?? '';
         
         if (!$logo) {
-            $fichierIni = __DIR__ . '/../../../data/conf/params.ini';
+            $fichierIni = FichierIni::getParamsIniPath();
             if (file_exists($fichierIni)) {
                 require_once __DIR__ . '/FichierIni.php';
                 $ini = new FichierIni();

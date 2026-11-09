@@ -192,8 +192,8 @@ if (!isset($FichierHtml)) {
     <script src="{$vendorUrl}/js/toastr.min.js"></script>
     
     <!-- Scripts locaux -->
-    <script src="{$publicUrl}/js/utilsJquery.js"></script>
-    <script src="{$publicUrl}/js/precise-star-rating.js"></script>
+    <script src="{$publicUrl}/js/utilsJquery.js?v=$v"></script>
+    <script src="{$publicUrl}/js/precise-star-rating.js?v=$v"></script>
     
     <!-- Select2 (CDN) -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
