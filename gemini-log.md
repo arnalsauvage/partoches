@@ -1,5 +1,26 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (09 Novembre 2026 - Après-midi)
+- **🔐 US-082 — Connexion Persistante Sécurisée ("Se souvenir de moi" - 14 jours)** :
+    - **Demande PO & Spécification Agile** :
+        - Permettre aux utilisateurs d'être automatiquement reconnus et connectés pendant 14 jours s'ils ont coché "Rester connecté (14 jours)" lors de leur authentification.
+    - **Architecture & Sécurité (Standard OWASP Selector / Validator)** :
+        - Évitement strict du stockage direct du mot de passe ou d'un cookie prédictible / rejouable.
+        - **Migration BDD (`006_create_auth_token_table.sql`)** : création de la table `auth_token` (`id`, `user_id`, `selector` VARCHAR(32) UNIQUE, `hashed_validator` CHAR(64), `expires_at` DATETIME, `created_at` TIMESTAMP) avec clé étrangère CASCADE vers `utilisateur(id)` et index BDD sur `selector` et `expires_at`.
+        - **Service Métier Dédié (`AuthTokenService.php`)** :
+            - `creerToken(int $userId)` : génère un `selector` aléatoire (16 octets / 32 hex) et un `validator` (32 octets / 64 hex), stocke `hash('sha256', $validator)` en base, dépose un cookie HTTP `partoches_remember` d'une durée de 14 jours (flags `HttpOnly`, `SameSite=Lax`, `Secure` si HTTPS).
+            - `verifierEtConnecter()` : vérifie le cookie à chaque requête (dans `utilssi.php`), retrouve la ligne par `selector`, vérifie l'expiration, compare `hash_equals($token['hashed_validator'], hash('sha256', $validator))`, vérifie l'activation du compte (`actif == 1`), régénère la session (`session_regenerate_id(true)`) et hydrate `$_SESSION` (`id`, `user`, `email`, `image`, `privilege`, `login`).
+            - `revoquerToken(?string $selector)` & `supprimerCookie()` : révocation instantanée en base et suppression du cookie lors d'une déconnexion explicite (`login.php?logoff=1`).
+            - `nettoyerTokensExpires()` : purge opportuniste des tokens périmés.
+    - **Intégration Vue & Design System Canopée** :
+        - Modification de la popup de connexion (`menuLogin.html`) : ajout de la case à cocher cochée par défaut "Rester connecté (14 jours)".
+        - Styles CSS déclarés dans `styles-communs.css` (`.form-group-remember`, `.checkbox-remember-label`, `.checkbox-remember-input`), respect strict de la Règle 4 (aucun `style="..."` inline).
+    - **Tests & Qualité** :
+        - Création de la suite unitaire `tests/AuthTokenServiceTest.php` (6 tests, 17 assertions) couvrant création, validation, rejet si validateur altéré, rejet si expiré, révocation à la déconnexion, rejet compte inactif.
+        - **180 / 180 tests PHPUnit validés (100% Succès)**.
+        - **56 / 56 Smoke Tests validés (100% Succès)**.
+
+
 ### 📖 Résumé de la session (09 Novembre 2026 - Midi)
 - **⚙️ Rétro Agile & Refonte Complète de la Page Administration (`params.php` & `params_view.phtml`)** :
     - **Contexte & Analyse du Fouillis Initial** :

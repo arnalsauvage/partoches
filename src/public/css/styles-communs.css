@@ -406,3 +406,32 @@ body {
         top: 55px;
     }
 }
+
+
+/* --- CONNEXION PERSISTANTE ("SE SOUVENIR DE MOI") --- */
+.contenu_popup .form-group-remember {
+    margin-top: 6px;
+    margin-bottom: 12px;
+}
+
+.contenu_popup .checkbox-remember-label {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.84em !important;
+    color: var(--c-marron-fonce, #2b1d1a);
+    font-weight: 500 !important;
+    margin: 0 !important;
+    user-select: none;
+}
+
+.contenu_popup .checkbox-remember-input {
+    width: 16px !important;
+    height: 16px !important;
+    cursor: pointer;
+    accent-color: var(--c-accent, #8B4513);
+    margin: 0 !important;
+    display: inline-block !important;
+    float: none !important;
+}

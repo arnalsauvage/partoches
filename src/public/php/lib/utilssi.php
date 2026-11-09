@@ -50,6 +50,11 @@ if (!isset ($FichierUtilsSi)) {
         }
     }
 
+    // --- RECONNAISSANCE AUTOMATIQUE ("SE SOUVENIR DE MOI" - 14 JOURS) ---
+    if ((empty($_SESSION['user']) || $_SESSION['user'] === 'invite') && class_exists('AuthTokenService')) {
+        AuthTokenService::verifierEtConnecter();
+    }
+
     /**
      * Limite la longueur d'une chaine à x caractères
      * @param string $chaine
