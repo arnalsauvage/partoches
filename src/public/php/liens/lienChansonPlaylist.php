@@ -40,10 +40,10 @@ function nombreDeLiensDeLaPlaylist($idPlaylist)
 {
     $db = $_SESSION['mysql'];
     $idPlaylist = (int)$idPlaylist;
-    $maRequete = "SELECT COUNT(*) FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'";
+    $maRequete = "SELECT COUNT(*) AS total FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'";
     $result = $db->query($maRequete) or die ("Problème nombreDeLiensDeLaPlaylist #1 : " . $db->error);
-    $row = $result->fetch_row();
-    return (int)($row[0] ?? 0);
+    $row = $result->fetch_assoc();
+    return (int)($row['total'] ?? 0);
 }
 
 // Cherche un lienChansonPlaylist et le renvoie s'il existe
@@ -82,9 +82,9 @@ function creelienChansonPlaylist($idChanson, $idPlaylist)
     $idPlaylist = (int)$idPlaylist;
     
     // On compte proprement en SQL
-    $res = $db->query("SELECT COUNT(*) FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'");
-    $row = $res->fetch_row();
-    $nb = (int)$row[0] + 1;
+    $res = $db->query("SELECT COUNT(*) AS total FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'");
+    $row = $res ? $res->fetch_assoc() : null;
+    $nb = (int)($row['total'] ?? 0) + 1;
 
     $maRequete = "INSERT INTO lienchansonplaylist (id, id_chanson, id_playlist, ordre) VALUES (NULL, '$idChanson', '$idPlaylist', '$nb')";
     $db->query($maRequete) or die ("Problème creelienChansonPlaylist#1 : " . $db->error);

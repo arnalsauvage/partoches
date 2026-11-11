@@ -21,8 +21,10 @@ function cherchePlaylists($critere, $valeur, $critereTri = 'nom', $bTriAscendant
     // Mapping pour la compatibilité avec le renommage de colonnes
     if ($critereTri === 'date') $critereTri = 'date_creation';
     
-    $maRequete = "SELECT * FROM playlist WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
-    $maRequete .= $bTriAscendant ? " ASC" : " DESC";
+    $direction = $bTriAscendant ? "ASC" : "DESC";
+    $maRequete = "SELECT id, nom, description, date_creation, id_utilisateur, type, criteres, image, hits FROM playlist WHERE $critere LIKE '$valeur' ORDER BY $critereTri $direction";
+    // $maRequete .= $bTriAscendant ? " ASC" : " DESC";
+
     
     $result = $db->query($maRequete) or die ("Problème cherchePlaylists #1 : " . $db->error);
     return $result;
@@ -33,9 +35,12 @@ function cherchePlaylist($id)
 {
     $db = $_SESSION['mysql'];
     $id = (int)$id;
-    $maRequete = "SELECT * FROM playlist WHERE id = '$id'";
+    $maRequete = "SELECT id, nom, description, date_creation, id_utilisateur, type, criteres, image, hits FROM playlist WHERE id = '$id'";
     $result = $db->query($maRequete) or die ("Problème cherchePlaylist #1 : " . $db->error);
-    return ($ligne = $result->fetch_assoc()) ? $ligne : 0;
+    if ($ligne = $result->fetch_assoc()) {
+        return array_merge(array_values($ligne), $ligne);
+    }
+    return 0;
 }
 
 // Cherche une playlist et la renvoie si elle existe
@@ -43,9 +48,12 @@ function cherchePlaylistParLeNom($nom)
 {
     $db = $_SESSION['mysql'];
     $nom = $db->real_escape_string($nom);
-    $maRequete = "SELECT * FROM playlist WHERE nom = '$nom'";
+    $maRequete = "SELECT id, nom, description, date_creation, id_utilisateur, type, criteres, image, hits FROM playlist WHERE nom = '$nom'";
     $result = $db->query($maRequete) or die ("Problème cherchePlaylistParLeNom #1 : " . $db->error);
-    return ($ligne = $result->fetch_assoc()) ? $ligne : 0;
+    if ($ligne = $result->fetch_assoc()) {
+        return array_merge(array_values($ligne), $ligne);
+    }
+    return 0;
 }
 
 // Crée une playlist
@@ -109,7 +117,7 @@ function creemodifiePlaylist($id, $nom, $description, $date, $image, $hits)
 function imagePlaylist($idplaylist)
 {
 
-    $maRequete = "SELECT * FROM document WHERE document.idTable = '$idplaylist' AND document.nomTable='playlist' ";
+    $maRequete = "SELECT id, nom, tailleKo, date, version, nomTable, idTable, idUser, hits FROM document WHERE document.idTable = '$idplaylist' AND document.nomTable='playlist' ";
     $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg')";
     $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème imagePlaylist #1 : " . $_SESSION ['mysql']->error);
     if (empty($result)) {
@@ -118,7 +126,7 @@ function imagePlaylist($idplaylist)
 
     // Choisit une vignette au hasard parmi les images
     // renvoie la ligne sélectionnée : id, nom, description, date , image, hits
-    if (($ligne = ($result->fetch_assoc() ?: $result->fetch_row()))) {
+    if ($ligne = $result->fetch_assoc()) {
         $nomDoc = $ligne['nom'] ?? $ligne[1] ?? '';
         $versionDoc = (int)($ligne['version'] ?? $ligne[4] ?? 1);
         return composeNomVersion($nomDoc, $versionDoc);
@@ -131,7 +139,7 @@ function infosPlaylist($id)
 {
     $enr = chercheplaylist($id);
     // id_journee id_joueur poste statut
-    $retour = "Id : " . $enr [0] . " Nom : " . $enr [1] . " Description : " . $enr [2] . " Date : " . $enr [3] . " image : " . $enr [4] . " Hits : " . $enr [5];
+    $retour = "Id : " . ($enr['id'] ?? $enr[0] ?? '') . " Nom : " . ($enr['nom'] ?? $enr[1] ?? '') . " Description : " . ($enr['description'] ?? $enr[2] ?? '') . " Date : " . ($enr['date_creation'] ?? $enr[3] ?? '') . " image : " . ($enr['image'] ?? $enr[7] ?? '') . " Hits : " . ($enr['hits'] ?? $enr[8] ?? 0);
     return $retour . "<BR>\n";
 }
 

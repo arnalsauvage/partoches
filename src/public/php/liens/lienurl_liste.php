@@ -51,19 +51,19 @@ if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_INVITE"]) {
 $html .= "  <div class='video-grid'>";
 
 $_numLigneParcourue = 0;
-while ($_lienurl = $_listeDeslienurls->fetch_row()) {
+while ($_lienurl = $_listeDeslienurls->fetch_assoc()) {
     $_numLigneParcourue++;
     if (($_numLigneParcourue < $pagination->getItemDebut()) || $_numLigneParcourue > $pagination->getItemFin()) {
         continue;
     }
 
     // [0]id [1]table [2]idTable [3]url [4]nom [5]description
-    $idLien = $_lienurl[0];
-    $nomTable = $_lienurl[1];
-    $idTable = (int)$_lienurl[2];
-    $url = $_lienurl[3];
-    $titre = htmlspecialchars($_lienurl[4]);
-    $desc = htmlspecialchars(limiteLongueur($_lienurl[5], 80));
+    $idLien = (int)($_lienurl['id'] ?? $_lienurl[0]);
+    $nomTable = $_lienurl['nomTable'] ?? $_lienurl['nomtable'] ?? $_lienurl[1];
+    $idTable = (int)($_lienurl['idTable'] ?? $_lienurl['idtable'] ?? $_lienurl[2]);
+    $url = $_lienurl['url'] ?? $_lienurl[3];
+    $titre = htmlspecialchars($_lienurl['type'] ?? $_lienurl[4] ?? '');
+    $desc = htmlspecialchars(limiteLongueur($_lienurl['description'] ?? $_lienurl[5] ?? '', 80));
     
     $infosObjet = LienUrl::getInfosObjetLie($nomTable, $idTable);
     
@@ -138,8 +138,8 @@ HTML;
     // Boutons d'action
     $actionsHtml = "";
     if ($_SESSION['privilege'] > $GLOBALS["PRIVILEGE_MEMBRE"]) {
-        $idConcerne = $_lienurl[2];
-        $editUrl = ($_lienurl[1] == "chanson") ? "$_lienurlForm?id=$idConcerne" : "#";
+        $idConcerne = $idTable;
+        $editUrl = ($nomTable == "chanson") ? "$_lienurlForm?id=$idConcerne" : "#";
         $actionsHtml .= "<a href='$editUrl' class='btn btn-xs btn-default' title='Modifier source'><i class='glyphicon glyphicon-pencil'></i></a>";
     }
     

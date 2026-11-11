@@ -13,9 +13,13 @@ class LienStrumChanson
      */
     public static function chercheLiensStrumChanson($critere, $valeur, $critereTri = 'ordre', $bTriAscendant = true)
     {
-        $db = $_SESSION ['mysql'];
-        $maRequete = "SELECT * FROM lienstrumchanson WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
-        $maRequete .= $bTriAscendant ? " ASC" : " DESC";
+        $db = $_SESSION['mysql'];
+        $critere = $db->real_escape_string($critere);
+        $valeur = $db->real_escape_string($valeur);
+        $critereTri = $db->real_escape_string($critereTri);
+        $direction = $bTriAscendant ? "ASC" : "DESC";
+
+        $maRequete = "SELECT id, idChanson, idStrum, strum, ordre FROM lienstrumchanson WHERE $critere LIKE '$valeur' ORDER BY $critereTri $direction";
         $result = $db->query($maRequete) or die ("Problème chercheliensStrumChanson #1 : " . $db->error);
         return $result;
     }
@@ -25,10 +29,14 @@ class LienStrumChanson
      */
     public static function chercheLienStrumChanson($id)
     {
-        $db = $_SESSION ['mysql'];
-        $maRequete = "SELECT * FROM lienstrumchanson WHERE id = '$id'";
+        $db = $_SESSION['mysql'];
+        $id = (int)$id;
+        $maRequete = "SELECT id, idChanson, idStrum, strum, ordre FROM lienstrumchanson WHERE id = '$id'";
         $result = $db->query($maRequete) or die ("Problème cherchelienStrumChanson #1 : " . $db->error);
-        return $result->fetch_row() ?: 0;
+        if ($ligne = $result->fetch_assoc()) {
+            return array_merge(array_values($ligne), $ligne);
+        }
+        return 0;
     }
 
     /**
@@ -37,11 +45,13 @@ class LienStrumChanson
     public static function creelienStrumChanson($_strum, $idchanson, $idStrum = 0)
     {
         $db = $_SESSION['mysql'];
-        $res = $db->query("SELECT MAX(ordre) FROM lienstrumchanson WHERE idchanson = $idchanson");
-        $nb = ($res && $row = $res->fetch_row()) ? (int)$row[0] + 1 : 1;
+        $idchanson = (int)$idchanson;
+        $idStrum = (int)$idStrum;
+        $res = $db->query("SELECT MAX(ordre) AS max_ordre FROM lienstrumchanson WHERE idchanson = $idchanson");
+        $nb = ($res && $row = $res->fetch_assoc()) ? (int)($row['max_ordre'] ?? 0) + 1 : 1;
         
         $_strum = $db->real_escape_string($_strum);
-        $maRequete = "INSERT INTO lienstrumchanson (strum, idchanson, ordre, idStrum) VALUES ('$_strum', '$idchanson', '$nb', $idStrum)";
+        $maRequete = "INSERT INTO lienstrumchanson (strum, idChanson, ordre, idStrum) VALUES ('$_strum', '$idchanson', '$nb', $idStrum)";
         $db->query($maRequete) or die ("Problème creelienStrumChanson#1 : " . $db->error);
         return $db->insert_id;
     }
@@ -52,6 +62,7 @@ class LienStrumChanson
     public static function supprimeLienStrumChanson($id)
     {
         $db = $_SESSION['mysql'];
+        $id = (int)$id;
         $maRequete = "DELETE FROM lienstrumchanson WHERE id='$id'";
         $db->query($maRequete) or die ("Problème #1 dans supprimeLienStrumChanson : " . $db->error);
     }

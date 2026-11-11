@@ -1,6 +1,22 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (11 Novembre 2026 - Soirée)
+- **⚡ US-085 — Sprint Technique « Clean Assoc BDD » — Lot 1 : Liens & Playlists (`LienDocSongbook`, `LienStrumChanson`, `LienUrl`, `playlist`)** :
+    - **Contexte & Objectif** :
+        - Éradication de la dette technique liée aux accès SQL par index numériques (`fetch_row()`, `$row[0]`, `$row[1]`) et requêtes non déterministes `SELECT *` sur les tables de liaisons et de playlists.
+        - Remplacement systématique par `fetch_assoc()`, projection SQL explicite de colonnes nommées, et accès par clés associatives (`$row['id']`, `$row['nom']`).
+        - Rétrocompatibilité garantie sur les wrappers et fonctions historiques grâce au format hybride `array_merge(array_values($ligne), $ligne)`.
+    - **Modifications Apportées** :
+        - **`LienDocSongbook.php`** : Projection explicite `SELECT id, idDocument, idSongbook, ordre`, `fetch_assoc()`, typage entier strict, calcul de comptage `SELECT COUNT(*) AS total`.
+        - **`LienStrumChanson.php`** : Projection explicite `SELECT id, idChanson, idStrum, strum, ordre`, élimination de `fetch_row()`, `MAX(ordre) AS max_ordre`.
+        - **`LienUrl.php` & `lienurl_voir.php` & `lienurl_liste.php`** : Projections explicites des 9 colonnes nommées, `fetch_assoc()`, éradication des index numériques `$lienurl[0..5]` et `$resultat[8]`.
+        - **`lienChansonPlaylist.php`** : Remplacement des derniers reliquats `fetch_row()` par `fetch_assoc()` et `COUNT(*) AS total`.
+        - **`playlist.php` & `playlist_liste.php`** : Projection explicite `SELECT id, nom, description, date_creation, id_utilisateur, type, criteres, image, hits FROM playlist`, parcours des cartes en `fetch_assoc()`, sécurisation de `infosPlaylist()`.
+        - **Tests unitaires (`tests/LienDocSongbookTest.php`)** : Adaptation du mock mysqli pour valider la requête nommée et les clés associatives.
+    - **Validation & Non-Régression** :
+        - 194 / 194 tests PHPUnit validés (100% Succès, 1020 assertions).
+        - 28 / 28 Smoke tests & HTML lint validés (100% Succès, 168 assertions).
+
 - **🩹 Fix Régression : Ajout et Affichage des Morceaux en Playlist (`lienChansonPlaylist.php`, `playlist_form_view.phtml`)** :
     - **Contexte & Symptôme PO** :
         - Lors de l'ajout d'un morceau dans une playlist, le toast « Morceau ajouté avec succès ! » s'affichait bien, mais le morceau n'apparaissait ni dans l'onglet « Morceaux » du formulaire, ni dans `playlist_voir.php`.

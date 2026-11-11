@@ -79,7 +79,7 @@ $html .= "          </div>
         <div class='row'>";
 
 if ($resultat->num_rows > 0) {
-    while ($ligne = $resultat->fetch_row()) {
+    while ($ligne = $resultat->fetch_assoc()) {
         $html .= afficheCartePlaylist($ligne);
     }
 } else {

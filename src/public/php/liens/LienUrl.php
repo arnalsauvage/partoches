@@ -21,9 +21,12 @@ class LienUrl
      */
     public static function chargeLiensurls($critereTri = 'date', $bTriAscendant = true)
     {
-        $maRequete = "SELECT * FROM lienurl ORDER BY $critereTri";
-        $maRequete = !$bTriAscendant ? $maRequete . " DESC" : $maRequete . " ASC";
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienurls #1 : " . $_SESSION ['mysql']->error);
+        $db = $_SESSION['mysql'];
+        $critereTri = $db->real_escape_string($critereTri);
+        $direction = $bTriAscendant ? "ASC" : "DESC";
+
+        $maRequete = "SELECT id, nomTable, idTable, url, type, description, date, idUser, hits FROM lienurl ORDER BY $critereTri $direction";
+        $result = $db->query($maRequete) or die ("Problème chercheLienurls #1 : " . $db->error);
         return $result;
     }
 
@@ -32,9 +35,14 @@ class LienUrl
      */
     public static function chercheLienurls($critere, $valeur, $critereTri = 'type', $bTriAscendant = true)
     {
-        $maRequete = "SELECT * FROM lienurl WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
-        $maRequete = !$bTriAscendant ? $maRequete . " DESC" : $maRequete . " ASC";
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienurls #1 : " . $_SESSION ['mysql']->error);
+        $db = $_SESSION['mysql'];
+        $critere = $db->real_escape_string($critere);
+        $valeur = $db->real_escape_string($valeur);
+        $critereTri = $db->real_escape_string($critereTri);
+        $direction = $bTriAscendant ? "ASC" : "DESC";
+
+        $maRequete = "SELECT id, nomTable, idTable, url, type, description, date, idUser, hits FROM lienurl WHERE $critere LIKE '$valeur' ORDER BY $critereTri $direction";
+        $result = $db->query($maRequete) or die ("Problème chercheLienurls #1 : " . $db->error);
         return $result;
     }
 
@@ -43,12 +51,14 @@ class LienUrl
      */
     public static function chercheLienurlId($id)
     {
-        $maRequete = "SELECT * FROM lienurl WHERE lienurl.id = '$id'";
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienurlId #1 : " . $_SESSION ['mysql']->error);
-        if ($ligne = $result->fetch_row()) {
-            return ($ligne);
+        $db = $_SESSION['mysql'];
+        $id = (int)$id;
+        $maRequete = "SELECT id, nomTable, idTable, url, type, description, date, idUser, hits FROM lienurl WHERE id = '$id'";
+        $result = $db->query($maRequete) or die ("Problème chercheLienurlId #1 : " . $db->error);
+        if ($ligne = $result->fetch_assoc()) {
+            return array_merge(array_values($ligne), $ligne);
         }
-        return (0);
+        return 0;
     }
 
     /**
@@ -56,12 +66,17 @@ class LienUrl
      */
     public static function chercheLienurlUrlTableId($url, $table, $id)
     {
-        $maRequete = "SELECT * FROM lienurl WHERE lienurl.url = '$url' AND lienurl.idTable = '$id' AND lienurl.nomTable = '$table'";
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienurlUrlTableId #1 : " . $_SESSION ['mysql']->error);
-        if ($ligne = $result->fetch_row()) {
-            return ($ligne);
+        $db = $_SESSION['mysql'];
+        $url = $db->real_escape_string($url);
+        $table = $db->real_escape_string($table);
+        $id = (int)$id;
+
+        $maRequete = "SELECT id, nomTable, idTable, url, type, description, date, idUser, hits FROM lienurl WHERE url = '$url' AND idTable = '$id' AND nomTable = '$table'";
+        $result = $db->query($maRequete) or die ("Problème chercheLienurlUrlTableId #1 : " . $db->error);
+        if ($ligne = $result->fetch_assoc()) {
+            return array_merge(array_values($ligne), $ligne);
         }
-        return (0);
+        return 0;
     }
 
     /**
@@ -69,9 +84,13 @@ class LienUrl
      */
     public static function chercheLiensUrlsTableId($table, $id)
     {
-        $maRequete = "SELECT * FROM lienurl WHERE lienurl.idtable = '$id' AND lienurl.nomtable = '$table' ORDER BY lienurl.id ASC";
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLiensUrlsTableId #1 : " . $_SESSION ['mysql']->error);
-        return ($result);
+        $db = $_SESSION['mysql'];
+        $table = $db->real_escape_string($table);
+        $id = (int)$id;
+
+        $maRequete = "SELECT id, nomTable, idTable, url, type, description, date, idUser, hits FROM lienurl WHERE idTable = '$id' AND nomTable = '$table' ORDER BY id ASC";
+        $result = $db->query($maRequete) or die ("Problème chercheLiensUrlsTableId #1 : " . $db->error);
+        return $result;
     }
 
     /**
@@ -79,14 +98,23 @@ class LienUrl
      */
     public static function creeLienurl($url, $type, $description, $nomTable, $idTable, $date, $iduser, $hits)
     {
+        $db = $_SESSION['mysql'];
+        $urlEsc = $db->real_escape_string($url);
+        $typeEsc = $db->real_escape_string($type);
+        $descEsc = $db->real_escape_string($description);
+        $nomTableEsc = $db->real_escape_string($nomTable);
+        $idTable = (int)$idTable;
+        $iduser = (int)$iduser;
+        $hits = (int)$hits;
         $date = convertitDateJJMMAAAAversMySql($date);
-        $maRequete = "INSERT INTO lienurl VALUES (NULL,  '$nomTable', '$idTable', '$url', '$type', '$description', '$date', $iduser, $hits)";
-        
+
         $resultat = self::chercheLienurlUrlTableId($url, $nomTable, $idTable);
         if ($resultat != NULL) {
             return false;
         }
-        $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème creeLienurl#1 : " . $_SESSION ['mysql']->error);
+
+        $maRequete = "INSERT INTO lienurl (id, nomTable, idTable, url, type, description, date, idUser, hits) VALUES (NULL, '$nomTableEsc', '$idTable', '$urlEsc', '$typeEsc', '$descEsc', '$date', $iduser, $hits)";
+        $result = $db->query($maRequete) or die ("Problème creeLienurl#1 : " . $db->error);
         return $result;
     }
 
@@ -95,15 +123,26 @@ class LienUrl
      */
     public static function modifieLienurl($id, $url, $type, $description, $nomTable, $idTable, $date, $idUser, $hits)
     {
+        $db = $_SESSION['mysql'];
+        $id = (int)$id;
         $resultat = self::chercheLienurlId($id);
         if ($resultat == NULL) {
             return false;
         }
+
+        $urlEsc = $db->real_escape_string($url);
+        $typeEsc = $db->real_escape_string($type);
+        $descEsc = $db->real_escape_string($description);
+        $nomTableEsc = $db->real_escape_string($nomTable);
+        $idTable = (int)$idTable;
+        $idUser = (int)$idUser;
+        $hits = (int)$hits;
         $date = convertitDateJJMMAAAAversMySql($date);
+
         $maRequete = "UPDATE lienurl
-	        SET type = '$type', url = '$url', description = '$description', nomtable = '$nomTable', idtable = '$idTable', date = '$date', idUser = '$idUser', hits = '$hits'
-	        WHERE id = '$id' ";
-        $_SESSION ['mysql']->query($maRequete) or die ("Problème modifieLienurl #1 : " . $_SESSION ['mysql']->error . BR_REQUETE . $maRequete);
+	        SET type = '$typeEsc', url = '$urlEsc', description = '$descEsc', nomTable = '$nomTableEsc', idTable = '$idTable', date = '$date', idUser = '$idUser', hits = '$hits'
+	        WHERE id = '$id'";
+        $db->query($maRequete) or die ("Problème modifieLienurl #1 : " . $db->error . BR_REQUETE . $maRequete);
         return true;
     }
 
@@ -112,8 +151,10 @@ class LienUrl
      */
     public static function supprimeLienurl($id)
     {
+        $db = $_SESSION['mysql'];
+        $id = (int)$id;
         $maRequete = "DELETE FROM lienurl WHERE id='$id'";
-        $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimeLienurl : " . $_SESSION ['mysql']->error);
+        $db->query($maRequete) or die ("Problème #1 dans supprimeLienurl : " . $db->error);
     }
 
     /**
@@ -121,13 +162,15 @@ class LienUrl
      */
     public static function ajouteUnHit($idLien)
     {
+        $idLien = (int)$idLien;
         $resultat = self::chercheLienurlId($idLien);
         if ($resultat == NULL) {
             return false;
         }
-        $nbHits = $resultat[8] + 1;
-        $maRequete = "UPDATE lienurl SET hits = '$nbHits' WHERE id = '$idLien' ";
-        $_SESSION ['mysql']->query($maRequete) or die ("Problème modifieLienurl #1 : " . $_SESSION ['mysql']->error . BR_REQUETE . $maRequete);
+        $nbHits = (int)($resultat['hits'] ?? $resultat[8] ?? 0) + 1;
+        $db = $_SESSION['mysql'];
+        $maRequete = "UPDATE lienurl SET hits = '$nbHits' WHERE id = '$idLien'";
+        $db->query($maRequete) or die ("Problème modifieLienurl #1 : " . $db->error . BR_REQUETE . $maRequete);
         return true;
     }
 
@@ -136,9 +179,9 @@ class LienUrl
      */
     public static function chercheNderniersLiens($type)
     {
-        $db = $_SESSION ['mysql'];
+        $db = $_SESSION['mysql'];
         $type = $db->real_escape_string($type);
-        $maRequete = "SELECT * FROM lienurl WHERE type LIKE '$type' ORDER BY date DESC";
+        $maRequete = "SELECT id, nomTable, idTable, url, type, description, date, idUser, hits FROM lienurl WHERE type LIKE '$type' ORDER BY date DESC";
         $result = $db->query($maRequete) or die ("Problème chercheNderniersLiens #1 : " . $db->error);
         return $result;
     }
@@ -198,6 +241,9 @@ function chercheLienurls($critere, $valeur, $critereTri = 'type', $bTriAscendant
 }
 function chercheLienurlId($id) {
     return LienUrl::chercheLienurlId($id);
+}
+function chercheLienurlUrlTableId($url, $table, $id) {
+    return LienUrl::chercheLienurlUrlTableId($url, $table, $id);
 }
 function chercheLiensUrlsTableId($table, $id) {
     return LienUrl::chercheLiensUrlsTableId($table, $id);

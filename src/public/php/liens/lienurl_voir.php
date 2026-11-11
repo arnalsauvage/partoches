@@ -7,9 +7,13 @@
  */
 function afficheLien($lien): string
 {
-    $url = htmlspecialchars($lien[3] ?? '', ENT_QUOTES);
-    $type = htmlspecialchars($lien[4] ?? '', ENT_QUOTES);
-    $description = htmlspecialchars($lien[5] ?? '', ENT_QUOTES);
+    $rawUrl = $lien['url'] ?? $lien[3] ?? '';
+    $rawType = $lien['type'] ?? $lien[4] ?? '';
+    $rawDesc = $lien['description'] ?? $lien[5] ?? '';
+
+    $url = htmlspecialchars($rawUrl, ENT_QUOTES);
+    $type = htmlspecialchars($rawType, ENT_QUOTES);
+    $description = htmlspecialchars($rawDesc, ENT_QUOTES);
     
     // Nettoyage du type pour détection vidéo
     $search = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'à', 'á', 'â', 'ã', 'ä', 'å', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ò', 'ó', 'ô', 'õ', 'ö', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ');
@@ -26,7 +30,7 @@ function afficheLien($lien): string
 
     if ($is_video) {
         // Layout VIDÉO : Vidéo à gauche, Texte à droite
-        $url_embed = prepareYoutubeEmbedUrl($lien[3] ?? '');
+        $url_embed = prepareYoutubeEmbedUrl($rawUrl);
         $contenuHtml .= "      <div class='col-sm-6 col-md-5'>";
         $contenuHtml .= "        <div class='embed-responsive embed-responsive-16by9'>";
         $contenuHtml .= "          <iframe class='embed-responsive-item' src='$url_embed' loading='lazy' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen></iframe>";

@@ -3,7 +3,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Tests pour la classe LienDocSongbook.
- * Note: Cette classe dépend fortement de la BDD via $_SESSION['mysql'].
+ * Note: Cette classe dépend de la BDD via $_SESSION['mysql'].
  */
 class LienDocSongbookTest extends TestCase
 {
@@ -47,18 +47,24 @@ class LienDocSongbookTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
             
-        $expectedRow = [1, 10, 20, 1]; // id, idDoc, idSB, ordre
+        $expectedRow = ['id' => 1, 'idDocument' => 10, 'idSongbook' => 20, 'ordre' => 1];
         
-        $resultMock->method('fetch_row')->willReturn($expectedRow);
+        $resultMock->method('fetch_assoc')->willReturn($expectedRow);
         
         $this->mysqliMock->expects($this->once())
             ->method('query')
-            ->with($this->stringContains("SELECT * FROM liendocsongbook WHERE id = '1'"))
+            ->with($this->stringContains("SELECT id, idDocument, idSongbook, ordre FROM liendocsongbook WHERE id = '1'"))
             ->willReturn($resultMock);
 
         $result = LienDocSongbook::chercheLienDocSongbook(1);
         
-        $this->assertEquals($expectedRow, $result);
+        $this->assertEquals(1, $result['id']);
+        $this->assertEquals(10, $result['idDocument']);
+        $this->assertEquals(20, $result['idSongbook']);
+        $this->assertEquals(1, $result['ordre']);
+        // Rétrocompatibilité indexée
+        $this->assertEquals(1, $result[0]);
+        $this->assertEquals(10, $result[1]);
     }
 
     /**
@@ -72,7 +78,7 @@ class LienDocSongbookTest extends TestCase
         $name = getenv('DATABASE_NAME') ?: ($_ENV['DATABASE_NAME'] ?? 'dbPartoches');
 
         $realDb = new mysqli($host, $user, $pass, $name);
-        $result = $realDb->query("SELECT 1 UNION SELECT 2 UNION SELECT 3"); // 3 lignes
+        $result = $realDb->query("SELECT 3 AS total");
         
         $this->mysqliMock->expects($this->once())
             ->method('query')
@@ -93,7 +99,7 @@ class LienDocSongbookTest extends TestCase
         $resultMock = $this->getMockBuilder(mysqli_result::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $resultMock->method('fetch_row')->willReturn([1, 10, 20, 1]);
+        $resultMock->method('fetch_assoc')->willReturn(['id' => 1, 'idDocument' => 10, 'idSongbook' => 20, 'ordre' => 1]);
         
         $this->mysqliMock->method('query')->willReturn($resultMock);
 
