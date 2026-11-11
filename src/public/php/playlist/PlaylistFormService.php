@@ -13,6 +13,15 @@ class PlaylistFormService
         $mode = ($id > 0) ? "MAJ" : "INS";
 
         if ($mode === "MAJ") {
+            $db = $_SESSION['mysql'] ?? null;
+            if ($db && $id > 0) {
+                // Auto-réparation des éventuels liens inversés (id_chanson <-> id_playlist)
+                $db->query("UPDATE lienchansonplaylist l
+                            INNER JOIN chanson c ON l.id_playlist = c.id
+                            LEFT JOIN playlist p ON l.id_playlist = p.id
+                            SET l.id_playlist = l.id_chanson, l.id_chanson = l.id_playlist
+                            WHERE l.id_chanson = $id AND p.id IS NULL");
+            }
             $donnee = chercheplaylist($id);
             $typePl = $donnee['type'] ?? 0;
             $criteres = json_decode($donnee['criteres'] ?? "[]", true);

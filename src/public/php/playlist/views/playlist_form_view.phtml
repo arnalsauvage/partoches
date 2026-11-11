@@ -244,11 +244,15 @@
                             <tbody>
                                 <?php 
                                 $lignes = chercheLiensChansonPlaylist('id_playlist', $id, "ordre", true);
-                                while ($ligne = $lignes->fetch_row()): 
-                                    $ch = Chanson::load((int)$ligne[1]);
+                                while ($ligne = $lignes->fetch_assoc()): 
+                                    $chId = (int)($ligne['id_chanson'] ?? 0);
+                                    $ch = Chanson::load($chId);
+                                    if (!$ch) continue;
+                                    $rang = (int)($ligne['ordre'] ?? 1);
+                                    $idLien = (int)($ligne['id'] ?? 0);
                                 ?>
                                     <tr>
-                                        <td><?= $ligne[3] ?></td>
+                                        <td><?= $rang ?></td>
                                         <td>
                                             <strong><?= htmlspecialchars($ch->getNom()) ?></strong>
                                             <?php if ($ch->getInterprete()): ?>
@@ -260,9 +264,9 @@
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-xs">
-                                                <a href="?id=<?= $id ?>&action=up&rang=<?= $ligne[3] ?>" class="btn btn-default" title="Monter"><i class="glyphicon glyphicon-arrow-up"></i></a>
-                                                <a href="?id=<?= $id ?>&action=down&rang=<?= $ligne[3] ?>" class="btn btn-default" title="Descendre"><i class="glyphicon glyphicon-arrow-down"></i></a>
-                                                <a href="?id=<?= $id ?>&action=del&idLien=<?= $ligne[0] ?>" class="btn btn-danger" onclick="return confirm('Enlever ?');" title="Supprimer de la playlist"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a href="?id=<?= $id ?>&action=up&rang=<?= $rang ?>" class="btn btn-default" title="Monter"><i class="glyphicon glyphicon-arrow-up"></i></a>
+                                                <a href="?id=<?= $id ?>&action=down&rang=<?= $rang ?>" class="btn btn-default" title="Descendre"><i class="glyphicon glyphicon-arrow-down"></i></a>
+                                                <a href="?id=<?= $id ?>&action=del&idLien=<?= $idLien ?>" class="btn btn-danger" onclick="return confirm('Enlever ?');" title="Supprimer de la playlist"><i class="glyphicon glyphicon-trash"></i></a>
                                             </div>
                                         </td>
                                     </tr>

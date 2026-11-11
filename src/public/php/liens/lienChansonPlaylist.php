@@ -5,28 +5,30 @@ require_once __DIR__ . "/../lib/utilssi.php";
 // Fonctions de gestion des liens chanson playlist dans la table lienchansonplaylist
 
 // Cherche les lienChansonPlaylists correspondant à un critère
-function chercheLiensChansonPlaylist($critere, $valeur, $critereTri = 'nom', $bTriAscendant = true)
+function chercheLiensChansonPlaylist($critere, $valeur, $critereTri = 'ordre', $bTriAscendant = true)
 {
-    $maRequete = "SELECT * FROM lienchansonplaylist WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
-    if ($bTriAscendant == false)
-        $maRequete .= " DESC";
-    else
-        $maRequete .= " ASC";
-    // echo "ma requete : " . $maRequete;
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheliensChansonPlaylist #1 : " . $_SESSION ['mysql']->error);
+    $db = $_SESSION['mysql'];
+    $critere = $db->real_escape_string($critere);
+    $valeur = $db->real_escape_string($valeur);
+    $critereTri = $db->real_escape_string($critereTri);
+    $direction = $bTriAscendant ? "ASC" : "DESC";
+
+    $maRequete = "SELECT id, id_chanson, id_playlist, ordre FROM lienchansonplaylist WHERE $critere LIKE '$valeur' ORDER BY $critereTri $direction";
+    $result = $db->query($maRequete) or die ("Problème chercheliensChansonPlaylist #1 : " . $db->error);
     return $result;
 }
 
 // Cherche un lienChansonPlaylist et le renvoie s'il existe
 function chercheLienChansonPlaylist($id)
 {
-    $maRequete = "SELECT * FROM lienchansonplaylist WHERE id = '$id'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème cherchelienChansonPlaylist #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la lisgne sélectionnée : id, nom, interprète, année
-    if (($ligne = $result->fetch_row()))
-        return ($ligne);
-    else
-        return (0);
+    $db = $_SESSION['mysql'];
+    $id = (int)$id;
+    $maRequete = "SELECT id, id_chanson, id_playlist, ordre FROM lienchansonplaylist WHERE id = '$id'";
+    $result = $db->query($maRequete) or die ("Problème cherchelienChansonPlaylist #1 : " . $db->error);
+    if (($ligne = $result->fetch_assoc())) {
+        return array_merge(array_values($ligne), $ligne);
+    }
+    return 0;
 }
 
 // Renvoie le nombre de chansons dans une playlist
@@ -36,99 +38,122 @@ function chercheLienChansonPlaylist($id)
  */
 function nombreDeLiensDeLaPlaylist($idPlaylist)
 {
-    $maRequete = "SELECT * FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'";
-    $result = $_SESSION['mysql']->query($maRequete) or die ("Problème nombreDeLiensDeLaPlaylist #1 : " . $_SESSION['mysql']->error);
-    $row_cnt = $result->num_rows;
-    return ($row_cnt);
+    $db = $_SESSION['mysql'];
+    $idPlaylist = (int)$idPlaylist;
+    $maRequete = "SELECT COUNT(*) FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'";
+    $result = $db->query($maRequete) or die ("Problème nombreDeLiensDeLaPlaylist #1 : " . $db->error);
+    $row = $result->fetch_row();
+    return (int)($row[0] ?? 0);
 }
 
 // Cherche un lienChansonPlaylist et le renvoie s'il existe
 function chercheLienParIdPlaylistIdChanson($idPlaylist, $idChanson)
 {
-    $maRequete = "SELECT * FROM lienchansonplaylist WHERE id_chanson = '$idChanson' AND id_playlist = '$idPlaylist'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheIdPlaylistIdChanson #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, nom, interprète, année
-    if (($ligne = $result->fetch_row()))
-        return ($ligne);
-    else
-        return (0);
+    $db = $_SESSION['mysql'];
+    $idPlaylist = (int)$idPlaylist;
+    $idChanson = (int)$idChanson;
+    $maRequete = "SELECT id, id_chanson, id_playlist, ordre FROM lienchansonplaylist WHERE id_chanson = '$idChanson' AND id_playlist = '$idPlaylist'";
+    $result = $db->query($maRequete) or die ("Problème chercheIdPlaylistIdChanson #1 : " . $db->error);
+    if (($ligne = $result->fetch_assoc())) {
+        return array_merge(array_values($ligne), $ligne);
+    }
+    return 0;
 }
 
-// Cherche le nieme lienChansonPlaylist  d'un Playlistet le renvoie s'il existe
+// Cherche le nieme lienChansonPlaylist d'une playlist et le renvoie s'il existe
 function chercheLienParIdPlaylistOrdre($idPlaylist, $ordre)
 {
-    $maRequete = "SELECT * FROM lienchansonplaylist WHERE ordre = '$ordre' AND id_playlist = '$idPlaylist'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheLienParIdPlaylistOrdre #1 : " . $_SESSION ['mysql']->error);
-    // renvoie la ligne sélectionnée : id, nom, interprète, année
-    if (($ligne = $result->fetch_row()))
-        return ($ligne);
-    else
-        return (0);
+    $db = $_SESSION['mysql'];
+    $idPlaylist = (int)$idPlaylist;
+    $ordre = (int)$ordre;
+    $maRequete = "SELECT id, id_chanson, id_playlist, ordre FROM lienchansonplaylist WHERE ordre = '$ordre' AND id_playlist = '$idPlaylist'";
+    $result = $db->query($maRequete) or die ("Problème chercheLienParIdPlaylistOrdre #1 : " . $db->error);
+    if (($ligne = $result->fetch_assoc())) {
+        return array_merge(array_values($ligne), $ligne);
+    }
+    return 0;
 }
 
 // Crée un lienChansonPlaylist
 function creelienChansonPlaylist($idChanson, $idPlaylist)
 {
+    $db = $_SESSION['mysql'];
     $idChanson = (int)$idChanson;
     $idPlaylist = (int)$idPlaylist;
     
     // On compte proprement en SQL
-    $res = $_SESSION['mysql']->query("SELECT COUNT(*) FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'");
+    $res = $db->query("SELECT COUNT(*) FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'");
     $row = $res->fetch_row();
-    $nb = $row[0] + 1;
+    $nb = (int)$row[0] + 1;
 
     $maRequete = "INSERT INTO lienchansonplaylist (id, id_chanson, id_playlist, ordre) VALUES (NULL, '$idChanson', '$idPlaylist', '$nb')";
-    $_SESSION ['mysql']->query($maRequete) or die ("Problème creelienChansonPlaylist#1 : " . $_SESSION ['mysql']->error);
+    $db->query($maRequete) or die ("Problème creelienChansonPlaylist#1 : " . $db->error);
 }
 
-// Modifie en base la lienChansonPlaylist
+// Modifie en base le lienChansonPlaylist
 function modifielienChansonPlaylist($id, $idChanson, $idPlaylist, $ordre)
 {
-    $maRequete = "UPDATE  lienchansonplaylist
-	SET id_chanson = '$idChanson', id_playlist = '$idPlaylist', ordre = '$ordre'
-	WHERE id='$id'";
-// 	echo $maRequete . "<br>";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème modifielienChansonPlaylist #1 : " . $_SESSION ['mysql']->error);
+    $db = $_SESSION['mysql'];
+    $id = (int)$id;
+    $idChanson = (int)$idChanson;
+    $idPlaylist = (int)$idPlaylist;
+    $ordre = (int)$ordre;
+
+    $maRequete = "UPDATE lienchansonplaylist
+	              SET id_chanson = '$idChanson', id_playlist = '$idPlaylist', ordre = '$ordre'
+	              WHERE id = '$id'";
+    $db->query($maRequete) or die ("Problème modifielienChansonPlaylist #1 : " . $db->error);
 }
 
-// Cette fonction supprime un lienChansonPlaylist si il existe
+// Cette fonction supprime un lienChansonPlaylist s'il existe
 function supprimelienChansonPlaylist($idlienChansonPlaylist)
 {
-    // On supprime les enregistrements dans lienChansonPlaylist
-    $maRequete = "DELETE FROM lienchansonplaylist
-	WHERE id='$idlienChansonPlaylist'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimelienChansonPlaylist : " . $_SESSION ['mysql']->error);
-    // On réordonne la liste
-    ordonneLiensPlaylist($idlienChansonPlaylist);
+    $db = $_SESSION['mysql'];
+    $idlienChansonPlaylist = (int)$idlienChansonPlaylist;
+
+    // Récupérer l'id_playlist avant suppression pour réordonner ensuite
+    $lien = chercheLienChansonPlaylist($idlienChansonPlaylist);
+    $idPlaylist = $lien ? (int)($lien['id_playlist'] ?? $lien[2]) : 0;
+
+    $maRequete = "DELETE FROM lienchansonplaylist WHERE id = '$idlienChansonPlaylist'";
+    $db->query($maRequete) or die ("Problème #1 dans supprimelienChansonPlaylist : " . $db->error);
+
+    if ($idPlaylist > 0) {
+        ordonneLiensPlaylist($idPlaylist);
+    }
 }
 
 // Cette fonction supprime un lienChansonPlaylist si il existe
 function supprimelienIdChansonIdPlaylist($idChanson, $idPlaylist)
 {
-    // On supprime les enregistrements dans lienChansonPlaylist
-    $maRequete = "DELETE FROM lienchansonplaylist
-	WHERE id_chanson = '$idChanson' AND id_playlist = '$idPlaylist'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimelienChansonPlaylist : " . $_SESSION ['mysql']->error);
-    // On réordonne la liste
+    $db = $_SESSION['mysql'];
+    $idChanson = (int)$idChanson;
+    $idPlaylist = (int)$idPlaylist;
+
+    $maRequete = "DELETE FROM lienchansonplaylist WHERE id_chanson = '$idChanson' AND id_playlist = '$idPlaylist'";
+    $db->query($maRequete) or die ("Problème #1 dans supprimelienIdChansonIdPlaylist : " . $db->error);
+
     ordonneLiensPlaylist($idPlaylist);
 }
 
-// Cette fonction supprime un lienChansonPlaylist si il existe
+// Cette fonction supprime tous les liens vers une chanson
 function supprimeliensChansonPlaylistDeLaChanson($idChanson)
 {
-    // On supprime les enregistrements dans lienChansonPlaylist
-    $maRequete = "DELETE FROM lienchansonplaylist
-	WHERE id_chanson ='$idChanson'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimeliensChansonPlaylistDeLaChanson : " . $_SESSION ['mysql']->error);
+    $db = $_SESSION['mysql'];
+    $idChanson = (int)$idChanson;
+
+    $maRequete = "DELETE FROM lienchansonplaylist WHERE id_chanson = '$idChanson'";
+    $db->query($maRequete) or die ("Problème #1 dans supprimeliensChansonPlaylistDeLaChanson : " . $db->error);
 }
 
 // Cette fonction supprime tous les liens de la playlist
 function supprimeliensChansonPlaylistDeLaPlaylist($idPlaylist)
 {
-    // On supprime les enregistrements dans lienChansonPlaylist
-    $maRequete = "DELETE FROM lienchansonplaylist
-	WHERE id_playlist ='$idPlaylist'";
-    $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème #1 dans supprimeliensChansonPlaylistDeLaPlaylist : " . $_SESSION ['mysql']->error);
+    $db = $_SESSION['mysql'];
+    $idPlaylist = (int)$idPlaylist;
+
+    $maRequete = "DELETE FROM lienchansonplaylist WHERE id_playlist = '$idPlaylist'";
+    $db->query($maRequete) or die ("Problème #1 dans supprimeliensChansonPlaylistDeLaPlaylist : " . $db->error);
 }
 
 // Cette fonction modifie ou crée un lienChansonPlaylist si besoin
@@ -140,98 +165,109 @@ function creeModifielienChansonPlaylist($id, $idChanson, $idPlaylist, $ordre = 0
         creelienChansonPlaylist($idChanson, $idPlaylist);
 }
 
-// Cette fonction renvoie une chaine de description de la lienChansonPlaylist
+// Cette fonction renvoie une chaîne de description du lienChansonPlaylist
 function infoslienChansonPlaylist($id)
 {
     $enr = chercheLienChansonPlaylist($id);
-    // id_journee id_joueur poste statut
-    $retour = "Id : " . $enr [0] . " idChanson : " . $enr [1] . " IdPlaylist : " . $enr [2] . " Ordre : " . $enr [3];
+    if (!$enr) return "";
+    $retour = "Id : " . ($enr['id'] ?? $enr[0]) . 
+              " idChanson : " . ($enr['id_chanson'] ?? $enr[1]) . 
+              " IdPlaylist : " . ($enr['id_playlist'] ?? $enr[2]) . 
+              " Ordre : " . ($enr['ordre'] ?? $enr[3]);
     return $retour . "<BR>\n";
 }
-
 
 // Cette fonction s'assure que les chansons d'une playlist soient numérotées de 1 à n
 function ordonneLiensPlaylist($idPlaylist)
 {
-    // Récupérer la liste des liens triés par ordre
+    $idPlaylist = (int)$idPlaylist;
     $lignes = chercheLiensChansonPlaylist('id_playlist', $idPlaylist, "ordre", true);
 
-    // Les stocker dans un tableau
+    $mesLiens = [];
     $numero = 1;
-    while ($ligne = $lignes->fetch_row()) {
-        $mesLiens [$numero] = $ligne;
+    while ($ligne = $lignes->fetch_assoc()) {
+        $mesLiens[$numero] = $ligne;
         $numero++;
     }
 
-    // Faire une boucle de 1 à n pour les renuméroter
     $parcours = 1;
     while ($parcours < $numero) {
-        // Attention à l'ordre des colonnes : id_chanson est à l'index 2, id_playlist à l'index 1
-        modifielienChansonPlaylist($mesLiens[$parcours][0], $mesLiens[$parcours][1], $mesLiens[$parcours][2], $parcours);
+        modifielienChansonPlaylist(
+            (int)$mesLiens[$parcours]['id'], 
+            (int)$mesLiens[$parcours]['id_chanson'], 
+            (int)$mesLiens[$parcours]['id_playlist'], 
+            $parcours
+        );
         $parcours++;
     }
 }
 
 function remonteTitrePlaylist($idPlaylist, $rang, $longueurSaut)
 {
+    $idPlaylist = (int)$idPlaylist;
+    $rang = (int)$rang;
+    $longueurSaut = (int)$longueurSaut;
+
     if ($rang <= $longueurSaut) {
         return false;
     }
 
-    // cherche le doc à monter
     $lienAmonter = chercheLienParIdPlaylistOrdre($idPlaylist, $rang);
-    if ($lienAmonter == 0) {
+    if (!$lienAmonter) {
         return false;
     }
 
-    // cherche le doc à baisser
     $lienAbaisser = chercheLienParIdPlaylistOrdre($idPlaylist, $rang - $longueurSaut);
-    if ($lienAbaisser == 0) {
+    if (!$lienAbaisser) {
         return false;
     }
 
-    //  changer l'ordre et enregistrer
-    modifielienChansonPlaylist($lienAmonter[0], $lienAmonter[1], $lienAmonter[2], (int)$lienAmonter[3] - (int)$longueurSaut);
-    modifielienChansonPlaylist($lienAbaisser[0], $lienAbaisser[1], $lienAbaisser[2], (int)$lienAbaisser[3] + (int)$longueurSaut);
+    $idLienMonter = (int)($lienAmonter['id'] ?? $lienAmonter[0]);
+    $idChansonMonter = (int)($lienAmonter['id_chanson'] ?? $lienAmonter[1]);
+    $idPlMonter = (int)($lienAmonter['id_playlist'] ?? $lienAmonter[2]);
+    $ordreMonter = (int)($lienAmonter['ordre'] ?? $lienAmonter[3]);
 
-    //  réordonner au cas où
+    $idLienBaisser = (int)($lienAbaisser['id'] ?? $lienAbaisser[0]);
+    $idChansonBaisser = (int)($lienAbaisser['id_chanson'] ?? $lienAbaisser[1]);
+    $idPlBaisser = (int)($lienAbaisser['id_playlist'] ?? $lienAbaisser[2]);
+    $ordreBaisser = (int)($lienAbaisser['ordre'] ?? $lienAbaisser[3]);
+
+    modifielienChansonPlaylist($idLienMonter, $idChansonMonter, $idPlMonter, $ordreMonter - $longueurSaut);
+    modifielienChansonPlaylist($idLienBaisser, $idChansonBaisser, $idPlBaisser, $ordreBaisser + $longueurSaut);
+
     ordonneLiensPlaylist($idPlaylist);
     return true;
 }
 
 function descendTitrePlaylist($idPlaylist, $rang, $longueurSaut)
 {
-    // cherche le doc à descendre
+    $idPlaylist = (int)$idPlaylist;
+    $rang = (int)$rang;
+    $longueurSaut = (int)$longueurSaut;
+
     $lienAdescendre = chercheLienParIdPlaylistOrdre($idPlaylist, $rang);
-    if ($lienAdescendre == 0) {
+    if (!$lienAdescendre) {
         return false;
     }
 
-    // cherche le doc à monter
     $lienAmonter = chercheLienParIdPlaylistOrdre($idPlaylist, $rang + $longueurSaut);
-    if ($lienAmonter == 0) {
+    if (!$lienAmonter) {
         return false;
     }
 
-    //  changer l'ordre et enregistrer
-    modifielienChansonPlaylist($lienAdescendre[0], $lienAdescendre[1], $lienAdescendre[2], (int)$lienAdescendre[3] + (int)$longueurSaut);
-    modifielienChansonPlaylist($lienAmonter[0], $lienAmonter[1], $lienAmonter[2], (int)$lienAmonter[3] - (int)$longueurSaut);
+    $idLienDesc = (int)($lienAdescendre['id'] ?? $lienAdescendre[0]);
+    $idChansonDesc = (int)($lienAdescendre['id_chanson'] ?? $lienAdescendre[1]);
+    $idPlDesc = (int)($lienAdescendre['id_playlist'] ?? $lienAdescendre[2]);
+    $ordreDesc = (int)($lienAdescendre['ordre'] ?? $lienAdescendre[3]);
 
-    //  réordonner au cas où
+    $idLienMonter = (int)($lienAmonter['id'] ?? $lienAmonter[0]);
+    $idChansonMonter = (int)($lienAmonter['id_chanson'] ?? $lienAmonter[1]);
+    $idPlMonter = (int)($lienAmonter['id_playlist'] ?? $lienAmonter[2]);
+    $ordreMonter = (int)($lienAmonter['ordre'] ?? $lienAmonter[3]);
+
+    modifielienChansonPlaylist($idLienDesc, $idChansonDesc, $idPlDesc, $ordreDesc + $longueurSaut);
+    modifielienChansonPlaylist($idLienMonter, $idChansonMonter, $idPlMonter, $ordreMonter - $longueurSaut);
+
     ordonneLiensPlaylist($idPlaylist);
     return true;
 }
-
-// Fonction de test
-function testelienChansonPlaylist()
-{
-    creelienChansonPlaylist(1, 1);
-    creelienChansonPlaylist(2, 1);
-    // creeModifielienChansonPlaylist ( 2, 1,1,3 );
-    creelienChansonPlaylist(3, 1);
-    // echo infoslienChansonPlaylist ( $id );
-}
-
-// testelienChansonPlaylist ();
-// ordonneLiensPlaylist(24);
-// TODO ajouter des logs pur tracer l'activité du site

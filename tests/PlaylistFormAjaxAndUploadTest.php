@@ -384,4 +384,58 @@ class PlaylistFormAjaxAndUploadTest extends TestCase
         @unlink($path);
         @rmdir($chansonDir);
     }
+
+    public function testAddSongAndCheckOrderAndDisplay(): void
+    {
+        $db = $_SESSION['mysql'];
+        $db->query("INSERT INTO playlist (nom, description, date_creation, id_utilisateur, type, criteres, image, hits) VALUES ('Test Pl Add', '', NOW(), 1, 0, '[]', '', 0)");
+        $plId = (int)$db->insert_id;
+        $this->testPlaylistId = $plId;
+
+        $msg = PlaylistFormService::addSong($plId, $this->testSongId);
+        $this->assertEquals("Morceau ajouté avec succès !", $msg);
+
+        // 1. Vérifier dans la table lienchansonplaylist
+        $check = $db->query("SELECT * FROM lienchansonplaylist WHERE id_playlist = $plId");
+        $this->assertEquals(1, $check->num_rows, "La chanson doit être présente pour id_playlist = $plId");
+        $row = $check->fetch_assoc();
+        $this->assertEquals($this->testSongId, (int)$row['id_chanson'], "id_chanson doit correspondre");
+        $this->assertEquals($plId, (int)$row['id_playlist'], "id_playlist doit correspondre");
+        $this->assertEquals(1, (int)$row['ordre'], "ordre doit être 1");
+
+        // 2. Vérifier avec chercheLiensChansonPlaylist
+        $res = chercheLiensChansonPlaylist('id_playlist', $plId, "ordre", true);
+        $this->assertEquals(1, $res->num_rows);
+        $rowLien = $res->fetch_row();
+        $this->assertEquals($this->testSongId, (int)$rowLien[1], "index 1 doit être id_chanson pour Chanson::load");
+
+        // 3. Vérifier avec getMorceauxPlaylist
+        $morceaux = getMorceauxPlaylist($plId, 'ordre');
+        $this->assertEquals(1, $morceaux->num_rows);
+    }
+
+    public function testAutoRepairInvertedLinks(): void
+    {
+        $db = $_SESSION['mysql'];
+        $db->query("INSERT INTO playlist (nom, description, date_creation, id_utilisateur, type, criteres, image, hits) VALUES ('Test Pl Inverted', '', NOW(), 1, 0, '[]', '', 0)");
+        $plId = (int)$db->insert_id;
+
+        // Simuler un lien inversé historique : id_playlist = chansonId, id_chanson = plId
+        $db->query("INSERT INTO lienchansonplaylist (id_chanson, id_playlist, ordre) VALUES ($plId, {$this->testSongId}, 1)");
+        $lienId = (int)$db->insert_id;
+
+        // Appeler prepareData qui déclenche l'auto-réparation
+        $data = PlaylistFormService::prepareData($plId);
+        $this->assertEquals("MAJ", $data['mode']);
+
+        // Vérifier que le lien a bien été réparé (id_chanson = testSongId, id_playlist = plId)
+        $res = $db->query("SELECT * FROM lienchansonplaylist WHERE id = $lienId");
+        $row = $res->fetch_assoc();
+        $this->assertEquals($this->testSongId, (int)$row['id_chanson'], "Lien réparé : id_chanson doit être le morceau");
+        $this->assertEquals($plId, (int)$row['id_playlist'], "Lien réparé : id_playlist doit être la playlist");
+
+        // Nettoyage
+        $db->query("DELETE FROM lienchansonplaylist WHERE id = $lienId");
+        $db->query("DELETE FROM playlist WHERE id = $plId");
+    }
 }

@@ -1,6 +1,26 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (11 Novembre 2026 - Soirée)
+- **🩹 Fix Régression : Ajout et Affichage des Morceaux en Playlist (`lienChansonPlaylist.php`, `playlist_form_view.phtml`)** :
+    - **Contexte & Symptôme PO** :
+        - Lors de l'ajout d'un morceau dans une playlist, le toast « Morceau ajouté avec succès ! » s'affichait bien, mais le morceau n'apparaissait ni dans l'onglet « Morceaux » du formulaire, ni dans `playlist_voir.php`.
+    - **Causes Racines Identifiées** :
+        - Dépendance fragile aux index numériques (`fetch_row()`) lors de `SELECT * FROM lienchansonplaylist` : selon que la table a été créée historiquement ou via la migration `001_playlists_and_dynamic_mode.sql` (Hostinger Prod), l'ordre physique des colonnes `id_chanson` et `id_playlist` différait, provoquant une inversion de colonnes lors de la réorganisation par `ordonneLiensPlaylist()`.
+        - Les morceaux ajoutés se retrouvaient enregistrés avec `id_chanson = playlist_id` et `id_playlist = chanson_id`, devenant invisibles pour les requêtes de consultation de la playlist.
+    - **Correctifs Apportés (SOLID & Canopée)** :
+        - **Module Liens (`lienChansonPlaylist.php`)** :
+            - Normalisation stricte de toutes les requêtes de sélection avec colonnes explicites (`SELECT id, id_chanson, id_playlist, ordre`), garantissant un mapping déterministe quel que soit le moteur MariaDB.
+            - Bascule intégrale de `ordonneLiensPlaylist()`, `remonteTitrePlaylist()`, `descendTitrePlaylist()` sur un accès associatif nommé (`$ligne['id_chanson']`, `$ligne['id_playlist']`, `$ligne['ordre']`, `$ligne['id']`).
+        - **Vue Formulaire (`playlist_form_view.phtml`)** :
+            - Remplacement de l'accès numérique `$ligne[1]`, `$ligne[3]` par `fetch_assoc()` (`$ligne['id_chanson']`, `$ligne['ordre']`, `$ligne['id']`).
+            - Ajout d'une vérification de robustesse `if (!$ch) continue;`.
+        - **Auto-Réparation Opportuniste (`PlaylistFormService.php`)** :
+            - Injection dans `prepareData()` d'une requête de réparation automatique et idempotente qui détecte et rétablit instantanément les liens inversés existants en BDD dès l'ouverture de la playlist.
+    - **Tests & Validation** :
+        - Ajout de `testAddSongAndCheckOrderAndDisplay()` et `testAutoRepairInvertedLinks()` dans `tests/PlaylistFormAjaxAndUploadTest.php`.
+        - **194 / 194 tests PHPUnit validés (100% Succès, 1015 assertions)**.
+        - **28 / 28 Smoke Tests & HTML Lint validés (100% Succès, 168 assertions)**.
+
 - **🛠️ Fix Communication Serveur AJAX & Robustesse Mosaïque Playlist (`playlist_form.php`)** :
     - **Contexte & Symptôme PO** :
         - Lors du clic sur « Prévisualiser la mosaïque », un toast d'erreur apparaissait : « Erreur technique lors de la communication serveur. ».
