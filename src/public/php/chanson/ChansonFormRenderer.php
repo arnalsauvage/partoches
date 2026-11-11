@@ -135,7 +135,7 @@ HTML;
     {
         $out = "<h2>Liste des documents</h2><ul class='list-group'>";
         $lignes = Document::chercheDocumentsTableId("chanson", $id);
-        while ($ligneDoc = ($lignes->fetch_assoc() ?: $lignes->fetch_row())) {
+        while ($ligneDoc = $lignes->fetch_assoc()) {
             $idDoc = (int)($ligneDoc['id'] ?? $ligneDoc[0]);
             $nomDoc = $ligneDoc['nom'] ?? $ligneDoc[1];
             $versionDoc = (int)($ligneDoc['version'] ?? $ligneDoc[4] ?? 1);
@@ -252,7 +252,7 @@ HTML;
         $out = "<h2>Corbeille</h2>";
         $fichiersEnBdd = [];
         $res = Document::chercheDocumentsTableId("chanson", (string)$id);
-        while ($f = ($res->fetch_assoc() ?: $res->fetch_row())) $fichiersEnBdd[] = Document::composeNomVersion($f['nom'] ?? $f[1], $f['version'] ?? $f[4] ?? 1);
+        while ($f = $res->fetch_assoc()) $fichiersEnBdd[] = Document::composeNomVersion($f['nom'] ?? $f[1], $f['version'] ?? $f[4] ?? 1);
 
         $fichiersSurDisque = $_chanson->fichiersChanson($_dossier_chansons);
         $nbOrphelins = 0;
@@ -386,14 +386,14 @@ HTML;
 HTML;
 
         $lignes = LienUrl::chercheLiensUrlsTableId("chanson", $id);
-        while ($l = $lignes->fetch_row()) {
-            $idL = $l[0];
-            $url = htmlentities($l[3]);
-            $type = htmlentities($l[4]);
-            $desc = htmlentities($l[5]);
-            $date = dateMysqlVersTexte($l[6]);
-            $idU = $l[7];
-            $hits = $l[8];
+        while ($l = $lignes->fetch_assoc()) {
+            $idL = (int)($l['id'] ?? $l[0]);
+            $url = htmlentities($l['url'] ?? $l[3] ?? '');
+            $type = htmlentities($l['type'] ?? $l[4] ?? '');
+            $desc = htmlentities($l['description'] ?? $l[5] ?? '');
+            $date = dateMysqlVersTexte($l['date'] ?? $l[6] ?? '');
+            $idU = (int)($l['idUser'] ?? $l[7] ?? 1);
+            $hits = (int)($l['hits'] ?? $l[8] ?? 0);
             $selectUser = Utilisateur::selectUtilisateur("nom", "%", "login", true, $idU, "utilisateur", "idUser$idL");
 
             $out .= <<<HTML

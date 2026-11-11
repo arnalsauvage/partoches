@@ -231,9 +231,9 @@ if ($mode == REGEN_THUMBS) {
     require_once "../lib/Image.php";
     $res = Document::chercheDocumentsTableId(CHANSON, $id);
     $count = 0;
-    while ($doc = $res->fetch_row()) {
-        $nomDoc = $doc[1];
-        $version = $doc[4];
+    while ($doc = $res->fetch_assoc()) {
+        $nomDoc = $doc['nom'] ?? $doc[1];
+        $version = (int)($doc['version'] ?? $doc[4] ?? 1);
         $ext = strtolower(pathinfo($nomDoc, PATHINFO_EXTENSION));
         if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
             $relPath = $id . "/" . Document::composeNomVersion($nomDoc, $version);

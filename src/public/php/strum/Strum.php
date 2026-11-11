@@ -170,8 +170,10 @@ class Strum
 
         // On compte le nombre d'utilisations
         $db = $_SESSION[self::MYSQL];
-        $res = $db->query("SELECT COUNT(*) FROM lienstrumchanson WHERE idStrum = $id");
-        $count = ($res) ? $res->fetch_row()[0] : 0;
+        $res = $db->query("SELECT COUNT(*) AS total FROM lienstrumchanson WHERE idStrum = $id");
+        $count = ($res && $r = $res->fetch_assoc()) ? (int)($r['total'] ?? 0) : 0;
+
+
 
         $badgeSwing = $this->_swing ? "<span class='label label-warning' style='background-color: #d35400; color: white; margin-left: 5px; font-weight: bold;'>SWING</span>" : "";
 
@@ -258,8 +260,8 @@ class Strum
         if ($result) {
             $total = $result->num_rows;
             $count = 0;
-            while ($ligne = $result->fetch_row()) {
-                $_idChanson = $ligne[0];
+            while ($ligne = $result->fetch_assoc()) {
+                $_idChanson = (int)($ligne['idChanson'] ?? $ligne[0]);
                 if (isset($titresChansons[$_idChanson])) {
                     if ($count < $limit) {
                         $links[] = "<a href='../chanson/chanson_voir.php?id=$_idChanson' style='color: inherit; font-style: italic;'>" . $titresChansons[$_idChanson] . "</a>";
@@ -297,8 +299,8 @@ class Strum
         
         $links = [];
         if ($result) {
-            while ($ligne = $result->fetch_row()) {
-                $_idChanson = $ligne[0];
+            while ($ligne = $result->fetch_assoc()) {
+                $_idChanson = (int)($ligne['idChanson'] ?? $ligne[0]);
                 if (isset($titresChansons[$_idChanson])) {
                     $links[] = $titresChansons[$_idChanson];
                 }

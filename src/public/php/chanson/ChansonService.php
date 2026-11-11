@@ -13,7 +13,7 @@ class ChansonService
         
         // 1. Utilisateur (Auteur)
         $userRow = Utilisateur::chercheUtilisateur($chanson->getIdUser());
-        $utilisateur = $userRow[1] ?? 'Inconnu';
+        $utilisateur = $userRow['pseudo'] ?? $userRow['nom'] ?? $userRow[1] ?? 'Inconnu';
 
         // 2. Documents et filtrage (Pochettes vs Médias)
         $resultDocs = Document::chercheDocumentsTableId("chanson", $id);
@@ -24,7 +24,7 @@ class ChansonService
         $canAccessAudio = MediaService::estAudioAccessible();
 
         if (!empty($resultDocs)) {
-            while ($ligne = ($resultDocs->fetch_assoc() ?: $resultDocs->fetch_row())) {
+            while ($ligne = $resultDocs->fetch_assoc()) {
                 $ext = strtolower(pathinfo($ligne['nom'] ?? $ligne[1], PATHINFO_EXTENSION));
                 
                 if (in_array($ext, ['mp3', 'm4a', 'aac', 'mp4'])) {
@@ -44,9 +44,9 @@ class ChansonService
         if (class_exists('LienStrumChanson')) {
             $resStrum = LienStrumChanson::chercheLiensStrumChanson("idChanson", $id);
             if ($resStrum) {
-                while ($l = $resStrum->fetch_row()) {
+                while ($l = $resStrum->fetch_assoc()) {
                     $s = new Strum();
-                    $s->chercheStrumParChaine($l[1]);
+                    $s->chercheStrumParChaine($l['strum'] ?? $l[3] ?? $l[1] ?? '');
                     $strums[] = $s;
                 }
             }

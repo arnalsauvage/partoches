@@ -63,7 +63,7 @@ class Chanson
     private function loadInstance(int $id): bool
     {
         $db = $_SESSION[self::MYSQL];
-        $sql = sprintf("SELECT * FROM chanson WHERE id = %d", $id);
+        $sql = sprintf("SELECT id, nom, interprete, annee, tempo, mesure, pulsation, datePub, idUser, hits, tonalite, cover, publication, tonalite_originale FROM chanson WHERE id = %d", $id);
         $res = $db->query($sql);
         if ($res && ($row = $res->fetch_assoc())) {
             $this->mysqlRowVersObjet($row);
@@ -205,7 +205,7 @@ class Chanson
     public function supprimeChansonBddFile() { $this->delete(); }
     public function chercheChansonParLeNom($nom) { 
         $db = $_SESSION[self::MYSQL];
-        $res = $db->query(sprintf("SELECT * FROM chanson WHERE nom = '%s'", $db->real_escape_string($nom)));
+        $res = $db->query(sprintf("SELECT id, nom, interprete, annee, tempo, mesure, pulsation, datePub, idUser, hits, tonalite, cover, publication, tonalite_originale FROM chanson WHERE nom = '%s'", $db->real_escape_string($nom)));
         if ($res && ($row = $res->fetch_assoc())) { $this->mysqlRowVersObjet($row); return 1; }
         return 0;
     }
@@ -218,8 +218,8 @@ class Chanson
         $db->query("DELETE FROM chanson WHERE id = " . $this->_id);
         if (class_exists('Document')) {
             $res = Document::chercheDocumentsTableId("chanson", $this->_id);
-            while ($row = $res->fetch_row()) {
-                Document::supprimeDocument((int)$row[0]);
+            while ($row = $res->fetch_assoc()) {
+                Document::supprimeDocument((int)($row['id'] ?? $row[0]));
             }
         }
     }

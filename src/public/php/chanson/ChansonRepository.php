@@ -104,8 +104,8 @@ class ChansonRepository
 
         $result = $db->query($sql) or die ("ChansonRepository::search error : " . $db->error . " SQL: $sql");
         $ids = [];
-        while ($row = $result->fetch_row()) {
-            $ids[] = (int)$row[0];
+        while ($row = $result->fetch_assoc()) {
+            $ids[] = (int)($row['id'] ?? $row[0]);
         }
         return $ids;
     }
@@ -117,7 +117,7 @@ class ChansonRepository
     {
         $db = $_SESSION['mysql'];
         $query = $db->real_escape_string($query);
-        $sql = "SELECT COUNT(chanson.id) FROM chanson";
+        $sql = "SELECT COUNT(chanson.id) AS total FROM chanson";
         
         $where = [];
         if (!isset($_SESSION['privilege']) || $_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
@@ -162,8 +162,10 @@ class ChansonRepository
         }
 
         $result = $db->query($sql) or die ("ChansonRepository::count error : " . $db->error);
-        $row = $result->fetch_row();
-        return (int) $row[0];
+        $row = $result->fetch_assoc();
+        return (int)($row['total'] ?? $row[0] ?? 0);
+
+
     }
 
     /**
@@ -172,7 +174,7 @@ class ChansonRepository
     public static function getLinks(int $idChanson): ?mysqli_result
     {
         $db = $_SESSION['mysql'];
-        $sql = sprintf("SELECT * FROM lienurl WHERE nomTable = 'chanson' AND idTable = %d", $idChanson);
+        $sql = sprintf("SELECT id, nomTable, idTable, url, type, description, date, idUser, hits FROM lienurl WHERE nomTable = 'chanson' AND idTable = %d", $idChanson);
         return $db->query($sql);
     }
 

@@ -1,6 +1,32 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (11 Novembre 2026 - Soirée)
+- **⚡ US-085 — Sprint Technique « Clean Assoc BDD » — Lot 3 : Catalogue & Chansons (`Chanson`, `ChansonRepository`, `ChansonService`, `ChansonFormRenderer`, `chanson_post`, `chanson_voir_view`, `Strum`, `UtilisateurNote`)** :
+    - **Contexte & Objectif** :
+        - Éradication intégrale des index numériques (`fetch_row()`, `$row[0]`, `$row[1]`) et normalisation des requêtes `SELECT` sur le coeur de métier du catalogue des chansons, rythmiques et notations.
+    - **Modifications Apportées** :
+        - **`ChansonRepository.php`** :
+            - `search()` : passage à `fetch_assoc()` et `$row['id']`.
+            - `count()` : requête explicite `SELECT COUNT(chanson.id) AS total`, exploitation de `$row['total']`.
+            - `getLinks()` : projection explicite des 9 colonnes de `lienurl` (`id, nomTable, idTable, url, type, description, date, idUser, hits`).
+        - **`ChansonService.php`** :
+            - Extraction de l'utilisateur avec repli associatif robuste `$userRow['pseudo'] ?? $userRow['nom']`.
+            - Parcours des documents et rythmiques strums via `fetch_assoc()`, extraction du pattern rythmique nommé `$l['strum']`.
+        - **`Chanson.php`** :
+            - `loadInstance()` et `chercheChansonParLeNom()` : projection explicite des 14 colonnes de la table `chanson`.
+            - `delete()` : suppression des documents associés via `fetch_assoc()` et `$row['id']`.
+        - **`ChansonFormRenderer.php` & `chanson_post.php`** :
+            - `renderFiles()`, `renderTrash()`, `renderLinks()` : éradication de `fetch_row()`, manipulation propre des clés associatives (`id`, `url`, `type`, `description`, `date`, `idUser`, `hits`).
+            - `REGEN_THUMBS` : parcours `fetch_assoc()` des documents.
+        - **Vue Fiche Chanson (`chanson_voir_view.phtml`)** :
+            - Remplacement des boucles de liens et songbooks par `fetch_assoc()`, exploitation de `$l['id']`, `$sb['id']` et `$sb['nom']`.
+        - **Strums & Notes (`Strum.php`, `UtilisateurNote.php`)** :
+            - `Strum.php` : comptage d'usage via `SELECT COUNT(*) AS total`, parcours des chansons associées en `fetch_assoc()` et `$ligne['idChanson']`.
+            - `UtilisateurNote.php` : projection explicite `SELECT id, idUtilisateur, nomObjet, idObjet, note`, hydratation `mysqlRowVersObjet` 100% associative.
+    - **Validation & Non-Régression** :
+        - 194 / 194 tests PHPUnit validés (100% Succès, 1020 assertions).
+        - 28 / 28 Smoke tests & HTML lint validés (100% Succès, 168 assertions).
+
 - **⚡ US-085 — Sprint Technique « Clean Assoc BDD » — Lot 2 : Songbooks & Médias (`Songbook`, `MediaRepository`, `MediaService`, `songbook_form`, `songbook_voir`, `songbook-portfolio`, `songbook_corbeille`)** :
     - **Contexte & Objectif** :
         - Poursuite de l'éradication des index numériques (`fetch_row()`, `$row[0]..$row[9]`) et requêtes `SELECT *` sur le domaine des Songbooks et de la médiathèque.

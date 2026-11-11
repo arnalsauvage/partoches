@@ -198,8 +198,8 @@
         <?php if ($liens && $liens->num_rows > 0): ?>
             <hr><h2><i class="glyphicon glyphicon-link"></i> Liens associés</h2>
             <div class="row">
-                <?php while ($l = $liens->fetch_row()): 
-                    LienUrl::ajouteUnHit($l[0]);
+                <?php while ($l = $liens->fetch_assoc()): 
+                    LienUrl::ajouteUnHit((int)($l['id'] ?? $l[0]));
                 ?>
                     <div class="col-sm-6"><?= afficheLien($l) ?></div>
                 <?php endwhile; ?>
@@ -210,15 +210,15 @@
         <?php if ($songbooks && $songbooks->num_rows > 0): ?>
             <hr><h2><i class="glyphicon glyphicon-book"></i> Songbooks associés</h2>
             <div class="row">
-                <?php while ($sb = $songbooks->fetch_row()): 
-                    $idSb = $sb[0];
+                <?php while ($sb = $songbooks->fetch_assoc()): 
+                    $idSb = (int)($sb['id'] ?? $sb[0]);
                     $imgSb = Songbook::imageSongbook($idSb);
                     $urlThumb = Image::getThumbnailUrl("$idSb/$imgSb", 'sd', 'songbooks');
                 ?>
                     <div class="col-xs-4 col-sm-3 col-md-2 text-center">
                         <a href="../songbook/songbook_voir.php?id=<?= $idSb ?>" class="thumbnail sb-thumb">
                             <img src="<?= $urlThumb ?>" class="sb-img-voir" alt="SB">
-                            <div class="caption"><small class="text-truncate"><?= $sb[1] ?></small></div>
+                            <div class="caption"><small class="text-truncate"><?= htmlspecialchars($sb['nom'] ?? $sb[1] ?? '') ?></small></div>
                         </a>
                     </div>
                 <?php endwhile; ?>

@@ -126,10 +126,10 @@ class UtilisateurNote
     // Cherche la note d'un utilisateur pour un media, et la charge si elle existe renvoie une valeur de résultat true ou d'échec false
     public function chercheNoteUtilisateur($idUtilisateur, $nomObjet, $idObjet)
     {
-        $maRequete = "SELECT * FROM noteUtilisateur WHERE idUtilisateur = '$idUtilisateur' AND idObjet = '$idObjet' AND nomObjet = '$nomObjet'";
+        $maRequete = "SELECT id, idUtilisateur, nomObjet, idObjet, note FROM noteUtilisateur WHERE idUtilisateur = '$idUtilisateur' AND idObjet = '$idObjet' AND nomObjet = '$nomObjet'";
         $result = $_SESSION ['mysql']->query($maRequete) or die ("Problème chercheNoteUtilisateur #1 : " . $_SESSION ['mysql']->error);
         // renvoie la ligne sélectionnée : id, idUtilisateur, nomObjet, idObjet, note
-        if ($ligne = $result->fetch_row()) {
+        if ($ligne = $result->fetch_assoc()) {
             $this->mysqlRowVersObjet($ligne);
             return (1);
         } else {
@@ -140,11 +140,11 @@ class UtilisateurNote
     // Passe une ligne résultat mysql dans un objet
     private function mysqlRowVersObjet($ligne)
     {
-        $this->_id = $ligne[0];
-        $this->_idUtilisateur = $ligne[1];
-        $this->_nomObjet = $ligne[2];
-        $this->_idObjet = $ligne[3];
-        $this->_note = $ligne[4];
+        $this->_id = (int)($ligne['id'] ?? $ligne[0]);
+        $this->_idUtilisateur = (int)($ligne['idUtilisateur'] ?? $ligne[1]);
+        $this->_nomObjet = (string)($ligne['nomObjet'] ?? $ligne[2]);
+        $this->_idObjet = (int)($ligne['idObjet'] ?? $ligne[3]);
+        $this->_note = (int)($ligne['note'] ?? $ligne[4]);
     }
 
     /**
