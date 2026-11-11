@@ -17,6 +17,9 @@
             - Calcul dynamique de la grille, découpage en tuiles carrées, redimensionnement et recadrage centré (crop) via GD.
             - Canevas haute définition : $400 \times 400\text{ px}$ pour $2 \times 2$, et $600 \times 600\text{ px}$ pour $3 \times 3$, $4 \times 4$ et $5 \times 5$.
             - Nommage horodaté unique (`slug_idPlaylist_timestamp.jpg`) évitant tout effet de cache HTTP.
+        - **Hotfix JS (`playlistform.js`)** :
+            - Échappement des apostrophes dans les chaînes de caractères (lignes 160 et 273 : `Génération de l\'aperçu...`, `L\'illustration...`), résolvant le `SyntaxError: missing ) after argument list`.
+            - Validation syntaxique Node.js validée sur l'ensemble des fichiers JS de `public/js/`.
         - **Workflow Prévisualisation & Validation Découplée (`PlaylistFormService.php`, `playlist_mosaic_ajax.php`)** :
             - `action: preview` : génère un fichier temporaire préfixé (`preview_slug_id_time.jpg`) sans écraser la BDD ni la pochette en ligne.
             - `action: apply` : convertit et officialise l'aperçu (`applyMosaicPreview`), met à jour la colonne `playlist.image` en BDD et purge les fichiers temporaires.

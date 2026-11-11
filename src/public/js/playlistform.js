@@ -157,7 +157,7 @@ $(document).ready(function () {
 
         var $btn = $(this);
         var originalHtml = $btn.html();
-        $btn.prop('disabled', true).html('<i class="glyphicon glyphicon-refresh spin"></i> Génération de l'aperçu...');
+        $btn.prop('disabled', true).html('<i class="glyphicon glyphicon-refresh spin"></i> Génération de l\'aperçu...');
 
         var playlistId = parseInt($('#playlist_id').val() || '0', 10);
         var playlistNom = $('#fnom').val() || 'Playlist';
@@ -270,7 +270,7 @@ $(document).ready(function () {
         }
         $('#playlist-preview-box').slideUp();
         if (typeof toastr !== 'undefined') {
-            toastr.info('Aperçu rejeté. L'illustration précédente est conservée.');
+            toastr.info("Aperçu rejeté. L'illustration précédente est conservée.");
         }
     });
 
