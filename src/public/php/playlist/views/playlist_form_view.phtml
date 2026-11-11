@@ -105,9 +105,15 @@
                                     if (empty($availableCovers)): ?>
                                         <p class='text-muted small'>Aucune pochette trouvée dans les chansons de cette playlist.</p>
                                     <?php else: ?>
-                                        <?php foreach ($availableCovers as $covUrl): 
+                                        <?php 
+                                        $publicDir = defined('PUBLIC_DIR') ? PUBLIC_DIR : dirname(__DIR__, 4) . '/src/public';
+                                        foreach ($availableCovers as $covUrl): 
                                             $thumbUrl = $covUrl;
-                                            if (str_contains($covUrl, '/data/chansons/')) $thumbUrl = "/data/vignettes/" . basename($covUrl);
+                                            // Si la version -mini existe à côté du fichier original, on l'utilise pour la miniature
+                                            $miniCandidate = preg_replace('/(\.[a-zA-Z0-9]+)$/', '-mini$1', $covUrl);
+                                            if ($miniCandidate && file_exists($publicDir . $miniCandidate)) {
+                                                $thumbUrl = $miniCandidate;
+                                            }
                                         ?>
                                             <img src='<?= htmlspecialchars($thumbUrl) ?>' class='mosaic-thumbnail' data-url='<?= htmlspecialchars($covUrl) ?>' title='Cliquer pour sélectionner/désélectionner' alt='Pochette'>
                                         <?php endforeach; ?>
