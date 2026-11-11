@@ -175,4 +175,40 @@ class PlaylistFormAjaxAndUploadTest extends TestCase
         $msg2 = PlaylistFormService::addSong($this->testPlaylistId, $this->testSongId);
         $this->assertEquals("Ce morceau est déjà dans la playlist.", $msg2);
     }
+
+    public function testThumbnailGenerationOnTheFly(): void
+    {
+        $chansonDir = dirname(__DIR__) . '/src/public/data/chansons/' . $this->testSongId;
+        if (!is_dir($chansonDir)) {
+            mkdir($chansonDir, 0755, true);
+        }
+
+        // Créer une fausse couverture source PNG
+        $sourceImg = imagecreatetruecolor(200, 200);
+        $sourcePath = $chansonDir . '/test-cover.png';
+        imagepng($sourceImg, $sourcePath);
+        imagedestroy($sourceImg);
+
+        $expectedMiniPath = $chansonDir . '/test-cover-mini.webp';
+        if (file_exists($expectedMiniPath)) {
+            unlink($expectedMiniPath);
+        }
+
+        // Appel de la méthode : doit générer la vignette mini.webp à la volée
+        $coverUrl = "/data/chansons/{$this->testSongId}/test-cover.png";
+        $thumbUrl = PlaylistFormService::getThumbnailUrlForCover($coverUrl);
+
+        $this->assertEquals("/data/chansons/{$this->testSongId}/test-cover-mini.webp", $thumbUrl);
+        $this->assertFileExists($expectedMiniPath);
+        $this->assertGreaterThan(0, filesize($expectedMiniPath));
+
+        // Deuxième appel : la vignette existe déjà, doit renvoyer immédiatement la même URL
+        $thumbUrlCached = PlaylistFormService::getThumbnailUrlForCover($coverUrl);
+        $this->assertEquals($thumbUrl, $thumbUrlCached);
+
+        // Nettoyage
+        @unlink($sourcePath);
+        @unlink($expectedMiniPath);
+        @rmdir($chansonDir);
+    }
 }

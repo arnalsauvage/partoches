@@ -49,6 +49,9 @@ class Image {
                         if (!str_contains($bName, '-mini.webp') && !str_contains($bName, '-sd.webp') && !str_contains($bName, '-pdf.jpg')) {
                             $sourcePath = $img;
                             $relPath = dirname($relPath) . "/" . $bName;
+                            $pathInfo = pathinfo($sourcePath);
+                            $thumbPath = $pathInfo['dirname'] . "/" . $pathInfo['filename'] . $suffix;
+                            $thumbUrl = "../../data/$subDir/" . dirname($relPath) . "/" . $pathInfo['filename'] . $suffix;
                             break;
                         }
                     }

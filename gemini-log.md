@@ -1,5 +1,24 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (11 Novembre 2026 - Fin d'Après-midi)
+- **🖼️ Génération Automatique des Vignettes WebP à la Volée pour les Mosaïques de Playlist (`playlist_form.php`)** :
+    - **Demande PO & Contexte** :
+        - Dans le formulaire de playlist (`playlist_form.php`), lorsqu'une couverture n'avait pas encore de miniature WebP (`-mini.webp`), la page servait l'image originale en haute définition (lourde) ou échouait si un chemin obsolète était utilisé.
+        - Le PO a demandé que le site génère automatiquement la vignette WebP dès qu'il en a besoin et qu'elle manque, sans forcer un passage par un batch manuel dans les outils d'administration.
+    - **Architecture & Implémentation** :
+        - **`PlaylistFormService::getThumbnailUrlForCover(string $coverUrl): string`** :
+            - Détecte l'URL de couverture, extrait le sous-dossier (`chansons`, `songbooks`, `playlists`), vérifie la présence de la miniature `-mini.webp`.
+            - S'appuie sur `Image::getThumbnailUrl()` qui utilise l'extension GD pour redimensionner (100x100 max) et encoder en WebP à la volée.
+            - Renvoie immédiatement le chemin racine normalisé `/data/.../-mini.webp` pour l'attribut `src` du navigateur.
+        - **`src/public/php/lib/Image.php`** :
+            - Correction d'un bug de recalcul : lors de la recherche d'une image alternative dans le dossier de la chanson, `$pathInfo`, `$thumbPath` et `$thumbUrl` sont désormais réactualisés avec le fichier réel trouvé, garantissant que l'extension et le chemin générés soient conformes.
+        - **`Dockerfile` & Environnement Docker local** :
+            - Ajout de `libwebp-dev` et de `--with-webp` dans la configuration GD pour supporter la génération native de WebP localement et en CI.
+        - **Tests & Non-Régression** :
+            - Ajout du test unitaire `testThumbnailGenerationOnTheFly()` dans `tests/PlaylistFormAjaxAndUploadTest.php` (7 tests, 20 assertions, 100% succès).
+            - **187 / 187 tests PHPUnit validés (100% Succès)**.
+            - **28 / 28 Smoke Tests & HTML Lint validés (100% Succès)**.
+
 ### 📖 Résumé de la session (11 Novembre 2026 - Après-midi)
 - **🎵 US-083 — Recherche Autocomplétée Prédictive de Chansons & Téléversement d'Illustration pour Playlist** :
     - **Demande PO & Spécification Agile** :

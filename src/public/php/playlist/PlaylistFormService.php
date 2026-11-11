@@ -182,6 +182,44 @@ class PlaylistFormService
     }
 
     /**
+     * Retourne l'URL de la miniature d'une couverture en la générant à la volée en WebP si elle manque.
+     */
+    public static function getThumbnailUrlForCover(string $coverUrl): string
+    {
+        if (empty($coverUrl)) {
+            return '/images/icones/vinyle.png';
+        }
+
+        // Si image externe (ex: Discogs / Spotify)
+        if (str_starts_with($coverUrl, 'http://') || str_starts_with($coverUrl, 'https://')) {
+            return $coverUrl;
+        }
+
+        // Si c'est déjà une miniature mini.webp
+        if (str_contains($coverUrl, '-mini.webp')) {
+            return $coverUrl;
+        }
+
+        require_once dirname(__DIR__) . '/lib/Image.php';
+
+        // Extraction du sous-dossier data (ex: chansons, songbooks, playlists) et du chemin relatif
+        if (preg_match('#(?:^|/)data/([a-zA-Z0-9_-]+)/(\d+)/(.+)#', $coverUrl, $matches)) {
+            $subDir = $matches[1];
+            $id = $matches[2];
+            $imgName = $matches[3];
+
+            $relPath = "$id/$imgName";
+            // Image::getThumbnailUrl vérifie et génère automatiquement la vignette WebP si absente
+            $genUrl = Image::getThumbnailUrl($relPath, 'mini', $subDir);
+            if ($genUrl) {
+                return preg_replace('#^(\.\./)+#', '/', $genUrl);
+            }
+        }
+
+        return $coverUrl;
+    }
+
+    /**
      * Génère une mosaïque 2x2 à partir d'un tableau d'URL d'images et la sauvegarde.
      */
     public static function generateMosaic(array $imageUrls, string $playlistName): string
