@@ -29,6 +29,10 @@ dans "Sommaire des morceaux" , si je clique sur la croix pour supprimer un morce
 ## 🟢 Icebox (à planifier)
 - [ ] **#09 — Refactorisation des pages "Admin"** (Appliquer SOLID à `params.php` et aux outils de diagnostic).
 
+## ✅ Terminé (Novembre 2026)
+- [x] **US-083 — Recherche autocomplétée prédictive de morceaux pour playlist & upload d'illustration** (Autocomplete >= 4 lettres avec titre, interprète, tonalité, requêtes préparées, upload d'illustration personnalisé sécurisé, zéro style inline).
+- [x] **US-082 — Connexion Persistante Sécurisée ("Se souvenir de moi" - 14 jours)** (Standard OWASP Selector / Validator, table auth_token).
+
 ## ✅ Terminé (Septembre 2026)
 - [x] **US-002 — Audit et Détection des Fichiers Orphelins & Doublons dans `/data`** (Détecteur de versions non référencées et comparateur MD5).
 - [x] **US-003 — Module de Sauvegarde Globale et Export ZIP** (Dump SQL complet + répertoire `data/` + `conf/params.ini` + `manifest.json`).

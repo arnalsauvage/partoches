@@ -1,5 +1,27 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (11 Novembre 2026 - Après-midi)
+- **🎵 US-083 — Recherche Autocomplétée Prédictive de Chansons & Téléversement d'Illustration pour Playlist** :
+    - **Demande PO & Spécification Agile** :
+        - Remplacer le `<select>` statique de 1000+ morceaux qui contraignait l'administrateur à ajouter par défaut le premier titre alphabétique (« (assis sur un banc du) Vieux Port »).
+        - Fournir un champ de recherche dynamique avec autocomplétion dès le 4ᵉ caractère affichant `Titre - Interprète` et la `Tonalité` pour distinguer les versions d'une même partition.
+        - Permettre le téléversement direct d'une illustration personnalisée (JPG, PNG, WebP) pour la playlist, en alternative à la mosaïque automatique.
+    - **Architecture & Sécurité (SOLID & Canopée)** :
+        - **Endpoint API Sécurisé (`chanson_recherche_ajax.php`)** : passage en requêtes préparées PDO/MySQLi avec bind parameters (`WHERE nom LIKE ? OR interprete LIKE ?`), contrôle strict des droits (`PRIVILEGE_EDITEUR`), renvoi de `id`, `nom`, `interprete`, `tonalite`.
+        - **Service Métier (`PlaylistFormService.php`)** :
+            - Ajout de `handleIllustrationUpload(array $file, int $playlistId, string $playlistNom): ?string` avec validation stricte du type MIME réel (`finfo`), limitation à 5 Mo, renommage assaini et sécurisé.
+        - **Contrôleur (`playlist_get.php`)** : prise en charge de `$_FILES['fimage_file']` pour persister l'illustration personnalisée en création comme en mise à jour.
+        - **Correctif Historique BDD (`lienChansonPlaylist.php`)** : correction de l'inversion critique des index `id_chanson` (1) et `id_playlist` (2) dans `ordonneLiensPlaylist()`, `remonteTitrePlaylist()` et `descendTitrePlaylist()`.
+        - **Vue & Script Dédié (`playlist_form_view.phtml` & `playlistform.js`)** :
+            - Intégration du composant de recherche autocomplétée avec debounce 250ms, badge visuel de tonalité, bouton de réinitialisation, fermeture au clic extérieur et Échap.
+            - Préservation de l'onglet actif (`sessionStorage`) lors de l'ajout d'un morceau pour éviter le saut vers l'onglet 1.
+            - Affichage de l'interprète et du badge de tonalité dans le tableau des morceaux de la playlist.
+            - Éradication totale des attributs `style="..."` (Règle 4 — 100% conforme Design System).
+    - **Tests & Qualité** :
+        - Suite de tests unitaires dédiée `tests/PlaylistFormAjaxAndUploadTest.php` (6 tests, 17 assertions) validant la recherche SQL préparée, les contrôles de sécurité à l'upload d'image et la détection des doublons.
+        - **186 / 186 tests PHPUnit validés (100% Succès)**.
+        - **28 / 28 Smoke Tests validés (100% Succès)**.
+
 ### 📖 Résumé de la session (09 Novembre 2026 - Après-midi)
 - **🔐 US-082 — Connexion Persistante Sécurisée ("Se souvenir de moi" - 14 jours)** :
     - **Demande PO & Spécification Agile** :

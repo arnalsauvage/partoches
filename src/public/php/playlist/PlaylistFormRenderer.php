@@ -35,6 +35,10 @@ class PlaylistFormRenderer
         include __DIR__ . '/views/playlist_form_view.phtml';
         $html .= ob_get_clean();
 
+        // Inclusion du script spécifique Playlist (Cache busting)
+        $v = time();
+        $html .= "<script src='../../js/playlistform.js?v=$v'></script>";
+
         $html .= envoieFooter();
 
         return $html;

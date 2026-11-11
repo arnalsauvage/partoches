@@ -1,7 +1,7 @@
 <?php
 /**
  * VUE : playlist_form_view.phtml
- * Template HTML pour le formulaire de playlist.
+ * Template HTML pour le formulaire de playlist (Design System Canopée - Règle 4).
  */
 ?>
 <div class='container playlist-form-container'>
@@ -16,7 +16,8 @@
     </div>
     
     <?php if ($message): ?>
-        <div class='alert alert-success'><?= $message ?></div>
+        <?php $alertClass = str_contains(strtolower($message), 'déjà') ? 'alert-warning' : 'alert-success'; ?>
+        <div class='alert <?= $alertClass ?>'><?= htmlspecialchars($message) ?></div>
     <?php endif; ?>
 
     <div id='tabs'>
@@ -28,7 +29,7 @@
         </ul>
 
         <div id='tabs-1'>
-            <form method="POST" action="playlist_get.php">
+            <form method="POST" action="playlist_get.php" enctype="multipart/form-data">
                 <input type="hidden" name="id" value="<?= $id ?>">
                 <input type="hidden" name="mode" value="<?= $mode ?>">
                 
@@ -36,17 +37,17 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Nom de la playlist :</label>
-                                <input type="text" name="fnom" class="form-control" value="<?= htmlspecialchars($playlist['nom'] ?? '') ?>" required>
+                                <label for="fnom">Nom de la playlist :</label>
+                                <input type="text" id="fnom" name="fnom" class="form-control" value="<?= htmlspecialchars($playlist['nom'] ?? '') ?>" required>
                             </div>
                             <div class="form-group">
-                                <label>Description :</label>
-                                <textarea name="fdescription" class="form-control" rows="3"><?= htmlspecialchars($playlist['description'] ?? '') ?></textarea>
+                                <label for="fdescription">Description :</label>
+                                <textarea id="fdescription" name="fdescription" class="form-control" rows="3"><?= htmlspecialchars($playlist['description'] ?? '') ?></textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Type :</label>
+                                <label for="playlist_type">Type :</label>
                                 <select name="ftype" id="playlist_type" class="form-control playlist-type-select">
                                     <option value="0" <?= ($typePl == 0) ? 'selected' : '' ?>>📝 Manuelle</option>
                                     <option value="1" <?= ($typePl == 1) ? 'selected' : '' ?>>🤖 Dynamique</option>
@@ -55,15 +56,15 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Date :</label>
+                                        <label for="fdate">Date :</label>
                                         <?php $readonlyDate = ($_SESSION['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) ? 'readonly' : ''; ?>
-                                        <input type="text" name="fdate" class="form-control" value="<?= dateMysqlVersTexte($playlist['date'] ?? date('Y-m-d')) ?>" <?= $readonlyDate ?>>
+                                        <input type="text" id="fdate" name="fdate" class="form-control" value="<?= dateMysqlVersTexte($playlist['date'] ?? date('Y-m-d')) ?>" <?= $readonlyDate ?>>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Hits :</label>
-                                        <input type="text" name="fhits" class="form-control" value="<?= $playlist['hits'] ?? 0 ?>" <?= $readonlyDate ?>>
+                                        <label for="fhits">Hits :</label>
+                                        <input type="text" id="fhits" name="fhits" class="form-control" value="<?= $playlist['hits'] ?? 0 ?>" <?= $readonlyDate ?>>
                                     </div>
                                 </div>
                             </div>
@@ -72,26 +73,32 @@
                 </div>
 
                 <div class="well playlist-config-well">
-                    <h3 class="dynamic-options-title" style="margin-top: 0;"><i class="glyphicon glyphicon-picture"></i> Visuel de la Playlist</h3>
-                    <p class="small text-muted mb-15">Sélectionnez jusqu'à 4 pochettes pour composer la mosaïque. Si vous n'en sélectionnez aucune, les 4 premières chansons seront utilisées.</p>
+                    <h3 class="dynamic-options-title mt-0"><i class="glyphicon glyphicon-picture"></i> Visuel de la Playlist</h3>
+                    <p class="small text-muted mb-15">Vous pouvez téléverser votre propre illustration personnalisée ou composer une mosaïque avec les morceaux de la playlist.</p>
                     
                     <input type="hidden" name="fimage" id="fimage" value="<?= htmlspecialchars($playlist['image'] ?? '') ?>">
                     
                     <div class="row">
                         <div class="col-md-3 text-center">
-                            <h5 style="font-weight:bold;">Pochette actuelle</h5>
+                            <h5 class="playlist-section-subtitle">Illustration actuelle</h5>
                             <?php if (!empty($playlist['image'])): ?>
-                                <img src='/data/playlists/<?= $playlist['image'] ?>' alt='Cover' class='img-responsive img-thumbnail' style='max-width:150px;'>
+                                <img src='/data/playlists/<?= htmlspecialchars($playlist['image']) ?>' alt='Cover' class='img-responsive img-thumbnail playlist-current-cover'>
                             <?php else: ?>
-                                <div style='width:150px; height:150px; background:#2b1d1a; margin: 0 auto; border-radius:4px; display:flex; align-items:center; justify-content:center;'><i class='glyphicon glyphicon-music' style='color:#D2B48C; font-size:48px;'></i></div>
+                                <div class='playlist-cover-placeholder'><i class='glyphicon glyphicon-music playlist-placeholder-icon'></i></div>
                             <?php endif; ?>
                             <div class="mt-10">
                                 <button type="button" id="btnClearMosaic" class="btn btn-xs btn-danger">Effacer (Mosaïque Auto)</button>
                             </div>
                         </div>
                         <div class="col-md-9">
-                            <h5 style="font-weight:bold;">Pochettes disponibles dans cette playlist</h5>
-                            <div id="mosaic-builder-container" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <div class="form-group">
+                                <label for="fimage_file"><i class="glyphicon glyphicon-upload"></i> Téléverser une illustration personnalisée (JPG, PNG, WebP) :</label>
+                                <input type="file" name="fimage_file" id="fimage_file" class="form-control" accept="image/jpeg,image/png,image/webp">
+                                <small class="text-muted">Si une image est fournie, elle deviendra l'illustration principale de la playlist.</small>
+                            </div>
+                            <hr class="playlist-divider">
+                            <h5 class="playlist-section-subtitle">Ou sélectionner jusqu'à 4 pochettes pour la mosaïque :</h5>
+                            <div id="mosaic-builder-container" class="playlist-mosaic-container">
                                 <?php if ($id > 0): ?>
                                     <?php 
                                     $availableCovers = PlaylistFormService::getPlaylistContextualCovers($id, 50);
@@ -102,25 +109,25 @@
                                             $thumbUrl = $covUrl;
                                             if (str_contains($covUrl, '/data/chansons/')) $thumbUrl = "/data/vignettes/" . basename($covUrl);
                                         ?>
-                                            <img src='<?= $thumbUrl ?>' class='mosaic-thumbnail' data-url='<?= $covUrl ?>' style='width:60px; height:60px; object-fit:cover; border:2px solid transparent; cursor:pointer; border-radius:4px;' title='Cliquer pour sélectionner/désélectionner'>
+                                            <img src='<?= htmlspecialchars($thumbUrl) ?>' class='mosaic-thumbnail' data-url='<?= htmlspecialchars($covUrl) ?>' title='Cliquer pour sélectionner/désélectionner' alt='Pochette'>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 <?php else: ?>
                                     <p class='text-muted small'>Enregistrez d'abord la playlist pour voir les pochettes contextuelles.</p>
                                 <?php endif; ?>
                             </div>
-                            <p class="small text-muted mt-10"><span id="mosaic-count">0</span> / 4 sélectionnée(s)</p>
+                            <p class="small text-muted mt-10">Pochettes sélectionnées : <span id="mosaic-count" class="badge">0</span> / 4</p>
                         </div>
                     </div>
                 </div>
 
-                <div id="dynamic_options" class="well dynamic-options-well" style="display: <?= ($typePl == 1) ? 'block' : 'none' ?>;">
+                <div id="dynamic_options" class="well dynamic-options-well <?= ($typePl == 1) ? '' : 'playlist-dynamic-hidden' ?>">
                     <h3 class="dynamic-options-title"><i class="glyphicon glyphicon-cog"></i> Critères automatiques</h3>
                     <hr>
                     <div class="row">
                         <div class="col-md-3">
-                            <label>Tonalité :</label>
-                            <select name="dyn_tonalite" class="form-control">
+                            <label for="dyn_tonalite">Tonalité :</label>
+                            <select id="dyn_tonalite" name="dyn_tonalite" class="form-control">
                                 <option value="">-- Peu importe --</option>
                                 <?php 
                                 $tonas = ['C','C#','Db','D','D#','Eb','E','F','F#','Gb','G','G#','Ab','A','A#','Bb','B'];
@@ -133,8 +140,8 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label>Tempo :</label>
-                            <select name="dyn_tempo" class="form-control">
+                            <label for="dyn_tempo">Tempo :</label>
+                            <select id="dyn_tempo" name="dyn_tempo" class="form-control">
                                 <option value="">-- Peu importe --</option>
                                 <?php foreach (['Largo','Adagio','Andante','Moderato','Allegro','Presto'] as $t): ?>
                                     <option value='<?= $t ?>' <?= ($criteres['tempo_famille'] ?? '') == $t ? 'selected' : '' ?>><?= $t ?></option>
@@ -142,24 +149,26 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label>Saison :</label>
-                            <select name="dyn_saison" class="form-control">
+                            <label for="dyn_saison">Saison :</label>
+                            <select id="dyn_saison" name="dyn_saison" class="form-control">
                                 <option value="">-- Peu importe --</option>
-                                <?php for ($a = date('Y'); $a >= 2018; $a--): ?>
+                                <?php for ($a = (int)date('Y'); $a >= 2018; $a--): ?>
                                     <option value='<?= $a ?>' <?= ($criteres['saison'] ?? '') == $a ? 'selected' : '' ?>><?= $a ?>-<?= ($a+1) ?></option>
                                 <?php endfor; ?>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label>Rythmique :</label>
-                            <select name="dyn_strum" class="form-control">
+                            <label for="dyn_strum">Rythmique :</label>
+                            <select id="dyn_strum" name="dyn_strum" class="form-control">
                                 <option value="">-- Peu importe --</option>
                                 <?php 
-                                $db = $_SESSION['mysql'];
-                                $resList = $db->query("SELECT id, strum FROM strum ORDER BY strum ASC");
-                                if ($resList): while($row = $resList->fetch_assoc()): ?>
-                                    <option value='<?= $row['id'] ?>' <?= ($criteres['idStrum'] ?? '') == $row['id'] ? 'selected' : '' ?>><?= htmlspecialchars($row['strum']) ?></option>
-                                <?php endwhile; endif; ?>
+                                $db = $_SESSION['mysql'] ?? null;
+                                if ($db):
+                                    $resList = $db->query("SELECT id, strum FROM strum ORDER BY strum ASC");
+                                    if ($resList): while($row = $resList->fetch_assoc()): ?>
+                                        <option value='<?= $row['id'] ?>' <?= ($criteres['idStrum'] ?? '') == $row['id'] ? 'selected' : '' ?>><?= htmlspecialchars($row['strum']) ?></option>
+                                    <?php endwhile; endif;
+                                endif; ?>
                             </select>
                         </div>
                     </div>
@@ -178,21 +187,29 @@
                 <div class="row mt-15">
                     <div class="col-md-7">
                         <table class="table table-striped playlist-songs-table">
-                            <thead><tr><th>Ordre</th><th>Titre</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Ordre</th><th>Titre / Interprète</th><th>Actions</th></tr></thead>
                             <tbody>
                                 <?php 
                                 $lignes = chercheLiensChansonPlaylist('id_playlist', $id, "ordre", true);
                                 while ($ligne = $lignes->fetch_row()): 
-                                    $ch = Chanson::load((int)$ligne[2]);
+                                    $ch = Chanson::load((int)$ligne[1]);
                                 ?>
                                     <tr>
                                         <td><?= $ligne[3] ?></td>
-                                        <td><strong><?= htmlspecialchars($ch->getNom()) ?></strong></td>
+                                        <td>
+                                            <strong><?= htmlspecialchars($ch->getNom()) ?></strong>
+                                            <?php if ($ch->getInterprete()): ?>
+                                                <span class="text-muted small"> - <?= htmlspecialchars($ch->getInterprete()) ?></span>
+                                            <?php endif; ?>
+                                            <?php if ($ch->getTonalite()): ?>
+                                                <span class="badge playlist-badge-tonalite"><?= htmlspecialchars($ch->getTonalite()) ?></span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td>
                                             <div class="btn-group btn-group-xs">
-                                                <a href="?id=<?= $id ?>&action=up&rang=<?= $ligne[3] ?>" class="btn btn-default"><i class="glyphicon glyphicon-arrow-up"></i></a>
-                                                <a href="?id=<?= $id ?>&action=down&rang=<?= $ligne[3] ?>" class="btn btn-default"><i class="glyphicon glyphicon-arrow-down"></i></a>
-                                                <a href="?id=<?= $id ?>&action=del&idLien=<?= $ligne[0] ?>" class="btn btn-danger" onclick="return confirm('Enlever ?');"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a href="?id=<?= $id ?>&action=up&rang=<?= $ligne[3] ?>" class="btn btn-default" title="Monter"><i class="glyphicon glyphicon-arrow-up"></i></a>
+                                                <a href="?id=<?= $id ?>&action=down&rang=<?= $ligne[3] ?>" class="btn btn-default" title="Descendre"><i class="glyphicon glyphicon-arrow-down"></i></a>
+                                                <a href="?id=<?= $id ?>&action=del&idLien=<?= $ligne[0] ?>" class="btn btn-danger" onclick="return confirm('Enlever ?');" title="Supprimer de la playlist"><i class="glyphicon glyphicon-trash"></i></a>
                                             </div>
                                         </td>
                                     </tr>
@@ -203,19 +220,29 @@
                     <div class="col-md-5">
                         <div class="well add-song-well">
                             <h4><i class="glyphicon glyphicon-plus"></i> Ajouter un morceau</h4>
-                            <form method="POST" action="playlist_form.php?id=<?= $id ?>">
+                            <p class="small playlist-search-help mb-10">Tapez au moins 4 lettres (titre ou interprète) pour afficher les suggestions :</p>
+                            <form method="POST" action="playlist_form.php?id=<?= $id ?>" id="formAjoutChansonPlaylist">
                                 <input type="hidden" name="id" value="<?= $id ?>">
-                                <select name="chanson" class="form-control select2">
-                                    <?php 
-                                    $res = $db->query("SELECT id, nom FROM chanson ORDER BY nom ASC");
-                                    while($row = $res->fetch_assoc()): ?>
-                                        <option value='<?= $row['id'] ?>'><?= htmlspecialchars($row['nom']) ?></option>
-                                    <?php endwhile; ?>
-                                </select>
-                                <button type="submit" class="btn btn-primary btn-block mt-10 btn-add-song">AJOUTER LE MORCEAU</button>
+                                <input type="hidden" name="chanson" id="inputChansonIdPlaylist" value="">
+                                
+                                <div class="form-group playlist-search-wrapper">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                                        <input type="text" id="rechercheChansonPlaylist" class="form-control" placeholder="Ex: Vieux port, Mistral, Brassens..." autocomplete="off">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button" id="btnResetSearch" title="Effacer"><i class="glyphicon glyphicon-remove"></i></button>
+                                        </span>
+                                    </div>
+                                    <div id="resultsChansonPlaylist" class="playlist-autocomplete-dropdown" role="listbox"></div>
+                                </div>
+                                
+                                <button type="submit" id="btnSubmitAddSong" class="btn btn-primary btn-block mt-10 btn-add-song" disabled>
+                                    <i class="glyphicon glyphicon-plus"></i> AJOUTER LE MORCEAU
+                                </button>
                             </form>
                         </div>
-                        <div class="well add-song-well" style="background-color: var(--c-accent);">
+
+                        <div class="well add-song-well import-songbook-well">
                             <h4><i class="glyphicon glyphicon-book"></i> Importer un Songbook</h4>
                             <p class="small">Ajoute toutes les chansons du recueil sélectionné.</p>
                             <form method="POST" action="playlist_form.php?id=<?= $id ?>">
@@ -223,10 +250,12 @@
                                 <input type="hidden" name="action" value="import_songbook">
                                 <select name="id_songbook" class="form-control select2">
                                     <?php 
-                                    $resSb = $db->query("SELECT id, nom FROM songbook ORDER BY nom ASC");
-                                    while($row = $resSb->fetch_assoc()): ?>
-                                        <option value='<?= $row['id'] ?>'><?= htmlspecialchars($row['nom']) ?></option>
-                                    <?php endwhile; ?>
+                                    if ($db):
+                                        $resSb = $db->query("SELECT id, nom FROM songbook ORDER BY nom ASC");
+                                        if ($resSb): while($row = $resSb->fetch_assoc()): ?>
+                                            <option value='<?= $row['id'] ?>'><?= htmlspecialchars($row['nom']) ?></option>
+                                        <?php endwhile; endif;
+                                    endif; ?>
                                 </select>
                                 <button type="submit" class="btn btn-warning btn-block mt-10" onclick="return confirm('Ajouter toutes les chansons de ce songbook ?');">
                                     <i class="glyphicon glyphicon-import"></i> IMPORTER TOUT LE SONGBOOK
@@ -239,56 +268,3 @@
         <?php endif; ?>
     </div>
 </div>
-
-<script>
-$(document).ready(function() {
-    var activeTab = sessionStorage.getItem('playlistFormActiveTab') || 0;
-    $("#tabs").tabs({
-        active: parseInt(activeTab),
-        activate: function(event, ui) {
-            sessionStorage.setItem('playlistFormActiveTab', ui.newTab.index());
-        }
-    });
-    if ($.fn.select2) $('.select2').select2({ theme: "bootstrap", width: '100%' });
-    $('#playlist_type').on('change', function() {
-        if ($(this).val() == '1') { $('#dynamic_options').slideDown(); } 
-        else { $('#dynamic_options').slideUp(); }
-    });
-
-    let selectedCovers = [];
-    let currentVal = $('#fimage').val();
-    if (currentVal && currentVal.indexOf(',') !== -1) {
-        selectedCovers = currentVal.split(',');
-        $('.mosaic-thumbnail').each(function() {
-            if (selectedCovers.indexOf($(this).data('url')) > -1) $(this).addClass('selected-cover');
-        });
-        $('#mosaic-count').text(selectedCovers.length);
-    }
-
-    $('.mosaic-thumbnail').on('click', function() {
-        let url = $(this).data('url');
-        let index = selectedCovers.indexOf(url);
-        if (index > -1) {
-            selectedCovers.splice(index, 1);
-            $(this).removeClass('selected-cover');
-        } else {
-            if (selectedCovers.length < 4) {
-                selectedCovers.push(url);
-                $(this).addClass('selected-cover');
-            } else {
-                toastr.warning('Maximum 4 pochettes.');
-            }
-        }
-        $('#fimage').val(selectedCovers.join(','));
-        $('#mosaic-count').text(selectedCovers.length);
-    });
-
-    $('#btnClearMosaic').on('click', function() {
-        selectedCovers = [];
-        $('.mosaic-thumbnail').removeClass('selected-cover');
-        $('#fimage').val('mosaique-automatique');
-        $('#mosaic-count').text(0);
-        toastr.info('Mosaïque effacée. Elle sera regénérée.');
-    });
-});
-</script>

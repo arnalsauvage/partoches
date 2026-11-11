@@ -78,16 +78,81 @@
 .add-song-well {
     background-color: var(--c-marron-fonce); 
     color: var(--c-beige);
+    border-radius: 8px;
+}
+
+.import-songbook-well {
+    background-color: var(--c-accent);
+    color: #fff;
+    border-radius: 8px;
 }
 
 .btn-add-song {
     background-color: var(--c-accent); 
     border: none;
+    font-weight: bold;
+}
+
+.btn-add-song:hover, .btn-add-song:focus {
+    background-color: #b0522c;
+    color: #fff;
+}
+
+.btn-add-song:disabled {
+    background-color: #666;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Visuel & Mosaïque */
+.playlist-section-subtitle {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: var(--c-marron-fonce);
+}
+
+.playlist-current-cover {
+    max-width: 150px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.playlist-cover-placeholder {
+    width: 150px;
+    height: 150px;
+    background: #2b1d1a;
+    margin: 0 auto;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.playlist-placeholder-icon {
+    color: #D2B48C;
+    font-size: 48px;
+}
+
+.playlist-divider {
+    border-top: 1px solid var(--c-marron-clair);
+    margin: 15px 0;
+}
+
+.playlist-mosaic-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .mosaic-thumbnail {
     opacity: 0.6;
     transition: all 0.2s ease-in-out;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    cursor: pointer;
+    border-radius: 4px;
 }
 
 .mosaic-thumbnail:hover {
@@ -102,6 +167,83 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+.playlist-dynamic-hidden {
+    display: none;
+}
+
+/* Recherche & Autocomplétion dynamique */
+.playlist-search-help {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.playlist-search-wrapper {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.playlist-autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    max-height: 280px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    display: none;
+}
+
+.playlist-search-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    color: #2b1d1a;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.playlist-search-item:last-child {
+    border-bottom: none;
+}
+
+.playlist-search-item:hover, .playlist-search-item:focus {
+    background-color: var(--c-beige);
+    color: var(--c-marron-fonce);
+}
+
+.playlist-search-item-info {
+    flex-grow: 1;
+}
+
+.playlist-search-no-result {
+    padding: 12px;
+    text-align: center;
+    font-style: italic;
+    color: #888;
+    background: #fff;
+}
+
+.playlist-badge-tonalite {
+    background-color: var(--c-accent);
+    color: #fff;
+    font-weight: bold;
+    font-size: 11px;
+    padding: 3px 7px;
+    border-radius: 10px;
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+/* Utilitaires Espacement */
+.mt-0 { margin-top: 0; }
 .mt-10 { margin-top: 10px; }
 .mt-15 { margin-top: 15px; }
 .mt-20 { margin-top: 20px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-15 { margin-bottom: 15px; }

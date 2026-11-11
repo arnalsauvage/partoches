@@ -269,4 +269,83 @@ class PlaylistFormService
             }
         }
     }
+
+    /**
+     * Gère le téléversement d'une image d'illustration personnalisée pour une playlist.
+     * Conforme aux règles de sécurité OWASP & Constitution (MIME réel, taille max 5Mo, renommage systématique).
+     *
+     * @param array $file Tableau $_FILES['fimage_file']
+     * @param int $playlistId ID de la playlist
+     * @param string $playlistNom Nom de la playlist pour le slug
+     * @return string|null Nom du fichier sauvegardé ou null si échec/aucun fichier
+     */
+    public static function handleIllustrationUpload(array $file, int $playlistId, string $playlistNom): ?string
+    {
+        if (!isset($file['error']) || $file['error'] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
+        $maxSize = 5 * 1024 * 1024;
+        if (($file['size'] ?? 0) <= 0 || ($file['size'] ?? 0) > $maxSize) {
+            return null;
+        }
+
+        $tmpPath = $file['tmp_name'] ?? '';
+        if (empty($tmpPath) || !file_exists($tmpPath)) {
+            return null;
+        }
+
+        $isRealUpload = is_uploaded_file($tmpPath) || (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING);
+        if (!$isRealUpload) {
+            return null;
+        }
+
+        // Vérification du type MIME réel
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $tmpPath);
+        finfo_close($finfo);
+
+        $allowedMimes = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif'
+        ];
+
+        if (!array_key_exists($mime, $allowedMimes)) {
+            return null;
+        }
+
+        $extension = $allowedMimes[$mime];
+
+        $playlistsDir = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/playlists' : dirname(__DIR__, 2) . '/data/playlists';
+        if (!is_dir($playlistsDir)) {
+            @mkdir($playlistsDir, 0775, true);
+        }
+
+        require_once dirname(__DIR__) . '/lib/html.php';
+        $simplified = function_exists('simplifieNomFichier') ? simplifieNomFichier($playlistNom) : $playlistNom;
+        $safeSlug = strtolower(pathinfo($simplified, PATHINFO_FILENAME));
+        $safeSlug = preg_replace('/[^a-z0-9_]/i', '_', str_replace('-', '_', $safeSlug));
+        $safeSlug = trim(preg_replace('/_+/', '_', $safeSlug), '_');
+        if (empty($safeSlug)) {
+            $safeSlug = 'playlist';
+        }
+
+        $uniqueSuffix = ($playlistId > 0) ? $playlistId . '_' . time() : 'custom_' . time() . '_' . bin2hex(random_bytes(4));
+        $newFileName = $safeSlug . '_' . $uniqueSuffix . '.' . $extension;
+        $destination = $playlistsDir . '/' . $newFileName;
+
+        if (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING && !is_uploaded_file($tmpPath)) {
+            $copied = copy($tmpPath, $destination);
+        } else {
+            $copied = move_uploaded_file($tmpPath, $destination);
+        }
+
+        if ($copied) {
+            return $newFileName;
+        }
+
+        return null;
+    }
 }

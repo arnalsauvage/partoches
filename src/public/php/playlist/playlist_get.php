@@ -3,6 +3,7 @@ require_once __DIR__ . "/../lib/utilssi.php";
 $pasDeMenu = true; // Empêche menu.php de faire un echo, pour que header() fonctionne
 require_once __DIR__ . "/../navigation/menu.php";
 require_once("playlist.php");
+require_once __DIR__ . '/PlaylistFormService.php';
 
 $nomTable = "playlist";
 
@@ -40,6 +41,14 @@ if ($_SESSION['mysql']) {
     $fdescription = $_SESSION['mysql']->real_escape_string($fdescription);
 }
 
+// Téléversement d'une illustration personnalisée (si fournie)
+if (isset($_FILES['fimage_file']) && $_FILES['fimage_file']['error'] === UPLOAD_ERR_OK) {
+    $uploaded = PlaylistFormService::handleIllustrationUpload($_FILES['fimage_file'], (int)$id, $fnom);
+    if ($uploaded !== null) {
+        $fimage = $uploaded;
+    }
+}
+
 // TRAITEMENT
 if ($mode == "MAJ" && $id) {
     if ($_SESSION ['privilege'] < $GLOBALS["PRIVILEGE_ADMIN"]) {
@@ -51,8 +60,7 @@ if ($mode == "MAJ" && $id) {
         }
     }
 
-    // Gestion Mosaïque Automatique ou Manuelle Multiple
-    require_once __DIR__ . '/PlaylistFormService.php';
+    // Gestion Mosaïque Automatique ou Manuelle Multiple (uniquement si pas d'image fixe uploadée)
     if (empty($fimage) || str_contains($fimage, 'mosaique-automatique')) {
         // On récupère les covers contextuelles
         $covers = PlaylistFormService::getPlaylistContextualCovers($id, 4);
@@ -73,8 +81,7 @@ if ($mode == "INS") {
     $fhits = 0;
     $fdate = date("d/m/Y");
 
-    // A la création, on n'a pas encore de chansons pour faire une belle mosaïque, mais on génère le fond neutre
-    require_once __DIR__ . '/PlaylistFormService.php';
+    // Si aucune illustration n'a été téléversée, on génère le visuel neutre par défaut
     if (empty($fimage)) {
         $fimage = PlaylistFormService::generateMosaic([], $fnom);
     }
