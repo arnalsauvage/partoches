@@ -3,7 +3,9 @@ use PHPUnit\Framework\TestCase;
 
 if (!defined('PHPUNIT_RUNNING')) define('PHPUNIT_RUNNING', true);
 if (session_status() === PHP_SESSION_NONE) session_start();
-require_once __DIR__ . '/../src/autoload.php';
+require_once __DIR__ . '/../src/public/autoload.php';
+require_once __DIR__ . '/../src/public/php/lib/utilssi.php';
+require_once __DIR__ . '/../src/public/php/lib/configMysql.php';
 require_once __DIR__ . '/../src/public/php/playlist/playlist.php';
 require_once __DIR__ . '/../src/public/php/playlist/PlaylistFormService.php';
 require_once __DIR__ . '/../src/public/php/liens/lienChansonPlaylist.php';
@@ -11,15 +13,41 @@ require_once __DIR__ . '/../src/public/php/liens/lienChansonPlaylist.php';
 class PlaylistFormAjaxAndUploadTest extends TestCase
 {
     private string $tempImgPath = '';
+    private int $testSongId = 0;
+    private int $testPlaylistId = 0;
 
     protected function setUp(): void
     {
+        global $mysqli;
+        if (!isset($_SESSION['mysql']) || !$_SESSION['mysql']) {
+            $_SESSION['mysql'] = $mysqli;
+        }
+
         $_SESSION['privilege'] = 2; // Éditeur
         $_SESSION['id'] = 1;
+
+        // Créer une chanson de test autonome pour garantir la compatibilité CI / GitHub Actions
+        $db = $_SESSION['mysql'];
+        if ($db) {
+            $db->query("INSERT INTO chanson (nom, interprete, annee, idUser, tempo, mesure, pulsation, datePub, hits, tonalite, publication) 
+                        VALUES ('Vieux Port Canopée Test', 'Arnal & Friends', 2026, 1, 120, '4/4', 'binaire', NOW(), 0, 'Am', 1)");
+            $this->testSongId = (int)$db->insert_id;
+        }
     }
 
     protected function tearDown(): void
     {
+        $db = $_SESSION['mysql'] ?? ($GLOBALS['mysqli'] ?? null);
+        if ($db) {
+            if ($this->testSongId > 0) {
+                $db->query("DELETE FROM chanson WHERE id = {$this->testSongId}");
+            }
+            if ($this->testPlaylistId > 0) {
+                $db->query("DELETE FROM lienchansonplaylist WHERE id_playlist = {$this->testPlaylistId}");
+                $db->query("DELETE FROM playlist WHERE id = {$this->testPlaylistId}");
+            }
+        }
+
         if (!empty($this->tempImgPath) && file_exists($this->tempImgPath)) {
             @unlink($this->tempImgPath);
         }
@@ -114,17 +142,18 @@ class PlaylistFormAjaxAndUploadTest extends TestCase
 
         $rows = [];
         while ($r = $res->fetch_assoc()) {
-            $rows[] = $r;
+            if ((int)$r['id'] === $this->testSongId) {
+                $rows[] = $r;
+            }
         }
         $stmt->close();
 
-        $this->assertNotEmpty($rows, "La recherche 'Port' doit retourner au moins une chanson.");
+        $this->assertNotEmpty($rows, "La recherche 'Port' doit retourner la chanson créée en setUp.");
         $first = $rows[0];
-        $this->assertArrayHasKey('id', $first);
-        $this->assertArrayHasKey('nom', $first);
-        $this->assertArrayHasKey('interprete', $first);
-        $this->assertArrayHasKey('tonalite', $first);
-        $this->assertStringContainsString('Port', $first['nom']);
+        $this->assertEquals($this->testSongId, (int)$first['id']);
+        $this->assertEquals('Vieux Port Canopée Test', $first['nom']);
+        $this->assertEquals('Arnal & Friends', $first['interprete']);
+        $this->assertEquals('Am', $first['tonalite']);
     }
 
     public function testAddSongAndDuplicateCheck(): void
@@ -133,25 +162,17 @@ class PlaylistFormAjaxAndUploadTest extends TestCase
         $this->assertNotNull($db);
 
         // Créer une playlist de test
-        creePlaylist("Test Playlist US-083", "Description test", "01/01/2026", "test.jpg", 0, 0, "[]");
-        $res = $db->query("SELECT id FROM playlist WHERE nom = 'Test Playlist US-083' ORDER BY id DESC LIMIT 1");
+        creePlaylist("Test Playlist US-083 CI", "Description test", "01/01/2026", "test.jpg", 0, 0, "[]");
+        $res = $db->query("SELECT id FROM playlist WHERE nom = 'Test Playlist US-083 CI' ORDER BY id DESC LIMIT 1");
         $row = $res->fetch_assoc();
-        $testPlaylistId = (int)$row['id'];
+        $this->testPlaylistId = (int)$row['id'];
 
-        // Trouver une chanson
-        $resCh = $db->query("SELECT id FROM chanson LIMIT 1");
-        $chRow = $resCh->fetch_assoc();
-        $testChansonId = (int)$chRow['id'];
-
-        // 1. Ajout réussi
-        $msg1 = PlaylistFormService::addSong($testPlaylistId, $testChansonId);
+        // 1. Ajout réussi avec la chanson créée en setUp
+        $msg1 = PlaylistFormService::addSong($this->testPlaylistId, $this->testSongId);
         $this->assertEquals("Morceau ajouté avec succès !", $msg1);
 
         // 2. Détection de doublon
-        $msg2 = PlaylistFormService::addSong($testPlaylistId, $testChansonId);
+        $msg2 = PlaylistFormService::addSong($this->testPlaylistId, $this->testSongId);
         $this->assertEquals("Ce morceau est déjà dans la playlist.", $msg2);
-
-        // Nettoyage
-        supprimePlaylist($testPlaylistId);
     }
 }
