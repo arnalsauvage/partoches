@@ -34,11 +34,18 @@ if (empty($covers)) {
     return;
 }
 
-// Limiter à 4 pochettes max
-$covers = array_slice($covers, 0, 4);
+$gridSize = (int)($_POST['grid_size'] ?? 0);
+$colorOrder = trim($_POST['color_order'] ?? 'manual');
+if (!in_array($colorOrder, ['manual', 'rainbow', 'brightness', 'warm_cold'])) {
+    $colorOrder = 'manual';
+}
+
+// Limiter selon la taille de grille demandée (max 25)
+$maxSlots = ($gridSize > 0) ? min(25, max(1, $gridSize)) : 25;
+$covers = array_slice($covers, 0, $maxSlots);
 
 try {
-    $fileName = PlaylistFormService::generateMosaic($covers, $playlistNom, $idPlaylist);
+    $fileName = PlaylistFormService::generateMosaic($covers, $playlistNom, $idPlaylist, $gridSize, $colorOrder);
     
     // Si la playlist existe déjà en BDD, mise à jour immédiate de la colonne image
     if ($idPlaylist > 0) {

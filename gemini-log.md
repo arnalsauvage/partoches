@@ -1,6 +1,35 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (11 Novembre 2026 - Fin de Journée)
+- **🎨 US-084 — Mosaïques Multi-formats NxN & Harmonisation Chromatique pour Playlists (`playlist_form.php`)** :
+    - **Demande PO & Spécification Agile** :
+        - Permettre de composer des mosaïques carrées de n'importe quelle taille : $2 \times 2$ (4), $3 \times 3$ (9), $4 \times 4$ (16), $5 \times 5$ (25 pochettes).
+        - Proposer un agencement automatique des pochettes selon leurs couleurs (Arc-en-ciel, Luminosité, Chaud-Froid Canopée).
+        - Fournir un bouton de remplissage automatique rapide pour composer une mosaïque complète en 1 clic.
+    - **Architecture & Implémentation (SOLID & Canopée)** :
+        - **Algorithme d'Harmonisation Chromatique (`PlaylistFormService.php`)** :
+            - Extraction de la couleur dominante moyenne RGB par échantillonnage GD ultra-rapide ($1 \times 1$ pixel, $< 2\text{ ms}$).
+            - Conversion mathématique pure RGB $\to$ HSL (Teinte $0^\circ \to 360^\circ$, Saturation, Luminosité).
+            - Mode **🌈 Arc-en-ciel** : tri par Teinte avec agencement en serpentin (zigzag 2D) garantissant une continuité fluide entre lignes adjacentes.
+            - Mode **☀️ Luminosité** : tri par clarté ascendante ($L$).
+            - Mode **🍂 Chaud vers Froid** : tri par distance thermique par rapport aux tons chauds/bois Canopée (orange $30^\circ$).
+        - **Générateur Universel de Mosaïques $N \times N$** :
+            - Calcul dynamique de la grille, découpage en tuiles carrées, redimensionnement et recadrage centré (crop) via GD.
+            - Canevas haute définition : $400 \times 400\text{ px}$ pour $2 \times 2$, et $600 \times 600\text{ px}$ pour $3 \times 3$, $4 \times 4$ et $5 \times 5$.
+            - Nommage horodaté unique (`slug_idPlaylist_timestamp.jpg`) évitant tout effet de cache HTTP.
+        - **Contrôleur AJAX (`playlist_mosaic_ajax.php`)** :
+            - Prise en charge des paramètres `grid_size` (4, 9, 16, 25) et `color_order`.
+            - Sécurisation `PRIVILEGE_EDITEUR` et mise à jour immédiate en BDD.
+        - **Interface Utilisateur & Expérience (`playlist_form_view.phtml`, `playlistform.js`, `playlistform.css`)** :
+            - Sélecteur de grille par boutons pills segmentés ($2 \times 2$, $3 \times 3$, $4 \times 4$, $5 \times 5$).
+            - Bouton `[ ⚡ Remplir auto ]` qui sélectionne instantanément les $N^2$ premières pochettes disponibles.
+            - Sélecteur déroulant de tri de couleur (`mosaic-color-order`).
+            - Bouton d'action dynamique indiquant la taille choisie et le nombre de pochettes sélectionnées.
+            - Respect strict de la Règle 4 (aucun `style="..."` inline, déport 100% CSS).
+    - **Tests & Non-Régression** :
+        - Ajout de `testGenerateMosaicGridNxNAndColorHarmony()` dans `tests/PlaylistFormAjaxAndUploadTest.php` validant l'extraction HSL, les tris chromatiques et la génération $3 \times 3$ à $600 \times 600\text{ px}$.
+        - **190 / 190 tests PHPUnit validés (100% Succès, 985 assertions)**.
+        - **28 / 28 Smoke Tests & HTML Lint validés (100% Succès, 441 assertions)**.
 - **🎨 Bouton de Génération Immédiate de Mosaïque de Playlist avec Aperçu Visuel Réactif (`playlist_form.php`)** :
     - **Demande PO & Spécification Agile** :
         - Lors de la sélection des 4 pochettes pour la mosaïque, absence de bouton d'action explicite : l'utilisateur cherchait où cliquer pour valider son choix, cliquait sur "Enregistrer", mais le rafraîchissement ne montrait aucun changement à cause du cache navigateur sur le nom statique `.jpg`.

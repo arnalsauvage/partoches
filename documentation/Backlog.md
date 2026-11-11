@@ -30,6 +30,7 @@ dans "Sommaire des morceaux" , si je clique sur la croix pour supprimer un morce
 - [ ] **#09 — Refactorisation des pages "Admin"** (Appliquer SOLID à `params.php` et aux outils de diagnostic).
 
 ## ✅ Terminé (Novembre 2026)
+- [x] **US-084 — Mosaïques Multi-formats NxN & Harmonisation Chromatique pour Playlists** (Grilles 2×2, 3×3, 4×4, 5×5, remplissage rapide, agencement de couleurs HSL Arc-en-ciel, Luminosité, Chaud/Froid Canopée, aperçu temps réel et génération asynchrone AJAX).
 - [x] **US-083 — Recherche autocomplétée prédictive de morceaux pour playlist & upload d'illustration** (Autocomplete >= 4 lettres avec titre, interprète, tonalité, requêtes préparées, upload d'illustration personnalisé sécurisé, zéro style inline).
 - [x] **US-082 — Connexion Persistante Sécurisée ("Se souvenir de moi" - 14 jours)** (Standard OWASP Selector / Validator, table auth_token).
 

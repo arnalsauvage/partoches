@@ -26,21 +26,92 @@ $(document).ready(function () {
         }
     });
 
-    // --- 3. GESTION DU VISUEL & MOSAÏQUE ---
+    // --- 3. GESTION DU VISUEL & MOSAÏQUE (US-084: NxN & Harmonisation Chromatique) ---
     var selectedCovers = [];
+    var maxCovers = 4;
+
+    function updateGenerateButtonState() {
+        var n = Math.round(Math.sqrt(maxCovers));
+        if (selectedCovers.length > 0) {
+            $('#btnGenerateMosaic').prop('disabled', false).html(
+                '<i class="glyphicon glyphicon-th-large"></i> Générer la mosaïque ' + n + '×' + n + ' (' + selectedCovers.length + ' / ' + maxCovers + ')'
+            );
+        } else {
+            $('#btnGenerateMosaic').prop('disabled', true).html(
+                '<i class="glyphicon glyphicon-th-large"></i> Générer la pochette de playlist avec ces images'
+            );
+        }
+    }
+
     var currentVal = $('#fimage').val();
     if (currentVal && currentVal.indexOf(',') !== -1) {
         selectedCovers = currentVal.split(',');
+        // Déduire le maxCovers selon le nombre initial
+        if (selectedCovers.length > 16) maxCovers = 25;
+        else if (selectedCovers.length > 9) maxCovers = 16;
+        else if (selectedCovers.length > 4) maxCovers = 9;
+        else maxCovers = 4;
+
+        $('#mosaic-grid-selector button').removeClass('active');
+        $('#mosaic-grid-selector button[data-grid="' + maxCovers + '"]').addClass('active');
+        $('#mosaic-max').text(maxCovers);
+
         $('.mosaic-thumbnail').each(function () {
             if (selectedCovers.indexOf($(this).data('url')) > -1) {
                 $(this).addClass('selected-cover');
             }
         });
         $('#mosaic-count').text(selectedCovers.length);
-        if (selectedCovers.length > 0) {
-            $('#btnGenerateMosaic').prop('disabled', false);
-        }
+        updateGenerateButtonState();
     }
+
+    // Sélecteur de Grille NxN
+    $('#mosaic-grid-selector button').on('click', function () {
+        $('#mosaic-grid-selector button').removeClass('active');
+        $(this).addClass('active');
+        maxCovers = parseInt($(this).data('grid'), 10) || 4;
+        $('#mosaic-max').text(maxCovers);
+
+        // Tronquer si la sélection actuelle dépasse le nouveau format
+        if (selectedCovers.length > maxCovers) {
+            selectedCovers = selectedCovers.slice(0, maxCovers);
+            $('.mosaic-thumbnail').each(function () {
+                if (selectedCovers.indexOf($(this).data('url')) === -1) {
+                    $(this).removeClass('selected-cover');
+                }
+            });
+            $('#fimage').val(selectedCovers.join(','));
+            $('#mosaic-count').text(selectedCovers.length);
+        }
+        updateGenerateButtonState();
+    });
+
+    // Remplissage automatique rapide
+    $('#btnAutoFillMosaic').on('click', function () {
+        selectedCovers = [];
+        $('.mosaic-thumbnail').removeClass('selected-cover');
+
+        var $thumbnails = $('.mosaic-thumbnail');
+        if ($thumbnails.length === 0) {
+            if (typeof toastr !== 'undefined') toastr.info('Aucune pochette disponible pour cette playlist.');
+            return;
+        }
+
+        var toSelect = $thumbnails.slice(0, maxCovers);
+        toSelect.each(function () {
+            var url = $(this).data('url');
+            selectedCovers.push(url);
+            $(this).addClass('selected-cover');
+        });
+
+        $('#fimage').val(selectedCovers.join(','));
+        $('#mosaic-count').text(selectedCovers.length);
+        updateGenerateButtonState();
+
+        if (typeof toastr !== 'undefined') {
+            toastr.success(selectedCovers.length + ' pochettes sélectionnées automatiquement.');
+        }
+    });
 
     $('.mosaic-thumbnail').on('click', function () {
         var url = $(this).data('url');
@@ -49,20 +120,18 @@ $(document).ready(function () {
             selectedCovers.splice(index, 1);
             $(this).removeClass('selected-cover');
         } else {
-            if (selectedCovers.length < 4) {
+            if (selectedCovers.length < maxCovers) {
                 selectedCovers.push(url);
                 $(this).addClass('selected-cover');
             } else {
                 if (typeof toastr !== 'undefined') {
-                    toastr.warning('Maximum 4 pochettes pour la mosaïque.');
+                    toastr.warning('Maximum ' + maxCovers + ' pochettes pour le format ' + Math.round(Math.sqrt(maxCovers)) + '×' + Math.round(Math.sqrt(maxCovers)) + '.');
                 }
             }
         }
         $('#fimage').val(selectedCovers.join(','));
         $('#mosaic-count').text(selectedCovers.length);
-        if (selectedCovers.length > 0) {
-            $('#btnGenerateMosaic').prop('disabled', false);
-        }
+        updateGenerateButtonState();
     });
 
     $('#btnClearMosaic').on('click', function () {
@@ -70,7 +139,7 @@ $(document).ready(function () {
         $('.mosaic-thumbnail').removeClass('selected-cover');
         $('#fimage').val('mosaique-automatique');
         $('#mosaic-count').text(0);
-        $('#btnGenerateMosaic').prop('disabled', true);
+        updateGenerateButtonState();
         if (typeof toastr !== 'undefined') {
             toastr.info('Mosaïque réinitialisée en mode automatique.');
         }
@@ -91,6 +160,7 @@ $(document).ready(function () {
 
         var playlistId = parseInt($('#playlist_id').val() || '0', 10);
         var playlistNom = $('#fnom').val() || 'Playlist';
+        var colorOrder = $('#mosaic-color-order').val() || 'manual';
 
         $.ajax({
             url: 'playlist_mosaic_ajax.php',
@@ -99,7 +169,9 @@ $(document).ready(function () {
             data: {
                 id: playlistId,
                 nom: playlistNom,
-                covers: selectedCovers
+                covers: selectedCovers,
+                grid_size: maxCovers,
+                color_order: colorOrder
             },
             success: function (res) {
                 $btn.prop('disabled', false).html(originalHtml);

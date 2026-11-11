@@ -99,7 +99,21 @@
                                 <small class="text-muted">Si une image est fournie, elle deviendra l'illustration principale de la playlist.</small>
                             </div>
                             <hr class="playlist-divider">
-                            <h5 class="playlist-section-subtitle">Ou sélectionner jusqu'à 4 pochettes pour la mosaïque :</h5>
+                            <h5 class="playlist-section-subtitle">Ou composer une mosaïque avec les morceaux :</h5>
+                            
+                            <div class="playlist-grid-selector-group">
+                                <span class="playlist-grid-label">Format de grille :</span>
+                                <div class="btn-group btn-group-sm" role="group" id="mosaic-grid-selector">
+                                    <button type="button" class="btn btn-default active" data-grid="4">2×2 (4)</button>
+                                    <button type="button" class="btn btn-default" data-grid="9">3×3 (9)</button>
+                                    <button type="button" class="btn btn-default" data-grid="16">4×4 (16)</button>
+                                    <button type="button" class="btn btn-default" data-grid="25">5×5 (25)</button>
+                                </div>
+                                <button type="button" id="btnAutoFillMosaic" class="btn btn-xs btn-default btn-autofill-mosaic" title="Remplir automatiquement avec les premières chansons">
+                                    <i class="glyphicon glyphicon-flash"></i> Remplir auto
+                                </button>
+                            </div>
+
                             <div id="mosaic-builder-container" class="playlist-mosaic-container">
                                 <?php if ($id > 0): ?>
                                     <?php 
@@ -118,7 +132,22 @@
                                     <p class='text-muted small'>Enregistrez d'abord la playlist pour voir les pochettes contextuelles.</p>
                                 <?php endif; ?>
                             </div>
-                            <p class="small text-muted mt-10">Pochettes sélectionnées : <span id="mosaic-count" class="badge">0</span> / 4</p>
+
+                            <div class="playlist-mosaic-controls-row">
+                                <div class="playlist-mosaic-count-box">
+                                    Pochettes : <span id="mosaic-count" class="badge">0</span> / <span id="mosaic-max">4</span>
+                                </div>
+                                <div class="playlist-color-order-group">
+                                    <label for="mosaic-color-order" class="playlist-color-order-label"><i class="glyphicon glyphicon-tint"></i> Agencement :</label>
+                                    <select id="mosaic-color-order" name="mosaic_color_order" class="form-control input-sm playlist-color-select">
+                                        <option value="manual">Ordre de sélection</option>
+                                        <option value="rainbow">🌈 Arc-en-ciel (Spectre)</option>
+                                        <option value="brightness">☀️ Dégradé Lumineux</option>
+                                        <option value="warm_cold">🍂 Chaud vers Froid (Canopée)</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="mt-10">
                                 <button type="button" id="btnGenerateMosaic" class="btn btn-sm btn-generate-mosaic" disabled>
                                     <i class="glyphicon glyphicon-th-large"></i> Générer la pochette de playlist avec ces images

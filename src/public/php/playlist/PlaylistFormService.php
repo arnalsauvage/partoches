@@ -220,9 +220,23 @@ class PlaylistFormService
     }
 
     /**
-     * Génère une mosaïque 2x2 à partir d'un tableau d'URL d'images et la sauvegarde.
+     * Génère une mosaïque NxN à partir d'un tableau d'URL d'images et la sauvegarde.
+     * Supporte les grilles carrées 2x2 (4), 3x3 (9), 4x4 (16), 5x5 (25) et l'harmonisation chromatique.
+     *
+     * @param array $imageUrls Tableau des URLs d'images (locales ou externes)
+     * @param string $playlistName Nom de la playlist pour le slug
+     * @param int $playlistId ID de la playlist (pour nommage et purge)
+     * @param int $gridSize Nombre de cases souhaité (4, 9, 16, 25). Si 0, auto-déduit.
+     * @param string $colorOrder Mode d'agencement ('manual', 'rainbow', 'brightness', 'warm_cold')
+     * @return string Nom du fichier généré dans data/playlists/
      */
-    public static function generateMosaic(array $imageUrls, string $playlistName, int $playlistId = 0): string
+    public static function generateMosaic(
+        array $imageUrls, 
+        string $playlistName, 
+        int $playlistId = 0, 
+        int $gridSize = 0, 
+        string $colorOrder = 'manual'
+    ): string
     {
         $slug = self::slugify($playlistName);
         $uniqueSuffix = ($playlistId > 0) ? $playlistId . '_' . time() : 'mosaic_' . time();
@@ -243,52 +257,196 @@ class PlaylistFormService
         }
 
         $targetPath = $playlistsDir . "/" . $fileName;
-        
-        // Taille cible pour l'image finale
-        $finalWidth = 400;
-        $finalHeight = 400;
-        $mosaic = imagecreatetruecolor($finalWidth, $finalHeight);
-        
-        // Fond marron très foncé par défaut
-        $bgColor = imagecolorallocate($mosaic, 43, 29, 26);
-        imagefill($mosaic, 0, 0, $bgColor);
-        
+
         if (empty($imageUrls)) {
             // Pas d'images, on génère juste un fond avec des initiales
-            $textColor = imagecolorallocate($mosaic, 210, 180, 140); // Beige/Marron clair Canopée
-            // On écrit les initiales ou un texte par défaut (rudimentaire sans font ttf)
+            $finalWidth = 400;
+            $finalHeight = 400;
+            $mosaic = imagecreatetruecolor($finalWidth, $finalHeight);
+            $bgColor = imagecolorallocate($mosaic, 43, 29, 26);
+            imagefill($mosaic, 0, 0, $bgColor);
+            $textColor = imagecolorallocate($mosaic, 210, 180, 140);
             $text = strtoupper(substr($slug, 0, 2));
             imagestring($mosaic, 5, ($finalWidth / 2) - 10, ($finalHeight / 2) - 10, $text, $textColor);
             imagejpeg($mosaic, $targetPath, 85);
             imagedestroy($mosaic);
             return $fileName;
         }
-        
-        // On complète le tableau avec la première image si on en a moins de 4, ou on laisse vide.
-        // Option choisie : Si 1 image, elle prend tout. Si 2 ou 3 images, on les place dans les cases 200x200.
-        
-        if (count($imageUrls) === 1) {
-            // Une seule image, elle prend tout l'espace
-            self::stampImageToMosaic($mosaic, $imageUrls[0], 0, 0, $finalWidth, $finalHeight);
+
+        // Détermination de la dimension de grille N x N
+        $count = count($imageUrls);
+        if ($gridSize > 0) {
+            $n = (int)round(sqrt($gridSize));
         } else {
-            // Mosaïque 2x2
-            $tileW = 200;
-            $tileH = 200;
-            
-            // Tile 1 : Top Left
-            if (isset($imageUrls[0])) self::stampImageToMosaic($mosaic, $imageUrls[0], 0, 0, $tileW, $tileH);
-            // Tile 2 : Top Right
-            if (isset($imageUrls[1])) self::stampImageToMosaic($mosaic, $imageUrls[1], $tileW, 0, $tileW, $tileH);
-            // Tile 3 : Bottom Left
-            if (isset($imageUrls[2])) self::stampImageToMosaic($mosaic, $imageUrls[2], 0, $tileH, $tileW, $tileH);
-            // Tile 4 : Bottom Right
-            if (isset($imageUrls[3])) self::stampImageToMosaic($mosaic, $imageUrls[3], $tileW, $tileH, $tileW, $tileH);
+            if ($count <= 1) $n = 1;
+            elseif ($count <= 4) $n = 2;
+            elseif ($count <= 9) $n = 3;
+            elseif ($count <= 16) $n = 4;
+            else $n = 5;
         }
-        
+        $n = max(1, min(5, $n));
+        $totalSlots = $n * $n;
+
+        // Limiter aux slots nécessaires
+        $selectedUrls = array_values(array_slice($imageUrls, 0, $totalSlots));
+
+        // Harmonisation chromatique si demandée
+        if ($colorOrder !== 'manual' && count($selectedUrls) > 1) {
+            $selectedUrls = self::sortImagesByColorHarmony($selectedUrls, $colorOrder, $n);
+        }
+
+        // Taille globale du canevas
+        $finalSize = ($n >= 3) ? 600 : 400;
+        $mosaic = imagecreatetruecolor($finalSize, $finalSize);
+        $bgColor = imagecolorallocate($mosaic, 43, 29, 26);
+        imagefill($mosaic, 0, 0, $bgColor);
+
+        if ($n === 1) {
+            self::stampImageToMosaic($mosaic, $selectedUrls[0], 0, 0, $finalSize, $finalSize);
+        } else {
+            $tileSize = (int)floor($finalSize / $n);
+            for ($row = 0; $row < $n; $row++) {
+                for ($col = 0; $col < $n; $col++) {
+                    $idx = $row * $n + $col;
+                    if (isset($selectedUrls[$idx])) {
+                        $x = $col * $tileSize;
+                        $y = $row * $tileSize;
+                        self::stampImageToMosaic($mosaic, $selectedUrls[$idx], $x, $y, $tileSize, $tileSize);
+                    }
+                }
+            }
+        }
+
         imagejpeg($mosaic, $targetPath, 85);
         imagedestroy($mosaic);
-        
+
         return $fileName;
+    }
+
+    /**
+     * Trie les images selon une harmonie de couleur (Arc-en-ciel, Luminosité, Chaud-Froid).
+     */
+    public static function sortImagesByColorHarmony(array $urls, string $order, int $n = 2): array
+    {
+        $items = [];
+        foreach ($urls as $url) {
+            $hsl = self::getImageDominantHsl($url);
+            $items[] = [
+                'url' => $url,
+                'h' => $hsl['h'],
+                's' => $hsl['s'],
+                'l' => $hsl['l']
+            ];
+        }
+
+        switch ($order) {
+            case 'rainbow':
+                // Tri par Teinte (Hue 0° -> 360°)
+                usort($items, fn($a, $b) => $a['h'] <=> $b['h']);
+                $sortedUrls = array_column($items, 'url');
+                return self::arrangeSnakePattern($sortedUrls, $n);
+
+            case 'brightness':
+                // Tri par Luminosité (Sombre -> Clair)
+                usort($items, fn($a, $b) => $a['l'] <=> $b['l']);
+                return array_column($items, 'url');
+
+            case 'warm_cold':
+                // Tri par proximité avec les teintes chaudes Canopée (orange ~ 30°)
+                usort($items, function($a, $b) {
+                    $distA = min(abs($a['h'] - 30), abs($a['h'] - 30 + 360), abs($a['h'] - 30 - 360));
+                    $distB = min(abs($b['h'] - 30), abs($b['h'] - 30 + 360), abs($b['h'] - 30 - 360));
+                    return $distA <=> $distB;
+                });
+                return array_column($items, 'url');
+
+            default:
+                return $urls;
+        }
+    }
+
+    /**
+     * Réordonne un tableau d'éléments en serpentin sur une grille N x N.
+     */
+    private static function arrangeSnakePattern(array $elements, int $n): array
+    {
+        if ($n <= 1) return $elements;
+        $result = [];
+        $chunks = array_chunk($elements, $n);
+        foreach ($chunks as $rowIndex => $row) {
+            if ($rowIndex % 2 === 1) {
+                $row = array_reverse($row);
+            }
+            foreach ($row as $item) {
+                $result[] = $item;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Calcule la teinte HSL dominante d'une image locale ou distante.
+     */
+    public static function getImageDominantHsl(string $url): array
+    {
+        $defaultHsl = ['h' => 0.0, 's' => 0.0, 'l' => 0.5];
+
+        $filePath = $url;
+        $publicDir = defined('PUBLIC_DIR') ? PUBLIC_DIR : dirname(__DIR__, 2);
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            $filePath = $url;
+        } elseif (str_starts_with($url, '../')) {
+            $filePath = __DIR__ . "/" . $url;
+        } elseif (str_starts_with($url, '/')) {
+            $filePath = $publicDir . $url;
+        }
+
+        $content = @file_get_contents($filePath);
+        if (!$content) return $defaultHsl;
+
+        $img = @imagecreatefromstring($content);
+        if (!$img) return $defaultHsl;
+
+        // Réduire en 1x1 pour obtenir la moyenne RGB
+        $thumb = imagecreatetruecolor(1, 1);
+        $w = imagesx($img);
+        $h = imagesy($img);
+        imagecopyresampled($thumb, $img, 0, 0, 0, 0, 1, 1, $w, $h);
+        $rgb = imagecolorat($thumb, 0, 0);
+
+        $r = ($rgb >> 16) & 0xFF;
+        $g = ($rgb >> 8) & 0xFF;
+        $b = $rgb & 0xFF;
+
+        imagedestroy($thumb);
+        imagedestroy($img);
+
+        // Conversion RGB -> HSL
+        $rNorm = $r / 255.0;
+        $gNorm = $g / 255.0;
+        $bNorm = $b / 255.0;
+
+        $max = max($rNorm, $gNorm, $bNorm);
+        $min = min($rNorm, $gNorm, $bNorm);
+        $delta = $max - $min;
+
+        $l = ($max + $min) / 2.0;
+        if ($delta == 0) {
+            $h = 0.0;
+            $s = 0.0;
+        } else {
+            $s = ($l < 0.5) ? ($delta / ($max + $min)) : ($delta / (2.0 - $max - $min));
+            if ($max == $rNorm) {
+                $h = 60.0 * fmod((($gNorm - $bNorm) / $delta), 6);
+            } elseif ($max == $gNorm) {
+                $h = 60.0 * ((($bNorm - $rNorm) / $delta) + 2.0);
+            } else {
+                $h = 60.0 * ((($rNorm - $gNorm) / $delta) + 4.0);
+            }
+            if ($h < 0) $h += 360.0;
+        }
+
+        return ['h' => $h, 's' => $s, 'l' => $l];
     }
     
     private static function stampImageToMosaic($mosaic, string $url, int $dstX, int $dstY, int $dstW, int $dstH): void

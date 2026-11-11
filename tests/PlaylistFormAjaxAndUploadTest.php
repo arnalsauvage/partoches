@@ -258,4 +258,70 @@ class PlaylistFormAjaxAndUploadTest extends TestCase
         $this->assertStringContainsString('Accès refusé', $data['error']);
         $_SESSION['privilege'] = 2; // Rétablir
     }
+
+    public function testGenerateMosaicGridNxNAndColorHarmony(): void
+    {
+        $chansonDir = dirname(__DIR__) . '/src/public/data/chansons/' . $this->testSongId;
+        if (!is_dir($chansonDir)) {
+            mkdir($chansonDir, 0755, true);
+        }
+
+        // Créer 9 images de couleurs distinctes (Rouge, Vert, Bleu, etc.)
+        $colors = [
+            [255, 0, 0],   // Rouge (H ~ 0)
+            [0, 255, 0],   // Vert (H ~ 120)
+            [0, 0, 255],   // Bleu (H ~ 240)
+            [255, 255, 0], // Jaune (H ~ 60)
+            [0, 255, 255], // Cyan (H ~ 180)
+            [255, 0, 255], // Magenta (H ~ 300)
+            [50, 50, 50],  // Sombre
+            [200, 200, 200],// Clair
+            [255, 140, 0]  // Orange (H ~ 33)
+        ];
+
+        $covers = [];
+        foreach ($colors as $idx => $rgb) {
+            $img = imagecreatetruecolor(50, 50);
+            $col = imagecolorallocate($img, $rgb[0], $rgb[1], $rgb[2]);
+            imagefill($img, 0, 0, $col);
+            $path = $chansonDir . "/tile_color_{$idx}.png";
+            imagepng($img, $path);
+            imagedestroy($img);
+            $covers[] = "/data/chansons/{$this->testSongId}/tile_color_{$idx}.png";
+        }
+
+        // 1. Test extraction HSL
+        $hsl = PlaylistFormService::getImageDominantHsl($covers[0]); // Rouge
+        $this->assertEqualsWithDelta(0.0, $hsl['h'], 5.0, "La teinte du rouge doit être proche de 0°");
+        $this->assertGreaterThan(0.9, $hsl['s'], "La saturation du rouge pur doit être proche de 1");
+
+        // 2. Test tri Rainbow
+        $rainbowSorted = PlaylistFormService::sortImagesByColorHarmony($covers, 'rainbow', 3);
+        $this->assertCount(9, $rainbowSorted);
+
+        // 3. Test tri Luminosité
+        $brightSorted = PlaylistFormService::sortImagesByColorHarmony($covers, 'brightness', 3);
+        $this->assertCount(9, $brightSorted);
+
+        // 4. Test génération mosaïque 3x3 (9) avec tri arc-en-ciel
+        $mosaicFile = PlaylistFormService::generateMosaic($covers, 'Test Mosaïque 3x3', 888, 9, 'rainbow');
+        $this->assertNotEmpty($mosaicFile);
+        $this->assertStringStartsWith('test-mosaique-3x3_888_', $mosaicFile);
+
+        $playlistsDir = dirname(__DIR__) . '/src/public/data/playlists';
+        $fullPath = $playlistsDir . '/' . $mosaicFile;
+        $this->assertFileExists($fullPath);
+
+        // Vérifier les dimensions du canevas généré (600x600 pour 3x3)
+        $sizeInfo = getimagesize($fullPath);
+        $this->assertEquals(600, $sizeInfo[0]);
+        $this->assertEquals(600, $sizeInfo[1]);
+
+        // Nettoyage
+        @unlink($fullPath);
+        foreach ($colors as $idx => $rgb) {
+            @unlink($chansonDir . "/tile_color_{$idx}.png");
+        }
+        @rmdir($chansonDir);
+    }
 }

@@ -280,3 +280,69 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(359deg); }
 }
+
+/* Sélecteur de Grille NxN & Agencement Couleur */
+.playlist-grid-selector-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.playlist-grid-label {
+    font-weight: 600;
+    color: var(--c-marron-fonce);
+    font-size: 13px;
+}
+
+.btn-autofill-mosaic {
+    background-color: var(--c-beige);
+    color: var(--c-marron-fonce);
+    border: 1px solid var(--c-marron-clair);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-autofill-mosaic:hover {
+    background-color: var(--c-marron-fonce);
+    color: var(--c-beige);
+}
+
+.playlist-mosaic-controls-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.playlist-mosaic-count-box {
+    font-size: 13px;
+    color: #666;
+    font-weight: 600;
+}
+
+.playlist-color-order-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.playlist-color-order-label {
+    margin: 0;
+    font-size: 13px;
+    color: var(--c-marron-fonce);
+    font-weight: 600;
+}
+
+.playlist-color-select {
+    display: inline-block;
+    width: auto;
+    min-width: 180px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.ml-10 { margin-left: 10px; }
