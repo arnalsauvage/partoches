@@ -222,11 +222,27 @@ class PlaylistFormService
     /**
      * Génère une mosaïque 2x2 à partir d'un tableau d'URL d'images et la sauvegarde.
      */
-    public static function generateMosaic(array $imageUrls, string $playlistName): string
+    public static function generateMosaic(array $imageUrls, string $playlistName, int $playlistId = 0): string
     {
         $slug = self::slugify($playlistName);
-        $fileName = $slug . ".jpg";
-        $targetPath = dirname(__DIR__, 2) . "/data/playlists/" . $fileName;
+        $uniqueSuffix = ($playlistId > 0) ? $playlistId . '_' . time() : 'mosaic_' . time();
+        $fileName = $slug . '_' . $uniqueSuffix . ".jpg";
+        $playlistsDir = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/playlists' : dirname(__DIR__, 2) . "/data/playlists";
+        if (!is_dir($playlistsDir)) {
+            @mkdir($playlistsDir, 0775, true);
+        }
+
+        // Nettoyage des anciennes mosaïques de cette playlist
+        if ($playlistId > 0) {
+            $oldFiles = glob($playlistsDir . '/' . $slug . '_' . $playlistId . '_*.jpg');
+            if (!empty($oldFiles)) {
+                foreach ($oldFiles as $oldFile) {
+                    @unlink($oldFile);
+                }
+            }
+        }
+
+        $targetPath = $playlistsDir . "/" . $fileName;
         
         // Taille cible pour l'image finale
         $finalWidth = 400;
@@ -280,14 +296,13 @@ class PlaylistFormService
         // Gestion des URL relatives (partoches : souvent ../../data/chansons/...)
         // On les résout en local si elles commencent par .. ou /
         $filePath = $url;
-        if (str_starts_with($url, 'http')) {
+        $publicDir = defined('PUBLIC_DIR') ? PUBLIC_DIR : dirname(__DIR__, 2);
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
             $filePath = $url;
         } elseif (str_starts_with($url, '../')) {
-            // On remonte depuis public/php/playlist
-            $filePath = __DIR__ . "/" . $url; // File_get_contents sait résoudre public/php/playlist/../../data...
+            $filePath = __DIR__ . "/" . $url;
         } elseif (str_starts_with($url, '/')) {
-            // dirname(__DIR__, 2) == src/public
-            $filePath = dirname(__DIR__, 2) . $url; 
+            $filePath = $publicDir . $url; 
         }
         
         // Tenter de charger l'image silencieusement

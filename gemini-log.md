@@ -1,5 +1,28 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (11 Novembre 2026 - Fin de Journée)
+- **🎨 Bouton de Génération Immédiate de Mosaïque de Playlist avec Aperçu Visuel Réactif (`playlist_form.php`)** :
+    - **Demande PO & Spécification Agile** :
+        - Lors de la sélection des 4 pochettes pour la mosaïque, absence de bouton d'action explicite : l'utilisateur cherchait où cliquer pour valider son choix, cliquait sur "Enregistrer", mais le rafraîchissement ne montrait aucun changement à cause du cache navigateur sur le nom statique `.jpg`.
+        - Ajout d'un bouton d'action dédié : « Générer la pochette de playlist avec ces images ».
+    - **Architecture & Implémentation (SOLID & OWASP)** :
+        - **Endpoint AJAX dédié (`playlist_mosaic_ajax.php`)** :
+            - Protégé par `PRIVILEGE_EDITEUR`, validation stricte des paramètres (1 à 4 pochettes).
+            - Appelle `PlaylistFormService::generateMosaic($covers, $playlistNom, $idPlaylist)`.
+            - Met à jour immédiatement la colonne `playlist.image` via requête préparée SQL si `$idPlaylist > 0`.
+            - Renvoie JSON avec horodatage de cache-busting (`?v=timestamp`).
+        - **Service Métier (`PlaylistFormService.php`)** :
+            - Nommage dynamique unique avec horodatage (`slug_idPlaylist_timestamp.jpg`), empêchant tout problème de cache navigateur HTTP 304.
+            - Purge opportuniste des anciennes mosaïques de la même playlist pour préserver le disque.
+        - **Vue & Script Dédié (`playlist_form_view.phtml` & `playlistform.js`)** :
+            - Bouton `.btn-generate-mosaic` stylisé Canopée (désactivé si 0 pochette, activé de 1 à 4).
+            - Au clic, spinner animé (`.spin`), appel AJAX, mise à jour instantanée du composant "Illustration actuelle" sous les yeux de l'utilisateur, toastr de succès et assignation de `#fimage`.
+            - Correction des ID HTML dupliqués (`id="playlist_id"`, `id="form_ajout_chanson_playlist_id"`, `id="form_import_songbook_playlist_id"`).
+    - **Tests & Non-Régression** :
+        - Ajout de 2 tests dans `tests/PlaylistFormAjaxAndUploadTest.php` : `testGenerateMosaicWithCovers()` et `testPlaylistMosaicAjaxEndpointRejectsNonEditor()`.
+        - **189 / 189 tests PHPUnit validés (100% Succès)**.
+        - **28 / 28 Smoke Tests & HTML Lint validés (100% Succès)**.
+
 ### 📖 Résumé de la session (11 Novembre 2026 - Fin d'Après-midi)
 - **🖼️ Génération Automatique des Vignettes WebP à la Volée pour les Mosaïques de Playlist (`playlist_form.php`)** :
     - **Demande PO & Contexte** :

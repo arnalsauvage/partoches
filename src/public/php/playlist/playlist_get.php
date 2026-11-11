@@ -64,13 +64,13 @@ if ($mode == "MAJ" && $id) {
     if (empty($fimage) || str_contains($fimage, 'mosaique-automatique')) {
         // On récupère les covers contextuelles
         $covers = PlaylistFormService::getPlaylistContextualCovers($id, 4);
-        $fimage = PlaylistFormService::generateMosaic($covers, $fnom);
+        $fimage = PlaylistFormService::generateMosaic($covers, $fnom, $id);
     } elseif (str_contains($fimage, ',')) {
         // Sélection multiple par l'utilisateur (URLs séparées par des virgules)
         $selectedCovers = array_filter(explode(',', $fimage));
         // On ne garde que les 4 premières
         $selectedCovers = array_slice($selectedCovers, 0, 4);
-        $fimage = PlaylistFormService::generateMosaic($selectedCovers, $fnom);
+        $fimage = PlaylistFormService::generateMosaic($selectedCovers, $fnom, $id);
     }
 
     modifiePlaylist($id, $fnom, $fdescription, $fdate, $fimage, $fhits, $ftype, $fcriteres);

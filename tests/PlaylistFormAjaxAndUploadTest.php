@@ -211,4 +211,51 @@ class PlaylistFormAjaxAndUploadTest extends TestCase
         @unlink($expectedMiniPath);
         @rmdir($chansonDir);
     }
+
+    public function testGenerateMosaicWithCovers(): void
+    {
+        $chansonDir = dirname(__DIR__) . '/src/public/data/chansons/' . $this->testSongId;
+        if (!is_dir($chansonDir)) {
+            mkdir($chansonDir, 0755, true);
+        }
+
+        $covers = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $img = imagecreatetruecolor(100, 100);
+            $path = $chansonDir . "/tile_$i.png";
+            imagepng($img, $path);
+            imagedestroy($img);
+            $covers[] = "/data/chansons/{$this->testSongId}/tile_$i.png";
+        }
+
+        $mosaicFileName = PlaylistFormService::generateMosaic($covers, 'Test Mosaïque US', 999);
+        $this->assertNotEmpty($mosaicFileName);
+        $this->assertStringStartsWith('test-mosaique-us_999_', $mosaicFileName);
+        $this->assertStringEndsWith('.jpg', $mosaicFileName);
+
+        $playlistsDir = dirname(__DIR__) . '/src/public/data/playlists';
+        $fullPath = $playlistsDir . '/' . $mosaicFileName;
+        $this->assertFileExists($fullPath);
+        $this->assertGreaterThan(0, filesize($fullPath));
+
+        // Nettoyage
+        @unlink($fullPath);
+        for ($i = 1; $i <= 4; $i++) {
+            @unlink($chansonDir . "/tile_$i.png");
+        }
+        @rmdir($chansonDir);
+    }
+
+    public function testPlaylistMosaicAjaxEndpointRejectsNonEditor(): void
+    {
+        $_SESSION['privilege'] = 0; // Visiteur non éditeur
+        ob_start();
+        require dirname(__DIR__) . '/src/public/php/playlist/playlist_mosaic_ajax.php';
+        $output = ob_get_clean();
+
+        $data = json_decode($output, true);
+        $this->assertFalse($data['success']);
+        $this->assertStringContainsString('Accès refusé', $data['error']);
+        $_SESSION['privilege'] = 2; // Rétablir
+    }
 }

@@ -30,7 +30,7 @@
 
         <div id='tabs-1'>
             <form method="POST" action="playlist_get.php" enctype="multipart/form-data">
-                <input type="hidden" name="id" value="<?= $id ?>">
+                <input type="hidden" name="id" id="playlist_id" value="<?= $id ?>">
                 <input type="hidden" name="mode" value="<?= $mode ?>">
                 
                 <div class="well playlist-config-well">
@@ -82,9 +82,11 @@
                         <div class="col-md-3 text-center">
                             <h5 class="playlist-section-subtitle">Illustration actuelle</h5>
                             <?php if (!empty($playlist['image'])): ?>
-                                <img src='/data/playlists/<?= htmlspecialchars($playlist['image']) ?>' alt='Cover' class='img-responsive img-thumbnail playlist-current-cover'>
+                                <img src='/data/playlists/<?= htmlspecialchars($playlist['image']) ?>?v=<?= time() ?>' alt='Cover' id='playlist-current-cover-img' class='img-responsive img-thumbnail playlist-current-cover'>
+                                <div id='playlist-cover-placeholder-box' class='playlist-cover-placeholder playlist-dynamic-hidden'><i class='glyphicon glyphicon-music playlist-placeholder-icon'></i></div>
                             <?php else: ?>
-                                <div class='playlist-cover-placeholder'><i class='glyphicon glyphicon-music playlist-placeholder-icon'></i></div>
+                                <div id='playlist-cover-placeholder-box' class='playlist-cover-placeholder'><i class='glyphicon glyphicon-music playlist-placeholder-icon'></i></div>
+                                <img src='' alt='Cover' id='playlist-current-cover-img' class='img-responsive img-thumbnail playlist-current-cover playlist-dynamic-hidden'>
                             <?php endif; ?>
                             <div class="mt-10">
                                 <button type="button" id="btnClearMosaic" class="btn btn-xs btn-danger">Effacer (Mosaïque Auto)</button>
@@ -117,6 +119,11 @@
                                 <?php endif; ?>
                             </div>
                             <p class="small text-muted mt-10">Pochettes sélectionnées : <span id="mosaic-count" class="badge">0</span> / 4</p>
+                            <div class="mt-10">
+                                <button type="button" id="btnGenerateMosaic" class="btn btn-sm btn-generate-mosaic" disabled>
+                                    <i class="glyphicon glyphicon-th-large"></i> Générer la pochette de playlist avec ces images
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -222,7 +229,7 @@
                             <h4><i class="glyphicon glyphicon-plus"></i> Ajouter un morceau</h4>
                             <p class="small playlist-search-help mb-10">Tapez au moins 4 lettres (titre ou interprète) pour afficher les suggestions :</p>
                             <form method="POST" action="playlist_form.php?id=<?= $id ?>" id="formAjoutChansonPlaylist">
-                                <input type="hidden" name="id" value="<?= $id ?>">
+                                <input type="hidden" name="id" id="form_ajout_chanson_playlist_id" value="<?= $id ?>">
                                 <input type="hidden" name="chanson" id="inputChansonIdPlaylist" value="">
                                 
                                 <div class="form-group playlist-search-wrapper">
@@ -246,7 +253,7 @@
                             <h4><i class="glyphicon glyphicon-book"></i> Importer un Songbook</h4>
                             <p class="small">Ajoute toutes les chansons du recueil sélectionné.</p>
                             <form method="POST" action="playlist_form.php?id=<?= $id ?>">
-                                <input type="hidden" name="id" value="<?= $id ?>">
+                                <input type="hidden" name="id" id="form_import_songbook_playlist_id" value="<?= $id ?>">
                                 <input type="hidden" name="action" value="import_songbook">
                                 <select name="id_songbook" class="form-control select2">
                                     <?php 

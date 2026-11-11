@@ -37,6 +37,9 @@ $(document).ready(function () {
             }
         });
         $('#mosaic-count').text(selectedCovers.length);
+        if (selectedCovers.length > 0) {
+            $('#btnGenerateMosaic').prop('disabled', false);
+        }
     }
 
     $('.mosaic-thumbnail').on('click', function () {
@@ -57,6 +60,9 @@ $(document).ready(function () {
         }
         $('#fimage').val(selectedCovers.join(','));
         $('#mosaic-count').text(selectedCovers.length);
+        if (selectedCovers.length > 0) {
+            $('#btnGenerateMosaic').prop('disabled', false);
+        }
     });
 
     $('#btnClearMosaic').on('click', function () {
@@ -64,9 +70,63 @@ $(document).ready(function () {
         $('.mosaic-thumbnail').removeClass('selected-cover');
         $('#fimage').val('mosaique-automatique');
         $('#mosaic-count').text(0);
+        $('#btnGenerateMosaic').prop('disabled', true);
         if (typeof toastr !== 'undefined') {
             toastr.info('Mosaïque réinitialisée en mode automatique.');
         }
+    });
+
+    // Génération AJAX immédiate de la mosaïque avec aperçu en temps réel
+    $('#btnGenerateMosaic').on('click', function () {
+        if (selectedCovers.length === 0) {
+            if (typeof toastr !== 'undefined') {
+                toastr.warning('Veuillez sélectionner au moins 1 pochette.');
+            }
+            return;
+        }
+
+        var $btn = $(this);
+        var originalHtml = $btn.html();
+        $btn.prop('disabled', true).html('<i class="glyphicon glyphicon-refresh spin"></i> Génération en cours...');
+
+        var playlistId = parseInt($('#playlist_id').val() || '0', 10);
+        var playlistNom = $('#fnom').val() || 'Playlist';
+
+        $.ajax({
+            url: 'playlist_mosaic_ajax.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                id: playlistId,
+                nom: playlistNom,
+                covers: selectedCovers
+            },
+            success: function (res) {
+                $btn.prop('disabled', false).html(originalHtml);
+                if (res.success) {
+                    $('#fimage').val(res.fileName);
+                    $('#playlist-current-cover-img').attr('src', res.imageUrl).removeClass('playlist-dynamic-hidden').show();
+                    $('#playlist-cover-placeholder-box').addClass('playlist-dynamic-hidden').hide();
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(res.message || 'Pochette générée avec succès !');
+                    }
+                } else {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(res.error || 'Erreur lors de la génération.');
+                    } else {
+                        alert(res.error || 'Erreur lors de la génération.');
+                    }
+                }
+            },
+            error: function () {
+                $btn.prop('disabled', false).html(originalHtml);
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Erreur technique lors de la communication serveur.');
+                } else {
+                    alert('Erreur technique lors de la génération.');
+                }
+            }
+        });
     });
 
     // --- 4. RECHERCHE AUTOCOMPLÉTÉE PRÉDICTIVE (US-083) ---
