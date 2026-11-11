@@ -259,6 +259,29 @@ class PlaylistFormAjaxAndUploadTest extends TestCase
         $_SESSION['privilege'] = 2; // Rétablir
     }
 
+    public function testPlaylistMosaicAjaxEndpointPreviewSuccess(): void
+    {
+        $_SESSION['privilege'] = 2; // Éditeur
+        $_POST = [
+            'action' => 'preview',
+            'id' => 5,
+            'nom' => 'Test Playlist',
+            'covers' => ['/data/playlists/fraschetta.jpg'],
+            'grid_size' => 4,
+            'color_order' => 'manual'
+        ];
+
+        ob_start();
+        require dirname(__DIR__) . '/src/public/php/playlist/playlist_mosaic_ajax.php';
+        $output = ob_get_clean();
+
+        $data = json_decode($output, true);
+        $this->assertIsArray($data, "Output doit être du JSON valide: " . $output);
+        $this->assertTrue($data['success'] ?? false, "Response success doit être true: " . $output);
+        $this->assertTrue($data['isPreview'] ?? false);
+        $this->assertNotEmpty($data['fileName'] ?? '');
+    }
+
     public function testGenerateMosaicGridNxNAndColorHarmony(): void
     {
         $chansonDir = dirname(__DIR__) . '/src/public/data/chansons/' . $this->testSongId;

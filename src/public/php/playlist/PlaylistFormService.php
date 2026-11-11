@@ -121,8 +121,13 @@ class PlaylistFormService
      */
     public static function slugify(string $text): string
     {
-        // Remplacer les caractères accentués
-        $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+        // Remplacer les caractères accentués de façon robuste
+        if (function_exists('iconv')) {
+            $translit = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+            if ($translit !== false && !empty($translit)) {
+                $text = $translit;
+            }
+        }
         // Tout en minuscules
         $text = strtolower($text);
         // Remplacer tout ce qui n'est pas alphanumérique par un tiret
@@ -273,8 +278,11 @@ class PlaylistFormService
             $textColor = imagecolorallocate($mosaic, 210, 180, 140);
             $text = strtoupper(substr($slug, 0, 2));
             imagestring($mosaic, 5, ($finalWidth / 2) - 10, ($finalHeight / 2) - 10, $text, $textColor);
-            imagejpeg($mosaic, $targetPath, 85);
+            $saved = @imagejpeg($mosaic, $targetPath, 85);
             imagedestroy($mosaic);
+            if (!$saved || !file_exists($targetPath)) {
+                throw new \RuntimeException("Impossible d'écrire l'image dans le répertoire des playlists ($playlistsDir).");
+            }
             return $fileName;
         }
 
@@ -322,8 +330,11 @@ class PlaylistFormService
             }
         }
 
-        imagejpeg($mosaic, $targetPath, 85);
+        $saved = @imagejpeg($mosaic, $targetPath, 85);
         imagedestroy($mosaic);
+        if (!$saved || !file_exists($targetPath)) {
+            throw new \RuntimeException("Impossible d'écrire l'image dans le répertoire des playlists ($playlistsDir).");
+        }
 
         return $fileName;
     }
@@ -390,22 +401,49 @@ class PlaylistFormService
     }
 
     /**
+     * Résout une URL d'image en chemin local absolu sur le serveur.
+     */
+    public static function resolveLocalFilePath(string $url): string
+    {
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        // Nettoyer les paramètres de requête éventuels (?v=123)
+        $cleanUrl = parse_url($url, PHP_URL_PATH) ?? $url;
+
+        if (str_starts_with($cleanUrl, '../')) {
+            $path = __DIR__ . '/' . $cleanUrl;
+            if (file_exists($path)) return $path;
+        }
+
+        $publicDir = defined('PUBLIC_DIR') ? PUBLIC_DIR : dirname(__DIR__, 2);
+        $candidate1 = $publicDir . $cleanUrl;
+        if (file_exists($candidate1)) {
+            return $candidate1;
+        }
+
+        if (defined('ROOT_DIR')) {
+            $candidate2 = ROOT_DIR . '/public' . $cleanUrl;
+            if (file_exists($candidate2)) return $candidate2;
+        }
+
+        $candidate3 = dirname(__DIR__, 2) . $cleanUrl;
+        if (file_exists($candidate3)) {
+            return $candidate3;
+        }
+
+        return $candidate1;
+    }
+
+    /**
      * Calcule la teinte HSL dominante d'une image locale ou distante.
      */
     public static function getImageDominantHsl(string $url): array
     {
         $defaultHsl = ['h' => 0.0, 's' => 0.0, 'l' => 0.5];
 
-        $filePath = $url;
-        $publicDir = defined('PUBLIC_DIR') ? PUBLIC_DIR : dirname(__DIR__, 2);
-        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
-            $filePath = $url;
-        } elseif (str_starts_with($url, '../')) {
-            $filePath = __DIR__ . "/" . $url;
-        } elseif (str_starts_with($url, '/')) {
-            $filePath = $publicDir . $url;
-        }
-
+        $filePath = self::resolveLocalFilePath($url);
         $content = @file_get_contents($filePath);
         if (!$content) return $defaultHsl;
 
@@ -414,8 +452,8 @@ class PlaylistFormService
 
         // Réduire en 1x1 pour obtenir la moyenne RGB
         $thumb = imagecreatetruecolor(1, 1);
-        $w = imagesx($img);
-        $h = imagesy($img);
+        $w = (int)imagesx($img);
+        $h = (int)imagesy($img);
         imagecopyresampled($thumb, $img, 0, 0, 0, 0, 1, 1, $w, $h);
         $rgb = imagecolorat($thumb, 0, 0);
 
@@ -437,50 +475,51 @@ class PlaylistFormService
 
         $l = ($max + $min) / 2.0;
         if ($delta == 0) {
-            $h = 0.0;
-            $s = 0.0;
+            $hue = 0.0;
+            $sat = 0.0;
         } else {
-            $s = ($l < 0.5) ? ($delta / ($max + $min)) : ($delta / (2.0 - $max - $min));
+            $sat = ($l < 0.5) ? ($delta / ($max + $min)) : ($delta / (2.0 - $max - $min));
             if ($max == $rNorm) {
-                $h = 60.0 * fmod((($gNorm - $bNorm) / $delta), 6);
+                $hue = 60.0 * fmod((($gNorm - $bNorm) / $delta), 6);
             } elseif ($max == $gNorm) {
-                $h = 60.0 * ((($bNorm - $rNorm) / $delta) + 2.0);
+                $hue = 60.0 * ((($bNorm - $rNorm) / $delta) + 2.0);
             } else {
-                $h = 60.0 * ((($rNorm - $gNorm) / $delta) + 4.0);
+                $hue = 60.0 * ((($rNorm - $gNorm) / $delta) + 4.0);
             }
-            if ($h < 0) $h += 360.0;
+            if ($hue < 0) $hue += 360.0;
         }
 
-        return ['h' => $h, 's' => $s, 'l' => $l];
+        return ['h' => $hue, 's' => $sat, 'l' => $l];
     }
     
     private static function stampImageToMosaic($mosaic, string $url, int $dstX, int $dstY, int $dstW, int $dstH): void
     {
-        // Gestion des URL relatives (partoches : souvent ../../data/chansons/...)
-        // On les résout en local si elles commencent par .. ou /
-        $filePath = $url;
-        $publicDir = defined('PUBLIC_DIR') ? PUBLIC_DIR : dirname(__DIR__, 2);
-        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
-            $filePath = $url;
-        } elseif (str_starts_with($url, '../')) {
-            $filePath = __DIR__ . "/" . $url;
-        } elseif (str_starts_with($url, '/')) {
-            $filePath = $publicDir . $url; 
-        }
+        $filePath = self::resolveLocalFilePath($url);
         
         // Tenter de charger l'image silencieusement
         $content = @file_get_contents($filePath);
         if ($content) {
             $img = @imagecreatefromstring($content);
             if ($img !== false) {
-                $srcW = imagesx($img);
-                $srcH = imagesy($img);
+                $srcW = (int)imagesx($img);
+                $srcH = (int)imagesy($img);
                 // On recadre au centre (Crop)
-                $minDim = min($srcW, $srcH);
-                $srcX = ($srcW - $minDim) / 2;
-                $srcY = ($srcH - $minDim) / 2;
+                $minDim = (int)min($srcW, $srcH);
+                $srcX = (int)floor(($srcW - $minDim) / 2);
+                $srcY = (int)floor(($srcH - $minDim) / 2);
                 
-                imagecopyresampled($mosaic, $img, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $minDim, $minDim);
+                imagecopyresampled(
+                    $mosaic, 
+                    $img, 
+                    (int)$dstX, 
+                    (int)$dstY, 
+                    $srcX, 
+                    $srcY, 
+                    (int)$dstW, 
+                    (int)$dstH, 
+                    $minDim, 
+                    $minDim
+                );
                 imagedestroy($img);
             }
         }

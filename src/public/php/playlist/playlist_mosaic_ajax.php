@@ -1,10 +1,31 @@
 <?php
+ob_start();
+
 // Inclusion de l'autoloader
 require_once file_exists(dirname(__DIR__, 3) . '/autoload.php') ? dirname(__DIR__, 3) . '/autoload.php' : dirname(__DIR__, 2) . '/autoload.php';
 require_once __DIR__ . '/PlaylistFormService.php';
 
-if (!headers_sent()) {
-    header('Content-Type: application/json');
+if (!function_exists('sendMosaicJsonResponse')) {
+    /**
+     * Envoie une réponse JSON propre en purgeant tout buffer parasite (warnings/notices).
+     */
+    function sendMosaicJsonResponse(array $data, int $statusCode = 200): void {
+        if (ob_get_length()) {
+            ob_clean();
+        }
+        if (!headers_sent()) {
+            http_response_code($statusCode);
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        echo json_encode($data);
+        if (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING) {
+            if (ob_get_level() > 1) {
+                ob_end_flush();
+            }
+            return;
+        }
+        exit();
+    }
 }
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -12,8 +33,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (($_SESSION['privilege'] ?? 0) < ($GLOBALS["PRIVILEGE_EDITEUR"] ?? 2)) {
-    echo json_encode(['success' => false, 'error' => 'Accès refusé. Privilège éditeur requis.']);
-    if (!defined('PHPUNIT_RUNNING')) exit();
+    sendMosaicJsonResponse(['success' => false, 'error' => 'Accès refusé. Privilège éditeur requis.']);
     return;
 }
 
@@ -27,8 +47,7 @@ if ($action === 'cancel') {
     if (!empty($previewFile)) {
         PlaylistFormService::cancelMosaicPreview($previewFile);
     }
-    echo json_encode(['success' => true, 'message' => 'Aperçu annulé.']);
-    if (!defined('PHPUNIT_RUNNING')) exit();
+    sendMosaicJsonResponse(['success' => true, 'message' => 'Aperçu annulé.']);
     return;
 }
 
@@ -36,26 +55,23 @@ if ($action === 'cancel') {
 if ($action === 'apply') {
     $previewFile = trim($_POST['preview_file'] ?? '');
     if (empty($previewFile)) {
-        echo json_encode(['success' => false, 'error' => 'Aucun aperçu à valider.']);
-        if (!defined('PHPUNIT_RUNNING')) exit();
+        sendMosaicJsonResponse(['success' => false, 'error' => 'Aucun aperçu à valider.']);
         return;
     }
 
     $finalFile = PlaylistFormService::applyMosaicPreview($previewFile, $playlistNom, $idPlaylist);
     if (!$finalFile) {
-        echo json_encode(['success' => false, 'error' => "Impossible d'appliquer l'aperçu (fichier introuvable)."]);
-        if (!defined('PHPUNIT_RUNNING')) exit();
+        sendMosaicJsonResponse(['success' => false, 'error' => "Impossible d'appliquer l'aperçu (fichier introuvable)."]);
         return;
     }
 
-    echo json_encode([
+    sendMosaicJsonResponse([
         'success' => true,
         'isApplied' => true,
         'fileName' => $finalFile,
         'imageUrl' => '/data/playlists/' . $finalFile . '?v=' . time(),
         'message' => 'Pochette validée et enregistrée avec succès !'
     ]);
-    if (!defined('PHPUNIT_RUNNING')) exit();
     return;
 }
 
@@ -69,8 +85,7 @@ if (is_array($coversRaw)) {
 }
 
 if (empty($covers)) {
-    echo json_encode(['success' => false, 'error' => 'Veuillez sélectionner au moins une pochette.']);
-    if (!defined('PHPUNIT_RUNNING')) exit();
+    sendMosaicJsonResponse(['success' => false, 'error' => 'Veuillez sélectionner au moins une pochette.']);
     return;
 }
 
@@ -87,7 +102,7 @@ try {
     // Génère un fichier temporaire avec préfixe preview_ sans impacter la BDD
     $fileName = PlaylistFormService::generateMosaic($covers, $playlistNom, $idPlaylist, $gridSize, $colorOrder, true);
 
-    echo json_encode([
+    sendMosaicJsonResponse([
         'success' => true,
         'isPreview' => true,
         'fileName' => $fileName,
@@ -95,5 +110,5 @@ try {
         'message' => 'Aperçu généré ! Vous pouvez valider ou tester un autre agencement.'
     ]);
 } catch (\Throwable $e) {
-    echo json_encode(['success' => false, 'error' => 'Erreur lors de la génération : ' . $e->getMessage()]);
+    sendMosaicJsonResponse(['success' => false, 'error' => 'Erreur lors de la génération : ' . $e->getMessage()]);
 }

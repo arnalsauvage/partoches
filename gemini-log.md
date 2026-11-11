@@ -1,5 +1,30 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (11 Novembre 2026 - Soirée)
+- **🛠️ Fix Communication Serveur AJAX & Robustesse Mosaïque Playlist (`playlist_form.php`)** :
+    - **Contexte & Symptôme PO** :
+        - Lors du clic sur « Prévisualiser la mosaïque », un toast d'erreur apparaissait : « Erreur technique lors de la communication serveur. ».
+    - **Causes Racines Identifiées** :
+        - Pollution du flux JSON en cas de warnings/notices PHP ou dépréciations float-to-int dans `imagecopyresampled` (PHP 8.2), provoquant un `parsererror` côté jQuery `$.ajax`.
+        - Absence de tampon de sortie nettoyé (`ob_start()` / `ob_clean()`) dans le point de terminaison `playlist_mosaic_ajax.php`.
+        - Résolution de chemins locaux d'images perturbée par d'éventuels paramètres d'URL (`?v=...`) ou variations entre l'arborescence Docker locale et celle de Hostinger Prod.
+        - Gestion d'erreur opaque côté frontend (`playlistform.js`), masquant le code HTTP et le message retourné par le serveur.
+    - **Correctifs Apportés (SOLID & Canopée)** :
+        - **Endpoint AJAX (`playlist_mosaic_ajax.php`)** :
+            - Introduction de la fonction `sendMosaicJsonResponse()` avec tamponnage de sortie propre (`ob_start()`, `ob_clean()`), en-tête `charset=utf-8` et compatibilité native avec PHPUnit.
+        - **Service Métier (`PlaylistFormService.php`)** :
+            - Création du résolveur robuste `resolveLocalFilePath(string $url): string` qui assainit l'URL (`parse_url`), élimine les query strings de cache-busting et teste les chemins racines multi-environnements.
+            - Sécurisation des dimensions GD dans `imagecopyresampled()` avec casting strict en `(int)` pour éliminer toute notice de perte de précision en PHP 8.2+.
+            - Sécurisation de `imagejpeg` avec vérification de persistance physique et levée d'une `RuntimeException` explicite en cas de restriction de droits d'écriture sur le répertoire `data/playlists`.
+            - Remplacement de l'appel direct `iconv` par un appel sécurisé avec vérification de retour dans `slugify()`.
+        - **Frontend JS (`playlistform.js`)** :
+            - Amélioration des callbacks `error:` pour `preview` et `apply` : journalisation `console.error` détaillée et extraction du message d'erreur contextualisé (`xhr.responseJSON?.error`, statuts 403, 404 ou texte serveur).
+    - **Tests & Validation** :
+        - Ajout du test unitaire `testPlaylistMosaicAjaxEndpointPreviewSuccess()` dans `tests/PlaylistFormAjaxAndUploadTest.php`.
+        - Validation de syntaxe JS sans erreur (`node -c src/public/js/playlistform.js`).
+        - **192 / 192 tests PHPUnit validés (100% Succès, 1004 assertions)**.
+        - **28 / 28 Smoke Tests & HTML Lint validés (100% Succès, 168 assertions)**.
+
 ### 📖 Résumé de la session (11 Novembre 2026 - Fin de Journée)
 - **🎨 US-084 — Mosaïques Multi-formats NxN & Harmonisation Chromatique pour Playlists (`playlist_form.php`)** :
     - **Demande PO & Spécification Agile** :

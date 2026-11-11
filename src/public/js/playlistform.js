@@ -192,12 +192,23 @@ $(document).ready(function () {
                     }
                 }
             },
-            error: function () {
+            error: function (xhr, status, error) {
                 $btn.prop('disabled', false).html(originalHtml);
+                console.error('Erreur AJAX Prévisualisation :', status, error, xhr.responseText);
+                var errMsg = 'Erreur technique lors de la communication serveur.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errMsg = xhr.responseJSON.error;
+                } else if (xhr.status === 403 || xhr.status === 401) {
+                    errMsg = 'Session expirée ou privilèges insuffisants.';
+                } else if (xhr.status === 404) {
+                    errMsg = 'Point de terminaison AJAX introuvable (404).';
+                } else if (xhr.responseText && xhr.responseText.length > 0 && xhr.responseText.length < 300) {
+                    errMsg += ' (' + xhr.responseText.replace(/<[^>]*>?/gm, '').trim() + ')';
+                }
                 if (typeof toastr !== 'undefined') {
-                    toastr.error('Erreur technique lors de la communication serveur.');
+                    toastr.error(errMsg);
                 } else {
-                    alert('Erreur technique lors de la génération.');
+                    alert(errMsg);
                 }
             }
         });
@@ -243,12 +254,23 @@ $(document).ready(function () {
                     }
                 }
             },
-            error: function () {
+            error: function (xhr, status, error) {
                 $btn.prop('disabled', false).html(originalHtml);
+                console.error('Erreur AJAX Validation :', status, error, xhr.responseText);
+                var errMsg = 'Erreur technique lors de la validation.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errMsg = xhr.responseJSON.error;
+                } else if (xhr.status === 403 || xhr.status === 401) {
+                    errMsg = 'Session expirée ou privilèges insuffisants.';
+                } else if (xhr.status === 404) {
+                    errMsg = 'Point de terminaison AJAX introuvable (404).';
+                } else if (xhr.responseText && xhr.responseText.length > 0 && xhr.responseText.length < 300) {
+                    errMsg += ' (' + xhr.responseText.replace(/<[^>]*>?/gm, '').trim() + ')';
+                }
                 if (typeof toastr !== 'undefined') {
-                    toastr.error('Erreur technique lors de la validation.');
+                    toastr.error(errMsg);
                 } else {
-                    alert('Erreur technique.');
+                    alert(errMsg);
                 }
             }
         });
