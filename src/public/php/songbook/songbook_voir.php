@@ -59,7 +59,7 @@ $imgTag = $imgUrl ? "<img src='$imgUrl' alt='$nom' class='img-responsive img-thu
 $lignes = LienDocSongbook::chercheLiensDocSongbook('idSongbook', $id, "ordre");
 $chansons = [];
 if ($lignes) {
-    while ($ligne = ($lignes->fetch_assoc() ?: $lignes->fetch_row())) {
+    while ($ligne = $lignes->fetch_assoc()) {
         $idDoc = (int)($ligne['idDocument'] ?? $ligne[1] ?? 0);
         if (!$idDoc) continue;
 
@@ -125,7 +125,7 @@ HTML;
 $docsPdf = Document::chercheDocumentsTableId("songbook", $id);
 $dernierPdf = null;
 if ($docsPdf) {
-    while ($doc = ($docsPdf->fetch_assoc() ?: $docsPdf->fetch_row())) {
+    while ($doc = $docsPdf->fetch_assoc()) {
         $nomDoc = $doc['nom'] ?? $doc[1] ?? '';
         if (strpos(strtolower($nomDoc), '.pdf') !== false) {
             $dernierPdf = $doc; 

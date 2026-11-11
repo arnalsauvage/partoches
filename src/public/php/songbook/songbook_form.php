@@ -189,7 +189,7 @@ if ($mode == "MAJ") {
 HTML;
     
     $docsRecueil = Document::chercheDocumentsTableId("songbook", $id);
-    while ($doc = ($docsRecueil->fetch_assoc() ?: $docsRecueil->fetch_row())) {
+    while ($doc = $docsRecueil->fetch_assoc()) {
         $html .= renderDocumentRow($doc, $id);
     }
     $html .= "</div>";
@@ -219,9 +219,9 @@ HTML;
     
     $liens = chercheLiensDocSongbook('idSongbook', $id, "ordre");
     $n = 0;
-    while ($lien = $liens->fetch_row()) {
+    while ($lien = $liens->fetch_assoc()) {
         $n++;
-        $docLien = chercheDocument($lien[1]);
+        $docLien = chercheDocument((int)($lien['idDocument'] ?? $lien[1]));
         if ($docLien) {
             $html .= renderSommaireRow($docLien, $id, $n);
         }

@@ -5,7 +5,7 @@ $debug = true;
 //echo "<br> En bdd : <br>;";
 $fichiersEnBdd = [];
 $resultat = chercheDocumentsTableId($_table_lien_url, $id);
-while ($fichierEnBdd = ($resultat->fetch_assoc() ?: $resultat->fetch_row())) {
+while ($fichierEnBdd = $resultat->fetch_assoc()) {
     $fichiersEnBdd[] = $fichierEnBdd;
 }
 $fichiersSurDisque = fichiersSongbook($id); // repertoire nom extension

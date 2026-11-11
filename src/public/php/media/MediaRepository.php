@@ -92,9 +92,10 @@ class MediaRepository
     public static function chercheMedia(int $id): ?Media
     {
         self::checkDbConnection();
-        $maRequete = sprintf("SELECT * FROM media WHERE id = %d", (int)$id);
+        $id = (int)$id;
+        $maRequete = "SELECT id, type, titre, image, auteur, lien, description, tags, datePub, hits FROM media WHERE id = $id";
         $result = $_SESSION[self::MYSQL]->query($maRequete);
-        if ($result && $ligne = $result->fetch_row()) {
+        if ($result && $ligne = $result->fetch_assoc()) {
             return self::mysqlRowVersObjet($ligne);
         }
         return null;
@@ -103,16 +104,16 @@ class MediaRepository
     private static function mysqlRowVersObjet(array $ligne): Media
     {
         return new Media([
-            'id'          => (int)$ligne[0],
-            'type'        => (string)$ligne[1],
-            'titre'       => (string)$ligne[2],
-            'image'       => (string)$ligne[3],
-            'auteur'      => (int)$ligne[4],
-            'lien'        => (string)$ligne[5],
-            'description' => (string)$ligne[6],
-            'tags'        => (string)$ligne[7],
-            'datePub'     => (string)$ligne[8],
-            'hits'        => (int)$ligne[9],
+            'id'          => (int)($ligne['id'] ?? $ligne[0] ?? 0),
+            'type'        => (string)($ligne['type'] ?? $ligne[1] ?? ''),
+            'titre'       => (string)($ligne['titre'] ?? $ligne[2] ?? ''),
+            'image'       => (string)($ligne['image'] ?? $ligne[3] ?? ''),
+            'auteur'      => (int)($ligne['auteur'] ?? $ligne[4] ?? 1),
+            'lien'        => (string)($ligne['lien'] ?? $ligne[5] ?? ''),
+            'description' => (string)($ligne['description'] ?? $ligne[6] ?? ''),
+            'tags'        => (string)($ligne['tags'] ?? $ligne[7] ?? ''),
+            'datePub'     => (string)($ligne['datePub'] ?? $ligne[8] ?? ''),
+            'hits'        => (int)($ligne['hits'] ?? $ligne[9] ?? 0),
         ]);
     }
 
@@ -125,8 +126,8 @@ class MediaRepository
         $result = $db->query($maRequete);
         $tableau = [];
         if ($result) {
-            while ($row = $result->fetch_row()) {
-                $tableau[] = (int)$row[0];
+            while ($row = $result->fetch_assoc()) {
+                $tableau[] = (int)($row['id'] ?? $row[0]);
             }
         }
         return $tableau;
@@ -167,8 +168,8 @@ class MediaRepository
         $result = $db->query($maRequete);
         $tableau = [];
         if ($result) {
-            while ($row = $result->fetch_row()) {
-                $tableau[] = (int)$row[0];
+            while ($row = $result->fetch_assoc()) {
+                $tableau[] = (int)($row['id'] ?? $row[0]);
             }
         }
         return $tableau;
@@ -180,10 +181,10 @@ class MediaRepository
         $db = $_SESSION[self::MYSQL];
         $where = self::buildWhereClause($filtres, $db);
         
-        $res = $db->query("SELECT COUNT(*) FROM media $where");
+        $res = $db->query("SELECT COUNT(*) AS total FROM media $where");
         if ($res) {
-            $row = $res->fetch_row();
-            return (int)$row[0];
+            $row = $res->fetch_assoc();
+            return (int)($row['total'] ?? $row[0] ?? 0);
         }
         return 0;
     }
@@ -209,8 +210,8 @@ class MediaRepository
         if (!empty($requete)) {
             try {
                 $result = $_SESSION[self::MYSQL]->query($requete);
-                if ($result && $row = $result->fetch_row()) {
-                    return (int)$row[0];
+                if ($result && $row = $result->fetch_assoc()) {
+                    return (int)($row['idTable'] ?? $row['idtable'] ?? $row[0] ?? 0);
                 }
             } catch (Throwable $e) {
                 return null;

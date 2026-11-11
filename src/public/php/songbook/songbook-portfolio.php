@@ -22,11 +22,11 @@ $html .= "  <h1 class='text-center' style='margin-bottom: 40px;'><i class='glyph
 $html .= "  <div class='portfolio-grid'>";
 
 if ($listeSongbooks) {
-    while ($songbook = $listeSongbooks->fetch_row()) {
+    while ($songbook = $listeSongbooks->fetch_assoc()) {
         // Songbook : [0]id [1]nom [2]description [3]date [4]image [5]hits [6]idUser
-        $idSb = $songbook[0];
-        $nomSb = htmlspecialchars($songbook[1]);
-        $dateSb = dateMysqlVersTexte($songbook[3]);
+        $idSb = (int)($songbook['id'] ?? $songbook[0]);
+        $nomSb = htmlspecialchars($songbook['nom'] ?? $songbook[1] ?? '');
+        $dateSb = dateMysqlVersTexte($songbook['date'] ?? $songbook[3] ?? '');
         $imageSb = imageSongbook($idSb);
         
         // Utilisation de la vignette moderne via Image.php
@@ -37,7 +37,7 @@ if ($listeSongbooks) {
         $pdfSb = "vide";
         $docsSb = chercheDocumentsTableId("songbook", $idSb);
         if ($docsSb) {
-            while ($doc = ($docsSb->fetch_assoc() ?: $docsSb->fetch_row())) {
+            while ($doc = $docsSb->fetch_assoc()) {
                 $nomDoc = $doc['nom'] ?? $doc[1] ?? '';
                 $versionDoc = (int)($doc['version'] ?? $doc[4] ?? 1);
                 if (strstr(strtolower($nomDoc), "pdf")) {
@@ -56,8 +56,8 @@ if ($listeSongbooks) {
         $trackListHtml = "";
         $liensChansons = LienDocSongbook::chercheLiensDocSongbook('idSongbook', $idSb, "ordre");
         if ($liensChansons) {
-            while ($lien = $liensChansons->fetch_row()) {
-                $docInfo = chercheDocument($lien[1]); // [6] est l'idChanson
+            while ($lien = $liensChansons->fetch_assoc()) {
+                $docInfo = chercheDocument((int)($lien['idDocument'] ?? $lien[1])); // [6] est l'idChanson
                 if (is_array($docInfo)) {
                     $idChanson = (int)($docInfo['idTable'] ?? $docInfo[6] ?? 0);
                     if (isset($titresChansons[$idChanson])) {

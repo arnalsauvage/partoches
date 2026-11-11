@@ -1,6 +1,26 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (11 Novembre 2026 - Soirée)
+- **⚡ US-085 — Sprint Technique « Clean Assoc BDD » — Lot 2 : Songbooks & Médias (`Songbook`, `MediaRepository`, `MediaService`, `songbook_form`, `songbook_voir`, `songbook-portfolio`, `songbook_corbeille`)** :
+    - **Contexte & Objectif** :
+        - Poursuite de l'éradication des index numériques (`fetch_row()`, `$row[0]..$row[9]`) et requêtes `SELECT *` sur le domaine des Songbooks et de la médiathèque.
+    - **Modifications Apportées** :
+        - **`MediaRepository.php`** :
+            - `chercheMedia()` : projection explicite `SELECT id, type, titre, image, auteur, lien, description, tags, datePub, hits FROM media`.
+            - `mysqlRowVersObjet()` : hydratation 100% associative `$ligne['id']`, `$ligne['titre']`, etc. avec repli défensif indexé.
+            - `chercheMediasParType()`, `chercheTousLesMedias()`, `getIdChansonAssocie()` : utilisation de `fetch_assoc()`, `SELECT COUNT(*) AS total`.
+        - **`MediaService.php`** :
+            - Migration intégrale des méthodes de batch (`chercheNdernieresPartoches`, `chercheNderniersAudios`, `chercheNdernieresVideos`, `chercheAutresDocuments`) sur `fetch_assoc()` et clés nommées (`id`, `nom`).
+        - **`Songbook.php`** :
+            - `chercheSongbooks()`, `chercheSongbook()`, `imageSongbook()` : projections SQL explicites de colonnes nommées, élimination de `fetch_row()` et `mysqli_fetch_row()`.
+            - `chercheSongbook()` : retour au format hybride associatif + indexé `array_merge(array_values($data), $data)`.
+            - `CreeSongBookPdf()` : requête nommée explicite avec alias déterministes (`doc_nom`, `chanson_nom`, `chanson_id`, `doc_version`) et parcours `fetch_assoc()`.
+        - **Vues & Formulaires Songbook (`songbook_form.php`, `songbook_voir.php`, `songbook-portfolio.php`, `songbook_corbeille.php`)** :
+            - Remplacement de tous les appels `fetch_row()` par `fetch_assoc()`.
+    - **Validation & Non-Régression** :
+        - 194 / 194 tests PHPUnit validés (100% Succès, 1020 assertions).
+        - 28 / 28 Smoke tests & HTML lint validés (100% Succès, 168 assertions).
+
 - **⚡ US-085 — Sprint Technique « Clean Assoc BDD » — Lot 1 : Liens & Playlists (`LienDocSongbook`, `LienStrumChanson`, `LienUrl`, `playlist`)** :
     - **Contexte & Objectif** :
         - Éradication de la dette technique liée aux accès SQL par index numériques (`fetch_row()`, `$row[0]`, `$row[1]`) et requêtes non déterministes `SELECT *` sur les tables de liaisons et de playlists.

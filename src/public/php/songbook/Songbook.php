@@ -98,7 +98,7 @@ class Songbook
      */
     public function chercheSongbook(int $id): bool
     {
-        $maRequete = sprintf("SELECT * FROM songbook WHERE id = '%s'", $id);
+        $maRequete = sprintf("SELECT id, nom, description, date, image, hits, idUser, type FROM songbook WHERE id = %d", (int)$id);
         $result = $_SESSION[self::MYSQL]->query($maRequete);
         if ($ligne = $result->fetch_assoc()) {
             $this->mysqlRowVersObjet($ligne);
@@ -243,11 +243,11 @@ class Songbook
         
         $where = count($conditions) > 0 ? "WHERE " . implode(" AND ", $conditions) : "";
         
-        $maRequete = "SELECT * FROM songbook $where ORDER BY $tri $order";
+        $maRequete = "SELECT id, nom, description, date, image, hits, idUser, type FROM songbook $where ORDER BY $tri $order";
         $result = $db->query($maRequete) or die($db->error);
         
         $liste = [];
-        while ($row = $result->fetch_row()) {
+        while ($row = $result->fetch_assoc()) {
             $sb = new Songbook();
             $sb->mysqlRowVersObjet($row);
             $liste[] = $sb;
@@ -276,10 +276,10 @@ class Songbook
     public static function imageSongbook($idSongbook): string
     {
         $db = $_SESSION['mysql'];
-        $maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
+        $maRequete = "SELECT id, nom, tailleKo, date, version, nomTable, idTable, idUser, hits FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
         $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg' OR document.nom LIKE '%.webp') LIMIT 1";
         $result = $db->query($maRequete);
-        if ($ligne = ($result->fetch_assoc() ?: $result->fetch_row())) {
+        if ($ligne = $result->fetch_assoc()) {
             $nom = $ligne['nom'] ?? $ligne[1] ?? '';
             $version = (int)($ligne['version'] ?? $ligne[4] ?? 1);
             return Document::composeNomVersion($nom, $version);
@@ -294,18 +294,28 @@ function chercheSongbooks($critere, $valeur, $critereTri = 'nom', $bTriAscendant
 {
     // On simule l'ancien retour (mysqli_result) pour ne pas tout casser d'un coup
     $order = $bTriAscendant ? "ASC" : "DESC";
-    $maRequete = "SELECT * FROM songbook WHERE $critere LIKE '$valeur' ORDER BY $critereTri $order";
+    $maRequete = "SELECT id, nom, description, date, image, hits, idUser, type FROM songbook WHERE $critere LIKE '$valeur' ORDER BY $critereTri $order";
     return $_SESSION['mysql']->query($maRequete);
 }
 
 function chercheSongbook($id): array
 {
     $sb = new Songbook((int)$id);
-    // On simule l'ancien retour (tableau indexé)
-    return [
-        $sb->getId(), $sb->getNom(), $sb->getDescription(), $sb->getDate(), 
-        $sb->getImage(), $sb->getHits(), $sb->getIdUser(), $sb->getType()
+    $data = [
+        'id'          => $sb->getId(),
+        'nom'         => $sb->getNom(),
+        'description' => $sb->getDescription(),
+        'date'        => $sb->getDate(),
+        'image'       => $sb->getImage(),
+        'hits'        => $sb->getHits(),
+        'idUser'      => $sb->getIdUser(),
+        'type'        => $sb->getType()
     ];
+
+    return array_merge(array_values($data), $data);
+
+
+
 }
 
 function chercheSongbookParLeNom($nom): array
@@ -313,8 +323,8 @@ function chercheSongbookParLeNom($nom): array
     $db = $_SESSION['mysql'];
     $nomEsc = $db->real_escape_string($nom);
     $result = $db->query("SELECT id FROM songbook WHERE nom = '$nomEsc'");
-    if ($row = $result->fetch_row()) {
-        return chercheSongbook($row[0]);
+    if ($row = $result->fetch_assoc()) {
+        return chercheSongbook((int)($row['id'] ?? $row[0]));
     }
     return [];
 }
@@ -373,10 +383,10 @@ function dupliqueSongbook($idSongbook): bool
 function imageSongbook($idSongbook): string
 {
     $db = $_SESSION['mysql'];
-    $maRequete = "SELECT * FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
+    $maRequete = "SELECT id, nom, tailleKo, date, version, nomTable, idTable, idUser, hits FROM document WHERE document.idTable = '$idSongbook' AND document.nomTable='songbook' ";
     $maRequete .= " AND ( document.nom LIKE '%.png' OR document.nom LIKE '%.jpg') LIMIT 1";
     $result = $db->query($maRequete);
-    if ($ligne = ($result->fetch_assoc() ?: $result->fetch_row())) {
+    if ($ligne = $result->fetch_assoc()) {
         $nom = $ligne['nom'] ?? $ligne[1] ?? '';
         $version = (int)($ligne['version'] ?? $ligne[4] ?? 1);
         return composeNomVersion($nom, $version);
@@ -409,17 +419,17 @@ function CreeSongBookPdf($idSongbook): array
     $db = $_SESSION['mysql'];
     $listeNomsChanson = []; $listeNomsFichier = []; $listeIdChanson = []; $listeVersionsDoc = [];
 
-    $maRequete = "SELECT document.nom, chanson.nom as t, chanson.id, document.version 
+    $maRequete = "SELECT document.nom AS doc_nom, chanson.nom AS chanson_nom, chanson.id AS chanson_id, document.version AS doc_version 
                   FROM document 
                   LEFT JOIN liendocsongbook ON liendocsongbook.idDocument = document.id 
                   LEFT JOIN chanson ON document.idTable = chanson.id
                   WHERE liendocsongbook.idSongbook = '$idSongbook' ORDER BY liendocsongbook.ordre ASC";
     $result = $db->query($maRequete);
-    while ($ligne = mysqli_fetch_row($result)) {
-        $listeNomsFichier[] = $ligne[0];
-        $listeNomsChanson[] = $ligne[1];
-        $listeIdChanson[] = $ligne[2];
-        $listeVersionsDoc[] = $ligne[3];
+    while ($ligne = $result->fetch_assoc()) {
+        $listeNomsFichier[] = $ligne['doc_nom'];
+        $listeNomsChanson[] = $ligne['chanson_nom'];
+        $listeIdChanson[] = (int)$ligne['chanson_id'];
+        $listeVersionsDoc[] = (int)$ligne['doc_version'];
     }
     
     $sb = new Songbook((int)$idSongbook);

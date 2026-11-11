@@ -39,8 +39,8 @@ class MediaService
         $maRequete = "SELECT id FROM document WHERE nomTable = 'chanson' AND nom LIKE '%.pdf' ORDER BY date DESC LIMIT $limit";
         $result = $db->query($maRequete);
         if ($result) {
-            while ($row = $result->fetch_row()) {
-                self::ajouteDocument((int)$row[0], "partoche");
+            while ($row = $result->fetch_assoc()) {
+                self::ajouteDocument((int)($row['id'] ?? $row[0]), "partoche");
             }
         }
     }
@@ -51,14 +51,14 @@ class MediaService
         $maRequete = "SELECT id FROM document WHERE nomTable='chanson' AND (nom LIKE '%.mp3' OR nom LIKE '%.m4a' OR nom LIKE '%.aac') ORDER BY date DESC LIMIT $limit";
         $result = $db->query($maRequete);
         if ($result) {
-            while ($row = $result->fetch_row()) {
-                self::ajouteDocument((int)$row[0], "audio");
+            while ($row = $result->fetch_assoc()) {
+                self::ajouteDocument((int)($row['id'] ?? $row[0]), "audio");
             }
         }
         $nderniersLiens = LienUrl::chercheNderniersLiens("Audio");
         if ($nderniersLiens) {
-            while ($liensUrl = $nderniersLiens->fetch_row()) {
-                self::ajouteLienurl((int)$liensUrl[0]);
+            while ($liensUrl = $nderniersLiens->fetch_assoc()) {
+                self::ajouteLienurl((int)($liensUrl['id'] ?? $liensUrl[0]));
             }
         }
     }
@@ -68,15 +68,15 @@ class MediaService
         $db = $_SESSION[self::MYSQL];
         $nderniersLiens = LienUrl::chercheNderniersLiens("vid%"); 
         if ($nderniersLiens) {
-            while ($liensUrl = $nderniersLiens->fetch_row()) {
-                self::ajouteLienurl((int)$liensUrl[0]);
+            while ($liensUrl = $nderniersLiens->fetch_assoc()) {
+                self::ajouteLienurl((int)($liensUrl['id'] ?? $liensUrl[0]));
             }
         }
         $maRequete = "SELECT id FROM document WHERE nomTable='chanson' AND nom LIKE '%.mp4' ORDER BY date DESC LIMIT $limit";
         $result = $db->query($maRequete);
         if ($result) {
-            while ($row = $result->fetch_row()) {
-                self::ajouteDocument((int)$row[0], "vidéo");
+            while ($row = $result->fetch_assoc()) {
+                self::ajouteDocument((int)($row['id'] ?? $row[0]), "vidéo");
             }
         }
     }
@@ -91,15 +91,15 @@ class MediaService
                       ORDER BY date DESC LIMIT $limit";
         $result = $db->query($maRequete);
         if ($result) {
-            while ($row = $result->fetch_row()) {
-                $ext = strtolower(pathinfo($row[1], PATHINFO_EXTENSION));
+            while ($row = $result->fetch_assoc()) {
+                $ext = strtolower(pathinfo($row['nom'] ?? $row[1], PATHINFO_EXTENSION));
                 $type = match($ext) {
                     'mscz' => 'musescore',
                     'crd'  => 'songpress',
                     'ppt', 'pptx', 'doc', 'docx', 'svg' => 'document',
                     default => 'fichier'
                 };
-                self::ajouteDocument((int)$row[0], $type);
+                self::ajouteDocument((int)($row['id'] ?? $row[0]), $type);
             }
         }
     }
