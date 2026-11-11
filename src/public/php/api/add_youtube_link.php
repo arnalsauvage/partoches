@@ -15,7 +15,7 @@ require_once dirname(__DIR__) . "/lib/utilssi.php";
 require_once dirname(__DIR__) . "/liens/LienUrl.php";
 require_once dirname(__DIR__) . "/chanson/Chanson.php";
 
-// Définition de la clé API secrète (configurable via params.ini si présent, sinon fallback sécurisé)
+// Définition de la clé API secrète
 $expectedToken = "canopee-tutos-secret-key-2026";
 if (isset($conf) && is_array($conf) && !empty($conf['api']['secret_token'])) {
     $expectedToken = $conf['api']['secret_token'];
@@ -40,9 +40,22 @@ try {
         exit;
     }
 
+    // Action spéciale : Normalisation de tous les anciens 'video' vers 'Vidéo'
+    if (isset($data['action']) && $data['action'] === 'normalize_types') {
+        $sql = "UPDATE lienurl SET type = 'Vidéo' WHERE LOWER(type) = 'video'";
+        $_SESSION['mysql']->query($sql);
+        $affected = $_SESSION['mysql']->affected_rows;
+        echo json_encode([
+            'success' => true,
+            'message' => "Normalisation terminée : $affected ligne(s) mise(s) à jour vers 'Vidéo'."
+        ]);
+        exit;
+    }
+
     $idChanson = isset($data['idChanson']) ? (int)$data['idChanson'] : (isset($data['id']) ? (int)$data['id'] : 0);
     $url = trim($data['url'] ?? '');
-    $description = trim($data['description'] ?? 'Tuto stage ukulele');
+    $description = trim($data['description'] ?? '');
+    $type = !empty($data['type']) ? trim($data['type']) : 'Vidéo';
 
     if ($idChanson <= 0 || empty($url)) {
         http_response_code(400);
@@ -67,20 +80,27 @@ try {
     // Vérifier si le lien existe déjà
     $existant = LienUrl::chercheLienurlUrlTableId($url, 'chanson', $idChanson);
     if ($existant != NULL) {
+        // Mise à jour du type et de la description existants
+        $idLien = is_array($existant) ? ($existant['id'] ?? $existant[0]) : 0;
+        if ($idLien > 0) {
+            LienUrl::modifieLienurl($idLien, $url, $type, $description, 'chanson', $idChanson, date('d/m/Y'), 1, 0);
+        }
         echo json_encode([
             'success' => true,
-            'message' => 'Le lien existe déjà pour cette chanson.',
+            'message' => 'Lien déjà présent : type et description actualisés avec succès.',
             'idChanson' => $idChanson,
             'url' => $url,
-            'deja_present' => true
+            'type' => $type,
+            'description' => $description,
+            'mis_a_jour' => true
         ]);
         exit;
     }
 
-    // Créer le lien
+    // Créer le lien avec le type 'Vidéo' (V majuscule et accent)
     $res = LienUrl::creeLienurl(
         $url,
-        'video',
+        $type,
         $description,
         'chanson',
         $idChanson,
@@ -92,10 +112,12 @@ try {
     if ($res) {
         echo json_encode([
             'success' => true,
-            'message' => 'Lien YouTube associé avec succès.',
+            'message' => 'Lien Vidéo associé avec succès.',
             'idChanson' => $idChanson,
             'titreChanson' => $chanson->getNom(),
-            'url' => $url
+            'url' => $url,
+            'type' => $type,
+            'description' => $description
         ]);
     } else {
         http_response_code(500);
