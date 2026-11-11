@@ -26,19 +26,20 @@ $(document).ready(function () {
         }
     });
 
-    // --- 3. GESTION DU VISUEL & MOSAÏQUE (US-084: NxN & Harmonisation Chromatique) ---
+    // --- 3. GESTION DU VISUEL & MOSAÏQUE (US-084: NxN, Harmonisation Chromatique & Aperçu Avant Validation) ---
     var selectedCovers = [];
     var maxCovers = 4;
+    var currentPreviewFile = null;
 
     function updateGenerateButtonState() {
         var n = Math.round(Math.sqrt(maxCovers));
         if (selectedCovers.length > 0) {
             $('#btnGenerateMosaic').prop('disabled', false).html(
-                '<i class="glyphicon glyphicon-th-large"></i> Générer la mosaïque ' + n + '×' + n + ' (' + selectedCovers.length + ' / ' + maxCovers + ')'
+                '<i class="glyphicon glyphicon-eye-open"></i> Prévisualiser la mosaïque ' + n + '×' + n + ' (' + selectedCovers.length + ' / ' + maxCovers + ')'
             );
         } else {
             $('#btnGenerateMosaic').prop('disabled', true).html(
-                '<i class="glyphicon glyphicon-th-large"></i> Générer la pochette de playlist avec ces images'
+                '<i class="glyphicon glyphicon-eye-open"></i> Prévisualiser la mosaïque avec ces images'
             );
         }
     }
@@ -145,7 +146,7 @@ $(document).ready(function () {
         }
     });
 
-    // Génération AJAX immédiate de la mosaïque avec aperçu en temps réel
+    // 1. Génération de l'Aperçu (sans écraser la couverture actuelle ni altérer la BDD)
     $('#btnGenerateMosaic').on('click', function () {
         if (selectedCovers.length === 0) {
             if (typeof toastr !== 'undefined') {
@@ -156,7 +157,7 @@ $(document).ready(function () {
 
         var $btn = $(this);
         var originalHtml = $btn.html();
-        $btn.prop('disabled', true).html('<i class="glyphicon glyphicon-refresh spin"></i> Génération en cours...');
+        $btn.prop('disabled', true).html('<i class="glyphicon glyphicon-refresh spin"></i> Génération de l'aperçu...');
 
         var playlistId = parseInt($('#playlist_id').val() || '0', 10);
         var playlistNom = $('#fnom').val() || 'Playlist';
@@ -167,6 +168,7 @@ $(document).ready(function () {
             type: 'POST',
             dataType: 'json',
             data: {
+                action: 'preview',
                 id: playlistId,
                 nom: playlistNom,
                 covers: selectedCovers,
@@ -176,11 +178,11 @@ $(document).ready(function () {
             success: function (res) {
                 $btn.prop('disabled', false).html(originalHtml);
                 if (res.success) {
-                    $('#fimage').val(res.fileName);
-                    $('#playlist-current-cover-img').attr('src', res.imageUrl).removeClass('playlist-dynamic-hidden').show();
-                    $('#playlist-cover-placeholder-box').addClass('playlist-dynamic-hidden').hide();
+                    currentPreviewFile = res.fileName;
+                    $('#playlist-preview-img').attr('src', res.imageUrl);
+                    $('#playlist-preview-box').removeClass('playlist-dynamic-hidden').hide().slideDown();
                     if (typeof toastr !== 'undefined') {
-                        toastr.success(res.message || 'Pochette générée avec succès !');
+                        toastr.info(res.message || 'Aperçu généré ! Validez-le si vous êtes satisfait.');
                     }
                 } else {
                     if (typeof toastr !== 'undefined') {
@@ -199,6 +201,77 @@ $(document).ready(function () {
                 }
             }
         });
+    });
+
+    // 2. Validation explicite de l'aperçu (officialisation en BDD & mise à jour illustration)
+    $('#btnValidateMosaic').on('click', function () {
+        if (!currentPreviewFile) return;
+
+        var $btn = $(this);
+        var originalHtml = $btn.html();
+        $btn.prop('disabled', true).html('<i class="glyphicon glyphicon-refresh spin"></i> Enregistrement...');
+
+        var playlistId = parseInt($('#playlist_id').val() || '0', 10);
+        var playlistNom = $('#fnom').val() || 'Playlist';
+
+        $.ajax({
+            url: 'playlist_mosaic_ajax.php',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                action: 'apply',
+                preview_file: currentPreviewFile,
+                id: playlistId,
+                nom: playlistNom
+            },
+            success: function (res) {
+                $btn.prop('disabled', false).html(originalHtml);
+                if (res.success) {
+                    $('#fimage').val(res.fileName);
+                    $('#playlist-current-cover-img').attr('src', res.imageUrl).removeClass('playlist-dynamic-hidden').show();
+                    $('#playlist-cover-placeholder-box').addClass('playlist-dynamic-hidden').hide();
+                    $('#playlist-preview-box').slideUp();
+                    currentPreviewFile = null;
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(res.message || 'Pochette validée et enregistrée avec succès !');
+                    }
+                } else {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(res.error || 'Erreur lors de la validation.');
+                    } else {
+                        alert(res.error || 'Erreur.');
+                    }
+                }
+            },
+            error: function () {
+                $btn.prop('disabled', false).html(originalHtml);
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Erreur technique lors de la validation.');
+                } else {
+                    alert('Erreur technique.');
+                }
+            }
+        });
+    });
+
+    // 3. Rejet / Annulation de l'aperçu
+    $('#btnCancelPreview').on('click', function () {
+        if (currentPreviewFile) {
+            $.ajax({
+                url: 'playlist_mosaic_ajax.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    action: 'cancel',
+                    preview_file: currentPreviewFile
+                }
+            });
+            currentPreviewFile = null;
+        }
+        $('#playlist-preview-box').slideUp();
+        if (typeof toastr !== 'undefined') {
+            toastr.info('Aperçu rejeté. L'illustration précédente est conservée.');
+        }
     });
 
     // --- 4. RECHERCHE AUTOCOMPLÉTÉE PRÉDICTIVE (US-083) ---

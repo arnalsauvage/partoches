@@ -91,6 +91,23 @@
                             <div class="mt-10">
                                 <button type="button" id="btnClearMosaic" class="btn btn-xs btn-danger">Effacer (Mosaïque Auto)</button>
                             </div>
+
+                            <!-- Encart d'Aperçu de la Mosaïque (Avant Validation) -->
+                            <div id="playlist-preview-box" class="playlist-preview-box playlist-dynamic-hidden mt-15">
+                                <h5 class="playlist-section-subtitle text-warning">
+                                    <i class="glyphicon glyphicon-eye-open"></i> Nouvel Aperçu
+                                </h5>
+                                <img src="" alt="Aperçu de la mosaïque" id="playlist-preview-img" class="img-responsive img-thumbnail playlist-preview-img">
+                                <p class="small text-muted mt-5">Aperçu temporaire non enregistré.</p>
+                                <div class="mt-10">
+                                    <button type="button" id="btnValidateMosaic" class="btn btn-sm btn-success btn-block mb-5">
+                                        <i class="glyphicon glyphicon-ok"></i> Valider cette pochette
+                                    </button>
+                                    <button type="button" id="btnCancelPreview" class="btn btn-xs btn-default btn-block">
+                                        <i class="glyphicon glyphicon-remove"></i> Rejeter l'aperçu
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-9">
                             <div class="form-group">
@@ -150,7 +167,7 @@
 
                             <div class="mt-10">
                                 <button type="button" id="btnGenerateMosaic" class="btn btn-sm btn-generate-mosaic" disabled>
-                                    <i class="glyphicon glyphicon-th-large"></i> Générer la pochette de playlist avec ces images
+                                    <i class="glyphicon glyphicon-eye-open"></i> Prévisualiser la mosaïque avec ces images
                                 </button>
                             </div>
                         </div>

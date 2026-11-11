@@ -17,6 +17,11 @@
             - Calcul dynamique de la grille, découpage en tuiles carrées, redimensionnement et recadrage centré (crop) via GD.
             - Canevas haute définition : $400 \times 400\text{ px}$ pour $2 \times 2$, et $600 \times 600\text{ px}$ pour $3 \times 3$, $4 \times 4$ et $5 \times 5$.
             - Nommage horodaté unique (`slug_idPlaylist_timestamp.jpg`) évitant tout effet de cache HTTP.
+        - **Workflow Prévisualisation & Validation Découplée (`PlaylistFormService.php`, `playlist_mosaic_ajax.php`)** :
+            - `action: preview` : génère un fichier temporaire préfixé (`preview_slug_id_time.jpg`) sans écraser la BDD ni la pochette en ligne.
+            - `action: apply` : convertit et officialise l'aperçu (`applyMosaicPreview`), met à jour la colonne `playlist.image` en BDD et purge les fichiers temporaires.
+            - `action: cancel` : supprime l'aperçu temporaire et rétablit l'état antérieur.
+            - Enregistrement formulaire principal : prise en charge automatique si l'utilisateur valide le formulaire complet avec un aperçu ouvert.
         - **Contrôleur AJAX (`playlist_mosaic_ajax.php`)** :
             - Prise en charge des paramètres `grid_size` (4, 9, 16, 25) et `color_order`.
             - Sécurisation `PRIVILEGE_EDITEUR` et mise à jour immédiate en BDD.

@@ -65,6 +65,11 @@ if ($mode == "MAJ" && $id) {
         // On récupère les covers contextuelles
         $covers = PlaylistFormService::getPlaylistContextualCovers($id, 4);
         $fimage = PlaylistFormService::generateMosaic($covers, $fnom, $id);
+    } elseif (str_starts_with($fimage, 'preview_')) {
+        $applied = PlaylistFormService::applyMosaicPreview($fimage, $fnom, $id);
+        if ($applied) {
+            $fimage = $applied;
+        }
     } elseif (str_contains($fimage, ',')) {
         // Sélection multiple par l'utilisateur (URLs séparées par des virgules)
         $selectedCovers = array_filter(explode(',', $fimage));

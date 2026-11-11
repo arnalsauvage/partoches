@@ -17,10 +17,50 @@ if (($_SESSION['privilege'] ?? 0) < ($GLOBALS["PRIVILEGE_EDITEUR"] ?? 2)) {
     return;
 }
 
+$action = trim($_POST['action'] ?? 'preview'); // 'preview', 'apply', 'cancel'
 $idPlaylist = (int)($_POST['id'] ?? 0);
 $playlistNom = trim($_POST['nom'] ?? 'Playlist');
-$coversRaw = $_POST['covers'] ?? [];
 
+// 1. ACTION : ANNULER L'APERÇU
+if ($action === 'cancel') {
+    $previewFile = trim($_POST['preview_file'] ?? '');
+    if (!empty($previewFile)) {
+        PlaylistFormService::cancelMosaicPreview($previewFile);
+    }
+    echo json_encode(['success' => true, 'message' => 'Aperçu annulé.']);
+    if (!defined('PHPUNIT_RUNNING')) exit();
+    return;
+}
+
+// 2. ACTION : VALIDER L'APERÇU (ENREGISTREMENT DÉFINITIF)
+if ($action === 'apply') {
+    $previewFile = trim($_POST['preview_file'] ?? '');
+    if (empty($previewFile)) {
+        echo json_encode(['success' => false, 'error' => 'Aucun aperçu à valider.']);
+        if (!defined('PHPUNIT_RUNNING')) exit();
+        return;
+    }
+
+    $finalFile = PlaylistFormService::applyMosaicPreview($previewFile, $playlistNom, $idPlaylist);
+    if (!$finalFile) {
+        echo json_encode(['success' => false, 'error' => "Impossible d'appliquer l'aperçu (fichier introuvable)."]);
+        if (!defined('PHPUNIT_RUNNING')) exit();
+        return;
+    }
+
+    echo json_encode([
+        'success' => true,
+        'isApplied' => true,
+        'fileName' => $finalFile,
+        'imageUrl' => '/data/playlists/' . $finalFile . '?v=' . time(),
+        'message' => 'Pochette validée et enregistrée avec succès !'
+    ]);
+    if (!defined('PHPUNIT_RUNNING')) exit();
+    return;
+}
+
+// 3. ACTION : PRÉVISUALISATION (PAR DÉFAUT)
+$coversRaw = $_POST['covers'] ?? [];
 $covers = [];
 if (is_array($coversRaw)) {
     $covers = array_filter($coversRaw);
@@ -40,31 +80,19 @@ if (!in_array($colorOrder, ['manual', 'rainbow', 'brightness', 'warm_cold'])) {
     $colorOrder = 'manual';
 }
 
-// Limiter selon la taille de grille demandée (max 25)
 $maxSlots = ($gridSize > 0) ? min(25, max(1, $gridSize)) : 25;
 $covers = array_slice($covers, 0, $maxSlots);
 
 try {
-    $fileName = PlaylistFormService::generateMosaic($covers, $playlistNom, $idPlaylist, $gridSize, $colorOrder);
-    
-    // Si la playlist existe déjà en BDD, mise à jour immédiate de la colonne image
-    if ($idPlaylist > 0) {
-        $db = $_SESSION['mysql'] ?? ($GLOBALS['mysqli'] ?? null);
-        if ($db) {
-            $stmt = $db->prepare("UPDATE playlist SET image = ? WHERE id = ?");
-            if ($stmt) {
-                $stmt->bind_param("si", $fileName, $idPlaylist);
-                $stmt->execute();
-                $stmt->close();
-            }
-        }
-    }
+    // Génère un fichier temporaire avec préfixe preview_ sans impacter la BDD
+    $fileName = PlaylistFormService::generateMosaic($covers, $playlistNom, $idPlaylist, $gridSize, $colorOrder, true);
 
     echo json_encode([
         'success' => true,
+        'isPreview' => true,
         'fileName' => $fileName,
         'imageUrl' => '/data/playlists/' . $fileName . '?v=' . time(),
-        'message' => 'Pochette générée avec succès !'
+        'message' => 'Aperçu généré ! Vous pouvez valider ou tester un autre agencement.'
     ]);
 } catch (\Throwable $e) {
     echo json_encode(['success' => false, 'error' => 'Erreur lors de la génération : ' . $e->getMessage()]);

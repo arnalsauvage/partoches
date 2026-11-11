@@ -324,4 +324,41 @@ class PlaylistFormAjaxAndUploadTest extends TestCase
         }
         @rmdir($chansonDir);
     }
+
+    public function testMosaicPreviewAndApplyWorkflow(): void
+    {
+        $chansonDir = dirname(__DIR__) . '/src/public/data/chansons/' . $this->testSongId;
+        if (!is_dir($chansonDir)) {
+            mkdir($chansonDir, 0755, true);
+        }
+
+        $img = imagecreatetruecolor(50, 50);
+        $path = $chansonDir . "/tile_test_preview.png";
+        imagepng($img, $path);
+        imagedestroy($img);
+        $covers = ["/data/chansons/{$this->testSongId}/tile_test_preview.png"];
+
+        // 1. Génération de l'aperçu (action: preview)
+        $previewFile = PlaylistFormService::generateMosaic($covers, 'Preview Playlist', 777, 4, 'manual', true);
+        $this->assertStringStartsWith('preview_preview-playlist_777_', $previewFile);
+
+        $playlistsDir = dirname(__DIR__) . '/src/public/data/playlists';
+        $previewFullPath = $playlistsDir . '/' . $previewFile;
+        $this->assertFileExists($previewFullPath);
+
+        // 2. Validation / officialisation de l'aperçu (action: apply)
+        $finalFile = PlaylistFormService::applyMosaicPreview($previewFile, 'Preview Playlist', 777);
+        $this->assertNotNull($finalFile);
+        $this->assertStringStartsWith('preview-playlist_777_', $finalFile);
+        $this->assertFalse(str_starts_with($finalFile, 'preview_preview-playlist'), "Le fichier définitif ne doit plus avoir le préfixe preview_");
+
+        $finalFullPath = $playlistsDir . '/' . $finalFile;
+        $this->assertFileExists($finalFullPath);
+        $this->assertFileDoesNotExist($previewFullPath, "L'aperçu temporaire doit avoir été déplacé ou supprimé.");
+
+        // Nettoyage
+        @unlink($finalFullPath);
+        @unlink($path);
+        @rmdir($chansonDir);
+    }
 }

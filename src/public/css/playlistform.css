@@ -346,3 +346,25 @@
 }
 
 .ml-10 { margin-left: 10px; }
+
+/* Encart Aperçu Mosaïque */
+.playlist-preview-box {
+    background-color: #fff;
+    border: 2px dashed var(--c-accent);
+    border-radius: 8px;
+    padding: 10px;
+    animation: fadeIn 0.3s ease;
+}
+
+.playlist-preview-img {
+    border: 2px solid var(--c-accent);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.mt-5 { margin-top: 5px; }
+.mb-5 { margin-bottom: 5px; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

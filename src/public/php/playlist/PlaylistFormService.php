@@ -235,20 +235,25 @@ class PlaylistFormService
         string $playlistName, 
         int $playlistId = 0, 
         int $gridSize = 0, 
-        string $colorOrder = 'manual'
+        string $colorOrder = 'manual',
+        bool $isPreview = false
     ): string
     {
         $slug = self::slugify($playlistName);
         $uniqueSuffix = ($playlistId > 0) ? $playlistId . '_' . time() : 'mosaic_' . time();
-        $fileName = $slug . '_' . $uniqueSuffix . ".jpg";
+        $prefix = $isPreview ? 'preview_' : '';
+        $fileName = $prefix . $slug . '_' . $uniqueSuffix . ".jpg";
         $playlistsDir = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/playlists' : dirname(__DIR__, 2) . "/data/playlists";
         if (!is_dir($playlistsDir)) {
             @mkdir($playlistsDir, 0775, true);
         }
 
-        // Nettoyage des anciennes mosaïques de cette playlist
+        // Nettoyage des anciens fichiers (mosaïques définitives ou previews antérieures)
         if ($playlistId > 0) {
-            $oldFiles = glob($playlistsDir . '/' . $slug . '_' . $playlistId . '_*.jpg');
+            $pattern = $isPreview 
+                ? $playlistsDir . '/preview_' . $slug . '_' . $playlistId . '_*.jpg'
+                : $playlistsDir . '/' . $slug . '_' . $playlistId . '_*.jpg';
+            $oldFiles = glob($pattern);
             if (!empty($oldFiles)) {
                 foreach ($oldFiles as $oldFile) {
                     @unlink($oldFile);
@@ -477,6 +482,75 @@ class PlaylistFormService
                 
                 imagecopyresampled($mosaic, $img, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $minDim, $minDim);
                 imagedestroy($img);
+            }
+        }
+    }
+
+/**
+     * Valide et officialise un aperçu de mosaïque en illustration définitive de playlist.
+     */
+    public static function applyMosaicPreview(string $previewFileName, string $playlistName, int $playlistId = 0): ?string
+    {
+        $playlistsDir = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/playlists' : dirname(__DIR__, 2) . "/data/playlists";
+        $previewPath = $playlistsDir . '/' . basename($previewFileName);
+
+        if (!file_exists($previewPath)) {
+            return null;
+        }
+
+        $slug = self::slugify($playlistName);
+        $uniqueSuffix = ($playlistId > 0) ? $playlistId . '_' . time() : 'mosaic_' . time();
+        $finalFileName = $slug . '_' . $uniqueSuffix . ".jpg";
+        $finalPath = $playlistsDir . '/' . $finalFileName;
+
+        if (!@rename($previewPath, $finalPath)) {
+            copy($previewPath, $finalPath);
+            @unlink($previewPath);
+        }
+
+        // Nettoyage des anciennes mosaïques et previews
+        if ($playlistId > 0) {
+            $oldFiles = glob($playlistsDir . '/' . $slug . '_' . $playlistId . '_*.jpg');
+            if (!empty($oldFiles)) {
+                foreach ($oldFiles as $oldFile) {
+                    if ($oldFile !== $finalPath) {
+                        @unlink($oldFile);
+                    }
+                }
+            }
+            $oldPreviews = glob($playlistsDir . '/preview_' . $slug . '_' . $playlistId . '_*.jpg');
+            if (!empty($oldPreviews)) {
+                foreach ($oldPreviews as $oldFile) {
+                    @unlink($oldFile);
+                }
+            }
+
+            // Mise à jour immédiate en BDD si ID existant
+            $db = $_SESSION['mysql'] ?? ($GLOBALS['mysqli'] ?? null);
+            if ($db) {
+                $stmt = $db->prepare("UPDATE playlist SET image = ? WHERE id = ?");
+                if ($stmt) {
+                    $stmt->bind_param("si", $finalFileName, $playlistId);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+            }
+        }
+
+        return $finalFileName;
+    }
+
+    /**
+     * Supprime un aperçu temporaire de mosaïque.
+     */
+    public static function cancelMosaicPreview(string $previewFileName): void
+    {
+        $base = basename($previewFileName);
+        if (str_starts_with($base, 'preview_')) {
+            $playlistsDir = defined('PUBLIC_DATA_DIR') ? PUBLIC_DATA_DIR . '/playlists' : dirname(__DIR__, 2) . "/data/playlists";
+            $previewPath = $playlistsDir . '/' . $base;
+            if (file_exists($previewPath)) {
+                @unlink($previewPath);
             }
         }
     }
