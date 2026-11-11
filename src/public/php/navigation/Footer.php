@@ -34,8 +34,10 @@ class Footer
         $maRequete = "SELECT valeur FROM parametres WHERE nom='" . $this->_cle . "' LIMIT 1";
         $result = $db->query($maRequete);
 
-        if ($result && ($ligne = $result->fetch_row())) {
-            $this->_html = $ligne[0] ?? '';
+        if ($result && ($ligne = $result->fetch_assoc())) {
+            $this->_html = $ligne['valeur'] ?? $ligne[0] ?? '';
+
+
         } else {
             $this->_html = "";
         }
@@ -52,9 +54,9 @@ class Footer
         $valeur = $db->real_escape_string($this->_html);
 
         // Vérifie si la clé existe déjà
-        $check = "SELECT COUNT(*) FROM parametres WHERE nom='" . $this->_cle . "'";
+        $check = "SELECT COUNT(*) AS total FROM parametres WHERE nom='" . $this->_cle . "'";
         $res = $db->query($check);
-        $exists = ($res && ($row = $res->fetch_row()) && $row[0] > 0);
+        $exists = ($res && ($row = $res->fetch_assoc()) && (int)($row['total'] ?? $row[0] ?? 0) > 0);
 
         if ($exists) {
             $maRequete = "UPDATE parametres SET valeur='$valeur' WHERE nom='" . $this->_cle . "'";

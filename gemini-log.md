@@ -1,6 +1,33 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
 ### 📖 Résumé de la session (11 Novembre 2026 - Soirée)
+- **⚡ US-085 — Sprint Technique « Clean Assoc BDD » — Lot 4 : Utilisateurs, Administration & Socle Technique (`Utilisateur`, `AdminService`, `BackupService`, `DataAuditService`, `Footer`, `compteur`, `configMysql`, `html`, `mysql`, `utilisateurBand_form`)** :
+    - **Contexte & Objectif** :
+        - Éradication définitive des derniers `fetch_row()`, `$row[0]`, `$row[1]` et requêtes `SELECT *` sur l'ensemble de l'infrastructure, l'administration, l'authentification et les helpers partagés.
+        - **Bilan US-085** : ZERO `fetch_row()` restant dans l'intégralité du code source applicatif PHP de Partoches (`src/public/php/`).
+    - **Modifications Apportées** :
+        - **`Utilisateur.php`** :
+            - `chercheUtilisateurParEmail()`, `chercheUtilisateurs()`, `chercheUtilisateur()`, `chercheUtilisateurParLeLogin()` : projection SQL explicite des 14 colonnes de la table `utilisateur`.
+            - `chercheUtilisateur()` & `chercheUtilisateurParLeLogin()` : retour hybride associatif + indexé (`array_merge(array_values($ligne), $ligne)`) pour compatibilité ascendante totale.
+            - `activeCompteParToken()` : mise à jour et retour propre en tableau associatif.
+            - `portraitDesUtilisateurs()` : hydratation double associative et indexée `$tableau[$uId]['login']` et `[0]`.
+            - `selectUtilisateur()` : passage à `fetch_assoc()` et exploitation des clés nommées (`login`, `prenom`, `nom`).
+            - `getNombreChansons()` : calcul avec `SELECT COUNT(*) AS total` et `fetch_assoc()`.
+        - **`AdminService.php`** :
+            - `getMigrationsStatus()` : lecture de version avec `$row['version'] ?? $row[0]`.
+            - `checkOrphanDirectories()` : récupération des IDs de chansons existantes via `fetch_assoc()`.
+        - **`BackupService.php` & `DataAuditService.php`** :
+            - Remplacement de tous les `fetch_row()` par `fetch_assoc()` (`SHOW TABLES`, `SHOW CREATE TABLE`, comptages, vérification des dossiers orphelins).
+        - **Socle & Utilitaires (`Footer.php`, `compteur.php`, `configMysql.php`, `html.php`, `mysql.php`, `utilisateurBand_form.php`)** :
+            - `Footer.php` : lecture et vérification d'existence en `fetch_assoc()`.
+            - `compteur.php` : incrémentation de hits avec `$row['hits']`.
+            - `mysql.php` : `chargeLibelles()` et `augmenteHits()` 100% associatifs.
+            - `html.php` : `champSelect()` migré sur `fetch_assoc()`.
+            - `utilisateurBand_form.php` : calculs de scores de groupe et sélection de membres en `fetch_assoc()`.
+    - **Validation & Non-Régression** :
+        - 194 / 194 tests PHPUnit validés (100% Succès, 1020 assertions).
+        - 28 / 28 Smoke tests & HTML lint validés (100% Succès, 168 assertions).
+
 - **⚡ US-085 — Sprint Technique « Clean Assoc BDD » — Lot 3 : Catalogue & Chansons (`Chanson`, `ChansonRepository`, `ChansonService`, `ChansonFormRenderer`, `chanson_post`, `chanson_voir_view`, `Strum`, `UtilisateurNote`)** :
     - **Contexte & Objectif** :
         - Éradication intégrale des index numériques (`fetch_row()`, `$row[0]`, `$row[1]`) et normalisation des requêtes `SELECT` sur le coeur de métier du catalogue des chansons, rythmiques et notations.

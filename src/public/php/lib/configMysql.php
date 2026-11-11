@@ -103,8 +103,10 @@ if (!isset($configMysql)) {
       UNIQUE KEY `login` (`login`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
 
-    $res_users = $mysqli->query("SELECT COUNT(*) FROM utilisateur");
-    if ($res_users && (int)$res_users->fetch_row()[0] === 0) {
+    $res_users = $mysqli->query("SELECT COUNT(*) AS total FROM utilisateur");
+    if ($res_users && (int)($res_users->fetch_assoc()['total'] ?? 0) === 0) {
+
+
         $mysqli->query("INSERT INTO utilisateur (id, login, mdp, prenom, nom, image, site, email, signature, dateDernierLogin, nbreLogins, privilege) VALUES (1, 'invite', '', 'Invité', 'Visiteur', 'utilisateur/defaut.png', '', 'invite@canopee.fr', '', NOW(), 0, 0)");
     }
 

@@ -74,7 +74,7 @@ class AdminService
         $played = [];
         if ($checkTable->num_rows > 0) {
             $res = $this->db->query("SELECT version FROM migrations");
-            while ($row = $res->fetch_row()) $played[] = $row[0];
+            while ($row = $res->fetch_assoc()) $played[] = $row['version'] ?? $row[0];
         }
 
         $migrationDir = $this->getMigrationDir();
@@ -243,7 +243,7 @@ class AdminService
         // 1. Liste des IDs existants
         $idsExistants = [];
         $res = $db->query("SELECT id FROM chanson");
-        while ($row = $res->fetch_row()) $idsExistants[] = (int)$row[0];
+        while ($row = $res->fetch_assoc()) $idsExistants[] = (int)($row['id'] ?? $row[0]);
 
         // 2. Scan du dossier data/chansons
         $count = 0;

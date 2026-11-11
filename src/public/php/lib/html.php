@@ -76,10 +76,11 @@ if (!isset($FichierHtml)) {
     {
         $champSelect = "<select name=$nom size=\"1\">";
         $choix = 0;
-        while ($ligne = $liste->fetch_row()) {
+        while ($ligne = $liste->fetch_assoc()) {
             $choix++;
             $selected = ($numero == $choix) ? "selected " : "";
-            $champSelect .= "<option $selected value=$choix>" . $ligne[1] . "</option>";
+            $val = $ligne['nom'] ?? $ligne[1] ?? reset($ligne);
+            $champSelect .= "<option $selected value=$choix>" . $val . "</option>";
         }
         return $champSelect . "</select>";
     }

@@ -89,8 +89,12 @@ function chargeLibelles($table, $libelle)
     $marequete = "select id, $libelle  from $table order by $libelle";
     $resultat = $_SESSION ['mysql']->query($marequete);
 
-    while ($ligne = $resultat->fetch_row()) {
-        $listeLibelles[$ligne[0]] = $ligne[1];
+    while ($ligne = $resultat->fetch_assoc()) {
+        $k = $ligne['id'] ?? $ligne[0];
+        $v = $ligne[$libelle] ?? $ligne[1] ?? '';
+        $listeLibelles[$k] = $v;
+
+
     }
 //	$_SESSION ['mysql']->free_result($resultat);
     return ($listeLibelles);
@@ -120,8 +124,10 @@ function augmenteHits($nomTable, $id)
 {
     $marequete = "select id, hits from $nomTable where id = '$id'";
     $result = $_SESSION ['mysql']->query($marequete) or die ("Problème augmenteHits #1 : table $nomTable, id : $id " . $_SESSION ['mysql']->error);
-    if ($ligne = $result->fetch_row()) {
-        $nbHits = $ligne[1] + 1;
+    if ($ligne = $result->fetch_assoc()) {
+        $nbHits = (int)($ligne['hits'] ?? $ligne[1] ?? 0) + 1;
+
+
         $marequete = "UPDATE $nomTable SET hits = '$nbHits' where id = '$id'";
         $_SESSION ['mysql']->query($marequete) or die ("Problème augmenteHits #2 : table $nomTable, id : $id " . $_SESSION ['mysql']->error);
     }

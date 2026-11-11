@@ -21,7 +21,7 @@ if ($_SESSION ['privilege'] >= $GLOBALS["PRIVILEGE_MEMBRE"]) {
         $affichage .= "Pour le groupe composé par : <br> <ul>";
         foreach ($_POST['utilisateurs'] as $valeur) {
             $utilisateur = chercheUtilisateur($valeur);
-            $affichage .= "<li>" . $utilisateur[1] . "</li>";
+            $affichage .= "<li>" . ($utilisateur['login'] ?? $utilisateur[1]) . "</li>";
         }
         $affichage .= "</ul> <br> Un bon choix de morceaux serait : <br>";
         $marequete = "select chanson.id , chanson.nom , SUM(noteUtilisateur.note) as score from chanson, noteUtilisateur
@@ -35,13 +35,14 @@ if ($_SESSION ['privilege'] >= $GLOBALS["PRIVILEGE_MEMBRE"]) {
             die ("Problème utilisateursBand #2 : " . $_SESSION ['mysql']->error);
         }
         $_compteur = 1;
-        while ($ligne = $resultat->fetch_row()) {
-            if (round($ligne[2] / $nombreMembres, 2) < 3) {
+        while ($ligne = $resultat->fetch_assoc()) {
+            $score = (float)($ligne['score'] ?? $ligne[2]);
+            if (round($score / $nombreMembres, 2) < 3) {
                 break;
             }
             $affichage .= $_compteur++ . " - ";
-            $affichage .= $ligne[1] . " ";
-            $affichage .= round($ligne[2] / $nombreMembres, 1) . "<br>";
+            $affichage .= ($ligne['nom'] ?? $ligne[1]) . " ";
+            $affichage .= round($score / $nombreMembres, 1) . "<br>";
         }
         $affichage .= "<a href=''>Retour</a>";
     }
@@ -65,17 +66,21 @@ order by votes DESC";
 // Affichage de la liste de selection des utilisateurs
     $affichage .= "<form action=\"utilisateurBand_form.php\" method=\"post\" enctype=\"multipart/form-data\">";
     $numligne = 0;
-    while ($ligne = $resultat->fetch_row()) {
+    while ($ligne = $resultat->fetch_assoc()) {
         $numligne++;
+        $uId = (int)($ligne['id'] ?? $ligne[0]);
+        $uPrenom = $ligne['prenom'] ?? $ligne[1] ?? '';
+        $uNom = $ligne['nom'] ?? $ligne[2] ?? '';
+        $uVotes = $ligne['votes'] ?? $ligne[3] ?? 0;
         $affichage .= "
         <div>
-        <input type='checkbox' style = 'width: 20px;' id='" . $ligne[0] . "' value='" . $ligne[0] . "' ' name='utilisateurs[]'";
-        if (isset($_POST['utilisateurs']) && in_array($ligne[0], $_POST['utilisateurs'])) {
+        <input type='checkbox' style = 'width: 20px;' id='$uId' value='$uId' name='utilisateurs[]'";
+        if (isset($_POST['utilisateurs']) && in_array($uId, $_POST['utilisateurs'])) {
             $affichage .= " checked ";
         }
         $affichage .= ">
-        <label  style = 'width: 240px;' for='" . $ligne[0] . "'>";
-        $affichage .= $ligne [1] . " " . $ligne [2] . " " . $ligne [3] . " votes"; // nom prenom
+        <label  style = 'width: 240px;' for='$uId'>";
+        $affichage .= "$uPrenom $uNom $uVotes votes";
         $affichage .= "</label></div><br>\n";
     }
     $affichage .= " <input type=\"submit\" value=\"Envoyer\" /></form> <br>";

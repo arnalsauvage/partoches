@@ -75,12 +75,12 @@ class Utilisateur
     {
         if ($this->_nbChansons === -1) {
             $db = $_SESSION['mysql'];
-            $maRequete = "SELECT COUNT(*) FROM chanson WHERE idUser = ?";
+            $maRequete = "SELECT COUNT(*) AS total FROM chanson WHERE idUser = ?";
             $stmt = $db->prepare($maRequete);
             $stmt->bind_param("i", $this->_id);
             $stmt->execute();
             $res = $stmt->get_result();
-            $this->_nbChansons = ($res) ? (int)$res->fetch_row()[0] : 0;
+            $this->_nbChansons = ($res && $r = $res->fetch_assoc()) ? (int)($r['total'] ?? 0) : 0;
         }
         return $this->_nbChansons;
     }
@@ -128,9 +128,13 @@ class Utilisateur
     {
         $db = $_SESSION ['mysql'];
         $email = $db->real_escape_string($email);
-        $maRequete = "SELECT * FROM utilisateur WHERE email LIKE '$email'";
+        $maRequete = "SELECT id, login, mdp, prenom, nom, image, site, email, signature, dateDernierLogin, nbreLogins, privilege, token_activation, est_actif FROM utilisateur WHERE email LIKE '$email'";
         $result = $db->query($maRequete) or die ("Problème chercheUtilisateurParEmail #1 : " . $db->error);
-        return $result->fetch_row();
+        if ($ligne = $result->fetch_assoc()) {
+            return array_merge(array_values($ligne), $ligne);
+        }
+        return null;
+
     }
 
     /**
@@ -141,7 +145,7 @@ class Utilisateur
         $db = $_SESSION ['mysql'];
         $critere = $db->real_escape_string($critere);
         $valeur = $db->real_escape_string($valeur);
-        $maRequete = "SELECT * FROM utilisateur WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
+        $maRequete = "SELECT id, login, mdp, prenom, nom, image, site, email, signature, dateDernierLogin, nbreLogins, privilege, token_activation, est_actif FROM utilisateur WHERE $critere LIKE '$valeur' ORDER BY $critereTri";
         $maRequete .= $bTriAscendant ? " ASC" : " DESC";
         $result = $db->query($maRequete) or die ("Problème chercheUtilisateurs #1 : " . $db->error . $maRequete);
         return $result;
@@ -155,13 +159,17 @@ class Utilisateur
         if (!$id) return 0;
         $db = $_SESSION ['mysql'];
         $id = (int)$id;
-        $maRequete = "SELECT * FROM utilisateur WHERE utilisateur.id = '$id'";
+        $maRequete = "SELECT id, login, mdp, prenom, nom, image, site, email, signature, dateDernierLogin, nbreLogins, privilege, token_activation, est_actif FROM utilisateur WHERE id = '$id'";
         try {
             $result = $db->query($maRequete);
             if (!$result) {
                 return 0;
             }
-            return $result->fetch_row() ?: 0;
+            if ($ligne = $result->fetch_assoc()) {
+                return array_merge(array_values($ligne), $ligne);
+            }
+            return 0;
+
         } catch (Throwable $e) {
             return 0;
         }
@@ -174,12 +182,16 @@ class Utilisateur
     {
         $db = $_SESSION ['mysql'];
         $login = $db->real_escape_string($login);
-        $maRequete = "SELECT * FROM utilisateur WHERE utilisateur.login = '$login'";
+        $maRequete = "SELECT id, login, mdp, prenom, nom, image, site, email, signature, dateDernierLogin, nbreLogins, privilege, token_activation, est_actif FROM utilisateur WHERE login = '$login'";
         $result = $db->query($maRequete);
         if (!$result) {
             die ("Problème chercheutilisateurParLeNom #1 : " . $db->error);
         }
-        return $result->fetch_row() ?: 0;
+        if ($ligne = $result->fetch_assoc()) {
+            return array_merge(array_values($ligne), $ligne);
+        }
+        return 0;
+
     }
 
     /**
@@ -237,14 +249,18 @@ class Utilisateur
         $db = $_SESSION['mysql'];
         $tokenEscaped = $db->real_escape_string($token);
         
-        $sql = "SELECT * FROM utilisateur WHERE token_activation = '$tokenEscaped' AND est_actif = 0 LIMIT 1";
+        $sql = "SELECT id, login, mdp, prenom, nom, image, site, email, signature, dateDernierLogin, nbreLogins, privilege, token_activation, est_actif FROM utilisateur WHERE token_activation = '$tokenEscaped' AND est_actif = 0 LIMIT 1";
         $res = $db->query($sql);
-        if ($res && $row = $res->fetch_row()) {
-            $userId = (int)$row[0];
+        if ($res && $ligne = $res->fetch_assoc()) {
+            $userId = (int)($ligne['id'] ?? $ligne[0]);
             $updateSql = "UPDATE utilisateur SET privilege = 1, est_actif = 1, token_activation = NULL WHERE id = $userId";
             $db->query($updateSql);
-            $row[11] = 1; // Privilège Membre
-            return $row;
+            $ligne['privilege'] = 1;
+            $ligne['est_actif'] = 1;
+            $ligne['token_activation'] = null;
+            return array_merge(array_values($ligne), $ligne);
+
+
         }
         return false;
     }
@@ -330,9 +346,15 @@ class Utilisateur
         $maRequete = "SELECT id, login, image FROM utilisateur";
         $result = $db->query($maRequete) or die ("Problème portraitDesUtilisateurs#1 : " . $db->error);
         $tableau = [];
-        while ($ligne = $result->fetch_row()) {
-            $tableau[$ligne[0]][0] = $ligne[1];
-            $tableau[$ligne[0]][1] = $ligne[2];
+        while ($ligne = $result->fetch_assoc()) {
+            $uId = (int)$ligne['id'];
+            $tableau[$uId][0] = $ligne['login'];
+            $tableau[$uId][1] = $ligne['image'];
+            $tableau[$uId]['login'] = $ligne['login'];
+            $tableau[$uId]['image'] = $ligne['image'];
+
+
+
         }
         return $tableau;
     }
@@ -344,9 +366,16 @@ class Utilisateur
     {
         $retour = "<select class='js-example-basic-single' name='$nomDuChamp' id='$idDuChamp'>\n";
         $lignes = self::chercheUtilisateurs($critere, $valeur, $critereTri, $bTriAscendant);
-        while ($ligne = $lignes->fetch_row()) {
-            $selected = ($ligne[0] == $idSelectionne) ? " selected" : "";
-            $retour .= "<option value='" . $ligne[0] . "'$selected>" . htmlentities($ligne[1] . " - " . $ligne[3] . " " . $ligne[4]) . "</option>\n";
+        while ($ligne = $lignes->fetch_assoc()) {
+            $uId = (int)($ligne['id'] ?? $ligne[0]);
+            $selected = ($uId == $idSelectionne) ? " selected" : "";
+            $login = $ligne['login'] ?? $ligne[1] ?? '';
+            $prenom = $ligne['prenom'] ?? $ligne[3] ?? '';
+            $nom = $ligne['nom'] ?? $ligne[4] ?? '';
+            $retour .= "<option value='" . $uId . "'$selected>" . htmlentities($login . " - " . $prenom . " " . $nom) . "</option>\n";
+
+
+
         }
         $retour .= "</select>\n";
         return $retour;

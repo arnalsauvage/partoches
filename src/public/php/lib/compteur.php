@@ -13,9 +13,12 @@ if (!isset ($FichierCompteur)) {
         }
         $resultat = $_SESSION ['mysql']->query($maRequete) or die ("Problème ajouteHits #1 : " . $_SESSION ['mysql']->error);
         // renvoie la lisgne sélectionnée : id, nom, taille, date, version, nomTable, idTable, idUser
-        $resultat = $resultat->fetch_row();
-        if ($resultat) {
-            $nombreHits = $resultat[0];
+        $row = $resultat->fetch_assoc();
+        if ($row) {
+            $nombreHits = (int)($row['hits'] ?? $row[0] ?? 0);
+
+
+
             if ($DEBUG_COMPTEUR) {
                 echo " Nombre de hits : $nombreHits <BR>";
             }

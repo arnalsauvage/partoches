@@ -348,9 +348,10 @@ class DataAuditService
             $existingIds = [];
             $res = $this->db->query("SELECT `{$config['pk']}` FROM `{$config['table']}`");
             if ($res) {
-                while ($row = $res->fetch_row()) {
-                    $existingIds[(int)$row[0]] = true;
+                while ($row = $res->fetch_assoc()) {
+                    $existingIds[(int)($row[$config['pk']] ?? reset($row))] = true;
                 }
+
             }
 
             // Scanner le répertoire

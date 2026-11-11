@@ -39,8 +39,10 @@ class BackupService
         $tablesResult = $this->db->query("SHOW TABLES");
         if (!$tablesResult) return $sql;
 
-        while ($tableRow = $tablesResult->fetch_row()) {
-            $tableName = $tableRow[0];
+        while ($tableRow = $tablesResult->fetch_assoc()) {
+            $tableName = (string)reset($tableRow);
+
+
 
             // 1. Structure de la table
             $sql .= "-- -----------------------------------------------------\n";
@@ -49,8 +51,10 @@ class BackupService
             $sql .= "DROP TABLE IF EXISTS `$tableName`;\n";
 
             $createResult = $this->db->query("SHOW CREATE TABLE `$tableName`");
-            if ($createResult && $createRow = $createResult->fetch_row()) {
-                $sql .= $createRow[1] . ";\n\n";
+            if ($createResult && ($createRow = $createResult->fetch_assoc())) {
+                $sql .= ($createRow['Create Table'] ?? $createRow[1] ?? '') . ";\n\n";
+
+
             }
 
             // 2. Données de la table
@@ -197,10 +201,11 @@ class BackupService
 
     private function countTable(string $table): int
     {
-        $res = $this->db->query("SELECT COUNT(*) FROM `$table`");
-        if ($res && $row = $res->fetch_row()) {
-            return (int)$row[0];
+        $res = $this->db->query("SELECT COUNT(*) AS total FROM `$table`");
+        if ($res && ($row = $res->fetch_assoc())) {
+            return (int)($row['total'] ?? $row[0] ?? 0);
         }
+
         return 0;
     }
 }
