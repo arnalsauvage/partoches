@@ -458,3 +458,50 @@ body {
     margin: 0;
     cursor: pointer;
 }
+
+/* --- VIGNETTES PLAYLISTS & SONGBOOKS (CHANSON VOIR) --- */
+.playlist-thumb {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    text-decoration: none !important;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.playlist-thumb:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--c-marron-clair, #D2B48C);
+}
+
+.playlist-img-voir {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.playlist-thumb-placeholder {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--c-beige, #F5F5DC);
+    color: var(--c-accent, #8B4513);
+    font-size: 32px;
+    border-radius: 4px;
+}
+
+.playlist-caption-title {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--c-marron-fonce, #2b1d1a);
+    margin-top: 4px;
+}

@@ -1,5 +1,20 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (13 Novembre 2026 - Soirée)
+- **⚡ US-087 — Affichage des playlists associées sur la page chanson (`chanson_voir`)** :
+    - **Contexte & Objectif** :
+        - Permettre aux visiteurs consultant une chanson (`chanson_voir.php`) de voir toutes les playlists dans lesquelles cette chanson est citée (`lienchansonplaylist`).
+        - Affichage clair de la vignette de la playlist (mosaïque, téléversement ou fallback visuel Canopée), du titre, avec lien direct au clic sur la vignette vers `playlist_voir.php?id={id}`.
+    - **Modifications Apportées** :
+        - **`ChansonRepository.php`** : Ajout de la méthode `getPlaylists(int $idChanson): ?mysqli_result` effectuant la jointure préparée `playlist` <-> `lienchansonplaylist`.
+        - **`ChansonService.php`** : Intégration des `$playlists` dans le jeu de données `$viewData` et ajout du helper `getPlaylistThumbnailUrl(array $pl): string` avec support des chemins relatifs web, mosaïques et fallbacks.
+        - **`chanson_voir_view.phtml`** : Ajout de la section « Playlists associées » sous forme de grille responsive de vignettes avec titre tronqué et lien vers `playlist_voir.php`.
+        - **`styles-communs.css`** : Classes Design System `.playlist-thumb`, `.playlist-img-voir`, `.playlist-thumb-placeholder`, `.playlist-caption-title` (0 style inline).
+        - **`tests/ChansonTest.php`** : Test unitaire `testChansonPlaylists()` validant la récupération des playlists d'une chanson, la résolution des URLs d'images et le nettoyage BDD.
+    - **Conformité & Standards** :
+        - Zéro attribut `style="..."` introduit (conformité Constitution).
+        - Requêtes préparées PDO / MySQLi.
+
 ### 📖 Résumé de la session (13 Novembre 2026 - Fin d'après-midi)
 - **⚡ US-086 — Formulaire modal de duplication sélective d'une chanson (Réservé Admin)** :
     - **Contexte & Objectif** :

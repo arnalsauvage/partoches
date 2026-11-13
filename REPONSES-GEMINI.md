@@ -1,5 +1,32 @@
 # 🤠 Réponses & Actions — Django
 
+## Session du 13 Novembre 2026 — US-087 : Affichage des playlists associées sur la page chanson (`chanson_voir`)
+
+### 🎯 Demande
+Sur la page d'une chanson (`chanson_voir.php`), afficher les playlists dans lesquelles cette chanson est citée : vignette de la playlist, titre, et clic sur la vignette menant vers la playlist.
+
+### 🛠️ Actions réalisées
+1. **Couche Persistance (`ChansonRepository.php`)** :
+   - Ajout de `ChansonRepository::getPlaylists(int $idChanson): ?mysqli_result`.
+   - Requête préparée joignant `playlist` et `lienchansonplaylist` pour récupérer les playlists contenant le morceau.
+
+2. **Couche Service (`ChansonService.php`)** :
+   - Injection de la liste des playlists associées dans le tableau `$viewData`.
+   - Ajout du helper `ChansonService::getPlaylistThumbnailUrl(array $pl): string` pour résoudre l'URL de la vignette (mosaïques `mosaic_*.jpg`, images téléversées, fallbacks BDD ou placeholder).
+
+3. **Couche Vue (`chanson_voir_view.phtml`)** :
+   - Ajout d'une section « Playlists associées » en grille responsive (2 à 6 colonnes selon écran).
+   - Vignette cliquable avec effet de survol Canopée, titre tronqué et redirection directe vers `playlist_voir.php?id={id}`.
+   - Placeholder visuel harmonisé avec icône de liste musicale si aucune image n'est configurée pour la playlist.
+   - Masquage automatique de la section si le morceau n'est cité dans aucune playlist.
+
+4. **Design System Canopée (`styles-communs.css`)** :
+   - Classes CSS dédiées : `.playlist-thumb`, `.playlist-img-voir`, `.playlist-thumb-placeholder`, `.playlist-caption-title`.
+   - Zéro attribut `style="..."` (conformité Constitution).
+
+5. **Tests Unitaires (`tests/ChansonTest.php`)** :
+   - Ajout de `testChansonPlaylists()` validant la détection des playlists, la résolution de vignettes et le nettoyage complet.
+
 ## Session du 13 Novembre 2026 — US-086 : Formulaire modal de duplication sélective d'une chanson
 
 ### 🎯 Demande

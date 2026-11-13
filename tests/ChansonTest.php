@@ -245,4 +245,71 @@ class ChansonTest extends TestCase
         $db->query("DELETE FROM lienstrumchanson WHERE idChanson = $sourceId OR idChanson = $newIdDefaut OR idChanson = $newIdSelectif");
         $db->query("DELETE FROM document WHERE nomTable = 'chanson' AND (idTable = $sourceId OR idTable = $newIdDefaut OR idTable = $newIdSelectif)");
     }
+
+    public function testChansonPlaylists()
+    {
+        $db = $_SESSION['mysql'];
+
+        // 1. Création d'une chanson test
+        $c = new Chanson();
+        $c->setNom("Chanson Playlist Test " . time());
+        $c->setInterprete("Artiste Playlist Test");
+        $c->setAnnee(2021);
+        $c->setIdUser(1);
+        $c->setTempo(120);
+        $c->setMesure("4/4");
+        $c->setPulsation("binaire");
+        $c->setTonalite("C");
+        $c->setPublication(1);
+        $songId = $c->save();
+        $this->assertGreaterThan(0, $songId);
+
+        // 2. Vérification que la chanson n'est dans aucune playlist au départ
+        require_once __DIR__ . "/../src/public/php/chanson/ChansonRepository.php";
+        $resVide = ChansonRepository::getPlaylists($songId);
+        $this->assertNotNull($resVide);
+        $this->assertEquals(0, $resVide->num_rows, "La chanson ne doit appartenir à aucune playlist initialement");
+
+        // 3. Création d'une playlist de test et association
+        require_once __DIR__ . "/../src/public/php/playlist/playlist.php";
+        require_once __DIR__ . "/../src/public/php/liens/lienChansonPlaylist.php";
+
+        $nomPl = "Playlist Test " . time();
+        $imgPl = "mosaic_test.jpg";
+        $db->query("INSERT INTO playlist (nom, description, date_creation, image, hits, id_utilisateur, type, criteres) 
+                    VALUES ('$nomPl', 'Description test', NOW(), '$imgPl', 5, 1, 0, '')");
+        $playlistId = (int)$db->insert_id;
+        $this->assertGreaterThan(0, $playlistId);
+
+        // Association chanson <-> playlist
+        creelienChansonPlaylist($songId, $playlistId);
+
+        // 4. Vérification que ChansonRepository::getPlaylists retrouve la playlist
+        $resPl = ChansonRepository::getPlaylists($songId);
+        $this->assertNotNull($resPl);
+        $this->assertEquals(1, $resPl->num_rows, "La chanson doit appartenir à 1 playlist");
+        $rowPl = $resPl->fetch_assoc();
+        $this->assertEquals($playlistId, (int)$rowPl['id']);
+        $this->assertEquals($nomPl, $rowPl['nom']);
+        $this->assertEquals($imgPl, $rowPl['image']);
+
+        // 5. Vérification du helper ChansonService::getPlaylistThumbnailUrl
+        require_once __DIR__ . "/../src/public/php/chanson/ChansonService.php";
+        $thumbUrl = ChansonService::getPlaylistThumbnailUrl($rowPl);
+        $this->assertStringContainsString("mosaic_test.jpg", $thumbUrl);
+        $this->assertStringStartsWith("../../data/playlists/", $thumbUrl);
+
+        // Test avec URL absolue ou externe
+        $thumbExt = ChansonService::getPlaylistThumbnailUrl(['id' => $playlistId, 'image' => 'https://example.com/cover.jpg']);
+        $this->assertEquals('https://example.com/cover.jpg', $thumbExt);
+
+        // Test avec image vide (placeholder attendu "")
+        $thumbEmpty = ChansonService::getPlaylistThumbnailUrl(['id' => 999999, 'image' => '']);
+        $this->assertEquals('', $thumbEmpty);
+
+        // 6. Nettoyage
+        $db->query("DELETE FROM lienchansonplaylist WHERE id_chanson = $songId OR id_playlist = $playlistId");
+        $db->query("DELETE FROM playlist WHERE id = $playlistId");
+        $c->supprimeChansonBddFile();
+    }
 }

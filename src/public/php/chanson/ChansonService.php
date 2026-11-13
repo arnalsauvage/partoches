@@ -58,6 +58,9 @@ class ChansonService
         // 5. Songbooks
         $songbooks = ChansonRepository::getSongbooks($id);
 
+        // 6. Playlists associées
+        $playlists = ChansonRepository::getPlaylists($id);
+
         return [
             'chanson' => $chanson,
             'id' => $id,
@@ -70,8 +73,39 @@ class ChansonService
             'strums' => $strums,
             'liens' => $liens,
             'songbooks' => $songbooks,
+            'playlists' => $playlists,
             'tempoInfo' => self::getTempoInfo($chanson->getTempo())
         ];
+    }
+
+    /**
+     * Résout l'URL relative de la vignette d'une playlist (mosaïque, upload ou fallback).
+     */
+    public static function getPlaylistThumbnailUrl(array $pl): string
+    {
+        $imagePochette = $pl['image'] ?? '';
+        $idPlaylist = (int)($pl['id'] ?? 0);
+
+        if (empty($imagePochette)) {
+            require_once dirname(__DIR__) . "/playlist/playlist.php";
+            $legacyImage = imagePlaylist($idPlaylist);
+            if (!empty($legacyImage)) {
+                $imagePochette = "data/playlists/" . $idPlaylist . "/" . $legacyImage;
+            }
+        }
+
+        if (!empty($imagePochette)) {
+            if (str_starts_with($imagePochette, 'http')) {
+                return $imagePochette;
+            }
+            $cleanPath = ltrim($imagePochette, '/');
+            if (!str_starts_with($cleanPath, 'data/')) {
+                $cleanPath = 'data/playlists/' . $cleanPath;
+            }
+            return '../../' . $cleanPath;
+        }
+
+        return "";
     }
 
     public static function getTempoInfo(int $bpm): array 

@@ -24,6 +24,7 @@ dans "Sommaire des morceaux" , si je clique sur la croix pour supprimer un morce
         </li>
 
 ## 🟡 Sprint en cours
+- [x] **US-087 — Affichage des playlists associées sur la page chanson (chanson_voir)** (Affichage responsive des playlists citant la chanson avec vignette, titre, lien direct vers la playlist et placeholder Canopée si pas d'image, zéro style inline).
 - [x] **US-086 — Duplication interactive d'une chanson en vue liste (Admin)** (Modale AJAX de duplication sélective : titre personnalisable, conservation des infos générales, sélection des documents/fichiers, des rythmiques et des liens/vidéos avec cases à cocher décochées par défaut et boutons tout cocher/décocher, soumission sécurisée et redirection formulaire avec toastr de succès).
 - [ ] **#08 — Intégration du Design System Canopée** (Migration progressive de toutes les pages vers les nouveaux composants CSS).
 

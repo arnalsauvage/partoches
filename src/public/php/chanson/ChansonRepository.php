@@ -192,6 +192,26 @@ class ChansonRepository
     }
 
     /**
+     * Récupère les playlists dans lesquelles une chanson est citée (lienchansonplaylist).
+     */
+    public static function getPlaylists(int $idChanson): ?mysqli_result
+    {
+        $db = $_SESSION['mysql'];
+        $sql = "SELECT DISTINCT p.id, p.nom, p.image, p.date_creation, p.hits, p.description
+                FROM playlist p
+                INNER JOIN lienchansonplaylist lcp ON p.id = lcp.id_playlist
+                WHERE lcp.id_chanson = ?
+                ORDER BY p.nom ASC";
+        $stmt = $db->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param("i", $idChanson);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
+    /**
      * Liste les fichiers physiques présents dans le dossier d'une chanson.
      */
     public static function getPhysicalFiles(int $idChanson, string $baseDir): array
