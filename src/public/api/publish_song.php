@@ -16,9 +16,9 @@ header('Content-Type: application/json; charset=utf-8');
 $SECRET_API_TOKEN = 'canopee_secret_2026';
 
 // 1. Vérification méthode HTTP
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
-    echo json_encode(['success' => false, 'error' => 'Méthode non autorisée. POST requis.']);
+    echo json_encode(['success' => false, 'error' => 'Méthode non autorisée. GET ou POST requis.']);
     exit;
 }
 
@@ -33,6 +33,80 @@ if (preg_match('/Bearer\s+(\S+)/i', $authHeader, $matches)) {
 if ($token !== $SECRET_API_TOKEN) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Authentification invalide ou manquante.']);
+    exit;
+}
+
+// 3. Gestion des requêtes GET (Recherche de visuel / Informations chanson)
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $action = $_GET['action'] ?? 'get_cover';
+    $title = trim($_GET['title'] ?? '');
+    $artist = trim($_GET['artist'] ?? '');
+
+    if (empty($title)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Titre obligatoire pour la recherche.']);
+        exit;
+    }
+
+    require_once __DIR__ . '/../php/lib/configMysql.php';
+    require_once __DIR__ . '/../php/lib/utilssi.php';
+    if (file_exists(__DIR__ . '/../php/lib/html.php')) {
+        require_once __DIR__ . '/../php/lib/html.php';
+    }
+    require_once __DIR__ . '/../php/chanson/Chanson.php';
+    require_once __DIR__ . '/../php/document/Document.php';
+
+    global $mysqli;
+    if (!$mysqli && isset($_SESSION['mysql'])) {
+        $mysqli = $_SESSION['mysql'];
+    }
+
+    if (!$mysqli) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Connexion MySQL indisponible.']);
+        exit;
+    }
+
+    $_SESSION = $_SESSION ?? [];
+    $_SESSION['mysql'] = $mysqli;
+    $_SESSION['id'] = 1;
+
+    $titleEsc = $mysqli->real_escape_string($title);
+    $artEsc = $mysqli->real_escape_string($artist);
+
+    // 1. Recherche exacte puis floue
+    $sql = "SELECT id, nom, interprete, tonalite FROM chanson WHERE nom = '$titleEsc' LIMIT 1";
+    $res = $mysqli->query($sql);
+    if (!$res || $res->num_rows === 0) {
+        $sql = "SELECT id, nom, interprete, tonalite FROM chanson WHERE nom LIKE '%$titleEsc%' OR '$titleEsc' LIKE CONCAT('%', nom, '%') ORDER BY id DESC LIMIT 1";
+        $res = $mysqli->query($sql);
+    }
+
+    if ($res && $row = $res->fetch_assoc()) {
+        $songId = (int)$row['id'];
+        $image = Document::imageTableId('chanson', $songId);
+        $coverUrl = null;
+        if (!empty($image)) {
+            $coverUrl = "https://partoches.canopee-musique.fr/data/chansons/" . $songId . "/" . $image;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'found' => true,
+            'song_id' => $songId,
+            'title' => $row['nom'],
+            'artist' => $row['interprete'],
+            'key' => $row['tonalite'],
+            'cover_filename' => $image ?: null,
+            'cover_url' => $coverUrl
+        ]);
+    } else {
+        echo json_encode([
+            'success' => true,
+            'found' => false,
+            'message' => 'Aucune chanson trouvée sur Partoches Canopée.'
+        ]);
+    }
     exit;
 }
 
