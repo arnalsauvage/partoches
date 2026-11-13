@@ -172,6 +172,13 @@ $_SESSION['mysql'] = $mysqli;
 $_SESSION['id'] = 1;
 
 try {
+    // Statut de publication (0 = brouillon, 1 = public)
+    // Par défaut, toute importation depuis le Compagnon arrive en mode Brouillon (0)
+    $publishFlag = 0;
+    if (isset($data['published']) && ($data['published'] === true || $data['published'] === 1 || $data['published'] === '1')) {
+        $publishFlag = 1;
+    }
+
     // Vérifier si la chanson existe déjà par son titre
     $nomEsc = $mysqli->real_escape_string($title);
     $artEsc = $mysqli->real_escape_string($artist);
@@ -183,7 +190,10 @@ try {
         $chanson = Chanson::load($songId);
         $chanson->setTonalite($key);
         $chanson->setTonaliteOriginale($key);
-        $chanson->setPublication(1);
+        // Si explicitement spécifié, on applique la valeur, sinon on conserve le statut existant
+        if (isset($data['published'])) {
+            $chanson->setPublication($publishFlag);
+        }
         $chanson->save();
         $action = 'updated';
     } else {
@@ -193,7 +203,7 @@ try {
         $chanson->setTonalite($key);
         $chanson->setTonaliteOriginale($key);
         $chanson->setIdUser(1);
-        $chanson->setPublication(1);
+        $chanson->setPublication($publishFlag); // 0 = Brouillon par défaut
         $songId = $chanson->save();
         $action = 'created';
     }
@@ -227,14 +237,19 @@ try {
         $mysqli->query("INSERT INTO document (nom, tailleKo, date, version, nomTable, idTable, idUser, hits) VALUES ('$docNameEsc', $tailleKo, '$dateJour', 1, 'chanson', $songId, 1, 0)");
     }
 
+    $isDraft = ($chanson->getPublication() == 0);
+    $statusText = $isDraft ? "en mode Brouillon" : "en mode Public";
+
     echo json_encode([
         'success' => true,
         'action' => $action,
         'song_id' => $songId,
         'title' => $title,
         'artist' => $artist,
+        'publication' => $chanson->getPublication(),
+        'is_draft' => $isDraft,
         'url' => "https://partoches.canopee-musique.fr/php/chanson/chanson_voir.php?id=" . $songId,
-        'message' => "Partition publiée avec succès sur Partoches Canopée !"
+        'message' => "Partition enregistrée {$statusText} sur Partoches Canopée !"
     ]);
 
 } catch (Throwable $e) {
