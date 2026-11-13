@@ -315,8 +315,7 @@ if ($_SESSION['vue'] == 'cartes') {
         if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
             $actions = "";
             if (estAdmin()) {
-                $confirmDupliquer = "return confirm('Voulez-vous dupliquer la chanson &laquo; " . htmlspecialchars(addslashes($_chanson->getNom()), ENT_QUOTES) . " &raquo; ?');";
-                $btnDupliquer = "<a href='{$chansonPost}?id={$_id}&amp;mode=DUP' class='btn btn-xs btn-default' title='Dupliquer la chanson' aria-label='Dupliquer' onclick=\"$confirmDupliquer\"><i class='glyphicon glyphicon-duplicate'></i></a>";
+                $btnDupliquer = "<button type='button' class='btn btn-xs btn-default' title='Dupliquer la chanson' aria-label='Dupliquer' onclick='ouvrirModalDupliquer({$_id});'><i class='glyphicon glyphicon-duplicate'></i></button>";
                 $btnSupprimer = boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages);
                 $actions = "<div class='btn-group btn-group-xs'>{$btnDupliquer}{$btnSupprimer}</div>";
             }
@@ -336,6 +335,34 @@ $contenuHtml .= "</div>";
 
 if ($nbreChansonsTotal == 0) {
     $contenuHtml .= "Pas de résultat ... <BR><a href='?razFiltres' class='btn btn-lg btn-default'><span class='glyphicon glyphicon-plus'> </span> Supprimer les filtres et tris</a>\n";
+}
+
+if (estAdmin()) {
+    $vJs = time();
+    $contenuHtml .= <<<HTML
+<div class="modal fade" id="modalDupliquerChanson" tabindex="-1" role="dialog" aria-labelledby="modalDupliquerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content modal-django-content">
+            <div class="modal-header modal-django-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title modal-django-title" id="modalDupliquerLabel">
+                    <i class="glyphicon glyphicon-duplicate"></i> Dupliquer une chanson
+                </h4>
+            </div>
+            <div class="modal-body modal-django-body" id="modalDupliquerBody">
+                <!-- Chargé dynamiquement via AJAX -->
+            </div>
+            <div class="modal-footer modal-django-footer">
+                <button type="button" class="btn btn-default btn-modal-django btn-modal-django-cancel" data-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary btn-modal-django btn-modal-django-confirm" id="btnConfirmerDuplication" onclick="$('#formDupliquerChanson').submit();">
+                    <i class="glyphicon glyphicon-duplicate"></i> Dupliquer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../js/chanson_dupliquer.js?v={$vJs}"></script>
+HTML;
 }
 
 $contenuHtml .= "</div></div>\n";

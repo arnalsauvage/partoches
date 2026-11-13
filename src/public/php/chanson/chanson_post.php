@@ -194,7 +194,12 @@ if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR
 //  3b - duplication chanson (réservée à l'administrateur)
 if ($id && $mode == DUP) {
     if (estAdmin()) {
-        $nouvelId = Chanson::dupliqueChanson((int)$id);
+        $selectedDocs = isset($_POST['doc_ids']) && is_array($_POST['doc_ids']) ? array_map('intval', $_POST['doc_ids']) : [];
+        $selectedStrums = isset($_POST['strum_ids']) && is_array($_POST['strum_ids']) ? array_map('intval', $_POST['strum_ids']) : [];
+        $selectedLiens = isset($_POST['lien_ids']) && is_array($_POST['lien_ids']) ? array_map('intval', $_POST['lien_ids']) : [];
+        $nouveauNom = isset($_POST['nom']) && trim($_POST['nom']) !== '' ? trim($_POST['nom']) : null;
+
+        $nouvelId = Chanson::dupliqueChanson((int)$id, $selectedDocs, $selectedStrums, $selectedLiens, $nouveauNom);
         if ($nouvelId) {
             redirection($nomTable . "_form.php?id=" . $nouvelId . "&msg=OK_DUP");
         }

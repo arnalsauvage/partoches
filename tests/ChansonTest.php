@@ -147,7 +147,7 @@ class ChansonTest extends TestCase
     {
         // Création de la chanson source
         $c = new Chanson();
-        $c->setNom("Chanson Duplication Test " . time());
+        $c->setNom("Chanson Duplication Source " . time());
         $c->setInterprete("Artiste Test");
         $c->setAnnee(2020);
         $c->setIdUser(1);
@@ -163,54 +163,86 @@ class ChansonTest extends TestCase
         // Ajout d'un lien URL
         require_once __DIR__ . "/../src/public/php/liens/LienUrl.php";
         LienUrl::creeLienurl("https://www.youtube.com/watch?v=testdup", "youtube", "Vidéo test", "chanson", $sourceId, date("d/m/Y"), 1, 10);
+        $resLien = LienUrl::chercheLiensUrlsTableId("chanson", $sourceId);
+        $rowLien = $resLien ? $resLien->fetch_assoc() : null;
+        $lienId = $rowLien ? (int)$rowLien['id'] : 0;
+        $this->assertGreaterThan(0, $lienId);
 
         // Ajout d'un strum
         require_once __DIR__ . "/../src/public/php/liens/LienStrumChanson.php";
-        LienStrumChanson::creelienStrumChanson("B B H B", $sourceId, 0);
+        $strumId = LienStrumChanson::creelienStrumChanson("B B H B", $sourceId, 0);
+        $this->assertGreaterThan(0, $strumId);
+
+        // Ajout d'un document attaché
+        require_once __DIR__ . "/../src/public/php/document/Document.php";
+        Document::creeDocument("test-dup.pdf", 42, "chanson", $sourceId);
+        $rowDoc = Document::chercheDocumentNomTableId("test-dup.pdf", "chanson", $sourceId);
+        $docId = $rowDoc ? (int)$rowDoc['id'] : 0;
+        $this->assertGreaterThan(0, $docId);
 
         // Simulation privilège admin
         $_SESSION['privilege'] = $GLOBALS['PRIVILEGE_ADMIN'] ?? 3;
 
-        // Duplication
-        $newId = Chanson::dupliqueChanson($sourceId);
-        $this->assertGreaterThan(0, $newId);
-        $this->assertNotEquals($sourceId, $newId);
+        // CAS 1 : Duplication par défaut (aucun élément sélectionné, nom source conservé)
+        $newIdDefaut = Chanson::dupliqueChanson($sourceId);
+        $this->assertGreaterThan(0, $newIdDefaut);
+        $this->assertNotEquals($sourceId, $newIdDefaut);
 
-        // Vérification des attributs de la copie
-        $copie = Chanson::load($newId);
-        $this->assertEquals($c->getNom(), $copie->getNom());
-        $this->assertEquals("Artiste Test", $copie->getInterprete());
-        $this->assertEquals(2020, $copie->getAnnee());
-        $this->assertEquals(135, $copie->getTempo());
-        $this->assertEquals("3/4", $copie->getMesure());
-        $this->assertEquals("ternaire", $copie->getPulsation());
-        $this->assertEquals("Em", $copie->getTonalite());
-        $this->assertEquals("Dm", $copie->getTonaliteOriginale());
-        $this->assertEquals(0, $copie->getHits(), "Les hits de la nouvelle chanson doivent être remis à 0");
-        $this->assertEquals(1, $copie->getPublication(), "La chanson dupliquée doit être publiée");
+        $copieDefaut = Chanson::load($newIdDefaut);
+        $this->assertEquals($c->getNom(), $copieDefaut->getNom());
+        $this->assertEquals("Artiste Test", $copieDefaut->getInterprete());
+        $this->assertEquals(2020, $copieDefaut->getAnnee());
+        $this->assertEquals(135, $copieDefaut->getTempo());
+        $this->assertEquals("3/4", $copieDefaut->getMesure());
+        $this->assertEquals("ternaire", $copieDefaut->getPulsation());
+        $this->assertEquals("Em", $copieDefaut->getTonalite());
+        $this->assertEquals("Dm", $copieDefaut->getTonaliteOriginale());
+        $this->assertEquals(0, $copieDefaut->getHits(), "Hits remis à 0");
+        $this->assertEquals(1, $copieDefaut->getPublication(), "Chanson publiée");
 
-        // Vérification des liens dupliqués
-        $liensCopie = LienUrl::chercheLiensUrlsTableId("chanson", $newId);
-        $this->assertNotNull($liensCopie);
-        $this->assertGreaterThanOrEqual(1, $liensCopie->num_rows);
+        // Vérification que RIEN n'est copié par défaut (désélectionnés par défaut)
+        $docsDefaut = Document::chercheDocumentsTableId("chanson", $newIdDefaut);
+        $this->assertEquals(0, $docsDefaut ? $docsDefaut->num_rows : 0, "Aucun document copié par défaut");
+        $strumsDefaut = LienStrumChanson::chercheLiensStrumChanson("idChanson", $newIdDefaut);
+        $this->assertEquals(0, $strumsDefaut ? $strumsDefaut->num_rows : 0, "Aucun strum copié par défaut");
+        $liensDefaut = LienUrl::chercheLiensUrlsTableId("chanson", $newIdDefaut);
+        $this->assertEquals(0, $liensDefaut ? $liensDefaut->num_rows : 0, "Aucun lien copié par défaut");
 
-        // Vérification des strums dupliqués
-        $strumsCopie = LienStrumChanson::chercheLiensStrumChanson("idChanson", $newId);
-        $this->assertNotNull($strumsCopie);
-        $this->assertGreaterThanOrEqual(1, $strumsCopie->num_rows);
+        // CAS 2 : Duplication sélective (avec sélection de doc, strum, lien et nouveau titre)
+        $nouveauTitre = "Chanson Dupliquee Personnalisee " . time();
+        $newIdSelectif = Chanson::dupliqueChanson(
+            $sourceId,
+            [$docId],
+            [$strumId],
+            [$lienId],
+            $nouveauTitre
+        );
+        $this->assertGreaterThan(0, $newIdSelectif);
 
-        // Vérification absence de documents attachés
-        require_once __DIR__ . "/../src/public/php/document/Document.php";
-        $docsCopie = Document::chercheDocumentsTableId("chanson", $newId);
-        $this->assertEquals(0, $docsCopie ? $docsCopie->num_rows : 0, "Aucun document attaché ne doit être dupliqué");
+        $copieSelective = Chanson::load($newIdSelectif);
+        $this->assertEquals($nouveauTitre, $copieSelective->getNom(), "Le nouveau titre doit être appliqué");
+
+        // Vérification des éléments copiés sélectivement
+        $docsSelectif = Document::chercheDocumentsTableId("chanson", $newIdSelectif);
+        $this->assertNotNull($docsSelectif);
+        $this->assertEquals(1, $docsSelectif->num_rows, "Le document sélectionné doit être copié");
+
+        $strumsSelectif = LienStrumChanson::chercheLiensStrumChanson("idChanson", $newIdSelectif);
+        $this->assertNotNull($strumsSelectif);
+        $this->assertEquals(1, $strumsSelectif->num_rows, "Le strum sélectionné doit être copié");
+
+        $liensSelectif = LienUrl::chercheLiensUrlsTableId("chanson", $newIdSelectif);
+        $this->assertNotNull($liensSelectif);
+        $this->assertEquals(1, $liensSelectif->num_rows, "Le lien sélectionné doit être copié");
 
         // Nettoyage BDD
-        $copie->supprimeChansonBddFile();
+        $copieDefaut->supprimeChansonBddFile();
+        $copieSelective->supprimeChansonBddFile();
         $c->supprimeChansonBddFile();
 
-        // Nettoyage des liens et strums de la source et de la copie
         $db = $_SESSION['mysql'];
-        $db->query("DELETE FROM lienurl WHERE nomtable = 'chanson' AND (idtable = $sourceId OR idtable = $newId)");
-        $db->query("DELETE FROM lienstrumchanson WHERE idChanson = $sourceId OR idChanson = $newId");
+        $db->query("DELETE FROM lienurl WHERE nomtable = 'chanson' AND (idtable = $sourceId OR idtable = $newIdDefaut OR idtable = $newIdSelectif)");
+        $db->query("DELETE FROM lienstrumchanson WHERE idChanson = $sourceId OR idChanson = $newIdDefaut OR idChanson = $newIdSelectif");
+        $db->query("DELETE FROM document WHERE nomTable = 'chanson' AND (idTable = $sourceId OR idTable = $newIdDefaut OR idTable = $newIdSelectif)");
     }
 }

@@ -435,3 +435,26 @@ body {
     display: inline-block !important;
     float: none !important;
 }
+
+/* --- MODALE DE DUPLICATION CHANSON --- */
+.modal-duplication-loading {
+    padding: 30px;
+}
+
+.dupliquer-btn-group-toggle {
+    margin-top: -3px;
+}
+
+.dupliquer-item-label {
+    font-weight: normal;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+}
+
+.dupliquer-item-label input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}

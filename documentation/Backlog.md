@@ -24,7 +24,7 @@ dans "Sommaire des morceaux" , si je clique sur la croix pour supprimer un morce
         </li>
 
 ## 🟡 Sprint en cours
-- [x] **US-086 — Duplication d'une chanson en vue liste (Admin)** (Duplication fidèle de tous les attributs, tonalité originale, liens externes et strums sans les documents attachés, réservée à l'administrateur avec confirmation et redirection formulaire).
+- [x] **US-086 — Duplication interactive d'une chanson en vue liste (Admin)** (Modale AJAX de duplication sélective : titre personnalisable, conservation des infos générales, sélection des documents/fichiers, des rythmiques et des liens/vidéos avec cases à cocher décochées par défaut et boutons tout cocher/décocher, soumission sécurisée et redirection formulaire avec toastr de succès).
 - [ ] **#08 — Intégration du Design System Canopée** (Migration progressive de toutes les pages vers les nouveaux composants CSS).
 
 ## 🟢 Icebox (à planifier)

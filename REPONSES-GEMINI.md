@@ -1,5 +1,49 @@
 # 🤠 Réponses & Actions — Django
 
+## Session du 13 Novembre 2026 — US-086 : Formulaire modal de duplication sélective d'une chanson
+
+### 🎯 Demande
+Remplacer la duplication directe par un formulaire interactif (modale) permettant à l'administrateur de choisir ce qu'il souhaite copier :
+- **Informations générales** : conservées avec possibilité d'éditer le titre.
+- **Fichiers attachés (documents)** : liste à cocher, décochés par défaut (avec boutons Tout cocher / Tout décocher).
+- **Rythmiques (strums)** : idem, décochés par défaut (avec boutons Tout cocher / Tout décocher).
+- **Liens et vidéos (lienurl)** : idem, décochés par défaut (avec boutons Tout cocher / Tout décocher).
+
+### 🛠️ Actions réalisées
+1. **Modale AJAX (`chanson_dupliquer_modal_ajax.php`)** :
+   - Contrôle d'accès strict `estAdmin()`.
+   - Champ de saisie pour modifier le titre de la chanson dupliquée (pré-rempli avec le nom actuel).
+   - Panneaux récapitulatifs clairs avec compteurs d'éléments.
+   - Listes à cocher (Bootstrap 3) avec boutons « Tout cocher » et « Tout décocher » pour chaque section : documents attachés, rythmiques et liens web/vidéos.
+   - Respect strict du Design System Canopée (zéro attribut `style="..."`).
+
+2. **Logique JavaScript (`src/public/js/chanson_dupliquer.js`)** :
+   - `ouvrirModalDupliquer(idChanson)` : ouverture asynchrone de la modale avec spinner de chargement et gestion d'erreurs AJAX.
+   - `cocherTous(classeCheck, etat)` : bascule dynamique de sélection pour chaque groupe de cases à cocher.
+
+3. **Service Métier (`Chanson::dupliqueChanson` dans `Chanson.php`)** :
+   - Mise à jour de la signature :
+     `public static function dupliqueChanson(int $idChanson, array $selectedDocIds = [], array $selectedStrumIds = [], array $selectedLienIds = [], ?string $nouveauNom = null): int`
+   - Application du nouveau titre s'il est spécifié.
+   - Copie sélective en base et physique des fichiers attachés vers le dossier de la nouvelle chanson (`src/public/data/chansons/{newId}/`).
+   - Copie sélective des liens URLs (`LienUrl`) et des rythmiques (`LienStrumChanson`).
+
+4. **Contrôleur (`chanson_post.php`)** :
+   - Réception et filtrage des tableaux d'identifiants (`doc_ids`, `strum_ids`, `lien_ids`) et du titre (`nom`).
+   - Appel sécurisé de `Chanson::dupliqueChanson(...)`.
+
+5. **Vue Liste (`chanson_liste.php`)** :
+   - Déclencheur du bouton Dupliquer mis à jour avec `onclick="ouvrirModalDupliquer({$_id});"`.
+   - Intégration du squelette HTML de la modale `#modalDupliquerChanson` et du script `chanson_dupliquer.js`.
+
+6. **Styles Design System (`styles-communs.css`)** :
+   - Ajout des classes utilitaires `.dupliquer-btn-group-toggle`, `.dupliquer-item-label`, `.modal-duplication-loading`.
+
+7. **Tests Unitaires (`tests/ChansonTest.php`)** :
+   - Mise à jour du test `testDupliqueChanson()` : validation du comportement par défaut (rien n'est copié en dehors des métadonnées) et de la copie sélective personnalisée (fichiers, strums, liens, nouveau titre).
+
+---
+
 ## Session du 13 Novembre 2026 — US-086 : Duplication d'une chanson en vue liste
 
 ### 🎯 Demande

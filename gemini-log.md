@@ -1,5 +1,21 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (13 Novembre 2026 - Fin d'après-midi)
+- **⚡ US-086 — Formulaire modal de duplication sélective d'une chanson (Réservé Admin)** :
+    - **Contexte & Objectif** :
+        - Évolution de l'US-086 : remplacer la duplication automatique par un formulaire modal interactif permettant à l'administrateur de personnaliser le titre et de cocher sélectivement les fichiers, les rythmiques et les liens à dupliquer (décochés par défaut).
+    - **Modifications Apportées** :
+        - **`chanson_dupliquer_modal_ajax.php`** : Contrôleur AJAX générant le formulaire de duplication dans une modale Bootstrap 3 avec champ titre, récapitulatif des attributs et 3 panneaux à cocher avec boutons « Tout cocher / Tout décocher ».
+        - **`src/public/js/chanson_dupliquer.js`** : Script client gérant l'ouverture dynamique via `ouvrirModalDupliquer(id)` et la sélection groupée via `cocherTous(classe, etat)`.
+        - **`Chanson.php`** : `Chanson::dupliqueChanson(int $idChanson, array $selectedDocIds = [], array $selectedStrumIds = [], array $selectedLienIds = [], ?string $nouveauNom = null): int` gérant la duplication sélective des fichiers (BDD + fichiers physiques sous `data/chansons/{newId}/`), strums et liens.
+        - **`chanson_post.php`** : Récupération des tableaux `doc_ids`, `strum_ids`, `lien_ids` et du titre personnalisé.
+        - **`chanson_liste.php`** : Appel de la modale au clic sur le bouton d'action et inclusion du markup modal + JS pour les admins.
+        - **`styles-communs.css`** : Classes CSS dédiées (`.dupliquer-btn-group-toggle`, `.dupliquer-item-label`, `.modal-duplication-loading`) garantissant zéro style inline.
+        - **`tests/ChansonTest.php`** : Test unitaire complet vérifiant les cas par défaut (zéro élément copié) et sélectif (éléments choisis copiés avec succès).
+    - **Conformité & Standards** :
+        - Zéro attribut `style="..."` introduit (conformité Constitution).
+        - Protection d'accès stricte `estAdmin()`.
+
 ### 📖 Résumé de la session (13 Novembre 2026 - Après-midi)
 - **⚡ US-086 — Duplication d'une chanson en vue liste (Réservé Admin)** :
     - **Contexte & Objectif** :

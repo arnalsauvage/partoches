@@ -359,14 +359,24 @@ class Chanson
     }
 
     /**
-     * Duplique une chanson existante (attributs et liens, hors documents attachés)
-     * Réservé à l'administrateur
+     * Duplique une chanson existante (réservé à l'administrateur).
+     * Les informations générales sont conservées par défaut avec possibilité de renommer.
+     * Copie sélective des documents attachés, des rythmiques (strums) et des liens URLs.
      *
      * @param int $idChanson Identifiant de la chanson source
+     * @param array $selectedDocIds Liste des IDs de documents à copier
+     * @param array $selectedStrumIds Liste des IDs de strums (lienstrumchanson) à copier
+     * @param array $selectedLienIds Liste des IDs de liens (lienurl) à copier
+     * @param string|null $nouveauNom Nom personnalisé pour la nouvelle chanson (ou null pour conserver le titre)
      * @return int Identifiant de la nouvelle chanson créée, ou 0 en cas d'erreur
      */
-    public static function dupliqueChanson(int $idChanson): int
-    {
+    public static function dupliqueChanson(
+        int $idChanson,
+        array $selectedDocIds = [],
+        array $selectedStrumIds = [],
+        array $selectedLienIds = [],
+        ?string $nouveauNom = null
+    ): int {
         if (!estAdmin() && (!defined('PHPUNIT_RUNNING') || !PHPUNIT_RUNNING)) {
             return 0;
         }
@@ -376,9 +386,11 @@ class Chanson
             return 0;
         }
 
-        // Création de la nouvelle chanson avec tous les attributs de la source
+        $nomFinal = (!empty($nouveauNom) && trim($nouveauNom) !== '') ? trim($nouveauNom) : $source->getNom();
+
+        // Création de la nouvelle chanson avec tous les attributs généraux de la source
         $nouvelleChanson = new self();
-        $nouvelleChanson->setNom($source->getNom());
+        $nouvelleChanson->setNom($nomFinal);
         $nouvelleChanson->setInterprete($source->getInterprete());
         $nouvelleChanson->setAnnee($source->getAnnee());
         $nouvelleChanson->setIdUser($_SESSION['id'] ?? $source->getIdUser());
@@ -397,7 +409,7 @@ class Chanson
             return 0;
         }
 
-        // Création du sous-dossier de la nouvelle chanson (sans copier les fichiers/documents)
+        // Création du sous-dossier de la nouvelle chanson
         global $_DOSSIER_CHANSONS;
         if (!empty($_DOSSIER_CHANSONS)) {
             $repertoire = $_DOSSIER_CHANSONS . $newId . "/";
@@ -406,38 +418,66 @@ class Chanson
             }
         }
 
-        // Duplication des liens URLs (LienUrl)
-        require_once dirname(__DIR__) . "/liens/LienUrl.php";
-        $resLiens = LienUrl::chercheLiensUrlsTableId("chanson", $idChanson);
-        if ($resLiens) {
-            $db = $_SESSION[self::MYSQL];
-            while ($row = $resLiens->fetch_assoc()) {
-                $urlEsc = $db->real_escape_string($row['url']);
-                $typeEsc = $db->real_escape_string($row['type']);
-                $descEsc = $db->real_escape_string($row['description']);
-                LienUrl::creeLienurl(
-                    $urlEsc,
-                    $typeEsc,
-                    $descEsc,
-                    "chanson",
-                    $newId,
-                    date("d/m/Y"),
-                    $_SESSION['id'] ?? (int)$row['idUser'],
-                    0
-                );
+        // Duplication sélective des documents attachés (fichiers)
+        if (!empty($selectedDocIds)) {
+            require_once dirname(__DIR__) . "/document/Document.php";
+            foreach ($selectedDocIds as $docId) {
+                $docId = (int)$docId;
+                $doc = Document::chercheDocument($docId);
+                if ($doc && ($doc['nomTable'] ?? '') === 'chanson' && (int)($doc['idTable'] ?? 0) === $idChanson) {
+                    Document::creeDocument($doc['nom'], $doc['tailleKo'], 'chanson', $newId);
+                    if (!empty($_DOSSIER_CHANSONS)) {
+                        $nomSource = Document::composeNomVersion($doc['nom'], $doc['version'] ?? 1);
+                        $cheminSource = $_DOSSIER_CHANSONS . $idChanson . '/' . $nomSource;
+                        if (!file_exists($cheminSource)) {
+                            if (file_exists($_DOSSIER_CHANSONS . $idChanson . '/' . $doc['nom'])) {
+                                $cheminSource = $_DOSSIER_CHANSONS . $idChanson . '/' . $doc['nom'];
+                            }
+                        }
+                        if (file_exists($cheminSource)) {
+                            $nomCible = Document::composeNomVersion($doc['nom'], 1);
+                            $cheminCible = $_DOSSIER_CHANSONS . $newId . '/' . $nomCible;
+                            @copy($cheminSource, $cheminCible);
+                        }
+                    }
+                }
             }
         }
 
-        // Duplication des strums associés (LienStrumChanson)
-        require_once dirname(__DIR__) . "/liens/LienStrumChanson.php";
-        $resStrums = LienStrumChanson::chercheLiensStrumChanson("idChanson", $idChanson);
-        if ($resStrums) {
-            while ($row = $resStrums->fetch_assoc()) {
-                LienStrumChanson::creelienStrumChanson(
-                    $row['strum'],
-                    $newId,
-                    (int)($row['idStrum'] ?? 0)
-                );
+        // Duplication sélective des liens URLs (LienUrl)
+        if (!empty($selectedLienIds)) {
+            require_once dirname(__DIR__) . "/liens/LienUrl.php";
+            foreach ($selectedLienIds as $lienId) {
+                $lienId = (int)$lienId;
+                $lien = LienUrl::chercheLienurlId($lienId);
+                if ($lien && ($lien['nomTable'] ?? '') === 'chanson' && (int)($lien['idTable'] ?? 0) === $idChanson) {
+                    LienUrl::creeLienurl(
+                        $lien['url'],
+                        $lien['type'],
+                        $lien['description'],
+                        "chanson",
+                        $newId,
+                        date("d/m/Y"),
+                        $_SESSION['id'] ?? (int)$lien['idUser'],
+                        0
+                    );
+                }
+            }
+        }
+
+        // Duplication sélective des strums associés (LienStrumChanson)
+        if (!empty($selectedStrumIds)) {
+            require_once dirname(__DIR__) . "/liens/LienStrumChanson.php";
+            foreach ($selectedStrumIds as $strumId) {
+                $strumId = (int)$strumId;
+                $strum = LienStrumChanson::chercheLienStrumChanson($strumId);
+                if ($strum && (int)($strum['idChanson'] ?? 0) === $idChanson) {
+                    LienStrumChanson::creelienStrumChanson(
+                        $strum['strum'],
+                        $newId,
+                        (int)($strum['idStrum'] ?? 0)
+                    );
+                }
             }
         }
 
