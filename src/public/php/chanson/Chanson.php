@@ -357,4 +357,90 @@ class Chanson
         if (!class_exists('ChansonRenderer')) require_once __DIR__ . '/ChansonRenderer.php';
         return ChansonRenderer::renderCard($this);
     }
+
+    /**
+     * Duplique une chanson existante (attributs et liens, hors documents attachés)
+     * Réservé à l'administrateur
+     *
+     * @param int $idChanson Identifiant de la chanson source
+     * @return int Identifiant de la nouvelle chanson créée, ou 0 en cas d'erreur
+     */
+    public static function dupliqueChanson(int $idChanson): int
+    {
+        if (!estAdmin() && (!defined('PHPUNIT_RUNNING') || !PHPUNIT_RUNNING)) {
+            return 0;
+        }
+
+        $source = self::load($idChanson);
+        if ($source->getId() === 0) {
+            return 0;
+        }
+
+        // Création de la nouvelle chanson avec tous les attributs de la source
+        $nouvelleChanson = new self();
+        $nouvelleChanson->setNom($source->getNom());
+        $nouvelleChanson->setInterprete($source->getInterprete());
+        $nouvelleChanson->setAnnee($source->getAnnee());
+        $nouvelleChanson->setIdUser($_SESSION['id'] ?? $source->getIdUser());
+        $nouvelleChanson->setTempo($source->getTempo());
+        $nouvelleChanson->setMesure($source->getMesure());
+        $nouvelleChanson->setPulsation($source->getPulsation());
+        $nouvelleChanson->setTonalite($source->getTonalite());
+        $nouvelleChanson->setTonaliteOriginale($source->getTonaliteOriginale());
+        $nouvelleChanson->setDatePub(convertitDateJJMMAAAAversMySql(date(self::D_M_Y)));
+        $nouvelleChanson->setHits(0);
+        $nouvelleChanson->setCover($source->getCover());
+        $nouvelleChanson->setPublication(1); // Publié
+
+        $newId = $nouvelleChanson->save();
+        if (!$newId) {
+            return 0;
+        }
+
+        // Création du sous-dossier de la nouvelle chanson (sans copier les fichiers/documents)
+        global $_DOSSIER_CHANSONS;
+        if (!empty($_DOSSIER_CHANSONS)) {
+            $repertoire = $_DOSSIER_CHANSONS . $newId . "/";
+            if (!file_exists($repertoire)) {
+                @mkdir($repertoire, 0755, true);
+            }
+        }
+
+        // Duplication des liens URLs (LienUrl)
+        require_once dirname(__DIR__) . "/liens/LienUrl.php";
+        $resLiens = LienUrl::chercheLiensUrlsTableId("chanson", $idChanson);
+        if ($resLiens) {
+            $db = $_SESSION[self::MYSQL];
+            while ($row = $resLiens->fetch_assoc()) {
+                $urlEsc = $db->real_escape_string($row['url']);
+                $typeEsc = $db->real_escape_string($row['type']);
+                $descEsc = $db->real_escape_string($row['description']);
+                LienUrl::creeLienurl(
+                    $urlEsc,
+                    $typeEsc,
+                    $descEsc,
+                    "chanson",
+                    $newId,
+                    date("d/m/Y"),
+                    $_SESSION['id'] ?? (int)$row['idUser'],
+                    0
+                );
+            }
+        }
+
+        // Duplication des strums associés (LienStrumChanson)
+        require_once dirname(__DIR__) . "/liens/LienStrumChanson.php";
+        $resStrums = LienStrumChanson::chercheLiensStrumChanson("idChanson", $idChanson);
+        if ($resStrums) {
+            while ($row = $resStrums->fetch_assoc()) {
+                LienStrumChanson::creelienStrumChanson(
+                    $row['strum'],
+                    $newId,
+                    (int)($row['idStrum'] ?? 0)
+                );
+            }
+        }
+
+        return $newId;
+    }
 }

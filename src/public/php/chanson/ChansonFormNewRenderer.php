@@ -37,6 +37,10 @@ class ChansonFormNewRenderer
         include __DIR__ . '/views/chanson_form_view.phtml';
         $sortie = ob_get_clean();
 
+        if (isset($_GET['msg']) && $_GET['msg'] === 'OK_DUP') {
+            $sortie .= "<script>$(function() { toastr.success('Chanson dupliquée avec succès !'); });</script>";
+        }
+
         $final = $headHtml;
         $final .= $MENU_HTML;
         $final .= $sortie;

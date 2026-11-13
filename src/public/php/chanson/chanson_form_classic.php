@@ -57,6 +57,7 @@ if (isset($_GET['msg'])) {
     switch($m) {
         case 'OK_REGEN': $msgScript .= "toastr.success('Vignettes régénérées avec succès ($count fichier(s) traité(s)).');"; break;
         case 'OK_UPLOAD': $msgScript .= "toastr.success('Fichier envoyé avec succès !');"; break;
+        case 'OK_DUP': $msgScript .= "toastr.success('Chanson dupliquée avec succès !');"; break;
     }
     $msgScript .= " });</script>";
 }

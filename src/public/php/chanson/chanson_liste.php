@@ -41,6 +41,10 @@ function logueRecherche($critereCherche): void
 $contenuHtml = "<div class='container'> \n
   <div class='starter-template'> \n";
 
+if (isset($_GET['msg']) && $_GET['msg'] === 'OK_DUP') {
+    $contenuHtml .= "<script>$(function() { toastr.success('Chanson dupliquée avec succès !'); });</script>";
+}
+
 $contenuHtml .= entreBalise("Chansons", "H1");
 
 // 1. Initialisation des sessions par défaut
@@ -308,8 +312,15 @@ if ($_SESSION['vue'] == 'cartes') {
             $contenuHtml .= TblCellule($_chanson->getHits(), 1, 1, "alignerAdroite");
         }
 
-        if (estAdmin()) {
-            $contenuHtml .= TblCellule(boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages));
+        if (aDroits($GLOBALS["PRIVILEGE_MEMBRE"])) {
+            $actions = "";
+            if (estAdmin()) {
+                $confirmDupliquer = "return confirm('Voulez-vous dupliquer la chanson &laquo; " . htmlspecialchars(addslashes($_chanson->getNom()), ENT_QUOTES) . " &raquo; ?');";
+                $btnDupliquer = "<a href='{$chansonPost}?id={$_id}&amp;mode=DUP' class='btn btn-xs btn-default' title='Dupliquer la chanson' aria-label='Dupliquer' onclick=\"$confirmDupliquer\"><i class='glyphicon glyphicon-duplicate'></i></a>";
+                $btnSupprimer = boutonSuppression($chansonPost . "?id=$_id&mode=SUPPR", $iconePoubelle, $cheminImages);
+                $actions = "<div class='btn-group btn-group-xs'>{$btnDupliquer}{$btnSupprimer}</div>";
+            }
+            $contenuHtml .= TblCellule($actions, 1, 1, CENTRER);
         }
         $contenuHtml .= TblFinLigne();
     }

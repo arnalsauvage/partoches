@@ -1,5 +1,22 @@
 # 📝 Journal de Bord Gemini (Projet Partoches)
 
+### 📖 Résumé de la session (13 Novembre 2026 - Après-midi)
+- **⚡ US-086 — Duplication d'une chanson en vue liste (Réservé Admin)** :
+    - **Contexte & Objectif** :
+        - Permettre à l'administrateur de dupliquer directement une chanson depuis la page de liste (`chanson_liste.php?vue=liste`).
+        - Publication immédiate de la copie avec l'ensemble de ses attributs musicaux (`nom`, `interprete`, `annee`, `tempo`, `mesure`, `pulsation`, `tonalite`, `tonaliteOriginale`, `cover`, `idUser`, `publication = 1`, `datePub` à aujourd'hui, `hits = 0`).
+        - Duplication automatique de tous les liens associés : URLs externes (`LienUrl`) et rythmiques (`LienStrumChanson`).
+        - Exclusion stricte de tous les documents attachés (aucune copie en BDD ni dans `data/chansons/`).
+    - **Modifications Apportées** :
+        - **`Chanson.php`** : Ajout de la méthode statique métier `Chanson::dupliqueChanson(int $idChanson): int`.
+        - **`chanson_post.php`** : Prise en charge du mode `mode=DUP` sécurisé par `estAdmin()`, avec redirection vers `chanson_form.php?id=$newId&msg=OK_DUP`.
+        - **`chanson_liste.php`** : Bouton d'action Dupliquer (`glyphicon-duplicate`) pour les administrateurs avec confirmation JS et groupement Bootstrap propre.
+        - **`ChansonFormNewRenderer.php` & `chanson_form_classic.php`** : Affichage du toast Toastr de confirmation `msg=OK_DUP`.
+        - **`tests/ChansonTest.php`** : Test unitaire `testDupliqueChanson()` vérifiant la copie des attributs, liens, strums et l'absence totale de documents attachés.
+    - **Conformité & Standards** :
+        - 0 style inline introduit (classes Bootstrap `btn-group btn-group-xs`).
+        - Protection d'accès stricte `estAdmin()`.
+
 ### 📖 Résumé de la session (11 Novembre 2026 - Soirée)
 - **⚡ US-085 — Sprint Technique « Clean Assoc BDD » — Lot 4 : Utilisateurs, Administration & Socle Technique (`Utilisateur`, `AdminService`, `BackupService`, `DataAuditService`, `Footer`, `compteur`, `configMysql`, `html`, `mysql`, `utilisateurBand_form`)** :
     - **Contexte & Objectif** :

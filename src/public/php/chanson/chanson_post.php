@@ -5,6 +5,7 @@ const RESTAUREDOC = "RESTAUREDOC";
 const RENDOC = "RENDOC";
 const SUPPRFIC = "SUPPRFIC";
 const SUPPR = "SUPPR";
+const DUP = "DUP";
 const REGEN_THUMBS = "REGEN_THUMBS";
 const CHANSON = "chanson";
 $nomTable = CHANSON;
@@ -188,6 +189,17 @@ if ($id && $mode == SUPPR && $_SESSION [PRIVILEGE] > $GLOBALS["PRIVILEGE_EDITEUR
     $_chanson = Chanson::load($id);
     $_chanson->supprimeChansonBddFile();
     redirection($nomTable . "_liste.php");
+}
+
+//  3b - duplication chanson (réservée à l'administrateur)
+if ($id && $mode == DUP) {
+    if (estAdmin()) {
+        $nouvelId = Chanson::dupliqueChanson((int)$id);
+        if ($nouvelId) {
+            redirection($nomTable . "_form.php?id=" . $nouvelId . "&msg=OK_DUP");
+        }
+    }
+    redirection($nomTable . "_liste.php?vue=liste");
 }
 
 //  4 - MAJ des infos depuis une API
