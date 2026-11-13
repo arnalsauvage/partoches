@@ -29,3 +29,8 @@ Dans la liste des chansons (`chanson_liste.php?vue=liste`), permettre à l'admin
 
 5. **Tests (`tests/ChansonTest.php`)** :
    - Ajout du test unitaire `testDupliqueChanson` validant les attributs, les liens, les strums et l'absence de documents attachés.
+
+6. **Déploiement & CI/CD** :
+   - Commit `571d2b4` : `feat(chanson): duplication d'une chanson en vue liste pour l'admin [monmac]` poussé sur `origin/master`.
+   - Pipeline GitHub Actions validé avec succès (Lint + tests PHPUnit).
+   - Déploiement automatique FTP vers Hostinger (`partoches.canopee-musique.fr`) exécuté avec succès.
